@@ -1,0 +1,163 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Theme tokens (overridden at runtime by the admin “Theme” page) ─────── */
+:root {
+  --c-primary: #7b1f2f;
+  --c-secondary: #c8a24a;
+  --c-accent: #e4ce9b;
+  --c-bg: #fbf7f0;
+  --c-text: #3e2a20;
+  --f-heading: "Noto Serif Khmer";
+  --f-body: "Noto Sans Khmer";
+  --gold-1: #a8842f;
+  --gold-2: #e4ce9b;
+  --gold-3: #f6e7be;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--c-bg);
+    color: var(--c-text);
+    font-family: var(--f-body), "Noto Sans Khmer", system-ui, sans-serif;
+    /* Khmer script needs generous leading to stay readable on small screens */
+    line-height: 2;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--f-heading), "Noto Serif Khmer", serif;
+    line-height: 1.75;
+    font-weight: 600;
+  }
+
+  ::selection {
+    background: var(--c-accent);
+    color: var(--c-primary);
+  }
+
+  /* Elegant, unobtrusive scrollbar */
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: var(--c-bg); }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--gold-1), var(--gold-2));
+    border-radius: 99px;
+  }
+}
+
+@layer components {
+  /* Warm ivory “paper” backdrop with a faint woven texture */
+  .paper {
+    background-color: var(--c-bg);
+    background-image:
+      radial-gradient(circle at 18% 12%, rgba(228, 206, 155, 0.28), transparent 45%),
+      radial-gradient(circle at 82% 78%, rgba(123, 31, 47, 0.07), transparent 50%),
+      repeating-linear-gradient(45deg, rgba(62, 42, 32, 0.016) 0 2px, transparent 2px 5px);
+  }
+
+  /* Metallic gold text — reads like foil stamping on a wedding card */
+  .gold-text {
+    background: linear-gradient(
+      100deg,
+      var(--gold-1) 0%,
+      var(--gold-2) 24%,
+      var(--gold-3) 38%,
+      var(--c-secondary) 52%,
+      #8f6b22 74%,
+      var(--gold-2) 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .gold-line {
+    background: linear-gradient(90deg, transparent, var(--c-secondary), var(--gold-3), var(--c-secondary), transparent);
+  }
+
+  .gold-border {
+    border: 1px solid rgba(200, 162, 74, 0.45);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55), 0 18px 60px -30px rgba(62, 42, 32, 0.5);
+  }
+
+  .card-panel {
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.9), rgba(247, 241, 230, 0.72));
+    backdrop-filter: blur(2px);
+  }
+
+  .section-pad { @apply px-5 py-16 sm:px-8 sm:py-20 lg:py-28; }
+
+  .btn-gold {
+    @apply relative inline-flex items-center justify-center gap-2 rounded-full px-8 py-3 text-base font-medium transition-all duration-500;
+    color: #fffdf7;
+    background: linear-gradient(120deg, var(--gold-1), var(--c-secondary) 45%, var(--gold-3) 62%, var(--c-secondary) 80%);
+    background-size: 200% auto;
+    box-shadow: 0 12px 34px -14px rgba(168, 132, 47, 0.9);
+    text-shadow: 0 1px 2px rgba(90, 60, 10, 0.35);
+  }
+  .btn-gold:hover { background-position: right center; transform: translateY(-1px); }
+  .btn-gold:active { transform: translateY(0); }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border px-6 py-2.5 text-sm transition-colors duration-300;
+    border-color: rgba(200, 162, 74, 0.55);
+    color: var(--c-primary);
+  }
+  .btn-outline:hover { background: rgba(228, 206, 155, 0.22); }
+
+  .field {
+    @apply w-full rounded-xl border bg-white/80 px-4 py-3 text-base outline-none transition;
+    border-color: rgba(200, 162, 74, 0.4);
+    color: var(--c-text);
+  }
+  .field:focus {
+    border-color: var(--c-secondary);
+    box-shadow: 0 0 0 3px rgba(228, 206, 155, 0.35);
+  }
+
+  .label { @apply mb-2 block text-sm; color: rgba(62, 42, 32, 0.75); }
+
+  /* Scroll-reveal (progressive enhancement — visible by default without JS) */
+  .reveal { opacity: 1; }
+  .js .reveal {
+    opacity: 0;
+    transform: translateY(26px);
+    transition: opacity 0.9s cubic-bezier(0.22, 0.9, 0.28, 1), transform 0.9s cubic-bezier(0.22, 0.9, 0.28, 1);
+    will-change: opacity, transform;
+  }
+  .js .reveal.is-visible { opacity: 1; transform: none; }
+
+  .petal {
+    position: absolute;
+    top: -8vh;
+    animation-name: petal;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    pointer-events: none;
+  }
+  @keyframes petal {
+    0% { transform: translateY(-8vh) rotate(0deg); opacity: 0; }
+    12% { opacity: 0.7; }
+    100% { transform: translateY(110vh) rotate(320deg); opacity: 0; }
+  }
+
+  .no-scroll { overflow: hidden; height: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .js .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .petal, .animate-floaty, .animate-pulseSoft { animation: none !important; }
+}
+
+/* Khmer text should never be broken mid-cluster */
+.khmer-wrap { word-break: keep-all; overflow-wrap: break-word; }
