@@ -67,7 +67,6 @@ export default async function AdminDashboard() {
               >
                 {rsvp.attending ? `ចូលរួម · ${toKhmerNumber(rsvp.guestCount)} នាក់` : "មិនអាចចូលរួម"}
               </span>
-              {rsvp.phone && <span className="text-xs text-slate-500">{rsvp.phone}</span>}
               {rsvp.message && (
                 <span className="w-full truncate text-xs text-slate-500">“{rsvp.message}”</span>
               )}

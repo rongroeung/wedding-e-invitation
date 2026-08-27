@@ -39,7 +39,7 @@ export function Countdown({ date }: { date: string }) {
   if (remaining === null) {
     return (
       <div className="reveal mt-10 text-center">
-        <p className="gold-text text-xl leading-loose khmer-wrap sm:text-2xl">
+        <p className="gold-text text-base leading-loose khmer-wrap sm:text-lg">
           សូមអបអរសាទរដល់គូស្វាមីភរិយាថ្មី! ❤️
         </p>
       </div>
@@ -48,7 +48,7 @@ export function Countdown({ date }: { date: string }) {
 
   return (
     <div className="reveal mt-10">
-      <p className="text-center text-xs text-gold-deep sm:text-sm">
+      <p className="text-center text-[0.7rem] text-gold-deep sm:text-xs">
         រាប់ថយក្រោយដល់ថ្ងៃមង្គលការ
       </p>
       <GoldDivider className="my-5" width="max-w-[150px]" icon="none" />
@@ -60,7 +60,7 @@ export function Countdown({ date }: { date: string }) {
             className="card-panel gold-border rounded-2xl px-1 py-4 text-center sm:py-5"
           >
             <div
-              className="gold-text text-2xl tabular-nums sm:text-4xl"
+              className="gold-text text-xl tabular-nums sm:text-2xl"
               suppressHydrationWarning
             >
               {toKhmerNumber2(value)}

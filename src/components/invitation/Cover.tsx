@@ -54,8 +54,8 @@ export function Cover({
           <p
             className={
               latin
-                ? "mt-4 text-xl font-semibold uppercase tracking-[0.08em] text-heading sm:text-2xl"
-                : "mt-4 text-xl font-semibold text-heading khmer-wrap sm:text-2xl"
+                ? "mt-4 text-lg font-semibold uppercase tracking-[0.08em] text-heading sm:text-xl"
+                : "mt-4 text-lg font-semibold text-heading khmer-wrap sm:text-xl"
             }
           >
             {displayName}

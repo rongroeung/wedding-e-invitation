@@ -57,6 +57,20 @@
       "when": 1787831989001,
       "tag": "0007_confused_colleen_wing",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1787845990591,
+      "tag": "0008_flashy_meggan",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1787846054634,
+      "tag": "0009_quiet_tigra",
+      "breakpoints": true
     }
   ]
 }

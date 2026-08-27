@@ -15,7 +15,6 @@ export function Rsvp({
   onSubmitted?: (attending: boolean) => void;
 }) {
   const [name, setName] = useState(guest ? `${guest.title} ${guest.name}` : "");
-  const [phone, setPhone] = useState("");
   const [attending, setAttending] = useState(true);
   const [guestCount, setGuestCount] = useState(guest?.allowedSeats ?? 1);
   const [message, setMessage] = useState("");
@@ -36,7 +35,6 @@ export function Rsvp({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: name.trim(),
-          phone: phone.trim(),
           attending,
           guestCount: attending ? Number(guestCount) || 1 : 0,
           message: message.trim(),
@@ -92,20 +90,6 @@ export function Rsvp({
                   placeholder="សូមបញ្ចូលឈ្មោះរបស់លោកអ្នក"
                   maxLength={120}
                   required
-                />
-              </div>
-
-              <div>
-                <label className="label" htmlFor="rsvp-phone">លេខទូរស័ព្ទ</label>
-                <input
-                  id="rsvp-phone"
-                  className="field"
-                  type="tel"
-                  inputMode="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="០១២ ៣៤៥ ៦៧៨"
-                  maxLength={40}
                 />
               </div>
 

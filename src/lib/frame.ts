@@ -68,6 +68,8 @@ export type FrameConfig = {
   art: boolean;
   /** Space the card's content must leave at head and foot, as a % of width. */
   clearance: string;
+  /** Recolour the artwork to the title colour, keeping its relief. */
+  tint: boolean;
 };
 
 export function frameConfig(wedding: Wedding): FrameConfig {
@@ -104,5 +106,7 @@ export function frameConfig(wedding: Wedding): FrameConfig {
     motif: (wedding.frameMotif as BandMotif) ?? "lotus",
     art: custom || Boolean(builtin),
     clearance: builtin?.clearance ?? (layout === "corner" ? "48%" : custom ? "26%" : "17%"),
+    // Only artwork needs tinting; the generated bands already use the theme.
+    tint: wedding.frameTint && (custom || Boolean(builtin)),
   };
 }

@@ -7,7 +7,7 @@ import type { Wedding } from "@/lib/db/schema";
 export function InvitationMessage({ wedding }: { wedding: Wedding }) {
   return (
     <section id="invitation" className="section-pad relative text-center">
-      <h2 className="gold-text text-2xl leading-[1.9] khmer-wrap sm:text-[1.75rem]">
+      <h2 className="gold-text text-lg leading-[1.9] khmer-wrap sm:text-[1.35rem]">
         {wedding.title}
       </h2>
 
@@ -35,13 +35,13 @@ export function InvitationMessage({ wedding }: { wedding: Wedding }) {
       <div className="mt-10 grid grid-cols-2 gap-x-5">
         <div>
           <p className="text-xs text-ink/75 khmer-wrap">កូនប្រុសនាម</p>
-          <p className="mt-2 text-lg font-semibold leading-loose text-heading khmer-wrap sm:text-xl">
+          <p className="mt-2 text-base font-semibold leading-loose text-heading khmer-wrap sm:text-lg">
             {wedding.groomFullName}
           </p>
         </div>
         <div>
           <p className="text-xs text-ink/75 khmer-wrap">កូនស្រីនាម</p>
-          <p className="mt-2 text-lg font-semibold leading-loose text-heading khmer-wrap sm:text-xl">
+          <p className="mt-2 text-base font-semibold leading-loose text-heading khmer-wrap sm:text-lg">
             {wedding.brideFullName}
           </p>
         </div>
@@ -51,7 +51,7 @@ export function InvitationMessage({ wedding }: { wedding: Wedding }) {
       <p className="mt-10 text-[0.9rem] leading-loose text-ink/90 khmer-wrap">
         ដែលនឹងប្រព្រឹត្តទៅ {wedding.weddingTimeKhmer}
       </p>
-      <p className="mt-3 text-lg font-semibold leading-loose text-heading khmer-wrap sm:text-xl">
+      <p className="mt-3 text-base font-semibold leading-loose text-heading khmer-wrap sm:text-lg">
         {wedding.weddingDateKhmer}
       </p>
       <p className="mx-auto mt-3 max-w-[26rem] text-[0.9rem] leading-loose text-ink/85 khmer-wrap">

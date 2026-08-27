@@ -26,9 +26,9 @@ export async function GET(request: Request) {
   } else {
     const data = await db.select().from(rsvps).orderBy(desc(rsvps.createdAt));
     rows = [
-      ["ឈ្មោះ", "លេខទូរស័ព្ទ", "វត្តមាន", "ចំនួនអ្នកចូលរួម", "សារជូនពរ", "កាលបរិច្ឆេទ"],
+      ["ឈ្មោះ", "វត្តមាន", "ចំនួនអ្នកចូលរួម", "សារជូនពរ", "កាលបរិច្ឆេទ"],
       ...data.map((r) => [
-        r.name, r.phone, r.attending ? "ចូលរួម" : "មិនអាចចូលរួម",
+        r.name, r.attending ? "ចូលរួម" : "មិនអាចចូលរួម",
         String(r.guestCount), r.message, new Date(r.createdAt).toISOString(),
       ]),
     ];

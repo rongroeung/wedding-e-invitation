@@ -51,6 +51,9 @@ const schema = z.object({
   giftEnabled: z.boolean().optional(),
   giftIntro: z.string().max(400).optional(),
   giftNote: z.string().max(400).optional(),
+  giftQrMediaId: z.string().max(80).nullable().optional(),
+  giftQrUrl: z.string().max(600).optional(),
+  giftAccountName: z.string().max(160).optional(),
 
   musicEnabled: z.boolean().optional(),
   musicTitle: z.string().max(160).optional(),
@@ -84,6 +87,7 @@ const schema = z.object({
   frameBottomUrl: z.string().max(600).optional(),
   frameMirrorBottom: z.boolean().optional(),
   frameSideRules: z.boolean().optional(),
+  frameTint: z.boolean().optional(),
 
   metaDescription: z.string().max(400).optional(),
 });

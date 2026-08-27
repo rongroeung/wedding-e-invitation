@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { Wedding } from "@/lib/db/schema";
+import { FrameArt } from "@/components/ui/FrameArt";
 import { OrnamentBand, type BandMotif } from "@/components/ui/OrnamentBand";
 import { mediaSrc } from "@/lib/media";
 import { BUILTIN_BAND_ART, CORNER_ART } from "@/lib/frame";
@@ -49,6 +50,7 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
     frameBottomUrl: wedding.frameBottomUrl,
     frameMirrorBottom: wedding.frameMirrorBottom,
     frameSideRules: wedding.frameSideRules,
+    frameTint: wedding.frameTint,
   });
 
   const colors: [keyof typeof form, string][] = [
@@ -217,6 +219,15 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
           </div>
         )}
 
+        <div className="mt-5">
+          <Toggle
+            label="ធ្វើឱ្យក្បាច់មានពណ៌ដូចចំណងជើង"
+            hint="ប្តូរពណ៌មាសរបស់ក្បាច់ទៅជាពណ៌ចំណងជើង ដោយរក្សាស្រមោល និងពន្លឺដដែល"
+            checked={form.frameTint}
+            onChange={(v) => setForm({ ...form, frameTint: v })}
+          />
+        </div>
+
         {frameLayoutOf(form) === "band" && !BUILTIN_BAND_ART[form.frameMotif as string] && form.frameSource !== "custom" && (
           <div className="mt-5">
             <Toggle
@@ -325,12 +336,10 @@ function FramePreview({
 
       {layout === "corner" ? (
         <div className="relative mx-auto aspect-[3/4] max-w-sm overflow-hidden rounded-lg border" style={surface}>
-          {/* eslint-disable @next/next/no-img-element */}
-          <img src={corner} alt="" className="absolute left-0 top-0 w-[46%]" />
-          <img src={corner} alt="" className="absolute right-0 top-0 w-[46%] -scale-x-100" />
-          <img src={corner} alt="" className="absolute bottom-0 left-0 w-[46%] -scale-y-100" />
-          <img src={corner} alt="" className="absolute bottom-0 right-0 w-[46%] -scale-100" />
-          {/* eslint-enable @next/next/no-img-element */}
+          <FrameArt src={corner} tint={form.frameTint as boolean} className="absolute left-0 top-0 w-[46%]" />
+          <FrameArt src={corner} tint={form.frameTint as boolean} className="absolute right-0 top-0 w-[46%] -scale-x-100" />
+          <FrameArt src={corner} tint={form.frameTint as boolean} className="absolute bottom-0 left-0 w-[46%] -scale-y-100" />
+          <FrameArt src={corner} tint={form.frameTint as boolean} className="absolute bottom-0 right-0 w-[46%] -scale-100" />
           <p
             className="absolute inset-x-0 top-1/2 -translate-y-1/2 text-center text-base"
             style={{ color: form.colorPrimary as string, fontFamily: form.fontHeading as string }}
@@ -342,8 +351,7 @@ function FramePreview({
         <div className="mx-auto flex max-w-sm flex-col overflow-hidden rounded-lg border" style={surface}>
           <div style={{ color: form.colorSecondary as string }}>
             {bandArt ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={top} alt="" className="w-full" />
+              <FrameArt src={top} tint={form.frameTint as boolean} className="w-full" />
             ) : (
               <OrnamentBand motif={form.frameMotif as BandMotif} className="w-full" />
             )}
@@ -363,8 +371,7 @@ function FramePreview({
 
           <div style={{ color: form.colorSecondary as string }}>
             {bandArt ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={bottom || top} alt="" className={`w-full ${mirror ? "-scale-y-100" : ""}`} />
+              <FrameArt src={bottom || top} tint={form.frameTint as boolean} flip={mirror} className="w-full" />
             ) : (
               <OrnamentBand motif={form.frameMotif as BandMotif} flip className="w-full" />
             )}

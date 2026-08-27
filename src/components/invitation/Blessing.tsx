@@ -25,7 +25,7 @@ export function Blessing({ wedding }: { wedding: Wedding }) {
           <p className="text-xs leading-loose text-ink/75 khmer-wrap sm:text-sm">
             ដោយក្តីគោរព និងក្តីស្រឡាញ់ពី
           </p>
-          <p className="gold-text mt-3 text-xl leading-loose khmer-wrap sm:text-2xl">
+          <p className="gold-text mt-3 text-base leading-loose khmer-wrap sm:text-lg">
             {wedding.groomName} &amp; {wedding.brideName} ❤️
           </p>
         </div>

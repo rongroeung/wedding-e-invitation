@@ -1,0 +1,1 @@
+ALTER TABLE "wedding" ADD COLUMN "frame_tint" boolean DEFAULT false NOT NULL;

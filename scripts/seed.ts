@@ -4,10 +4,10 @@ import "./load-env";
  *   npm run db:seed
  */
 import bcrypt from "bcryptjs";
+import { eq } from "drizzle-orm";
 import { getDb } from "../src/lib/db";
 import {
   galleryImages,
-  giftAccounts,
   guests,
   media,
   storyItems,
@@ -128,14 +128,29 @@ async function main() {
     console.log("✔ demo gallery seeded");
   }
 
-  /* ── Gift accounts ──────────────────────────────────────────── */
-  if ((await db.select().from(giftAccounts).limit(1)).length === 0) {
-    await db.insert(giftAccounts).values([
-      { bankName: "ABA Bank", accountName: "SOK VISAL", accountNumber: "000 123 456", sortOrder: 1 },
-      { bankName: "ACLEDA Bank", accountName: "LIN SREYPOV", accountNumber: "1000 12345 6", sortOrder: 2 },
-      { bankName: "Wing", accountName: "SOK VISAL", accountNumber: "012 345 678", sortOrder: 3 },
-    ]);
-    console.log("✔ gift accounts seeded");
+  /* ── Demo KHQR for the gift section ────────────────────────── */
+  const weddingRow = (await db.select().from(wedding).limit(1))[0];
+  if (weddingRow && !weddingRow.giftQrMediaId && !weddingRow.giftQrUrl) {
+    const { readFileSync, existsSync } = await import("node:fs");
+    const qrPath = "public/frames/demo-khqr.png";
+    if (existsSync(qrPath)) {
+      const data = readFileSync(qrPath);
+      const [row] = await db
+        .insert(media)
+        .values({
+          filename: "demo-khqr.png",
+          mimeType: "image/png",
+          size: data.byteLength,
+          kind: "image",
+          data,
+        })
+        .returning();
+      await db
+        .update(wedding)
+        .set({ giftQrMediaId: row.id, giftAccountName: "SOK VISAL" })
+        .where(eq(wedding.id, "main"));
+      console.log("✔ demo KHQR seeded");
+    }
   }
 
   /* ── Demo guests ────────────────────────────────────────────── */

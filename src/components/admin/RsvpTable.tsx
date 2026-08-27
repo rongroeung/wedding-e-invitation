@@ -17,9 +17,7 @@ export function RsvpTable({ rsvps }: { rsvps: Rsvp[] }) {
       if (filter === "no" && rsvp.attending) return false;
       if (!q) return true;
       return (
-        rsvp.name.toLowerCase().includes(q) ||
-        rsvp.phone.toLowerCase().includes(q) ||
-        rsvp.message.toLowerCase().includes(q)
+        rsvp.name.toLowerCase().includes(q) || rsvp.message.toLowerCase().includes(q)
       );
     });
   }, [rsvps, query, filter]);
@@ -69,7 +67,6 @@ export function RsvpTable({ rsvps }: { rsvps: Rsvp[] }) {
             <thead className="border-b border-slate-200 text-xs uppercase text-slate-500">
               <tr>
                 <th className="py-2 pr-4">ឈ្មោះ</th>
-                <th className="py-2 pr-4">លេខទូរស័ព្ទ</th>
                 <th className="py-2 pr-4">វត្តមាន</th>
                 <th className="py-2 pr-4">ចំនួន</th>
                 <th className="py-2 pr-4">សារជូនពរ</th>
@@ -80,7 +77,7 @@ export function RsvpTable({ rsvps }: { rsvps: Rsvp[] }) {
             <tbody className="divide-y divide-slate-100">
               {rows.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="py-10 text-center text-slate-400">
+                  <td colSpan={6} className="py-10 text-center text-slate-400">
                     មិនទាន់មានទិន្នន័យទេ
                   </td>
                 </tr>
@@ -88,7 +85,6 @@ export function RsvpTable({ rsvps }: { rsvps: Rsvp[] }) {
               {rows.map((rsvp) => (
                 <tr key={rsvp.id} className="align-top">
                   <td className="py-3 pr-4 font-medium text-slate-800">{rsvp.name}</td>
-                  <td className="py-3 pr-4 text-slate-600">{rsvp.phone || "—"}</td>
                   <td className="py-3 pr-4">
                     <span
                       className={`rounded-full px-2 py-0.5 text-xs ${

@@ -7,7 +7,6 @@ import { getGuestByCode } from "@/lib/queries";
 
 const schema = z.object({
   name: z.string().trim().min(1).max(120),
-  phone: z.string().trim().max(40).optional().default(""),
   attending: z.boolean(),
   guestCount: z.number().int().min(0).max(20).default(1),
   message: z.string().trim().max(600).optional().default(""),
@@ -35,7 +34,6 @@ export async function POST(request: Request) {
     guestId: guest?.id ?? null,
     guestCode: guest?.code ?? "",
     name: input.name,
-    phone: input.phone,
     attending: input.attending,
     guestCount: input.attending ? Math.max(1, input.guestCount) : 0,
     message: input.message,

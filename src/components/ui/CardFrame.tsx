@@ -1,4 +1,5 @@
 import type { FrameConfig } from "@/lib/frame";
+import { FrameArt } from "./FrameArt";
 import { OrnamentBand } from "./OrnamentBand";
 
 /**
@@ -12,7 +13,7 @@ import { OrnamentBand } from "./OrnamentBand";
  * know its dimensions.
  */
 export function CardFrame({ frame }: { frame: FrameConfig }) {
-  if (frame.layout === "corner") return <CornerFrame src={frame.cornerSrc} />;
+  if (frame.layout === "corner") return <CornerFrame src={frame.cornerSrc} tint={frame.tint} />;
 
   return (
     <div
@@ -20,8 +21,7 @@ export function CardFrame({ frame }: { frame: FrameConfig }) {
       aria-hidden="true"
     >
       {frame.art ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={frame.topSrc} alt="" className="w-full shrink-0 select-none" />
+        <FrameArt src={frame.topSrc} tint={frame.tint} className="w-full shrink-0" />
       ) : (
         <OrnamentBand motif={frame.motif} className="w-full shrink-0" />
       )}
@@ -31,11 +31,11 @@ export function CardFrame({ frame }: { frame: FrameConfig }) {
       />
 
       {frame.art ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
+        <FrameArt
           src={frame.bottomSrc}
-          alt=""
-          className={`w-full shrink-0 select-none ${frame.mirrorBottom ? "-scale-y-100" : ""}`}
+          tint={frame.tint}
+          flip={frame.mirrorBottom}
+          className="w-full shrink-0"
         />
       ) : (
         <OrnamentBand motif={frame.motif} flip className="w-full shrink-0" />
@@ -45,17 +45,15 @@ export function CardFrame({ frame }: { frame: FrameConfig }) {
 }
 
 /** One ornament, mirrored into each corner. */
-function CornerFrame({ src }: { src: string }) {
+function CornerFrame({ src, tint }: { src: string; tint: boolean }) {
   if (!src) return null;
-  const common = "absolute w-[46%] select-none";
+  const common = "absolute w-[46%]";
   return (
     <div className="pointer-events-none absolute inset-0 z-10" aria-hidden="true">
-      {/* eslint-disable @next/next/no-img-element */}
-      <img src={src} alt="" className={`${common} left-0 top-0`} />
-      <img src={src} alt="" className={`${common} right-0 top-0 -scale-x-100`} />
-      <img src={src} alt="" className={`${common} bottom-0 left-0 -scale-y-100`} />
-      <img src={src} alt="" className={`${common} bottom-0 right-0 -scale-100`} />
-      {/* eslint-enable @next/next/no-img-element */}
+      <FrameArt src={src} tint={tint} className={`${common} left-0 top-0`} />
+      <FrameArt src={src} tint={tint} className={`${common} right-0 top-0 -scale-x-100`} />
+      <FrameArt src={src} tint={tint} className={`${common} bottom-0 left-0 -scale-y-100`} />
+      <FrameArt src={src} tint={tint} className={`${common} bottom-0 right-0 -scale-100`} />
     </div>
   );
 }

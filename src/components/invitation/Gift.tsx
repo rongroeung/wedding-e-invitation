@@ -1,77 +1,52 @@
 "use client";
 
-import { useState } from "react";
-import type { GiftAccount, Wedding } from "@/lib/db/schema";
+import type { Wedding } from "@/lib/db/schema";
 import { mediaSrc } from "@/lib/media";
 import { GoldDivider } from "@/components/ui/Ornaments";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 
-/** ចំណងដៃ — optional digital gift section. */
-export function Gift({ wedding, accounts }: { wedding: Wedding; accounts: GiftAccount[] }) {
-  const [copied, setCopied] = useState<string | null>(null);
-
-  if (!wedding.giftEnabled || accounts.length === 0) return null;
-
-  async function copy(value: string, id: string) {
-    try {
-      await navigator.clipboard.writeText(value.replace(/\s/g, ""));
-      setCopied(id);
-      setTimeout(() => setCopied(null), 2000);
-    } catch {
-      /* clipboard unavailable (older in-app browsers) — ignore silently */
-    }
-  }
+/**
+ * ចំណងដៃ — one KHQR.
+ *
+ * KHQR is Cambodia's unified QR standard, so a single code is scannable from
+ * every bank and wallet app in the country. Listing separate account numbers
+ * per bank asks the guest to work out which one applies to them; one code does
+ * not.
+ */
+export function Gift({ wedding }: { wedding: Wedding }) {
+  const qr = mediaSrc(wedding.giftQrMediaId, wedding.giftQrUrl);
+  if (!wedding.giftEnabled || !qr) return null;
 
   return (
     <section id="gift" className="section-pad relative">
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-md">
         <SectionTitle eyebrow="ចំណងដៃ" title="ចំណងដៃ" subtitle={wedding.giftIntro} />
 
-        <p className="reveal mx-auto mb-8 max-w-xl text-center text-sm leading-loose text-ink/85 khmer-wrap sm:text-base">
+        <p className="reveal mx-auto mb-8 max-w-sm text-center text-[0.85rem] leading-loose text-ink/80 khmer-wrap">
           {wedding.giftNote}
         </p>
 
-        <div className="grid gap-4">
-          {accounts.map((account) => {
-            const qr = mediaSrc(account.qrMediaId, account.qrUrl);
-            return (
-              <div
-                key={account.id}
-                className="reveal card-panel gold-border rounded-2xl px-5 py-6 text-center"
-              >
-                <p className="gold-solid text-base font-medium sm:text-lg">{account.bankName}</p>
-                <GoldDivider className="my-4" width="max-w-[110px]" icon="none" />
-                <p className="text-sm text-ink/88 khmer-wrap">{account.accountName}</p>
-                <p className="mt-1 font-latin text-lg tracking-wide text-heading">
-                  {account.accountNumber}
-                </p>
-                {account.note && (
-                  <p className="mt-2 text-xs text-ink/75 khmer-wrap">{account.note}</p>
-                )}
+        <div className="reveal card-panel gold-border mx-auto max-w-[19rem] rounded-2xl px-5 py-7 text-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={qr}
+            alt="KHQR"
+            loading="lazy"
+            className="mx-auto w-full max-w-[15rem] rounded-xl bg-white"
+          />
 
-                {qr && (
-                  <div className="mt-5">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={qr}
-                      alt={`QR Code ${account.bankName}`}
-                      loading="lazy"
-                      className="mx-auto h-40 w-40 rounded-xl bg-white p-2 shadow-card"
-                    />
-                    <p className="mt-2 text-xs text-ink/75 khmer-wrap">ស្កេន QR Code</p>
-                  </div>
-                )}
+          {wedding.giftAccountName && (
+            <>
+              <GoldDivider className="my-4" width="max-w-[110px]" icon="none" />
+              <p className="text-sm font-medium tracking-wide text-heading">
+                {wedding.giftAccountName}
+              </p>
+            </>
+          )}
 
-                <button
-                  type="button"
-                  onClick={() => copy(account.accountNumber, account.id)}
-                  className="btn-outline mt-5 text-xs"
-                >
-                  {copied === account.id ? "បានចម្លងរួច ✓" : "ចម្លងលេខគណនី"}
-                </button>
-              </div>
-            );
-          })}
+          <p className="mt-3 text-xs text-ink/75 khmer-wrap">
+            ស្កេនដោយកម្មវិធីធនាគារណាមួយ
+          </p>
         </div>
       </div>
     </section>

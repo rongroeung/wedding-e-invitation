@@ -44,7 +44,7 @@ function Person({
       </div>
 
       <p className="mt-6 text-xs text-gold-deep">{role}</p>
-      <h3 className="mt-3 text-xl text-heading khmer-wrap sm:text-2xl">
+      <h3 className="mt-3 text-base text-heading khmer-wrap sm:text-lg">
         <span className="text-base text-ink/75">{title} </span>
         {name}
       </h3>

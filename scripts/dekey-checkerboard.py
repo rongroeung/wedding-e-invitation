@@ -19,6 +19,7 @@ CHECKER_LIGHT = 252.0
 CHECKER_DARK = 221.0
 CHECKER_MEAN = 236.0   # midpoint of the two greys
 CHECKER_TOL = 8.0
+NEUTRAL_TOL = 11.0
 CHROMA_FLOOR = 4.0     # below this is compression noise
 CHROMA_FULL = 45.0     # chroma of solidly inked pixels
 DARK_KNEE = 215.0      # darker than the dark square, so the checker scores zero
@@ -34,11 +35,11 @@ def dekey(src: str, dst: str) -> None:
     alpha = np.clip((chroma - CHROMA_FLOOR) / (CHROMA_FULL - CHROMA_FLOOR), 0, 1)
     alpha = np.maximum(alpha, np.clip((DARK_KNEE - lum) / DARK_FULL, 0, 1))
 
-    # A pixel that is neutral and sits on one of the two checker tones is
-    # background, wherever it happens to be.
-    checker = (chroma < CHECKER_TOL) & (
-        (np.abs(lum - CHECKER_LIGHT) < CHECKER_TOL) | (np.abs(lum - CHECKER_DARK) < CHECKER_TOL)
-    )
+    # Any neutral pixel is background. The artwork is gold throughout — even
+    # its palest highlight carries far more chroma than this — so testing for
+    # neutrality catches the checker wherever it sits, including the patches a
+    # tone-match test misses once compression has shifted them.
+    checker = chroma < NEUTRAL_TOL
 
     # Pale highlights inside the ornament read as background on their own, so
     # close the outline and fill what it encloses — but never revive the
@@ -46,6 +47,12 @@ def dekey(src: str, dst: str) -> None:
     solid = ndimage.binary_closing(alpha > 0.4, structure=np.ones((3, 3)), iterations=2)
     filled = ndimage.binary_fill_holes(solid) & ~checker
     alpha = np.where(filled, 1.0, alpha)
+
+    # Weak partial alpha is nearly always leftover checker rather than a real
+    # anti-aliased edge — real edges sit against solid ink and score higher.
+    # Left in, it is invisible against gold but ghosts as a grid once tinted.
+    knee = 0.28
+    alpha = np.clip((alpha - knee) / (1 - knee), 0, 1)
 
     # Drop specks the fill did not catch (stray checker noise).
     labels, n = ndimage.label(alpha > 0.15)

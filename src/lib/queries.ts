@@ -3,7 +3,6 @@ import { asc, desc, eq, sql } from "drizzle-orm";
 import { getDb } from "./db";
 import {
   galleryImages,
-  giftAccounts,
   guests,
   pageViews,
   rsvps,
@@ -11,7 +10,6 @@ import {
   wedding,
   weddingEvents,
   type GalleryImage,
-  type GiftAccount,
   type Guest,
   type StoryItem,
   type Wedding,
@@ -23,7 +21,6 @@ export type InvitationData = {
   events: WeddingEvent[];
   story: StoryItem[];
   gallery: GalleryImage[];
-  gifts: GiftAccount[];
 };
 
 /** Returns the wedding row, creating the default one on first run. */
@@ -37,14 +34,13 @@ export async function getWedding(): Promise<Wedding> {
 
 export async function getInvitationData(): Promise<InvitationData> {
   const db = await getDb();
-  const [weddingRow, events, story, gallery, gifts] = await Promise.all([
+  const [weddingRow, events, story, gallery] = await Promise.all([
     getWedding(),
     db.select().from(weddingEvents).orderBy(asc(weddingEvents.sortOrder)),
     db.select().from(storyItems).orderBy(asc(storyItems.sortOrder)),
     db.select().from(galleryImages).orderBy(asc(galleryImages.sortOrder)),
-    db.select().from(giftAccounts).orderBy(asc(giftAccounts.sortOrder)),
   ]);
-  return { wedding: weddingRow, events, story, gallery, gifts };
+  return { wedding: weddingRow, events, story, gallery };
 }
 
 export async function getGuestByCode(code: string): Promise<Guest | null> {

@@ -1,5 +1,5 @@
 import type { Wedding } from "@/lib/db/schema";
-import { buddhistEra, formatKhmerDate, formatKhmerTime, formatLatinDate } from "@/lib/khmer";
+import { buddhistEra, formatKhmerDate, formatKhmerTime } from "@/lib/khmer";
 import { GoldDivider, Lotus, PatternBackground } from "@/components/ui/Ornaments";
 import { Countdown } from "./Countdown";
 
@@ -22,17 +22,14 @@ export function DateSection({ wedding }: { wedding: Wedding }) {
 
         <div className="reveal mt-6">
           <Lotus className="mx-auto h-7 w-7 text-gold-dark" />
-          <h2 className="gold-text mt-5 text-2xl leading-loose khmer-wrap sm:text-4xl">
+          <h2 className="gold-text mt-5 text-lg leading-loose khmer-wrap sm:text-[1.35rem]">
             {khmerDate}
           </h2>
-          <p className="mt-3 text-base leading-loose text-heading khmer-wrap sm:text-lg">
+          <p className="mt-3 text-sm leading-loose text-heading khmer-wrap sm:text-base">
             {khmerTime}
           </p>
           <GoldDivider className="my-6" width="max-w-[200px]" />
-          <p className="font-latin text-sm tracking-wide text-ink/75 sm:text-base">
-            {formatLatinDate(date)}
-          </p>
-          <p className="mt-1 text-xs text-ink/75 sm:text-sm">{be}</p>
+          <p className="text-xs text-ink/80 khmer-wrap sm:text-sm">{be}</p>
         </div>
 
         {wedding.showCountdown && <Countdown date={new Date(wedding.weddingDate).toISOString()} />}

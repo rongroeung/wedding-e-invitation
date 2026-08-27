@@ -102,6 +102,10 @@ export const wedding = pgTable("wedding", {
   giftEnabled: boolean("gift_enabled").notNull().default(true),
   giftIntro: text("gift_intro").notNull().default(""),
   giftNote: text("gift_note").notNull().default(""),
+  /** A single KHQR — Cambodia's unified QR, scannable from every bank app. */
+  giftQrMediaId: text("gift_qr_media_id"),
+  giftQrUrl: text("gift_qr_url").notNull().default(""),
+  giftAccountName: text("gift_account_name").notNull().default(""),
 
   // Music
   musicEnabled: boolean("music_enabled").notNull().default(false),
@@ -142,6 +146,8 @@ export const wedding = pgTable("wedding", {
   frameBottomUrl: text("frame_bottom_url").notNull().default(""),
   frameMirrorBottom: boolean("frame_mirror_bottom").notNull().default(true),
   frameSideRules: boolean("frame_side_rules").notNull().default(true),
+  /** Tint the frame artwork to the title colour instead of its own gold. */
+  frameTint: boolean("frame_tint").notNull().default(false),
 
   // SEO
   metaDescription: text("meta_description").notNull().default(""),
@@ -201,23 +207,10 @@ export const rsvps = pgTable("rsvps", {
   guestId: text("guest_id").references(() => guests.id, { onDelete: "set null" }),
   guestCode: text("guest_code").notNull().default(""),
   name: text("name").notNull(),
-  phone: text("phone").notNull().default(""),
   attending: boolean("attending").notNull().default(true),
   guestCount: integer("guest_count").notNull().default(1),
   message: text("message").notNull().default(""),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-});
-
-/* ── Gift accounts ─────────────────────────────────────────────────────── */
-export const giftAccounts = pgTable("gift_accounts", {
-  id: id(),
-  bankName: text("bank_name").notNull(),
-  accountName: text("account_name").notNull(),
-  accountNumber: text("account_number").notNull(),
-  note: text("note").notNull().default(""),
-  qrMediaId: text("qr_media_id"),
-  qrUrl: text("qr_url").notNull().default(""),
-  sortOrder: integer("sort_order").notNull().default(0),
 });
 
 /* ── Page views ────────────────────────────────────────────────────────── */
@@ -234,6 +227,5 @@ export type StoryItem = typeof storyItems.$inferSelect;
 export type GalleryImage = typeof galleryImages.$inferSelect;
 export type Guest = typeof guests.$inferSelect;
 export type Rsvp = typeof rsvps.$inferSelect;
-export type GiftAccount = typeof giftAccounts.$inferSelect;
 
 export const nowSql = sql`now()`;

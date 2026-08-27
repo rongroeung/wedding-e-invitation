@@ -134,6 +134,40 @@
     background-color: var(--c-stage);
   }
 
+  /*
+   * Frame artwork tinted to the title colour.
+   *
+   * The artwork is a photographic gold with real relief, so a flat silhouette
+   * would throw that away. Instead the theme colour is laid down through the
+   * artwork's own alpha, and the artwork is drawn back over it in luminosity —
+   * which keeps every highlight and shadow while taking the hue from below.
+   * `isolation` keeps the blend inside the frame, off the paper.
+   */
+  .frame-tint {
+    position: relative;
+    isolation: isolate;
+    display: block;
+  }
+
+  .frame-tint::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: var(--gold-1);
+    -webkit-mask-image: var(--frame-art);
+    mask-image: var(--frame-art);
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+  }
+
+  .frame-tint > img {
+    position: relative;
+    mix-blend-mode: luminosity;
+    opacity: 0.55;
+  }
+
   /* The invitation card itself */
   .card-stock {
     background-color: var(--c-bg);

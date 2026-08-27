@@ -2,41 +2,41 @@ import type { StoryItem } from "@/lib/db/schema";
 import { Lotus } from "@/components/ui/Ornaments";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 
-/** រឿងរ៉ាវស្នេហារបស់យើង — optional timeline. */
+/**
+ * រឿងរ៉ាវស្នេហារបស់យើង — optional timeline.
+ *
+ * A single column, never alternating sides. The card is a fixed ~560px measure
+ * however wide the window is, so a two-sided timeline had entries colliding
+ * across the spine on desktop — viewport breakpoints fire there while the
+ * column stays narrow.
+ */
 export function LoveStory({ items }: { items: StoryItem[] }) {
   if (items.length === 0) return null;
 
   return (
     <section id="story" className="section-pad relative">
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-2xl">
         <SectionTitle eyebrow="ដំណើរជីវិត" title="រឿងរ៉ាវស្នេហារបស់យើង" />
 
-        <ol className="relative mx-auto max-w-2xl">
+        <ol className="relative mx-auto max-w-xl pl-9">
           <span
-            className="absolute left-[11px] top-2 h-[calc(100%-1rem)] w-px bg-gradient-to-b from-champagne via-gold/60 to-transparent sm:left-1/2"
+            className="absolute left-[11px] top-2 h-[calc(100%-1.5rem)] w-px bg-gradient-to-b from-champagne via-gold/60 to-transparent"
             aria-hidden="true"
           />
-          {items.map((item, index) => (
-            <li
-              key={item.id}
-              className={`reveal relative mb-8 pl-10 sm:mb-12 sm:w-1/2 sm:pl-0 ${
-                index % 2 === 0 ? "sm:pr-12 sm:text-right" : "sm:ml-auto sm:pl-12 sm:text-left"
-              }`}
-            >
+          {items.map((item) => (
+            <li key={item.id} className="reveal relative mb-9 last:mb-0">
               <span
-                className={`absolute left-0 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-ivory ring-1 ring-champagne sm:left-auto ${
-                  index % 2 === 0 ? "sm:-right-3" : "sm:-left-3"
-                }`}
+                className="absolute -left-9 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-ivory ring-1 ring-champagne"
                 aria-hidden="true"
               >
                 <Lotus className="h-3.5 w-3.5 text-gold-dark" />
               </span>
-              <p className="gold-solid text-sm font-medium sm:text-base">{item.label}</p>
-              <h3 className="mt-1 text-base leading-loose text-heading khmer-wrap sm:text-lg">
+              <p className="gold-solid text-sm font-medium">{item.label}</p>
+              <h3 className="mt-1 text-sm leading-loose text-heading khmer-wrap sm:text-base">
                 {item.title}
               </h3>
               {item.description && (
-                <p className="mt-1 text-sm leading-loose text-ink/85 khmer-wrap">
+                <p className="mt-1 text-[0.85rem] leading-loose text-ink/80 khmer-wrap">
                   {item.description}
                 </p>
               )}

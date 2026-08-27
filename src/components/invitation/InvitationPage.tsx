@@ -36,9 +36,10 @@ export function InvitationPage({
   guest: Guest | null;
   rsvpStatus?: "attending" | "declined" | "pending";
 }) {
-  const { wedding, events, story, gallery, gifts } = data;
+  const { wedding, events, story, gallery } = data;
   const [opened, setOpened] = useState(false);
   const [rsvpStatus, setRsvpStatus] = useState(initialRsvpStatus);
+  const giftQr = mediaSrc(wedding.giftQrMediaId, wedding.giftQrUrl);
   const contentRef = useRef<HTMLDivElement>(null);
   const tracked = useRef(false);
 
@@ -99,11 +100,11 @@ export function InvitationPage({
       wedding.showLoveStory && story.length > 0 ? { id: "story", label: "រឿងរ៉ាវ" } : null,
       wedding.showGallery && gallery.length > 0 ? { id: "gallery", label: "រូបភាព" } : null,
       wedding.showRsvp ? { id: "rsvp", label: "បញ្ជាក់វត្តមាន" } : null,
-      wedding.giftEnabled && gifts.length > 0 ? { id: "gift", label: "ចំណងដៃ" } : null,
+      wedding.giftEnabled && giftQr ? { id: "gift", label: "ចំណងដៃ" } : null,
       wedding.showContact ? { id: "contact", label: "ទំនាក់ទំនង" } : null,
     ];
     return items.filter(Boolean) as { id: string; label: string }[];
-  }, [wedding, events.length, story.length, gallery.length, gifts.length]);
+  }, [wedding, events.length, story.length, gallery.length, giftQr]);
 
   const musicSrc = wedding.musicEnabled
     ? mediaSrc(wedding.musicMediaId, wedding.musicUrl)
@@ -159,7 +160,7 @@ export function InvitationPage({
             onSubmitted={(attending) => setRsvpStatus(attending ? "attending" : "declined")}
           />
         )}
-        <Gift wedding={wedding} accounts={gifts} />
+        <Gift wedding={wedding} />
         {wedding.showContact && <Contact wedding={wedding} />}
         <Blessing wedding={wedding} />
         {wedding.showShare && (
