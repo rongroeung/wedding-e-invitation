@@ -66,6 +66,20 @@ export async function trackView(path: string, guestCode = "") {
   }
 }
 
+/** The guest's most recent RSVP, used to show their status on the invitation. */
+export async function getGuestRsvpStatus(code: string): Promise<"attending" | "declined" | "pending"> {
+  if (!code) return "pending";
+  const db = await getDb();
+  const rows = await db
+    .select()
+    .from(rsvps)
+    .where(eq(rsvps.guestCode, code))
+    .orderBy(desc(rsvps.createdAt))
+    .limit(1);
+  if (rows.length === 0) return "pending";
+  return rows[0].attending ? "attending" : "declined";
+}
+
 export async function getDashboardStats() {
   const db = await getDb();
   const [guestRows, rsvpRows, viewRows] = await Promise.all([

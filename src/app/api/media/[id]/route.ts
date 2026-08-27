@@ -14,13 +14,20 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
   const body = Buffer.isBuffer(file.data) ? file.data : Buffer.from(file.data as unknown as Uint8Array);
 
-  return new Response(new Uint8Array(body), {
-    headers: {
-      "Content-Type": file.mimeType,
-      "Content-Length": String(body.byteLength),
-      "Cache-Control": "public, max-age=31536000, immutable",
-      "Content-Disposition": `inline; filename="${encodeURIComponent(file.filename)}"`,
-      "X-Content-Type-Options": "nosniff",
-    },
-  });
+  const headers: Record<string, string> = {
+    "Content-Type": file.mimeType,
+    "Content-Length": String(body.byteLength),
+    "Cache-Control": "public, max-age=31536000, immutable",
+    "Content-Disposition": `inline; filename="${encodeURIComponent(file.filename)}"`,
+    "X-Content-Type-Options": "nosniff",
+  };
+
+  // SVG is markup: served from our own origin it could run script if opened
+  // directly. It stays inert inside an <img>, and this makes it inert anywhere.
+  if (file.mimeType === "image/svg+xml") {
+    headers["Content-Security-Policy"] =
+      "default-src 'none'; style-src 'unsafe-inline'; img-src data:; sandbox";
+  }
+
+  return new Response(new Uint8Array(body), { headers });
 }

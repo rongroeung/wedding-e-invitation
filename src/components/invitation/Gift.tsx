@@ -27,11 +27,11 @@ export function Gift({ wedding, accounts }: { wedding: Wedding; accounts: GiftAc
       <div className="mx-auto max-w-3xl">
         <SectionTitle eyebrow="ចំណងដៃ" title="ចំណងដៃ" subtitle={wedding.giftIntro} />
 
-        <p className="reveal mx-auto mb-8 max-w-xl text-center text-sm leading-loose text-ink/70 khmer-wrap sm:text-base">
+        <p className="reveal mx-auto mb-8 max-w-xl text-center text-sm leading-loose text-ink/85 khmer-wrap sm:text-base">
           {wedding.giftNote}
         </p>
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4">
           {accounts.map((account) => {
             const qr = mediaSrc(account.qrMediaId, account.qrUrl);
             return (
@@ -39,14 +39,14 @@ export function Gift({ wedding, accounts }: { wedding: Wedding; accounts: GiftAc
                 key={account.id}
                 className="reveal card-panel gold-border rounded-2xl px-5 py-6 text-center"
               >
-                <p className="gold-text text-base sm:text-lg">{account.bankName}</p>
+                <p className="gold-solid text-base font-medium sm:text-lg">{account.bankName}</p>
                 <GoldDivider className="my-4" width="max-w-[110px]" icon="none" />
-                <p className="text-sm text-ink/75 khmer-wrap">{account.accountName}</p>
-                <p className="mt-1 font-latin text-lg tracking-wide text-burgundy">
+                <p className="text-sm text-ink/88 khmer-wrap">{account.accountName}</p>
+                <p className="mt-1 font-latin text-lg tracking-wide text-heading">
                   {account.accountNumber}
                 </p>
                 {account.note && (
-                  <p className="mt-2 text-xs text-ink/55 khmer-wrap">{account.note}</p>
+                  <p className="mt-2 text-xs text-ink/75 khmer-wrap">{account.note}</p>
                 )}
 
                 {qr && (
@@ -58,7 +58,7 @@ export function Gift({ wedding, accounts }: { wedding: Wedding; accounts: GiftAc
                       loading="lazy"
                       className="mx-auto h-40 w-40 rounded-xl bg-white p-2 shadow-card"
                     />
-                    <p className="mt-2 text-xs text-ink/55 khmer-wrap">ស្កេន QR Code</p>
+                    <p className="mt-2 text-xs text-ink/75 khmer-wrap">ស្កេន QR Code</p>
                   </div>
                 )}
 

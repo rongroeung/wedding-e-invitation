@@ -11,6 +11,7 @@ const schema = z.object({
   title: z.string().max(160).optional(),
   subtitle: z.string().max(160).optional(),
   openButton: z.string().max(80).optional(),
+  monogram: z.string().max(12).optional(),
   coverPhotoId: z.string().max(80).nullable().optional(),
   coverPhotoUrl: z.string().max(500).optional(),
 
@@ -33,9 +34,7 @@ const schema = z.object({
   bridePhotoUrl: z.string().max(500).optional(),
 
   invitationHonorific: z.string().max(300).optional(),
-  invitationIntro: z.string().max(600).optional(),
-  invitationBody: z.string().max(600).optional(),
-  invitationClosing: z.string().max(900).optional(),
+  invitationBody: z.string().max(900).optional(),
 
   weddingDate: z.string().optional(),
   weddingDateKhmer: z.string().max(160).optional(),
@@ -74,6 +73,17 @@ const schema = z.object({
   fontHeading: z.string().max(80).optional(),
   fontBody: z.string().max(80).optional(),
   pattern: z.enum(["lotus", "angkor", "floral", "none"]).optional(),
+  frameSource: z.enum(["builtin", "custom"]).optional(),
+  frameMotif: z
+    .enum(["kbach", "royal", "royal-light", "lotus", "flame", "angkor", "wheel"])
+    .optional(),
+  frameLayout: z.enum(["band", "corner"]).optional(),
+  frameTopMediaId: z.string().max(80).nullable().optional(),
+  frameTopUrl: z.string().max(600).optional(),
+  frameBottomMediaId: z.string().max(80).nullable().optional(),
+  frameBottomUrl: z.string().max(600).optional(),
+  frameMirrorBottom: z.boolean().optional(),
+  frameSideRules: z.boolean().optional(),
 
   metaDescription: z.string().max(400).optional(),
 });

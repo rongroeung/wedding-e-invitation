@@ -17,9 +17,9 @@ export async function GET(request: Request) {
   if (type === "guests") {
     const data = await db.select().from(guests).orderBy(desc(guests.createdAt));
     rows = [
-      ["ឈ្មោះ", "ងារ", "លេខទូរស័ព្ទ", "ចំនួនកៅអី", "លេខកូដ", "តំណអញ្ជើញ", "ចំនួនមើល", "កំណត់ចំណាំ"],
+      ["ឈ្មោះ", "ងារ", "ឈ្មោះឡាតាំង", "ចំនួនកៅអី", "លេខកូដ", "តំណអញ្ជើញ", "ចំនួនមើល", "កំណត់ចំណាំ"],
       ...data.map((g) => [
-        g.name, g.title, g.phone, String(g.allowedSeats), g.code,
+        g.name, g.title, g.nameLatin, String(g.allowedSeats), g.code,
         `/invite/${g.code}`, String(g.views), g.notes,
       ]),
     ];

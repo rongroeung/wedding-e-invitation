@@ -3,13 +3,19 @@
 import { useState } from "react";
 import type { Guest } from "@/lib/db/schema";
 import { toKhmerNumber } from "@/lib/khmer";
-import { GoldDivider, Lotus, OrnateFrame } from "@/components/ui/Ornaments";
+import { GoldDivider, Lotus } from "@/components/ui/Ornaments";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 
 /** សូមមេត្តាចូលរួមបញ្ជាក់វត្តមាន — RSVP form. */
-export function Rsvp({ guest }: { guest: Guest | null }) {
+export function Rsvp({
+  guest,
+  onSubmitted,
+}: {
+  guest: Guest | null;
+  onSubmitted?: (attending: boolean) => void;
+}) {
   const [name, setName] = useState(guest ? `${guest.title} ${guest.name}` : "");
-  const [phone, setPhone] = useState(guest?.phone ?? "");
+  const [phone, setPhone] = useState("");
   const [attending, setAttending] = useState(true);
   const [guestCount, setGuestCount] = useState(guest?.allowedSeats ?? 1);
   const [message, setMessage] = useState("");
@@ -40,6 +46,7 @@ export function Rsvp({ guest }: { guest: Guest | null }) {
       const payload = await response.json();
       if (!response.ok || !payload.ok) throw new Error(payload.error || "មិនអាចផ្ញើបានទេ");
       setStatus("done");
+      onSubmitted?.(attending);
     } catch (err) {
       setStatus("error");
       setError(err instanceof Error ? err.message : "មានបញ្ហាបច្ចេកទេស សូមព្យាយាមម្ដងទៀត");
@@ -55,14 +62,13 @@ export function Rsvp({ guest }: { guest: Guest | null }) {
           subtitle="ដើម្បីឱ្យយើងខ្ញុំអាចរៀបចំទទួលស្វាគមន៍លោកអ្នកបានយ៉ាងប្រសើរ សូមមេត្តាបញ្ជាក់វត្តមានរបស់លោកអ្នក។"
         />
 
-        <div className="reveal card-panel gold-border relative overflow-hidden rounded-[26px] px-5 py-12 pt-14 sm:px-12 sm:pt-16">
-          <OrnateFrame />
+        <div className="reveal card-panel gold-border relative overflow-hidden rounded-[22px] px-5 py-9 sm:px-8">
 
           {status === "done" ? (
             <div className="relative py-8 text-center">
-              <Lotus className="mx-auto h-10 w-10 animate-floaty text-gold" />
+              <Lotus className="mx-auto h-10 w-10 animate-floaty text-gold-dark" />
               <GoldDivider className="my-6" width="max-w-[150px]" />
-              <p className="mx-auto max-w-md text-sm leading-loose text-burgundy khmer-wrap sm:text-base">
+              <p className="mx-auto max-w-md text-sm leading-loose text-heading khmer-wrap sm:text-base">
                 សូមអរគុណសម្រាប់ការបញ្ជាក់វត្តមាន។ យើងខ្ញុំរីករាយ និងទន្ទឹងរង់ចាំទទួលស្វាគមន៍លោកអ្នក
                 ក្នុងថ្ងៃដ៏សិរីមង្គលនេះ។ ❤️
               </p>
@@ -116,8 +122,8 @@ export function Rsvp({ guest }: { guest: Guest | null }) {
                       onClick={() => setAttending(option.value)}
                       className={`rounded-xl border px-4 py-3 text-sm transition-all duration-300 khmer-wrap ${
                         attending === option.value
-                          ? "border-gold bg-champagne/30 text-burgundy shadow-gold"
-                          : "border-champagne/50 bg-white/60 text-ink/60"
+                          ? "border-gold bg-champagne/30 text-heading shadow-gold"
+                          : "border-gold/40 bg-white/60 text-ink/75"
                       }`}
                       aria-pressed={attending === option.value}
                     >
@@ -158,7 +164,7 @@ export function Rsvp({ guest }: { guest: Guest | null }) {
                       +
                     </button>
                   </div>
-                  <p className="mt-2 text-xs text-ink/50 khmer-wrap">
+                  <p className="mt-2 text-xs text-ink/72 khmer-wrap">
                     ចំនួន {toKhmerNumber(guestCount)} នាក់
                     {guest ? ` (កៅអីដែលបានរៀបចំ៖ ${toKhmerNumber(guest.allowedSeats)})` : ""}
                   </p>
@@ -178,7 +184,7 @@ export function Rsvp({ guest }: { guest: Guest | null }) {
               </div>
 
               {error && (
-                <p className="rounded-xl bg-burgundy/10 px-4 py-3 text-sm text-burgundy khmer-wrap">
+                <p className="rounded-xl bg-heading/10 px-4 py-3 text-sm text-heading khmer-wrap">
                   {error}
                 </p>
               )}

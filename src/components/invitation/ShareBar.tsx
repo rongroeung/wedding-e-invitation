@@ -46,7 +46,7 @@ export function ShareBar({ title }: { title: string }) {
   return (
     <section className="section-pad relative !py-12">
       <div className="mx-auto max-w-2xl text-center">
-        <p className="reveal text-xs text-gold-deep/85 sm:text-sm">
+        <p className="reveal text-xs text-gold-deep sm:text-sm">
           ចែករំលែកសំបុត្រអញ្ជើញនេះ
         </p>
         <GoldDivider className="my-5" width="max-w-[140px]" icon="none" />

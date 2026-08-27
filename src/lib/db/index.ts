@@ -43,28 +43,18 @@ async function createDb(): Promise<DrizzleDb> {
   return db;
 }
 
-/** Applies the SQL migrations (idempotent) — used by the embedded database. */
+/** Brings the embedded database up to date on first use. */
 async function ensureSchema(db: DrizzleDb) {
-  const { readFileSync, existsSync, readdirSync } = await import("node:fs");
-  const path = await import("node:path");
-  const dir = path.join(process.cwd(), "drizzle");
-  if (!existsSync(dir)) return;
-  const files = readdirSync(dir)
-    .filter((f) => f.endsWith(".sql"))
-    .sort();
-  for (const file of files) {
-    const raw = readFileSync(path.join(dir, file), "utf8");
-    for (const statement of raw.split("--> statement-breakpoint")) {
-      const trimmed = statement.trim();
-      if (!trimmed) continue;
-      try {
-        await db.execute(trimmed as never);
-      } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        if (!/already exists/i.test(message)) throw error;
-      }
-    }
-  }
+  const { adoptExistingSchema, applyMigrations } = await import("./migrate");
+  const runner = {
+    exec: (sql: string) => db.execute(sql as never),
+    rows: async (sql: string) => {
+      const result = (await db.execute(sql as never)) as unknown as { rows?: { name: string }[] };
+      return result?.rows ?? [];
+    },
+  };
+  await adoptExistingSchema(runner);
+  await applyMigrations(runner);
 }
 
 export async function getDb(): Promise<DrizzleDb> {

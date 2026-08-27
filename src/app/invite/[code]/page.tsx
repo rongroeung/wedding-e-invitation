@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ThemeStyle } from "@/components/ThemeStyle";
 import { InvitationPage } from "@/components/invitation/InvitationPage";
-import { getGuestByCode, getInvitationData, getWedding } from "@/lib/queries";
+import { getGuestByCode, getGuestRsvpStatus, getInvitationData, getWedding } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
@@ -26,11 +26,14 @@ export default async function GuestInvitation({ params }: Params) {
   const guest = await getGuestByCode(decodeURIComponent(code));
   if (!guest) notFound();
 
-  const data = await getInvitationData();
+  const [data, rsvpStatus] = await Promise.all([
+    getInvitationData(),
+    getGuestRsvpStatus(guest.code),
+  ]);
   return (
     <>
       <ThemeStyle wedding={data.wedding} />
-      <InvitationPage data={data} guest={guest} />
+      <InvitationPage data={data} guest={guest} rsvpStatus={rsvpStatus} />
     </>
   );
 }

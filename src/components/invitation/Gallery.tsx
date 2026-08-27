@@ -44,7 +44,7 @@ export function Gallery({ images }: { images: GalleryImage[] }) {
       <div className="mx-auto max-w-5xl">
         <SectionTitle eyebrow="រូបភាព" title="អនុស្សាវរីយ៍របស់យើង" />
 
-        <div className="reveal columns-2 gap-3 sm:columns-3 sm:gap-4">
+        <div className="reveal columns-2 gap-3 sm:gap-4">
           {images.map((image, index) => (
             <button
               key={image.id}

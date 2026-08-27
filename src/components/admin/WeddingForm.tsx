@@ -57,6 +57,9 @@ export function WeddingForm({ wedding }: { wedding: Wedding }) {
           <Field label="អក្សរលើប៊ូតុងបើកសំបុត្រ">
             <Input value={form.openButton} onChange={(e) => set("openButton", e.target.value)} />
           </Field>
+          <Field label="អក្សរផ្ចិត (Monogram)" hint="ឧ. S&L — បង្ហាញនៅលើគម្របសំបុត្រ">
+            <Input value={form.monogram} maxLength={12} onChange={(e) => set("monogram", e.target.value)} />
+          </Field>
           <Field label="រូបភាពគម្រប (URL)" hint="ឬផ្ទុករូបភាពខាងក្រោម">
             <Input value={form.coverPhotoUrl} onChange={(e) => set("coverPhotoUrl", e.target.value)} />
           </Field>
@@ -111,12 +114,19 @@ export function WeddingForm({ wedding }: { wedding: Wedding }) {
 
       <Card title="អត្ថបទអញ្ជើញផ្លូវការ">
         <div className="space-y-4">
-          <Field label="ងារកិត្តិយស" hint="បង្ហាញនៅពេលភ្ញៀវបើកតំណទូទៅ (គ្មានឈ្មោះផ្ទាល់ខ្លួន)">
-            <Input value={form.invitationHonorific} onChange={(e) => set("invitationHonorific", e.target.value)} />
+          <Field
+            label="ងារកិត្តិយស"
+            hint="បង្ហាញជានិច្ចនៅលើសំបុត្រ — ភ្ញៀវត្រូវបានស្វាគមន៍តាមឈ្មោះនៅលើគម្របវិញ"
+          >
+            <Textarea
+              rows={2}
+              value={form.invitationHonorific}
+              onChange={(e) => set("invitationHonorific", e.target.value)}
+            />
           </Field>
-          <Field label="អារម្ភកថា"><Textarea rows={2} value={form.invitationIntro} onChange={(e) => set("invitationIntro", e.target.value)} /></Field>
-          <Field label="អត្ថបទអញ្ជើញ"><Textarea rows={2} value={form.invitationBody} onChange={(e) => set("invitationBody", e.target.value)} /></Field>
-          <Field label="អត្ថបទបញ្ចប់"><Textarea rows={3} value={form.invitationClosing} onChange={(e) => set("invitationClosing", e.target.value)} /></Field>
+          <Field label="អត្ថបទអញ្ជើញ">
+            <Textarea rows={3} value={form.invitationBody} onChange={(e) => set("invitationBody", e.target.value)} />
+          </Field>
         </div>
       </Card>
 

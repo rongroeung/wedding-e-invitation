@@ -48,7 +48,7 @@ export function Countdown({ date }: { date: string }) {
 
   return (
     <div className="reveal mt-10">
-      <p className="text-center text-xs text-gold-deep/85 sm:text-sm">
+      <p className="text-center text-xs text-gold-deep sm:text-sm">
         រាប់ថយក្រោយដល់ថ្ងៃមង្គលការ
       </p>
       <GoldDivider className="my-5" width="max-w-[150px]" icon="none" />
@@ -65,7 +65,7 @@ export function Countdown({ date }: { date: string }) {
             >
               {toKhmerNumber2(value)}
             </div>
-            <div className="mt-1 text-[0.65rem] text-ink/60 sm:text-xs">
+            <div className="mt-1 text-[0.65rem] text-ink/75 sm:text-xs">
               {COUNTDOWN_LABELS[key]}
             </div>
           </div>

@@ -18,7 +18,13 @@ export function GuestManager({
 }) {
   const { busy, message, send, setMessage } = useApi();
   const [query, setQuery] = useState("");
-  const [draft, setDraft] = useState({ title: "លោក", name: "", phone: "", allowedSeats: 1, notes: "" });
+  const [draft, setDraft] = useState({
+    title: "លោក",
+    name: "",
+    nameLatin: "",
+    allowedSeats: 1,
+    notes: "",
+  });
   const [bulk, setBulk] = useState("");
   const [qrGuest, setQrGuest] = useState<Guest | null>(null);
 
@@ -34,7 +40,7 @@ export function GuestManager({
     return guests.filter(
       (g) =>
         g.name.toLowerCase().includes(q) ||
-        g.phone.toLowerCase().includes(q) ||
+        g.nameLatin.toLowerCase().includes(q) ||
         g.code.toLowerCase().includes(q),
     );
   }, [guests, query]);
@@ -67,7 +73,10 @@ export function GuestManager({
       <StatusMessage message={message} />
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card title="បន្ថែមភ្ញៀវម្នាក់">
+        <Card
+          title="បន្ថែមភ្ញៀវម្នាក់"
+          description="ប្រព័ន្ធនឹងបង្កើតលេខកូដអញ្ជើញចៃដន្យដោយស្វ័យប្រវត្តិ"
+        >
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="ងារ">
               <Select value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })}>
@@ -79,8 +88,12 @@ export function GuestManager({
             <Field label="ឈ្មោះ">
               <Input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
             </Field>
-            <Field label="លេខទូរស័ព្ទ">
-              <Input value={draft.phone} onChange={(e) => setDraft({ ...draft, phone: e.target.value })} />
+            <Field label="ឈ្មោះជាអក្សរឡាតាំង" hint="ស្រេចចិត្ត — បង្ហាញនៅលើគម្រប">
+              <Input
+                value={draft.nameLatin}
+                placeholder="Mr. Theng Rathrongroeung"
+                onChange={(e) => setDraft({ ...draft, nameLatin: e.target.value })}
+              />
             </Field>
             <Field label="ចំនួនកៅអី">
               <Input
@@ -107,7 +120,8 @@ export function GuestManager({
                   body: JSON.stringify(draft),
                   successText: "បានបន្ថែមភ្ញៀវ",
                 });
-                if (result) setDraft({ title: draft.title, name: "", phone: "", allowedSeats: 1, notes: "" });
+                if (result)
+                  setDraft({ title: draft.title, name: "", nameLatin: "", allowedSeats: 1, notes: "" });
               }}
             >
               បន្ថែម
@@ -115,12 +129,12 @@ export function GuestManager({
           </div>
         </Card>
 
-        <Card title="នាំចូលភ្ញៀវច្រើននាក់" description="មួយបន្ទាត់ក្នុងមួយនាក់៖ ឈ្មោះ, លេខទូរស័ព្ទ, ចំនួនកៅអី">
+        <Card title="នាំចូលភ្ញៀវច្រើននាក់" description="មួយបន្ទាត់ក្នុងមួយនាក់៖ ឈ្មោះ, ចំនួនកៅអី">
           <Textarea
             rows={7}
             value={bulk}
             onChange={(e) => setBulk(e.target.value)}
-            placeholder={"ថេង រ័ត្នរង្សីរឿង, 012345678, 2\nចាន់ ដារ៉ា, 012333444, 1"}
+            placeholder={"ថេង រ័ត្នរង្សីរឿង, 2\nចាន់ ដារ៉ា, 1"}
           />
           <div className="mt-4 flex justify-end">
             <Button
@@ -147,7 +161,7 @@ export function GuestManager({
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="ស្វែងរកឈ្មោះ / លេខទូរស័ព្ទ / កូដ"
+            placeholder="ស្វែងរកឈ្មោះ / កូដ"
             className="w-full sm:w-64"
           />
         }
@@ -167,8 +181,11 @@ export function GuestManager({
                         {guest.allowedSeats} កៅអី · មើល {guest.views} ដង
                       </span>
                     </p>
-                    <p className="truncate text-xs text-slate-500">{link}</p>
-                    {guest.phone && <p className="text-xs text-slate-400">{guest.phone}</p>}
+                    <p className="truncate text-xs text-slate-500">
+                      <span className="font-mono text-slate-600">{guest.code}</span>
+                      <span className="ml-2 text-slate-400">{link}</span>
+                    </p>
+                    {guest.nameLatin && <p className="text-xs text-slate-400">{guest.nameLatin}</p>}
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2">
@@ -187,6 +204,21 @@ export function GuestManager({
                     )}
                     <Button variant="ghost" type="button" onClick={() => copy(link)}>ចម្លងតំណ</Button>
                     <Button variant="ghost" type="button" onClick={() => setQrGuest(guest)}>QR</Button>
+                    <Button
+                      variant="ghost"
+                      type="button"
+                      disabled={busy}
+                      title="បង្កើតលេខកូដថ្មី (តំណចាស់នឹងលែងដំណើរការ)"
+                      onClick={() =>
+                        send(`/api/admin/guests/${guest.id}`, {
+                          method: "PUT",
+                          body: JSON.stringify({ regenerateCode: true }),
+                          successText: "បានបង្កើតតំណថ្មី",
+                        })
+                      }
+                    >
+                      កូដថ្មី
+                    </Button>
                     <a
                       href={`https://t.me/share/url?url=${encodeURIComponent(link)}`}
                       target="_blank"

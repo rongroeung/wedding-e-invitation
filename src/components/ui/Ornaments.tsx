@@ -69,9 +69,9 @@ export function GoldDivider({
   return (
     <div className={`mx-auto flex w-full items-center justify-center gap-3 ${width} ${className}`}>
       <span className="gold-line h-px flex-1" />
-      {icon === "lotus" && <Lotus className="h-5 w-5 shrink-0 text-gold" />}
+      {icon === "lotus" && <Lotus className="h-5 w-5 shrink-0 text-gold-dark" />}
       {icon === "diamond" && (
-        <span className="h-2 w-2 rotate-45 bg-gold" aria-hidden="true" />
+        <span className="h-2 w-2 rotate-45 bg-gold-dark" aria-hidden="true" />
       )}
       <span className="gold-line h-px flex-1" />
     </div>
@@ -122,18 +122,6 @@ export function PatternBackground({ pattern = "lotus" }: { pattern?: string }) {
       </defs>
       <rect width="100%" height="100%" fill={`url(#${id})`} />
     </svg>
-  );
-}
-
-/** Decorative frame drawn around a panel. */
-export function OrnateFrame({ className = "" }: Props) {
-  return (
-    <div className={`pointer-events-none absolute inset-0 text-gold ${className}`} aria-hidden="true">
-      <CornerOrnament className="absolute left-0 top-0 h-16 w-16 sm:h-20 sm:w-20" />
-      <CornerOrnament className="absolute right-0 top-0 h-16 w-16 sm:h-20 sm:w-20" rotate={90} />
-      <CornerOrnament className="absolute bottom-0 right-0 h-16 w-16 sm:h-20 sm:w-20" rotate={180} />
-      <CornerOrnament className="absolute bottom-0 left-0 h-16 w-16 sm:h-20 sm:w-20" rotate={270} />
-    </div>
   );
 }
 

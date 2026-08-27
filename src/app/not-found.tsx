@@ -10,7 +10,7 @@ export default function NotFound() {
           រកមិនឃើញសំបុត្រអញ្ជើញនេះទេ
         </h1>
         <GoldDivider className="my-6" width="max-w-[150px]" />
-        <p className="text-sm leading-loose text-ink/70 khmer-wrap">
+        <p className="text-sm leading-loose text-ink/85 khmer-wrap">
           សូមមេត្តាពិនិត្យតំណរបស់លោកអ្នកម្ដងទៀត ឬទាក់ទងមកម្ចាស់ពិធីដោយផ្ទាល់។
         </p>
         <Link href="/" className="btn-gold mt-8">

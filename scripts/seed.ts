@@ -60,6 +60,12 @@ async function main() {
         "ប្រសិនបើលោកអ្នកមានបំណងចូលរួមជាចំណងដៃ សូមមេត្តាប្រើប្រាស់ព័ត៌មានខាងក្រោម៖",
       metaDescription:
         "សូមគោរពអញ្ជើញចូលរួមជាភ្ញៀវកិត្តិយស ក្នុងពិធីមង្គលការរបស់ សុខ វិសាល និង លីន ស្រីពៅ",
+      monogram: "S&L",
+      frameMotif: "kbach",
+      invitationHonorific:
+        "ឯកឧត្តម លោកអ្នកឧកញ៉ា អ្នកឧកញ៉ា ឧកញ៉ា លោកជំទាវ លោក លោកស្រី អ្នកនាង កញ្ញា",
+      invitationBody:
+        "អញ្ជើញចូលរួម ជាអធិបតី និងជាភ្ញៀវកិត្តិយស ដើម្បីប្រសិទ្ធិពរជ័យសិរីមង្គលអាពាហ៍ពិពាហ៍ កូនប្រុស កូនស្រី របស់យើងខ្ញុំ",
     });
     console.log("✔ wedding information seeded");
   } else {
@@ -135,9 +141,15 @@ async function main() {
   /* ── Demo guests ────────────────────────────────────────────── */
   if ((await db.select().from(guests).limit(1)).length === 0) {
     await db.insert(guests).values([
-      { code: "theng-rathrongroeung", title: "លោក", name: "ថេង រ័ត្នរង្សីរឿង", phone: "012 111 222", allowedSeats: 2 },
-      { code: "ABC123", title: "លោកស្រី", name: "ចាន់ ដារ៉ា", phone: "012 333 444", allowedSeats: 2 },
-      { code: "KHM456", title: "កញ្ញា", name: "សុវណ្ណ មករា", phone: "012 555 666", allowedSeats: 1 },
+      {
+        code: "K7Q4MXA2",
+        title: "លោក",
+        name: "ថេង រ័ត្នរង្សីរឿង",
+        nameLatin: "Mr. Theng Rathrongroeung",
+        allowedSeats: 2,
+      },
+      { code: "P3WHY9TB", title: "លោកស្រី", name: "ចាន់ ដារ៉ា", allowedSeats: 2 },
+      { code: "R6JZ2NDK", title: "កញ្ញា", name: "សុវណ្ណ មករា", allowedSeats: 1 },
     ]);
     console.log("✔ demo guests seeded");
   }

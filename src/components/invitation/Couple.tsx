@@ -36,27 +36,27 @@ function Person({
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-cream to-beige">
-                <Lotus className="h-14 w-14 text-gold/50" />
+                <Lotus className="h-14 w-14 text-gold-dark/60" />
               </div>
             )}
           </div>
         </div>
       </div>
 
-      <p className="mt-6 text-xs text-gold-deep/85">{role}</p>
-      <h3 className="mt-3 text-xl text-burgundy khmer-wrap sm:text-2xl">
-        <span className="text-base text-ink/60">{title} </span>
+      <p className="mt-6 text-xs text-gold-deep">{role}</p>
+      <h3 className="mt-3 text-xl text-heading khmer-wrap sm:text-2xl">
+        <span className="text-base text-ink/75">{title} </span>
         {name}
       </h3>
 
       <GoldDivider className="my-5" width="max-w-[120px]" icon="diamond" />
 
-      <p className="text-xs text-ink/60 khmer-wrap sm:text-sm">
+      <p className="text-xs text-ink/75 khmer-wrap sm:text-sm">
         {align === "left" ? "កូនប្រុសរបស់" : "កូនស្រីរបស់"}
       </p>
-      <p className="mt-2 text-sm leading-loose text-ink/85 khmer-wrap sm:text-base">{father}</p>
-      <p className="text-xs text-ink/55">និង</p>
-      <p className="text-sm leading-loose text-ink/85 khmer-wrap sm:text-base">{mother}</p>
+      <p className="mt-2 text-sm leading-loose text-ink/95 khmer-wrap sm:text-base">{father}</p>
+      <p className="text-xs text-ink/75">និង</p>
+      <p className="text-sm leading-loose text-ink/95 khmer-wrap sm:text-base">{mother}</p>
     </article>
   );
 }
@@ -67,7 +67,7 @@ export function Couple({ wedding }: { wedding: Wedding }) {
       <div className="mx-auto max-w-5xl">
         <SectionTitle eyebrow="គូស្វាមីភរិយាថ្មី" title="កូនប្រុស និង កូនស្រី" />
 
-        <div className="flex flex-col items-center gap-12 sm:gap-10 md:flex-row md:items-start">
+        <div className="flex flex-col items-center gap-12">
           <Person
             role="កូនប្រុស"
             title={wedding.groomTitle}
@@ -78,7 +78,7 @@ export function Couple({ wedding }: { wedding: Wedding }) {
             align="left"
           />
 
-          <div className="reveal flex shrink-0 flex-col items-center gap-3 self-center text-gold">
+          <div className="reveal flex shrink-0 flex-col items-center gap-3 self-center text-gold-dark">
             <WeddingRings className="h-12 w-20" />
             <span className="font-latin text-sm italic text-gold-deep">និង</span>
           </div>

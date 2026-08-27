@@ -9,16 +9,21 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        burgundy: "var(--c-primary)",
-        gold: "var(--c-secondary)",
-        champagne: "var(--c-accent)",
-        ivory: "var(--c-bg)",
-        ink: "var(--c-text)",
-        cream: "#F7F1E6",
-        beige: "#EFE3CE",
-        brown: "#3E2A20",
-        "gold-deep": "#A8842F",
-        "gold-light": "#F0DFB4",
+        // Written as rgb(<channels> / <alpha-value>) so utilities such as
+        // `text-ink/70` and `border-gold/40` actually compile.
+        heading: "rgb(var(--c-primary-rgb) / <alpha-value>)",
+        stage: "rgb(var(--c-stage-rgb) / <alpha-value>)",
+        "gold-frame": "rgb(var(--gold-frame-rgb) / <alpha-value>)",
+        gold: "rgb(var(--c-secondary-rgb) / <alpha-value>)",
+        champagne: "rgb(var(--c-accent-rgb) / <alpha-value>)",
+        ivory: "rgb(var(--c-bg-rgb) / <alpha-value>)",
+        ink: "rgb(var(--c-text-rgb) / <alpha-value>)",
+        cream: "#FBF9F5",
+        beige: "#EDE7DC",
+        brown: "#3B2C21",
+        "gold-deep": "rgb(var(--gold-deep-rgb) / <alpha-value>)",
+        "gold-dark": "rgb(var(--gold-1-rgb) / <alpha-value>)",
+        "gold-light": "rgb(var(--gold-3-rgb) / <alpha-value>)",
       },
       fontFamily: {
         khmer: ["var(--f-heading)", "Noto Serif Khmer", "serif"],
@@ -33,7 +38,7 @@ const config: Config = {
       },
       backgroundImage: {
         "gold-sheen":
-          "linear-gradient(100deg,#A8842F 0%,#E4CE9B 22%,#F6E7BE 38%,#C8A24A 55%,#8F6B22 78%,#E4CE9B 100%)",
+          "linear-gradient(100deg,var(--gold-deep) 0%,var(--gold-1) 22%,var(--gold-3) 40%,var(--gold-2) 56%,var(--gold-deep) 78%,var(--gold-1) 100%)",
       },
       keyframes: {
         fadeUp: { "0%": { opacity: "0", transform: "translateY(28px)" }, "100%": { opacity: "1", transform: "translateY(0)" } },

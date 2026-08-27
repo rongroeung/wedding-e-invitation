@@ -10,11 +10,18 @@ Built with **Next.js 15 (App Router) · TypeScript · Tailwind CSS · Drizzle OR
 
 ## ✨ What is included
 
+The invitation is presented as a **printed card**: a column of textured paper
+stock framed in antique gold, resting on a muted stage. On wide screens the
+stage divides into three zones — event details, the card, and the guest's QR
+code and RSVP status — each a proportional column with its own surface and a
+hairline boundary. The side zones are equal, so the card sits exactly centred
+and never grows past a comfortable reading measure.
+
 **Guest-facing invitation** (`/` and `/invite/<code>`)
 
 | | |
 |---|---|
-| 💌 Envelope cover | Full-screen cover with a gold-foil card that opens into the invitation |
+| 💌 Card cover | Monogram, the guest's name, and one button — like lifting an envelope flap |
 | 🙏 Formal invitation | Respectful Khmer wording, personalised with the guest’s name |
 | 👰 Couple section | Both families, parents’ names and portraits |
 | 📅 Date + countdown | Khmer numerals, Buddhist era, live countdown that turns into a congratulation |
@@ -27,6 +34,7 @@ Built with **Next.js 15 (App Router) · TypeScript · Tailwind CSS · Drizzle OR
 | 🎵 Music | Floating player that only ever starts from a user gesture |
 | 📞 Contact | `tel:` buttons for the groom and bride |
 | 🔗 Sharing | Telegram, Facebook, Messenger, copy link, Open Graph preview image |
+| 🧾 Desktop rails | Date and venue at a glance; the guest's QR code and live RSVP status |
 
 **Admin dashboard** (`/admin`) — statistics, wedding information, programme &
 love story, gallery, guests with personalised links and QR codes, RSVP list with
@@ -95,9 +103,14 @@ PostgreSQL server instead; the schema is identical.
 Each guest gets their own link and QR code:
 
 ```
-https://your-domain.com/invite/theng-rathrongroeung
-https://your-domain.com/invite/ABC123
+https://your-domain.com/invite/K7Q4MXA2
+https://your-domain.com/invite/P3WHY9TB
 ```
+
+Codes are random 8-character strings, never derived from the guest's name — a
+name in the URL would reveal who was invited to anyone who sees the link. You
+can still set a memorable code by hand, or press **កូដថ្មី** to issue a new one
+(which immediately invalidates the old link).
 
 The invitation then greets them by name (`សូមគោរពអញ្ជើញ លោក …`), pre-fills the
 RSVP form, and every open is counted on the dashboard.
@@ -111,12 +124,48 @@ link, download the QR code as PNG, or share straight to Telegram.
 ## 🎨 Theme
 
 **Admin → រូបរាង** controls the whole visual identity at runtime: five colours,
-the Khmer heading and body fonts, and the decorative pattern (lotus, Angkor,
-floral or none). The values are injected as CSS custom properties, so changes
-apply instantly without a rebuild.
+the Khmer heading and body fonts, and the decorative pattern. The values are
+injected as CSS custom properties, so changes apply instantly without a rebuild.
 
-Four ready-made palettes are included, the default being champagne gold, royal
-gold, deep burgundy and ivory.
+The single gold you pick is expanded into a four-stop metallic ramp, and the
+stage colour is derived from the paper colour, so a palette change stays
+coherent across the frame, dividers and buttons. Four ready-made palettes are
+included; the default is cotton paper, dark brown ink and antique gold.
+
+### The card frame
+
+The card is crowned by an ornament band, mirrored at its foot, with hairline
+rules joining the two. **Admin → រូបរាង → ស៊ុមសំបុត្រ** offers two sources:
+
+**Built-in** — three kinds:
+
+- *Band artwork* (`kbach`, the default) — gold Khmer kbach across the head and
+  foot, from artwork in `public/frames` (see the note there about rights).
+- *Corner artwork* (`royal`, `royal-light`) — one ornament mirrored into all
+  four corners.
+- *Generated bands* (`lotus`, `flame`, `angkor`, `wheel`) — drawn by
+  `scripts/ornament-source.mjs`; edit that and re-run
+  `node scripts/emit-ornaments.mjs` rather than hand-editing the component.
+
+**Your own artwork** — upload a band and the app uses it instead. This is the
+right route for professionally drawn Khmer kbach, which no generator will match.
+
+| | |
+|---|---|
+| Format | PNG with a transparent background, or SVG |
+| Width | 1200–2000px recommended; it is scaled to the card width |
+| Height | Anything — the side rules fill whatever space the bands leave |
+| Layout | *Band* (head and foot) or *Corner* (mirrored into all four) |
+| What to upload | Band: the **top** band only, mirrored for the foot unless you upload a separate one. Corner: the **top-left** corner only, mirrored into the other three. |
+
+Don't upload a complete four-sided frame as one image: the card grows with its
+content, so a fixed frame would stretch. Top and bottom bands plus the side
+rules give the same look at any length. You can also paste an image URL instead
+of uploading, and turn the side rules off if your artwork already has edges.
+
+The cover monogram (**Admin → ព័ត៌មានអាពាហ៍ពិពាហ៍**) and an optional Latin form
+of each guest's name (**Admin → ភ្ញៀវ**) let the cover read the way a printed
+card does — `Mr. Theng Rathrongroeung` above the open button.
 
 ---
 
@@ -132,7 +181,7 @@ src/
 ├── components/
 │   ├── invitation/              # cover, couple, countdown, gallery, RSVP …
 │   ├── admin/                   # dashboard forms and tables
-│   └── ui/                      # Khmer ornaments (hand-drawn inline SVG)
+│   └── ui/                      # card frame, ornament bands, monogram
 ├── lib/
 │   ├── db/                      # Drizzle schema + connection
 │   ├── khmer.ts                 # Khmer numerals, dates, time zone handling
@@ -150,11 +199,12 @@ scripts/                         # migrate, seed, optional font download
 | `npm run dev` | Development server |
 | `npm run build` / `start` | Production build and server |
 | `npm run db:setup` | Migrate **and** seed in one step |
-| `npm run db:migrate` | Apply the SQL migrations |
+| `npm run db:migrate` | Apply pending SQL migrations (tracked in a ledger table) |
 | `npm run db:seed` | Insert demo content + create the admin user |
 | `npm run db:generate` | Regenerate migrations after editing the schema |
 | `npm run db:studio` | Drizzle Studio (browse the database) |
 | `npm run fonts:download` | Self-host the Khmer web fonts in `public/fonts` |
+| `node scripts/emit-ornaments.mjs` | Regenerate the ornament band SVG component |
 
 ---
 

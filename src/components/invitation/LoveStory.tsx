@@ -29,14 +29,14 @@ export function LoveStory({ items }: { items: StoryItem[] }) {
                 }`}
                 aria-hidden="true"
               >
-                <Lotus className="h-3.5 w-3.5 text-gold" />
+                <Lotus className="h-3.5 w-3.5 text-gold-dark" />
               </span>
-              <p className="gold-text text-sm sm:text-base">{item.label}</p>
-              <h3 className="mt-1 text-base leading-loose text-burgundy khmer-wrap sm:text-lg">
+              <p className="gold-solid text-sm font-medium sm:text-base">{item.label}</p>
+              <h3 className="mt-1 text-base leading-loose text-heading khmer-wrap sm:text-lg">
                 {item.title}
               </h3>
               {item.description && (
-                <p className="mt-1 text-sm leading-loose text-ink/70 khmer-wrap">
+                <p className="mt-1 text-sm leading-loose text-ink/85 khmer-wrap">
                   {item.description}
                 </p>
               )}

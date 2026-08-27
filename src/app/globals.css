@@ -2,18 +2,57 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Khmer OS Muol Light — the ceremonial face Cambodian invitations set their
+ * titles in. Bundled (LGPL-2.1+, see public/fonts/KhmerOS-LICENSE.txt) because
+ * it is common on Cambodian desktops but absent from phones, and guests open
+ * these on phones.
+ */
+@font-face {
+  font-family: "Khmer OS Muol Light";
+  src:
+    local("Khmer OS Muol Light"),
+    url("/fonts/KhmerOSMuolLight.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* ── Theme tokens (overridden at runtime by the admin “Theme” page) ─────── */
 :root {
-  --c-primary: #7b1f2f;
-  --c-secondary: #c8a24a;
-  --c-accent: #e4ce9b;
-  --c-bg: #fbf7f0;
-  --c-text: #3e2a20;
-  --f-heading: "Noto Serif Khmer";
+  --c-primary: #4a3527;
+  --c-secondary: #c29a5b;
+  --c-accent: #e3d3b8;
+  --c-bg: #f6f3ee;
+  --c-text: #4a3a2c;
+  --c-stage: #e7e4df;
+  --c-zone: #ddd9d2;
+  --gold-frame: #c29a5b;
+  --f-heading: "Khmer OS Muol Light";
   --f-body: "Noto Sans Khmer";
-  --gold-1: #a8842f;
-  --gold-2: #e4ce9b;
-  --gold-3: #f6e7be;
+  /* Metallic gold ramp used for foil text and dividers.
+     Deliberately kept dark — pale golds disappear on an ivory background. */
+  --gold-deep: #614d2e;
+  --gold-1: #83683e;
+  --gold-2: #a8874e;
+  --gold-3: #cba374;
+
+  /*
+   * Tailwind can only apply its `/opacity` modifier to a colour whose channels
+   * it can see, so every themed colour is published twice: once as a hex value
+   * for raw CSS gradients, and once as an "r g b" triplet for Tailwind.
+   */
+  --c-primary-rgb: 74 53 39;
+  --c-secondary-rgb: 194 154 91;
+  --c-accent-rgb: 227 211 184;
+  --c-bg-rgb: 246 243 238;
+  --c-text-rgb: 74 58 44;
+  --c-stage-rgb: 231 228 223;
+  --c-zone-rgb: 221 217 210;
+  --gold-frame-rgb: 194 154 91;
+  --gold-deep-rgb: 97 77 46;
+  --gold-1-rgb: 131 104 62;
+  --gold-3-rgb: 203 163 116;
 }
 
 @layer base {
@@ -32,10 +71,20 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /* Khmer stacks glyphs above and below the em box (coeng subscripts,
+     vowel signs), so headings need far more leading than Latin would. */
   h1, h2, h3, h4 {
-    font-family: var(--f-heading), "Noto Serif Khmer", serif;
-    line-height: 1.75;
-    font-weight: 600;
+    font-family: var(--f-heading), "Khmer OS Muol Light", "Noto Serif Khmer", serif;
+    line-height: 2.05;
+    font-weight: 400;
+    padding-block: 0.08em;
+  }
+
+  /* Titles set in Muol; anything marked .title-face joins them. */
+  .title-face {
+    font-family: var(--f-heading), "Khmer OS Muol Light", "Noto Serif Khmer", serif;
+    font-weight: 400;
+    line-height: 2.05;
   }
 
   ::selection {
@@ -53,78 +102,107 @@
 }
 
 @layer components {
-  /* Warm ivory “paper” backdrop with a faint woven texture */
+  /*
+   * Cotton-paper stock. The fibre is an SVG turbulence filter baked into a
+   * data URI, so it costs one tiny inline asset rather than a bitmap request
+   * and stays crisp at any density.
+   */
   .paper {
     background-color: var(--c-bg);
     background-image:
-      radial-gradient(circle at 18% 12%, rgba(228, 206, 155, 0.28), transparent 45%),
-      radial-gradient(circle at 82% 78%, rgba(123, 31, 47, 0.07), transparent 50%),
-      repeating-linear-gradient(45deg, rgba(62, 42, 32, 0.016) 0 2px, transparent 2px 5px);
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23f)' opacity='0.22'/%3E%3C/svg%3E"),
+      radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.9), transparent 60%);
+    background-blend-mode: multiply, normal;
   }
 
-  /* Metallic gold text — reads like foil stamping on a wedding card */
+  /* The muted surface the card sits on, seen only on tablet and desktop */
+  .stage {
+    background-color: var(--c-stage);
+  }
+
+  /*
+   * Three-zone desktop stage. The side zones sit a shade deeper than the
+   * centre runway, and a hairline marks each boundary, so the three regions
+   * read as separate panels rather than one continuous field.
+   */
+  .zone-side {
+    background-color: var(--c-zone);
+    border-color: rgb(var(--gold-frame-rgb) / 0.28);
+  }
+
+  .zone-centre {
+    background-color: var(--c-stage);
+  }
+
+  /* The invitation card itself */
+  .card-stock {
+    background-color: var(--c-bg);
+    box-shadow:
+      0 1px 2px rgba(74, 53, 39, 0.08),
+      0 18px 50px -20px rgba(74, 53, 39, 0.28);
+  }
+
+  /*
+   * Metallic gold text — reads like foil stamping on a wedding card.
+   *
+   * Two things matter here. The ramp stays in the darker half of the gold
+   * range so the text keeps its contrast against ivory, and the element is
+   * an inline-block with padding: `background-clip: text` only paints inside
+   * the element box, so a Khmer glyph that rises or drops outside it would
+   * otherwise come out transparent and look cut off.
+   */
   .gold-text {
-    background: linear-gradient(
-      100deg,
-      var(--gold-1) 0%,
-      var(--gold-2) 24%,
-      var(--gold-3) 38%,
-      var(--c-secondary) 52%,
-      #8f6b22 74%,
-      var(--gold-2) 100%
-    );
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    padding: 0.12em 0.08em 0.26em;
+    color: var(--gold-1);
+  }
+
+  .gold-solid {
+    color: var(--gold-1);
   }
 
   .gold-line {
-    background: linear-gradient(90deg, transparent, var(--c-secondary), var(--gold-3), var(--c-secondary), transparent);
+    background: linear-gradient(90deg, transparent, var(--gold-1), var(--gold-2), var(--gold-1), transparent);
   }
 
   .gold-border {
-    border: 1px solid rgba(200, 162, 74, 0.45);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55), 0 18px 60px -30px rgba(62, 42, 32, 0.5);
+    border: 1px solid rgba(150, 118, 46, 0.5);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6), 0 20px 60px -28px rgba(62, 42, 32, 0.55);
   }
 
   .card-panel {
-    background: linear-gradient(160deg, rgba(255, 255, 255, 0.9), rgba(247, 241, 230, 0.72));
-    backdrop-filter: blur(2px);
+    background: rgba(255, 255, 255, 0.5);
   }
 
-  .section-pad { @apply px-5 py-16 sm:px-8 sm:py-20 lg:py-28; }
+  .section-pad { @apply px-6 py-14 sm:px-9 sm:py-16; }
 
   .btn-gold {
     @apply relative inline-flex items-center justify-center gap-2 rounded-full px-8 py-3 text-base font-medium transition-all duration-500;
     color: #fffdf7;
-    background: linear-gradient(120deg, var(--gold-1), var(--c-secondary) 45%, var(--gold-3) 62%, var(--c-secondary) 80%);
-    background-size: 200% auto;
-    box-shadow: 0 12px 34px -14px rgba(168, 132, 47, 0.9);
-    text-shadow: 0 1px 2px rgba(90, 60, 10, 0.35);
+    background: var(--c-primary);
+    box-shadow: 0 10px 26px -12px rgba(74, 53, 39, 0.75);
   }
-  .btn-gold:hover { background-position: right center; transform: translateY(-1px); }
+  .btn-gold:hover { filter: brightness(1.12); transform: translateY(-1px); }
   .btn-gold:active { transform: translateY(0); }
 
   .btn-outline {
     @apply inline-flex items-center justify-center gap-2 rounded-full border px-6 py-2.5 text-sm transition-colors duration-300;
-    border-color: rgba(200, 162, 74, 0.55);
+    border-color: rgba(150, 118, 46, 0.6);
     color: var(--c-primary);
   }
-  .btn-outline:hover { background: rgba(228, 206, 155, 0.22); }
+  .btn-outline:hover { background: rgba(216, 190, 133, 0.3); }
 
   .field {
     @apply w-full rounded-xl border bg-white/80 px-4 py-3 text-base outline-none transition;
-    border-color: rgba(200, 162, 74, 0.4);
+    border-color: rgba(150, 118, 46, 0.45);
     color: var(--c-text);
   }
   .field:focus {
-    border-color: var(--c-secondary);
-    box-shadow: 0 0 0 3px rgba(228, 206, 155, 0.35);
+    border-color: var(--gold-1);
+    box-shadow: 0 0 0 3px rgba(184, 145, 47, 0.28);
   }
 
-  .label { @apply mb-2 block text-sm; color: rgba(62, 42, 32, 0.75); }
+  .label { @apply mb-2 block text-sm; color: rgba(62, 42, 32, 0.88); }
 
   /* Scroll-reveal (progressive enhancement — visible by default without JS) */
   .reveal { opacity: 1; }
@@ -135,6 +213,76 @@
     will-change: opacity, transform;
   }
   .js .reveal.is-visible { opacity: 1; transform: none; }
+
+  /* ── Living backdrop ─────────────────────────────────────────────────
+   * A few drifting gold motes, one breathing pool of candlelight and a very
+   * slow sheen across the paper. All GPU-friendly transforms/opacity, all
+   * switched off under prefers-reduced-motion.
+   */
+  .mote {
+    position: absolute;
+    border-radius: 9999px;
+    background: radial-gradient(circle at 35% 35%, rgba(255, 244, 219, 0.95), var(--gold-3) 45%, transparent 72%);
+    animation-name: drift;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    will-change: transform, opacity;
+  }
+
+  @keyframes drift {
+    0%   { transform: translate3d(0, 12vh, 0) scale(0.85); opacity: 0; }
+    12%  { opacity: 0.75; }
+    50%  { transform: translate3d(14px, -34vh, 0) scale(1.1); }
+    88%  { opacity: 0.55; }
+    100% { transform: translate3d(-10px, -78vh, 0) scale(0.9); opacity: 0; }
+  }
+
+  .candle-glow {
+    position: absolute;
+    left: 50%;
+    border-radius: 9999px;
+    transform: translateX(-50%);
+    background: radial-gradient(circle, rgba(var(--gold-3-rgb) / 0.4), transparent 68%);
+    filter: blur(22px);
+    animation: breathe 7.5s ease-in-out infinite;
+    will-change: opacity, transform;
+  }
+
+  @keyframes breathe {
+    0%, 100% { opacity: 0.5; transform: translateX(-50%) scale(1); }
+    50%      { opacity: 0.85; transform: translateX(-50%) scale(1.09); }
+  }
+
+  .paper-sheen {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      104deg,
+      transparent 38%,
+      rgba(255, 252, 244, 0.5) 47%,
+      rgba(255, 250, 236, 0.72) 50%,
+      rgba(255, 252, 244, 0.5) 53%,
+      transparent 62%
+    );
+    background-size: 260% 100%;
+    animation: sheen-sweep 14s ease-in-out infinite;
+    mix-blend-mode: soft-light;
+  }
+
+  @keyframes sheen-sweep {
+    0%, 12%  { background-position: 130% 0; }
+    62%, 100% { background-position: -30% 0; }
+  }
+
+  /* The ring around the monogram, turning slowly */
+  .halo-spin {
+    animation: halo 46s linear infinite;
+    transform-origin: 50% 50%;
+  }
+
+  @keyframes halo {
+    to { transform: rotate(360deg); }
+  }
 
   .petal {
     position: absolute;
@@ -156,7 +304,16 @@
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .js .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
-  .petal, .animate-floaty, .animate-pulseSoft { animation: none !important; }
+  .petal,
+  .mote,
+  .candle-glow,
+  .paper-sheen,
+  .halo-spin,
+  .animate-floaty,
+  .animate-pulseSoft {
+    animation: none !important;
+  }
+  .paper-sheen { opacity: 0; }
 }
 
 /* Khmer text should never be broken mid-cluster */

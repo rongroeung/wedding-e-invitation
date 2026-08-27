@@ -18,13 +18,13 @@ function ContactCard({
   if (!phone) return null;
   return (
     <div className="reveal card-panel gold-border rounded-2xl px-5 py-7 text-center">
-      <p className="text-xs text-gold-deep/85">{role}</p>
-      <p className="mt-3 text-lg text-burgundy khmer-wrap">
-        <span className="text-sm text-ink/60">{title} </span>
+      <p className="text-xs text-gold-deep">{role}</p>
+      <p className="mt-3 text-lg text-heading khmer-wrap">
+        <span className="text-sm text-ink/75">{title} </span>
         {name}
       </p>
       <GoldDivider className="my-4" width="max-w-[100px]" icon="none" />
-      <p className="font-latin text-base tracking-wide text-ink/75">📞 {phone}</p>
+      <p className="font-latin text-base tracking-wide text-ink/88">📞 {phone}</p>
       <a href={`tel:${phone.replace(/\s/g, "")}`} className="btn-gold mt-5 text-sm">
         {action}
       </a>
@@ -40,7 +40,7 @@ export function Contact({ wedding }: { wedding: Wedding }) {
     <section id="contact" className="section-pad relative">
       <div className="mx-auto max-w-3xl">
         <SectionTitle eyebrow="ព័ត៌មានទំនាក់ទំនង" title="ទំនាក់ទំនង" />
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4">
           <ContactCard
             role="កូនប្រុស"
             title={wedding.groomTitle}

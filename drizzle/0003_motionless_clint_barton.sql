@@ -1,0 +1,1 @@
+ALTER TABLE "wedding" ADD COLUMN "frame_motif" text DEFAULT 'lotus' NOT NULL;

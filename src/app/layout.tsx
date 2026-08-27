@@ -64,6 +64,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="km" suppressHydrationWarning>
       <head>
+        <link
+          rel="preload"
+          href="/fonts/KhmerOSMuolLight.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
         {selfHostedFonts ? (
           <link rel="stylesheet" href="/fonts/fonts.css" />
         ) : (
@@ -71,7 +78,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <link rel="preconnect" href="https://fonts.googleapis.com" />
             <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
             <link
-              href="https://fonts.googleapis.com/css2?family=Noto+Serif+Khmer:wght@400;500;600;700&family=Noto+Sans+Khmer:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap"
+              href="https://fonts.googleapis.com/css2?family=Noto+Serif+Khmer:wght@400;500;600;700&family=Noto+Sans+Khmer:wght@300;400;500;600&family=Moul&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap"
               rel="stylesheet"
             />
           </>

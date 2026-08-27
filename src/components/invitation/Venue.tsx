@@ -16,12 +16,12 @@ export function Venue({ wedding }: { wedding: Wedding }) {
 
         <div className="reveal card-panel gold-border overflow-hidden rounded-[26px]">
           <div className="px-6 py-10 text-center sm:px-10">
-            <Lotus className="mx-auto h-6 w-6 text-gold" />
-            <h3 className="mt-5 text-xl leading-loose text-burgundy khmer-wrap sm:text-2xl">
+            <Lotus className="mx-auto h-6 w-6 text-gold-dark" />
+            <h3 className="mt-5 text-xl leading-loose text-heading khmer-wrap sm:text-2xl">
               {wedding.venueName}
             </h3>
             <GoldDivider className="my-5" width="max-w-[140px]" icon="diamond" />
-            <p className="mx-auto max-w-md text-sm leading-loose text-ink/75 khmer-wrap sm:text-base">
+            <p className="mx-auto max-w-md text-sm leading-loose text-ink/88 khmer-wrap sm:text-base">
               អាសយដ្ឋាន៖ {wedding.venueAddress}
             </p>
 
@@ -39,7 +39,7 @@ export function Venue({ wedding }: { wedding: Wedding }) {
           </div>
 
           {wedding.mapEmbedUrl && (
-            <div className="relative aspect-[4/3] w-full border-t border-champagne/50 sm:aspect-[16/9]">
+            <div className="relative aspect-[4/3] w-full border-t border-gold/40 sm:aspect-[16/9]">
               {mapLoaded ? (
                 <iframe
                   src={wedding.mapEmbedUrl}
@@ -56,8 +56,8 @@ export function Venue({ wedding }: { wedding: Wedding }) {
                   className="group flex h-full w-full flex-col items-center justify-center gap-3 bg-gradient-to-br from-cream to-beige/70"
                 >
                   <span className="text-3xl" aria-hidden="true">📍</span>
-                  <span className="text-sm text-burgundy khmer-wrap">មើលទីតាំងនៅលើផែនទី</span>
-                  <span className="text-[0.65rem] text-ink/50">
+                  <span className="text-sm text-heading khmer-wrap">មើលទីតាំងនៅលើផែនទី</span>
+                  <span className="text-[0.65rem] text-ink/72">
                     ចុចដើម្បីផ្ទុកផែនទី (សន្សំទិន្នន័យអ៊ីនធឺណិត)
                   </span>
                 </button>
