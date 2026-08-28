@@ -66,7 +66,7 @@ export function Rsvp({
             <div className="relative py-8 text-center">
               <Lotus className="mx-auto h-10 w-10 animate-floaty text-gold-dark" />
               <GoldDivider className="my-6" width="max-w-[150px]" />
-              <p className="mx-auto max-w-md text-sm leading-loose text-heading khmer-wrap sm:text-base">
+              <p className="mx-auto max-w-md text-base leading-loose text-heading khmer-wrap">
                 សូមអរគុណសម្រាប់ការបញ្ជាក់វត្តមាន។ យើងខ្ញុំរីករាយ និងទន្ទឹងរង់ចាំទទួលស្វាគមន៍លោកអ្នក
                 ក្នុងថ្ងៃដ៏សិរីមង្គលនេះ។ ❤️
               </p>

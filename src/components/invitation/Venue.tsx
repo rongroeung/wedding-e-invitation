@@ -17,11 +17,11 @@ export function Venue({ wedding }: { wedding: Wedding }) {
         <div className="reveal card-panel gold-border overflow-hidden rounded-[26px]">
           <div className="px-6 py-10 text-center sm:px-10">
             <Lotus className="mx-auto h-6 w-6 text-gold-dark" />
-            <h3 className="mt-5 text-base leading-loose text-heading khmer-wrap sm:text-lg">
+            <h3 className="mt-5 text-lg leading-loose text-heading khmer-wrap">
               {wedding.venueName}
             </h3>
             <GoldDivider className="my-5" width="max-w-[140px]" icon="diamond" />
-            <p className="mx-auto max-w-md text-sm leading-loose text-ink/88 khmer-wrap sm:text-base">
+            <p className="mx-auto max-w-md text-base leading-loose text-ink/88 khmer-wrap">
               អាសយដ្ឋាន៖ {wedding.venueAddress}
             </p>
 

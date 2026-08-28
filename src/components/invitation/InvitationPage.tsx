@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Guest } from "@/lib/db/schema";
 import type { InvitationData } from "@/lib/queries";
 import { mediaSrc } from "@/lib/media";
 import { Blessing } from "./Blessing";
 import { frameConfig } from "@/lib/frame";
-import { CardShell } from "./CardShell";
+import { CARD_SCROLL_ID, CardShell } from "./CardShell";
 import { ControlsRail, EventDetailsRail } from "./Rails";
 import { Contact } from "./Contact";
 import { Couple } from "./Couple";
@@ -19,7 +19,6 @@ import { LoveStory } from "./LoveStory";
 import { MusicPlayer } from "./MusicPlayer";
 import { Program } from "./Program";
 import { Rsvp } from "./Rsvp";
-import { SectionNav } from "./SectionNav";
 import { ShareBar } from "./ShareBar";
 import { Venue } from "./Venue";
 
@@ -40,16 +39,18 @@ export function InvitationPage({
   const [opened, setOpened] = useState(false);
   const [rsvpStatus, setRsvpStatus] = useState(initialRsvpStatus);
   const giftQr = mediaSrc(wedding.giftQrMediaId, wedding.giftQrUrl);
+  const frame = frameConfig(wedding);
   const contentRef = useRef<HTMLDivElement>(null);
   const tracked = useRef(false);
 
-  /* Lock scrolling while the cover is closed. */
+  /* Hold the page still behind the cover when the page is what scrolls. */
   useEffect(() => {
+    if (frame.sticky) return;
     document.body.style.overflow = opened ? "" : "hidden";
     return () => {
       document.body.style.overflow = "";
     };
-  }, [opened]);
+  }, [opened, frame.sticky]);
 
   /* Record the view once per page load. */
   useEffect(() => {
@@ -74,6 +75,8 @@ export function InvitationPage({
       elements.forEach((el) => el.classList.add("is-visible"));
       return;
     }
+    // The card scrolls inside its frame, so that element is the observer's
+    // root — against the viewport nothing below the fold would ever intersect.
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry, index) => {
@@ -84,33 +87,21 @@ export function InvitationPage({
           observer.unobserve(element);
         });
       },
-      { rootMargin: "0px 0px -8% 0px", threshold: 0.08 },
+      {
+        // With a fixed frame the card's own region scrolls, so that is the
+        // root; otherwise the page scrolls and the viewport is.
+        root: frame.sticky ? document.getElementById(CARD_SCROLL_ID) : null,
+        rootMargin: "0px 0px -8% 0px",
+        threshold: 0.08,
+      },
     );
     elements.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
-  }, [opened]);
-
-  const navItems = useMemo(() => {
-    const items = [
-      { id: "invitation", label: "សំបុត្រអញ្ជើញ" },
-      { id: "couple", label: "គូស្វាមីភរិយា" },
-      { id: "date", label: "ថ្ងៃមង្គលការ" },
-      wedding.showProgram && events.length > 0 ? { id: "program", label: "កម្មវិធី" } : null,
-      { id: "venue", label: "ទីតាំង" },
-      wedding.showLoveStory && story.length > 0 ? { id: "story", label: "រឿងរ៉ាវ" } : null,
-      wedding.showGallery && gallery.length > 0 ? { id: "gallery", label: "រូបភាព" } : null,
-      wedding.showRsvp ? { id: "rsvp", label: "បញ្ជាក់វត្តមាន" } : null,
-      wedding.giftEnabled && giftQr ? { id: "gift", label: "ចំណងដៃ" } : null,
-      wedding.showContact ? { id: "contact", label: "ទំនាក់ទំនង" } : null,
-    ];
-    return items.filter(Boolean) as { id: string; label: string }[];
-  }, [wedding, events.length, story.length, gallery.length, giftQr]);
+  }, [opened, frame.sticky]);
 
   const musicSrc = wedding.musicEnabled
     ? mediaSrc(wedding.musicMediaId, wedding.musicUrl)
     : "";
-
-  const frame = frameConfig(wedding);
 
   const musicButton = musicSrc ? (
     <MusicPlayer src={musicSrc} title={wedding.musicTitle} autoStart={opened} inline />
@@ -119,31 +110,24 @@ export function InvitationPage({
   return (
     <CardShell
       frame={frame}
+      scrollable={opened}
+      cover={
+        <Cover
+          wedding={wedding}
+          guest={guest}
+          opened={opened}
+          onOpen={() => setOpened(true)}
+        />
+      }
       left={<EventDetailsRail wedding={wedding} />}
       right={<ControlsRail guest={guest} rsvpStatus={rsvpStatus} music={musicButton} />}
     >
-      <Cover
-        wedding={wedding}
-        guest={guest}
-        frame={frame}
-        opened={opened}
-        onOpen={() => {
-          setOpened(true);
-          requestAnimationFrame(() => {
-            contentRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-          });
-        }}
-      />
-
-      {opened && <SectionNav items={navItems} title={wedding.title} />}
-
       <main
         ref={contentRef}
-        style={{ paddingTop: "var(--frame-clear, 5rem)", paddingBottom: "var(--frame-clear, 5rem)" }}
         className={`relative transition-opacity duration-1000 ${
           opened
             ? "opacity-100"
-            : "pointer-events-none h-[100svh] overflow-hidden !py-0 opacity-0 xl:h-[880px]"
+            : "pointer-events-none opacity-0"
         }`}
         aria-hidden={!opened}
       >

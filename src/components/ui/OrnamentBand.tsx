@@ -17,17 +17,20 @@ export function OrnamentBand({
   motif = "lotus",
   className = "",
   flip = false,
+  style,
 }: {
   motif?: BandMotif;
   className?: string;
   /** Mirrors the band vertically, for the foot of the card. */
   flip?: boolean;
+  style?: React.CSSProperties;
 }) {
   return (
     <svg
       viewBox="0 0 1000 190"
       preserveAspectRatio="xMidYMid meet"
       className={`${flip ? "-scale-y-100" : ""} ${className}`}
+      style={style}
       fill="none"
       aria-hidden="true"
       dangerouslySetInnerHTML={{ __html: BANDS[motif] ?? BANDS.lotus }}

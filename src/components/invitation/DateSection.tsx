@@ -16,20 +16,20 @@ export function DateSection({ wedding }: { wedding: Wedding }) {
       <PatternBackground pattern={wedding.pattern} />
 
       <div className="section-pad relative mx-auto max-w-3xl text-center">
-        <p className="reveal text-xs text-gold-deep sm:text-sm">
+        <p className="reveal text-sm text-gold-deep">
           ថ្ងៃដ៏សិរីមង្គល
         </p>
 
         <div className="reveal mt-6">
           <Lotus className="mx-auto h-7 w-7 text-gold-dark" />
-          <h2 className="gold-text mt-5 text-lg leading-loose khmer-wrap sm:text-[1.35rem]">
+          <h2 className="gold-text mt-5 text-[1.35rem] leading-loose khmer-wrap">
             {khmerDate}
           </h2>
-          <p className="mt-3 text-sm leading-loose text-heading khmer-wrap sm:text-base">
+          <p className="mt-3 text-base leading-loose text-heading khmer-wrap">
             {khmerTime}
           </p>
           <GoldDivider className="my-6" width="max-w-[200px]" />
-          <p className="text-xs text-ink/80 khmer-wrap sm:text-sm">{be}</p>
+          <p className="text-sm text-ink/80 khmer-wrap">{be}</p>
         </div>
 
         {wedding.showCountdown && <Countdown date={new Date(wedding.weddingDate).toISOString()} />}

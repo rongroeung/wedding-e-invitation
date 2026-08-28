@@ -32,7 +32,7 @@ export function LoveStory({ items }: { items: StoryItem[] }) {
                 <Lotus className="h-3.5 w-3.5 text-gold-dark" />
               </span>
               <p className="gold-solid text-sm font-medium">{item.label}</p>
-              <h3 className="mt-1 text-sm leading-loose text-heading khmer-wrap sm:text-base">
+              <h3 className="mt-1 text-base leading-loose text-heading khmer-wrap">
                 {item.title}
               </h3>
               {item.description && (

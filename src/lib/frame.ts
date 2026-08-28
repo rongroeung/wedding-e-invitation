@@ -3,32 +3,23 @@ import { mediaSrc } from "@/lib/media";
 import type { BandMotif } from "@/components/ui/OrnamentBand";
 
 type BuiltinArt =
-  | { layout: "corner"; corner: string; clearance: string }
-  | { layout: "band"; top: string; bottom: string; clearance: string };
+  | { layout: "corner"; corner: string }
+  | { layout: "band"; top: string; bottom: string };
 
-/**
- * Built-in frames that are artwork rather than a generated band.
- *
- * `clearance` is how much room the card's content must leave at head and foot,
- * as a percentage of the card's width — which is how the artwork scales, so the
- * figure holds at every card size.
- */
+/** Built-in frames that are artwork rather than a generated band. */
 export const BUILTIN_ART: Record<string, BuiltinArt> = {
   kbach: {
     layout: "band",
     top: "/frames/kbach-top.png",
     bottom: "/frames/kbach-bottom.png",
-    clearance: "33%",
   },
   royal: {
     layout: "corner",
     corner: "/frames/royal-corner.png",
-    clearance: "48%",
   },
   "royal-light": {
     layout: "corner",
     corner: "/frames/royal-light-corner.png",
-    clearance: "48%",
   },
 };
 
@@ -66,10 +57,12 @@ export type FrameConfig = {
   motif: BandMotif;
   /** True when the frame is drawn from artwork rather than the generated band. */
   art: boolean;
-  /** Space the card's content must leave at head and foot, as a % of width. */
-  clearance: string;
   /** Recolour the artwork to the title colour, keeping its relief. */
   tint: boolean;
+  /** Hold the frame on screen and scroll the invitation inside it. */
+  sticky: boolean;
+  /** Artwork size as a percentage of the card's width. */
+  scale: number;
 };
 
 export function frameConfig(wedding: Wedding): FrameConfig {
@@ -105,8 +98,9 @@ export function frameConfig(wedding: Wedding): FrameConfig {
     sideRules: layout === "band" && !builtin && !custom && wedding.frameSideRules,
     motif: (wedding.frameMotif as BandMotif) ?? "lotus",
     art: custom || Boolean(builtin),
-    clearance: builtin?.clearance ?? (layout === "corner" ? "48%" : custom ? "26%" : "17%"),
     // Only artwork needs tinting; the generated bands already use the theme.
     tint: wedding.frameTint && (custom || Boolean(builtin)),
+    sticky: wedding.frameSticky,
+    scale: Math.min(100, Math.max(30, wedding.frameScale)),
   };
 }

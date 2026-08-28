@@ -46,7 +46,7 @@ export function ShareBar({ title }: { title: string }) {
   return (
     <section className="section-pad relative !py-12">
       <div className="mx-auto max-w-2xl text-center">
-        <p className="reveal text-xs text-gold-deep sm:text-sm">
+        <p className="reveal text-sm text-gold-deep">
           ចែករំលែកសំបុត្រអញ្ជើញនេះ
         </p>
         <GoldDivider className="my-5" width="max-w-[140px]" icon="none" />
@@ -56,7 +56,7 @@ export function ShareBar({ title }: { title: string }) {
               key={button.key}
               type="button"
               onClick={button.onClick}
-              className="btn-outline text-xs sm:text-sm"
+              className="btn-outline text-sm"
             >
               <span aria-hidden="true">{button.icon}</span>
               {button.label}

@@ -103,16 +103,45 @@
 
 @layer components {
   /*
+   * Content dissolves into the frame instead of being sliced mid-glyph.
+   *
+   * A mask rather than a coloured gradient: painting a fade in --c-bg over
+   * textured paper leaves a paler haze at each edge, which is exactly the seam
+   * the card is meant not to have. Masking makes the content itself fade out,
+   * so what shows through is the card's own paper — ស្មើសាច់ by construction.
+   */
+  .scroll-fade {
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      #000 2.25rem,
+      #000 calc(100% - 2.25rem),
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      #000 2.25rem,
+      #000 calc(100% - 2.25rem),
+      transparent 100%
+    );
+  }
+
+  /*
    * Cotton-paper stock. The fibre is an SVG turbulence filter baked into a
    * data URI, so it costs one tiny inline asset rather than a bitmap request
    * and stays crisp at any density.
    */
   .paper {
     background-color: var(--c-bg);
+    /*
+     * Fibre only — no vignette or gradient. Anything positional makes the
+     * frame's strip read as a different tone from the scrolling content, and
+     * the two must be ស្មើសាច់: one continuous sheet of paper.
+     */
     background-image:
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23f)' opacity='0.22'/%3E%3C/svg%3E"),
-      radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.9), transparent 60%);
-    background-blend-mode: multiply, normal;
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23f)' opacity='0.22'/%3E%3C/svg%3E");
+    background-blend-mode: multiply;
   }
 
   /* The muted surface the card sits on, seen only on tablet and desktop */

@@ -21,7 +21,12 @@ export function ThemeStyle({ wedding }: { wedding: Wedding }) {
   // The side zones sit deeper again, so the three regions separate cleanly.
   const zone = shade(background, -0.17);
 
+  // Tailwind's sizes are in rem, so scaling the root size scales the whole
+  // invitation — type and the spacing around it together, in proportion.
+  const fontScale = Math.min(140, Math.max(70, wedding.fontScale)) / 100;
+
   const css = `:root{
+    font-size:${(16 * fontScale).toFixed(2)}px;
     --c-primary:${primary};
     --c-secondary:${gold};
     --c-accent:${accent};

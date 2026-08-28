@@ -124,7 +124,13 @@ link, download the QR code as PNG, or share straight to Telegram.
 ## 🎨 Theme
 
 **Admin → រូបរាង** controls the whole visual identity at runtime: five colours,
-the Khmer heading and body fonts, and the decorative pattern. The values are
+the Khmer heading and body fonts, the frame, and two size sliders — **ទំហំក្បាច់**
+(frame, 30–100%) and **ទំហំអក្សរទាំងមូល** (type, 70–140%). The type slider scales
+the invitation's root font size, so text and the spacing around it move together
+in proportion.
+
+**ក្បាច់ជាប់នឹងអេក្រង់** holds the frame on screen and scrolls the invitation
+inside it. Switch it off and the whole card scrolls with the page instead. The values are
 injected as CSS custom properties, so changes apply instantly without a rebuild.
 
 The single gold you pick is expanded into a four-stop metallic ramp, and the

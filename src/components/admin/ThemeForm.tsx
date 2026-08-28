@@ -51,6 +51,9 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
     frameMirrorBottom: wedding.frameMirrorBottom,
     frameSideRules: wedding.frameSideRules,
     frameTint: wedding.frameTint,
+    frameSticky: wedding.frameSticky,
+    frameScale: wedding.frameScale,
+    fontScale: wedding.fontScale,
   });
 
   const colors: [keyof typeof form, string][] = [
@@ -219,7 +222,29 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
           </div>
         )}
 
-        <div className="mt-5">
+        <div className="mt-5 space-y-4">
+          <Field
+            label={`ទំហំក្បាច់ · ${form.frameScale}%`}
+            hint="កាត់បន្ថយ ដើម្បីឱ្យក្បាច់តូច និងទុកកន្លែងច្រើនសម្រាប់អត្ថបទ"
+          >
+            <input
+              type="range"
+              min={30}
+              max={100}
+              step={5}
+              value={form.frameScale as number}
+              onChange={(e) => setForm({ ...form, frameScale: Number(e.target.value) })}
+              className="w-full accent-amber-600"
+            />
+          </Field>
+
+          <Toggle
+            label="ក្បាច់ជាប់នឹងអេក្រង់ (sticky)"
+            hint="ក្បាច់នៅនឹងកន្លែង ហើយអត្ថបទរំកិលនៅខាងក្នុង។ បើបិទ ទាំងអស់រំកិលជាមួយគ្នា"
+            checked={form.frameSticky as boolean}
+            onChange={(v) => setForm({ ...form, frameSticky: v })}
+          />
+
           <Toggle
             label="ធ្វើឱ្យក្បាច់មានពណ៌ដូចចំណងជើង"
             hint="ប្តូរពណ៌មាសរបស់ក្បាច់ទៅជាពណ៌ចំណងជើង ដោយរក្សាស្រមោល និងពន្លឺដដែល"
@@ -243,6 +268,23 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
 
       <Card title="ពុម្ពអក្សរ និងលំនាំ">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="sm:col-span-2 lg:col-span-4">
+            <Field
+              label={`ទំហំអក្សរទាំងមូល · ${form.fontScale}%`}
+              hint="កែទំហំអក្សរ និងគម្លាតទាំងអស់ក្នុងសំបុត្រតាមសមាមាត្រ"
+            >
+              <input
+                type="range"
+                min={70}
+                max={140}
+                step={5}
+                value={form.fontScale as number}
+                onChange={(e) => setForm({ ...form, fontScale: Number(e.target.value) })}
+                className="w-full accent-amber-600"
+              />
+            </Field>
+          </div>
+
           <Field label="ពុម្ពអក្សរចំណងជើង" hint="Khmer OS Muol Light ភ្ជាប់មកជាមួយកម្មវិធី">
             <Select value={form.fontHeading} onChange={(e) => setForm({ ...form, fontHeading: e.target.value })}>
               {HEADING_FONTS.map((font) => <option key={font} value={font}>{font.replace(/'/g, "")}</option>)}
@@ -336,10 +378,18 @@ function FramePreview({
 
       {layout === "corner" ? (
         <div className="relative mx-auto aspect-[3/4] max-w-sm overflow-hidden rounded-lg border" style={surface}>
-          <FrameArt src={corner} tint={form.frameTint as boolean} className="absolute left-0 top-0 w-[46%]" />
-          <FrameArt src={corner} tint={form.frameTint as boolean} className="absolute right-0 top-0 w-[46%] -scale-x-100" />
-          <FrameArt src={corner} tint={form.frameTint as boolean} className="absolute bottom-0 left-0 w-[46%] -scale-y-100" />
-          <FrameArt src={corner} tint={form.frameTint as boolean} className="absolute bottom-0 right-0 w-[46%] -scale-100" />
+          {(() => {
+            const w = { width: `${(46 * (form.frameScale as number)) / 100}%` };
+            const tint = form.frameTint as boolean;
+            return (
+              <>
+                <FrameArt src={corner} tint={tint} style={w} className="absolute left-0 top-0" />
+                <FrameArt src={corner} tint={tint} style={w} className="absolute right-0 top-0 -scale-x-100" />
+                <FrameArt src={corner} tint={tint} style={w} className="absolute bottom-0 left-0 -scale-y-100" />
+                <FrameArt src={corner} tint={tint} style={w} className="absolute bottom-0 right-0 -scale-100" />
+              </>
+            );
+          })()}
           <p
             className="absolute inset-x-0 top-1/2 -translate-y-1/2 text-center text-base"
             style={{ color: form.colorPrimary as string, fontFamily: form.fontHeading as string }}
@@ -349,11 +399,11 @@ function FramePreview({
         </div>
       ) : (
         <div className="mx-auto flex max-w-sm flex-col overflow-hidden rounded-lg border" style={surface}>
-          <div style={{ color: form.colorSecondary as string }}>
+          <div className="flex justify-center" style={{ color: form.colorSecondary as string }}>
             {bandArt ? (
-              <FrameArt src={top} tint={form.frameTint as boolean} className="w-full" />
+              <FrameArt src={top} tint={form.frameTint as boolean} style={{ width: `${form.frameScale}%` }} />
             ) : (
-              <OrnamentBand motif={form.frameMotif as BandMotif} className="w-full" />
+              <OrnamentBand motif={form.frameMotif as BandMotif} style={{ width: `${form.frameScale}%` }} />
             )}
           </div>
 
@@ -369,11 +419,11 @@ function FramePreview({
             </p>
           </div>
 
-          <div style={{ color: form.colorSecondary as string }}>
+          <div className="flex justify-center" style={{ color: form.colorSecondary as string }}>
             {bandArt ? (
-              <FrameArt src={bottom || top} tint={form.frameTint as boolean} flip={mirror} className="w-full" />
+              <FrameArt src={bottom || top} tint={form.frameTint as boolean} flip={mirror} style={{ width: `${form.frameScale}%` }} />
             ) : (
-              <OrnamentBand motif={form.frameMotif as BandMotif} flip className="w-full" />
+              <OrnamentBand motif={form.frameMotif as BandMotif} flip style={{ width: `${form.frameScale}%` }} />
             )}
           </div>
         </div>

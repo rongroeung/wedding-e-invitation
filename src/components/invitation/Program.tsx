@@ -26,7 +26,7 @@ export function Program({ events }: { events: WeddingEvent[] }) {
             <div key={groupName} className="reveal">
               <div className="mb-6 flex items-center justify-center gap-3">
                 <span className="text-lg" aria-hidden="true">{group.icon}</span>
-                <h3 className="text-base text-heading khmer-wrap sm:text-lg">{groupName}</h3>
+                <h3 className="text-lg text-heading khmer-wrap">{groupName}</h3>
               </div>
               <GoldDivider className="mb-8" width="max-w-[140px]" icon="none" />
 
@@ -39,12 +39,12 @@ export function Program({ events }: { events: WeddingEvent[] }) {
                     />
                     <div className="card-panel gold-border rounded-2xl px-5 py-4 transition-transform duration-500 hover:-translate-y-0.5 sm:px-6 sm:py-5">
                       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                        <p className="gold-solid text-sm font-medium sm:text-base">{event.timeLabel}</p>
+                        <p className="gold-solid text-base font-medium">{event.timeLabel}</p>
                         {event.location && (
                           <p className="text-xs text-ink/75 khmer-wrap">{event.location}</p>
                         )}
                       </div>
-                      <p className="mt-1 text-sm leading-loose text-heading khmer-wrap sm:text-base">
+                      <p className="mt-1 text-base leading-loose text-heading khmer-wrap">
                         {event.icon && <span className="mr-2">{event.icon}</span>}
                         {event.title}
                       </p>

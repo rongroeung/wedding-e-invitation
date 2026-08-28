@@ -148,6 +148,12 @@ export const wedding = pgTable("wedding", {
   frameSideRules: boolean("frame_side_rules").notNull().default(true),
   /** Tint the frame artwork to the title colour instead of its own gold. */
   frameTint: boolean("frame_tint").notNull().default(false),
+  /** Hold the frame on screen and scroll the invitation inside it. */
+  frameSticky: boolean("frame_sticky").notNull().default(true),
+  /** Frame artwork size, as a percentage of the card's width. */
+  frameScale: integer("frame_scale").notNull().default(60),
+  /** Overall type size for the invitation, as a percentage. */
+  fontScale: integer("font_scale").notNull().default(100),
 
   // SEO
   metaDescription: text("meta_description").notNull().default(""),

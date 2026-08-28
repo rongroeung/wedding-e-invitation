@@ -3,57 +3,93 @@ import { FrameArt } from "./FrameArt";
 import { OrnamentBand } from "./OrnamentBand";
 
 /**
- * The frame around an invitation card, in one of two layouts.
+ * One edge of the card's frame — the head or the foot.
  *
- * **Corner** mirrors one piece of artwork into all four corners.
+ * The frame is structural rather than an overlay: it sits above and below the
+ * scrolling content instead of floating over it. That is what lets the frame
+ * stay put on screen while the invitation scrolls between its edges, and it
+ * means content can never pass beneath the ornament and show through its gaps.
  *
- * **Band** crowns the head and foot and joins them with hairline rules. It is
- * laid out as a flex column so the rules simply fill whatever space the bands
- * leave — which means artwork of any height lines up without the app having to
- * know its dimensions.
+ * A band frame is one wide piece per edge. A corner frame is two pieces per
+ * edge, mirrored, with the gap between them left open.
  */
-export function CardFrame({ frame }: { frame: FrameConfig }) {
-  if (frame.layout === "corner") return <CornerFrame src={frame.cornerSrc} tint={frame.tint} />;
+export function FrameEdge({
+  frame,
+  edge,
+}: {
+  frame: FrameConfig;
+  edge: "top" | "bottom";
+}) {
+  const bottom = edge === "bottom";
+  // The artwork scales with the card's width, so one percentage governs both
+  // how wide it draws and — the aspect ratio being fixed — how much height it
+  // takes from the invitation.
+  const scale = frame.scale / 100;
+
+  if (frame.layout === "corner") {
+    if (!frame.cornerSrc) return null;
+    return (
+      <div
+        className="pointer-events-none relative flex w-full shrink-0 justify-between"
+        aria-hidden="true"
+      >
+        <FrameArt
+          src={frame.cornerSrc}
+          tint={frame.tint}
+          style={{ width: `${46 * scale}%` }}
+          className={bottom ? "-scale-y-100" : ""}
+        />
+        <FrameArt
+          src={frame.cornerSrc}
+          tint={frame.tint}
+          style={{ width: `${46 * scale}%` }}
+          className={bottom ? "-scale-100" : "-scale-x-100"}
+        />
+      </div>
+    );
+  }
+
+  // A generated band is built around a centre motif, so it scales about the
+  // centre.
+  if (!frame.art) {
+    return (
+      <div
+        className="pointer-events-none flex w-full shrink-0 justify-center text-gold-frame"
+        aria-hidden="true"
+      >
+        <OrnamentBand motif={frame.motif} flip={bottom} style={{ width: `${frame.scale}%` }} />
+      </div>
+    );
+  }
+
+  /*
+   * Band artwork is drawn in halves anchored to the card's edges rather than
+   * scaled about the centre. Scaling a whole band pulls its corner ornaments
+   * inward and leaves the card's own corners bare, which stops reading as a
+   * frame. Each half is a window onto the scaled artwork, so the ornaments stay
+   * in the corners at any size and only the quiet middle opens up. At 100% the
+   * halves meet and reassemble the band exactly.
+   *
+   * The window is scale/2 of the card and the artwork is scale of the card, so
+   * within the window the artwork is always exactly 200% — the ratio does not
+   * depend on the scale.
+   */
+  const src = bottom ? frame.bottomSrc : frame.topSrc;
+  const flip = bottom && frame.mirrorBottom;
+  const half = { width: `${frame.scale / 2}%` };
+  const art = { width: "200%", maxWidth: "none" };
 
   return (
     <div
-      className="pointer-events-none absolute inset-0 z-10 flex flex-col text-gold-frame"
+      className="pointer-events-none flex w-full shrink-0 justify-between text-gold-frame"
       aria-hidden="true"
     >
-      {frame.art ? (
-        <FrameArt src={frame.topSrc} tint={frame.tint} className="w-full shrink-0" />
-      ) : (
-        <OrnamentBand motif={frame.motif} className="w-full shrink-0" />
-      )}
-
-      <div
-        className={`mx-[1.6%] min-h-0 flex-1 ${frame.sideRules ? "border-x border-gold-frame/35" : ""}`}
-      />
-
-      {frame.art ? (
-        <FrameArt
-          src={frame.bottomSrc}
-          tint={frame.tint}
-          flip={frame.mirrorBottom}
-          className="w-full shrink-0"
-        />
-      ) : (
-        <OrnamentBand motif={frame.motif} flip className="w-full shrink-0" />
-      )}
-    </div>
-  );
-}
-
-/** One ornament, mirrored into each corner. */
-function CornerFrame({ src, tint }: { src: string; tint: boolean }) {
-  if (!src) return null;
-  const common = "absolute w-[46%]";
-  return (
-    <div className="pointer-events-none absolute inset-0 z-10" aria-hidden="true">
-      <FrameArt src={src} tint={tint} className={`${common} left-0 top-0`} />
-      <FrameArt src={src} tint={tint} className={`${common} right-0 top-0 -scale-x-100`} />
-      <FrameArt src={src} tint={tint} className={`${common} bottom-0 left-0 -scale-y-100`} />
-      <FrameArt src={src} tint={tint} className={`${common} bottom-0 right-0 -scale-100`} />
+      <span className="overflow-hidden" style={half}>
+        <FrameArt src={src} tint={frame.tint} flip={flip} style={art} className="block" />
+      </span>
+      <span className="flex justify-end overflow-hidden" style={half}>
+        <FrameArt src={src} tint={frame.tint} flip={flip} style={art} className="block" />
+      </span>
     </div>
   );
 }

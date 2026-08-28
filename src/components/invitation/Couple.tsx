@@ -44,19 +44,19 @@ function Person({
       </div>
 
       <p className="mt-6 text-xs text-gold-deep">{role}</p>
-      <h3 className="mt-3 text-base text-heading khmer-wrap sm:text-lg">
+      <h3 className="mt-3 text-lg text-heading khmer-wrap">
         <span className="text-base text-ink/75">{title} </span>
         {name}
       </h3>
 
       <GoldDivider className="my-5" width="max-w-[120px]" icon="diamond" />
 
-      <p className="text-xs text-ink/75 khmer-wrap sm:text-sm">
+      <p className="text-sm text-ink/75 khmer-wrap">
         {align === "left" ? "កូនប្រុសរបស់" : "កូនស្រីរបស់"}
       </p>
-      <p className="mt-2 text-sm leading-loose text-ink/95 khmer-wrap sm:text-base">{father}</p>
+      <p className="mt-2 text-base leading-loose text-ink/95 khmer-wrap">{father}</p>
       <p className="text-xs text-ink/75">និង</p>
-      <p className="text-sm leading-loose text-ink/95 khmer-wrap sm:text-base">{mother}</p>
+      <p className="text-base leading-loose text-ink/95 khmer-wrap">{mother}</p>
     </article>
   );
 }

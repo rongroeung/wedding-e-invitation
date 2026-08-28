@@ -12,23 +12,25 @@ export function FrameArt({
   className = "",
   tint = false,
   flip = false,
+  style,
 }: {
   src: string;
   className?: string;
   tint?: boolean;
   flip?: boolean;
+  style?: CSSProperties;
 }) {
   const flipClass = flip ? "-scale-y-100" : "";
 
   if (!tint) {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={src} alt="" className={`${className} ${flipClass} select-none`} />;
+    return <img src={src} alt="" style={style} className={`${className} ${flipClass} select-none`} />;
   }
 
   return (
     <span
       className={`frame-tint ${className} ${flipClass}`}
-      style={{ "--frame-art": `url(${src})` } as CSSProperties}
+      style={{ ...style, "--frame-art": `url(${src})` } as CSSProperties}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={src} alt="" className="w-full select-none" />
