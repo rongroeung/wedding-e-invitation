@@ -14,6 +14,8 @@ const NAV = [
   { href: "/admin/gift", label: "ចំណងដៃ", icon: "🎁" },
   { href: "/admin/music", label: "ភ្លេង", icon: "🎵" },
   { href: "/admin/theme", label: "រូបរាង", icon: "🎨" },
+  { href: "/admin/envelope", label: "សំបុត្រ & ស៊ុម ៣មិតិ", icon: "✉️" },
+  { href: "/admin/users", label: "គណនីគ្រប់គ្រង", icon: "🔐" },
 ];
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {

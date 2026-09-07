@@ -4,6 +4,7 @@ import { fail, getSession, ok, readJson, requireAdmin } from "@/lib/api";
 import { getDb } from "@/lib/db";
 import { wedding } from "@/lib/db/schema";
 import { getWedding } from "@/lib/queries";
+import { MONOGRAM_FONT_IDS } from "@/lib/monogram-fonts";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +13,10 @@ const schema = z.object({
   subtitle: z.string().max(160).optional(),
   openButton: z.string().max(80).optional(),
   monogram: z.string().max(12).optional(),
+  /* Validated against the catalogue, not as free text: this value ends up in a
+     `font-family` on a public page, and an id nobody offers would leave the
+     mark in a fallback serif with nothing to explain why. */
+  monogramFont: z.enum(MONOGRAM_FONT_IDS).optional(),
   coverPhotoId: z.string().max(80).nullable().optional(),
   coverPhotoUrl: z.string().max(500).optional(),
 
@@ -91,6 +96,47 @@ const schema = z.object({
   frameSticky: z.boolean().optional(),
   frameScale: z.number().int().min(30).max(100).optional(),
   fontScale: z.number().int().min(70).max(140).optional(),
+
+  envelopeEnabled: z.boolean().optional(),
+  envelopeStyle: z.enum(["royal-khmer", "burgundy-royal", "white-gold", "khmer-heritage", "blush-rose"]).optional(),
+  /* Colours are written straight into CSS custom properties, so only a plain
+     hex value is accepted — never an arbitrary string. */
+  envelopePaper: z.string().regex(/^(#[0-9a-fA-F]{3,8})?$/, "Use a hex colour").max(9).optional(),
+  envelopeGold: z.string().regex(/^(#[0-9a-fA-F]{3,8})?$/, "Use a hex colour").max(9).optional(),
+  envelopeSeal: z.boolean().optional(),
+  envelopeSealText: z.string().max(24).optional(),
+  envelopeAnimate: z.boolean().optional(),
+  envelopeDuration: z.number().int().min(1600).max(14000).optional(),
+  envelopeMusic: z.boolean().optional(),
+  envelopeSkip: z.boolean().optional(),
+  envelopeEveryVisit: z.boolean().optional(),
+  envelopeOpenLabel: z.string().max(60).optional(),
+  envelopeHint: z.string().max(120).optional(),
+  envelopeSkipLabel: z.string().max(40).optional(),
+
+  /*
+   * The pre-wedding film.
+   *
+   * `videoUrl` is checked for shape rather than trusted: only `http`/`https`
+   * survive, so a `javascript:` URL cannot reach an iframe's `src` even by
+   * accident. Empty is always allowed — it is how the link is cleared.
+   */
+  videoEnabled: z.boolean().optional(),
+  videoUrl: z
+    .string()
+    .max(600)
+    .refine(
+      (value) => value.trim() === "" || /^https?:\/\/[^\s]+$/i.test(value.trim()),
+      "Use a full http(s) link",
+    )
+    .optional(),
+  videoMediaId: z.string().max(64).nullable().optional(),
+  videoPosterId: z.string().max(64).nullable().optional(),
+  videoSkipLabel: z.string().max(40).optional(),
+  videoContinueLabel: z.string().max(60).optional(),
+
+  frameEmboss: z.boolean().optional(),
+  frameDepth: z.number().int().min(0).max(100).optional(),
 
   metaDescription: z.string().max(400).optional(),
 });

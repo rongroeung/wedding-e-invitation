@@ -1,8 +1,10 @@
 import {
   ALLOWED_AUDIO_TYPES,
   ALLOWED_IMAGE_TYPES,
+  ALLOWED_VIDEO_TYPES,
   MAX_AUDIO_BYTES,
   MAX_IMAGE_BYTES,
+  MAX_VIDEO_BYTES,
   fail,
   ok,
   requireAdmin,
@@ -11,7 +13,7 @@ import { getDb } from "@/lib/db";
 import { media } from "@/lib/db/schema";
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 /** Validated upload endpoint — stores the file as a row in the media table. */
 export async function POST(request: Request) {
@@ -26,11 +28,14 @@ export async function POST(request: Request) {
   }
 
   const file = form.get("file");
-  const kind = String(form.get("kind") ?? "image") === "audio" ? "audio" : "image";
+  const asked = String(form.get("kind") ?? "image");
+  const kind = asked === "audio" || asked === "video" ? asked : "image";
   if (!(file instanceof File)) return fail("សូមជ្រើសរើសឯកសារ", 422);
 
-  const allowed = kind === "audio" ? ALLOWED_AUDIO_TYPES : ALLOWED_IMAGE_TYPES;
-  const maxBytes = kind === "audio" ? MAX_AUDIO_BYTES : MAX_IMAGE_BYTES;
+  const allowed =
+    kind === "audio" ? ALLOWED_AUDIO_TYPES : kind === "video" ? ALLOWED_VIDEO_TYPES : ALLOWED_IMAGE_TYPES;
+  const maxBytes =
+    kind === "audio" ? MAX_AUDIO_BYTES : kind === "video" ? MAX_VIDEO_BYTES : MAX_IMAGE_BYTES;
 
   if (!allowed.includes(file.type)) {
     return fail(`ប្រភេទឯកសារមិនត្រូវបានអនុញ្ញាត (${file.type || "unknown"})`, 415);
@@ -41,9 +46,12 @@ export async function POST(request: Request) {
 
   const buffer = Buffer.from(await file.arrayBuffer());
 
-  // Extra safety: verify the magic bytes match the declared image type.
+  // Extra safety: verify the magic bytes match the declared type.
   if (kind === "image" && !looksLikeImage(buffer, file.type)) {
     return fail("ឯកសារមិនមែនជារូបភាពត្រឹមត្រូវទេ", 415);
+  }
+  if (kind === "video" && !looksLikeVideo(buffer, file.type)) {
+    return fail("ឯកសារមិនមែនជាវីដេអូត្រឹមត្រូវទេ", 415);
   }
 
   const db = await getDb();
@@ -59,6 +67,21 @@ export async function POST(request: Request) {
     .returning({ id: media.id, filename: media.filename, mimeType: media.mimeType, size: media.size });
 
   return ok({ ...row, url: `/api/media/${row.id}` }, { status: 201 });
+}
+
+/**
+ * Does this actually look like the video it claims to be?
+ *
+ * MP4 and MOV are both ISO base media: a length-prefixed `ftyp` box at offset
+ * 4. WebM is Matroska, whose EBML header is a fixed four bytes. A declared
+ * content type is a claim made by the browser from the file extension, and an
+ * extension is a claim made by whoever named the file.
+ */
+function looksLikeVideo(buffer: Buffer, mimeType: string) {
+  const head = buffer.subarray(4, 12).toString("ascii");
+  if (mimeType === "video/mp4" || mimeType === "video/quicktime") return head.startsWith("ftyp");
+  if (mimeType === "video/webm") return buffer.subarray(0, 4).toString("hex") === "1a45dfa3";
+  return false;
 }
 
 function looksLikeImage(buffer: Buffer, mimeType: string) {

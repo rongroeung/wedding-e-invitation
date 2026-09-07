@@ -25,6 +25,7 @@ export const CARD_SCROLL_ID = "card-scroll";
 export function CardShell({
   children,
   cover,
+  curtains,
   left,
   right,
   frame,
@@ -33,6 +34,18 @@ export function CardShell({
   children: ReactNode;
   /** Overlays the scroll region until the guest opens the invitation. */
   cover?: ReactNode;
+  /**
+   * The velvet, hung across the card's own column.
+   *
+   * Not across the viewport, which is where it wants to go and where it must
+   * not: on a wide screen the two side rails carry the guest's QR code and
+   * their RSVP status, and curtains gathered at the edges of the *window* sit
+   * on top of both of them for the rest of the visit. Hung in this column they
+   * frame exactly what they are meant to frame at every width, and the stage
+   * behind shows through either side of them on a desktop — which is what the
+   * wings of a stage look like anyway.
+   */
+  curtains?: ReactNode;
   left?: ReactNode;
   right?: ReactNode;
   frame: FrameConfig;
@@ -66,7 +79,7 @@ export function CardShell({
 
         {/* ── Zone 2 · the card ────────────────────────────────────────── */}
         <div
-          className={`zone-centre flex min-h-0 w-full max-w-[560px] justify-center xl:max-w-none xl:px-8 ${
+          className={`zone-centre relative flex min-h-0 w-full max-w-[560px] justify-center xl:max-w-none xl:px-8 ${
             oneScreen ? "h-full xl:py-8" : "xl:py-8"
           }`}
         >
@@ -105,7 +118,7 @@ export function CardShell({
                       : ""
                 }
               >
-                {children}
+                <div className="frame-safe">{children}</div>
               </div>
 
               {cover}
@@ -113,6 +126,8 @@ export function CardShell({
 
             <FrameEdge frame={frame} edge="bottom" />
           </div>
+
+          {curtains}
         </div>
 
         {/* ── Zone 3 · controls ────────────────────────────────────────── */}

@@ -1,5 +1,6 @@
 import type { FrameConfig } from "@/lib/frame";
 import { FrameArt } from "./FrameArt";
+import { Lotus } from "./Ornaments";
 import { OrnamentBand } from "./OrnamentBand";
 
 /**
@@ -21,6 +22,26 @@ export function FrameEdge({
   edge: "top" | "bottom";
 }) {
   const bottom = edge === "bottom";
+  const foil = { emboss: frame.emboss, depth: frame.depth };
+
+  /*
+   * What joins the corners to one another: a hairline from each piece meeting
+   * a lotus at the centre. It is what stops four ornaments reading as four
+   * unrelated pictures, and it fills the gap the band leaves when the frame is
+   * scaled below full width. Printed, like the rest of it — it does not draw
+   * itself on.
+   */
+  const join = (
+    <span
+      className="frame-join pointer-events-none absolute inset-x-0 top-1/2 flex -translate-y-1/2 items-center justify-center gap-[0.55rem] text-gold-frame"
+      style={{ paddingInline: `${frame.scale / 2 + 1}%` }}
+      aria-hidden="true"
+    >
+      <span className="frame-rule frame-rule-left h-px flex-1" />
+      <Lotus className="frame-centre h-3 w-3 shrink-0 text-gold-1" />
+      <span className="frame-rule frame-rule-right h-px flex-1" />
+    </span>
+  );
   // The artwork scales with the card's width, so one percentage governs both
   // how wide it draws and — the aspect ratio being fixed — how much height it
   // takes from the invitation.
@@ -33,16 +54,19 @@ export function FrameEdge({
         className="pointer-events-none relative flex w-full shrink-0 justify-between"
         aria-hidden="true"
       >
+        {join}
         <FrameArt
           src={frame.cornerSrc}
           tint={frame.tint}
-          style={{ width: `${46 * scale}%` }}
+          {...foil}
+          style={{ width: `${28 * scale}%` }}
           className={bottom ? "-scale-y-100" : ""}
         />
         <FrameArt
           src={frame.cornerSrc}
           tint={frame.tint}
-          style={{ width: `${46 * scale}%` }}
+          {...foil}
+          style={{ width: `${28 * scale}%` }}
           className={bottom ? "-scale-100" : "-scale-x-100"}
         />
       </div>
@@ -81,14 +105,29 @@ export function FrameEdge({
 
   return (
     <div
-      className="pointer-events-none flex w-full shrink-0 justify-between text-gold-frame"
+      className="pointer-events-none relative flex w-full shrink-0 justify-between text-gold-frame"
       aria-hidden="true"
     >
+      {join}
       <span className="overflow-hidden" style={half}>
-        <FrameArt src={src} tint={frame.tint} flip={flip} style={art} className="block" />
+        <FrameArt
+          src={src}
+          tint={frame.tint}
+          flip={flip}
+          {...foil}
+          style={art}
+          className="block"
+        />
       </span>
       <span className="flex justify-end overflow-hidden" style={half}>
-        <FrameArt src={src} tint={frame.tint} flip={flip} style={art} className="block" />
+        <FrameArt
+          src={src}
+          tint={frame.tint}
+          flip={flip}
+          {...foil}
+          style={art}
+          className="block"
+        />
       </span>
     </div>
   );

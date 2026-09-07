@@ -1,24 +1,43 @@
 "use client";
 
 import { useState } from "react";
-import type { Guest } from "@/lib/db/schema";
+import type { Guest, Rsvp as RsvpRecord } from "@/lib/db/schema";
 import { toKhmerNumber } from "@/lib/khmer";
-import { GoldDivider, Lotus } from "@/components/ui/Ornaments";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 
-/** សូមមេត្តាចូលរួមបញ្ជាក់វត្តមាន — RSVP form. */
+/** What the guest has already told us, if anything. */
+export type RsvpReply = Pick<RsvpRecord, "name" | "attending" | "guestCount" | "message">;
+
+/**
+ * សូមមេត្តាចូលរួមបញ្ជាក់វត្តមាន — the RSVP section.
+ *
+ * A guest who has already answered is thanked rather than asked again, and the
+ * thank-you survives a reload: the reply is read from the database on the
+ * server and passed in, so returning to the invitation shows the confirmation,
+ * not an empty form. The wording differs for a guest who is coming and one who
+ * has sent regrets, and either can reopen the form to change their answer.
+ */
 export function Rsvp({
   guest,
+  reply = null,
   onSubmitted,
 }: {
   guest: Guest | null;
+  /** The guest's stored reply, or null if they have not answered. */
+  reply?: RsvpReply | null;
   onSubmitted?: (attending: boolean) => void;
 }) {
-  const [name, setName] = useState(guest ? `${guest.title} ${guest.name}` : "");
-  const [attending, setAttending] = useState(true);
-  const [guestCount, setGuestCount] = useState(guest?.allowedSeats ?? 1);
-  const [message, setMessage] = useState("");
-  const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle");
+  const [saved, setSaved] = useState<RsvpReply | null>(reply);
+  const [editing, setEditing] = useState(false);
+  const [name, setName] = useState(
+    reply?.name || (guest ? `${guest.title} ${guest.name}` : ""),
+  );
+  const [attending, setAttending] = useState(reply ? reply.attending : true);
+  const [guestCount, setGuestCount] = useState(
+    reply?.guestCount || guest?.allowedSeats || 1,
+  );
+  const [message, setMessage] = useState(reply?.message ?? "");
+  const [status, setStatus] = useState<"idle" | "sending" | "error">("idle");
   const [error, setError] = useState("");
 
   async function submit(event: React.FormEvent) {
@@ -29,21 +48,23 @@ export function Rsvp({
     }
     setStatus("sending");
     setError("");
+    const payload = {
+      name: name.trim(),
+      attending,
+      guestCount: attending ? Number(guestCount) || 1 : 0,
+      message: message.trim(),
+    };
     try {
       const response = await fetch("/api/rsvp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: name.trim(),
-          attending,
-          guestCount: attending ? Number(guestCount) || 1 : 0,
-          message: message.trim(),
-          guestCode: guest?.code ?? "",
-        }),
+        body: JSON.stringify({ ...payload, guestCode: guest?.code ?? "" }),
       });
-      const payload = await response.json();
-      if (!response.ok || !payload.ok) throw new Error(payload.error || "មិនអាចផ្ញើបានទេ");
-      setStatus("done");
+      const body = await response.json();
+      if (!response.ok || !body.ok) throw new Error(body.error || "មិនអាចផ្ញើបានទេ");
+      setSaved(payload);
+      setEditing(false);
+      setStatus("idle");
       onSubmitted?.(attending);
     } catch (err) {
       setStatus("error");
@@ -51,31 +72,71 @@ export function Rsvp({
     }
   }
 
+  const confirmed = saved && !editing;
+
   return (
     <section id="rsvp" className="section-pad relative">
       <div className="mx-auto max-w-2xl">
         <SectionTitle
           eyebrow="បញ្ជាក់វត្តមាន"
-          title="សូមមេត្តាចូលរួមបញ្ជាក់វត្តមាន"
-          subtitle="ដើម្បីឱ្យយើងខ្ញុំអាចរៀបចំទទួលស្វាគមន៍លោកអ្នកបានយ៉ាងប្រសើរ សូមមេត្តាបញ្ជាក់វត្តមានរបស់លោកអ្នក។"
+          title={confirmed ? "សូមអរគុណ" : "សូមមេត្តាចូលរួមបញ្ជាក់វត្តមាន"}
+          subtitle={
+            confirmed
+              ? "យើងខ្ញុំបានទទួលការឆ្លើយតបរបស់លោកអ្នករួចរាល់ហើយ។"
+              : "ដើម្បីឱ្យយើងខ្ញុំអាចរៀបចំទទួលស្វាគមន៍លោកអ្នកបានយ៉ាងប្រសើរ សូមមេត្តាបញ្ជាក់វត្តមានរបស់លោកអ្នក។"
+          }
         />
 
         <div className="reveal card-panel gold-border relative overflow-hidden rounded-[22px] px-5 py-9 sm:px-8">
-
-          {status === "done" ? (
-            <div className="relative py-8 text-center">
-              <Lotus className="mx-auto h-10 w-10 animate-floaty text-gold-dark" />
-              <GoldDivider className="my-6" width="max-w-[150px]" />
+          {confirmed ? (
+            <div className="relative py-4 text-center">
               <p className="mx-auto max-w-md text-base leading-loose text-heading khmer-wrap">
-                សូមអរគុណសម្រាប់ការបញ្ជាក់វត្តមាន។ យើងខ្ញុំរីករាយ និងទន្ទឹងរង់ចាំទទួលស្វាគមន៍លោកអ្នក
-                ក្នុងថ្ងៃដ៏សិរីមង្គលនេះ។ ❤️
+                {saved.attending ? (
+                  <>
+                    សូមអរគុណសម្រាប់ការបញ្ជាក់វត្តមាន។ យើងខ្ញុំរីករាយ
+                    និងទន្ទឹងរង់ចាំទទួលស្វាគមន៍លោកអ្នក ក្នុងថ្ងៃដ៏សិរីមង្គលនេះ។
+                  </>
+                ) : (
+                  <>
+                    សូមអរគុណសម្រាប់ការឆ្លើយតប។ យើងខ្ញុំយល់ព្រម
+                    ហើយសូមរក្សាទុកនូវសេចក្ដីរីករាយនេះជាមួយលោកអ្នក
+                    ទោះបីមិនអាចជួបគ្នាក្នុងថ្ងៃនោះក៏ដោយ។
+                  </>
+                )}
               </p>
-              <button
-                type="button"
-                className="btn-outline mt-8"
-                onClick={() => { setStatus("idle"); setMessage(""); }}
-              >
-                បញ្ជាក់វត្តមានម្ដងទៀត
+
+              {/* What we recorded, so the guest can see it is right */}
+              <dl className="mx-auto mt-8 max-w-sm space-y-2.5 rounded-2xl bg-champagne/25 px-5 py-5 text-left">
+                <div className="flex items-baseline justify-between gap-4">
+                  <dt className="text-xs text-ink/70 khmer-wrap">ឈ្មោះ</dt>
+                  <dd className="text-sm text-heading khmer-wrap">{saved.name}</dd>
+                </div>
+                <div className="flex items-baseline justify-between gap-4">
+                  <dt className="text-xs text-ink/70 khmer-wrap">វត្តមាន</dt>
+                  <dd className="text-sm text-heading khmer-wrap">
+                    {saved.attending ? "ចូលរួម" : "មិនអាចចូលរួម"}
+                  </dd>
+                </div>
+                {saved.attending && (
+                  <div className="flex items-baseline justify-between gap-4">
+                    <dt className="text-xs text-ink/70 khmer-wrap">ចំនួនភ្ញៀវ</dt>
+                    <dd className="text-sm text-heading khmer-wrap">
+                      {toKhmerNumber(saved.guestCount)} នាក់
+                    </dd>
+                  </div>
+                )}
+                {saved.message && (
+                  <div className="border-t border-gold/25 pt-2.5">
+                    <dt className="text-xs text-ink/70 khmer-wrap">សារជូនពរ</dt>
+                    <dd className="mt-1 text-sm leading-loose text-heading khmer-wrap">
+                      {saved.message}
+                    </dd>
+                  </div>
+                )}
+              </dl>
+
+              <button type="button" className="btn-outline mt-8" onClick={() => setEditing(true)}>
+                កែប្រែចម្លើយ
               </button>
             </div>
           ) : (
@@ -173,9 +234,27 @@ export function Rsvp({
                 </p>
               )}
 
-              <button type="submit" className="btn-gold w-full" disabled={status === "sending"}>
-                {status === "sending" ? "កំពុងផ្ញើ..." : "បញ្ជាក់វត្តមាន"}
-              </button>
+              <div className="flex flex-col gap-3 sm:flex-row-reverse">
+                <button type="submit" className="btn-gold w-full" disabled={status === "sending"}>
+                  {status === "sending" ? "កំពុងផ្ញើ..." : "បញ្ជាក់វត្តមាន"}
+                </button>
+                {saved && (
+                  <button
+                    type="button"
+                    className="btn-outline w-full sm:w-auto sm:shrink-0"
+                    onClick={() => {
+                      setEditing(false);
+                      setName(saved.name);
+                      setAttending(saved.attending);
+                      setGuestCount(saved.guestCount || 1);
+                      setMessage(saved.message);
+                      setError("");
+                    }}
+                  >
+                    បោះបង់
+                  </button>
+                )}
+              </div>
             </form>
           )}
         </div>

@@ -63,24 +63,36 @@ export async function trackView(path: string, guestCode = "") {
 }
 
 /** The guest's most recent RSVP, used to show their status on the invitation. */
-export async function getGuestRsvpStatus(code: string): Promise<"attending" | "declined" | "pending"> {
-  if (!code) return "pending";
+/**
+ * The guest's most recent reply, or null if they have not answered yet.
+ *
+ * The invitation needs the whole row, not just the verdict: once a guest has
+ * replied the RSVP section shows what they said rather than an empty form, so
+ * it needs the seat count and the blessing back as well.
+ */
+export async function getGuestRsvp(code: string) {
+  if (!code) return null;
   const db = await getDb();
   const rows = await db
     .select()
     .from(rsvps)
     .where(eq(rsvps.guestCode, code))
-    .orderBy(desc(rsvps.createdAt))
+    .orderBy(desc(rsvps.updatedAt))
     .limit(1);
-  if (rows.length === 0) return "pending";
-  return rows[0].attending ? "attending" : "declined";
+  return rows[0] ?? null;
+}
+
+export async function getGuestRsvpStatus(code: string): Promise<"attending" | "declined" | "pending"> {
+  const row = await getGuestRsvp(code);
+  if (!row) return "pending";
+  return row.attending ? "attending" : "declined";
 }
 
 export async function getDashboardStats() {
   const db = await getDb();
   const [guestRows, rsvpRows, viewRows] = await Promise.all([
     db.select().from(guests),
-    db.select().from(rsvps).orderBy(desc(rsvps.createdAt)),
+    db.select().from(rsvps).orderBy(desc(rsvps.updatedAt)),
     db.select({ count: sql<number>`count(*)::int` }).from(pageViews),
   ]);
 

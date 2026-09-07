@@ -61,6 +61,19 @@ export const ALLOWED_IMAGE_TYPES = [
 ];
 export const ALLOWED_AUDIO_TYPES = ["audio/mpeg", "audio/mp3", "audio/ogg", "audio/wav", "audio/aac", "audio/mp4"];
 
+/**
+ * A pre-wedding film, uploaded rather than linked.
+ *
+ * 64 MB, and the number is a compromise rather than a preference. The file is
+ * read into memory as a `Buffer`, stored as one `bytea` row, and read back
+ * whole on every range request — so this is the largest video the app can serve
+ * without a real object store behind it. A wedding film is usually far bigger
+ * than that, which is why the dashboard offers a *link* first and treats the
+ * upload as the fallback for a short, already-compressed cut.
+ */
+export const MAX_VIDEO_BYTES = 64 * 1024 * 1024; // 64 MB
+export const ALLOWED_VIDEO_TYPES = ["video/mp4", "video/webm", "video/quicktime"];
+
 /** Random, URL-safe invitation code. */
 export function randomCode(length = 6) {
   const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";

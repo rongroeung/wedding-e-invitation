@@ -13,6 +13,15 @@ const PRESETS = [
   { name: "ត្នោតខ្លាំង & មាស", colorPrimary: "#3B2A1D", colorSecondary: "#B8935A", colorAccent: "#E7DAC2", colorBackground: "#F4F1EA", colorText: "#3F3125" },
   { name: "ទឹកក្រូចឈូក & មាស", colorPrimary: "#7B1F2F", colorSecondary: "#C8A24A", colorAccent: "#E4CE9B", colorBackground: "#FBF7F0", colorText: "#3E2A20" },
   { name: "បៃតងមរកត & មាស", colorPrimary: "#1F4D3D", colorSecondary: "#C2A353", colorAccent: "#DCE7DC", colorBackground: "#F8F7F0", colorText: "#26332C" },
+  /*
+   * The two pinks are built the same way as the others: the background stays a
+   * *paper* — barely tinted, so the fibre and the emboss still read on it — and
+   * all the colour goes into the primary and the accent. A saturated pink page
+   * with pale pink type looks like a greetings card; a blush sheet with deep
+   * plum type printed on it looks like stationery.
+   */
+  { name: "ផ្កាឈូកស្រាល & មាស", colorPrimary: "#6E3140", colorSecondary: "#C8A05E", colorAccent: "#F2D9DC", colorBackground: "#FCF4F3", colorText: "#4E3138" },
+  { name: "ផ្កាឈូក & មាសរ៉ូស", colorPrimary: "#8A4356", colorSecondary: "#C9906F", colorAccent: "#EBD3D6", colorBackground: "#FDF6F4", colorText: "#4A3238" },
 ];
 
 const HEADING_FONTS = [

@@ -24,7 +24,7 @@ export async function GET(request: Request) {
       ]),
     ];
   } else {
-    const data = await db.select().from(rsvps).orderBy(desc(rsvps.createdAt));
+    const data = await db.select().from(rsvps).orderBy(desc(rsvps.updatedAt));
     rows = [
       ["ឈ្មោះ", "វត្តមាន", "ចំនួនអ្នកចូលរួម", "សារជូនពរ", "កាលបរិច្ឆេទ"],
       ...data.map((r) => [

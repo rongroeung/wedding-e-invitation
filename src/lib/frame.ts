@@ -63,6 +63,16 @@ export type FrameConfig = {
   sticky: boolean;
   /** Artwork size as a percentage of the card's width. */
   scale: number;
+
+  /* ── Foil treatment ───────────────────────────────────────────────────
+     The artwork is a flat picture of gold; these make it read as gold that
+     was pressed into the paper. Both are static — the frame is printed
+     stationery and printed things do not move. Only artwork can take them: a
+     generated band already draws itself in the theme colour. */
+  /** Raise the ornament off the paper with a shadow and a lit edge. */
+  emboss: boolean;
+  /** How far it stands off, 0–1. */
+  depth: number;
 };
 
 export function frameConfig(wedding: Wedding): FrameConfig {
@@ -102,5 +112,9 @@ export function frameConfig(wedding: Wedding): FrameConfig {
     tint: wedding.frameTint && (custom || Boolean(builtin)),
     sticky: wedding.frameSticky,
     scale: Math.min(100, Math.max(30, wedding.frameScale)),
+    // Only artwork can be embossed; the generated bands are drawn in the theme
+    // colour and have no relief to catch light on.
+    emboss: wedding.frameEmboss && (custom || Boolean(builtin)),
+    depth: Math.min(100, Math.max(0, wedding.frameDepth)) / 100,
   };
 }

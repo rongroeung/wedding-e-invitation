@@ -8,11 +8,24 @@ import { formatLatinDate } from "@/lib/khmer";
 export function EventDetailsRail({ wedding }: { wedding: Wedding }) {
   return (
     <section>
-      <header className="mb-5 border-b border-gold-frame/30 pb-4">
-        <h2 className="flex items-center gap-2 text-lg font-semibold text-heading">
+      {/*
+        * Centred, on one axis, to match the "Controls" heading in the opposite
+        * rail — the two frame the invitation and any disagreement between them
+        * reads as one of the pair being wrong rather than as variety.
+        *
+        * `text-center` on the header centres the subtitle, and the mark travels
+        * inside the `h2`'s own centred flex row rather than sitting outside it,
+        * so the pair is centred as a unit exactly as the other rail's is.
+        *
+        * `items-baseline`, and the mark is drawn on its box's own centre line
+        * (see `SparkleIcon`), so it sits on the heading's baseline the way a
+        * piece of punctuation would.
+        */}
+      <header className="mb-5 border-b border-gold-frame/30 pb-4 text-center">
+        <h2 className="flex items-baseline justify-center gap-2 text-lg font-semibold leading-tight text-heading">
           <SparkleIcon /> Event Details
         </h2>
-        <p className="mt-1 text-xs text-ink/70">Wedding Celebration</p>
+        <p className="mt-1 text-xs leading-tight text-ink/70">Wedding Celebration</p>
       </header>
 
       <div className="space-y-3">
@@ -122,11 +135,32 @@ export function ControlsRail({
 
 /* ── Icons ─────────────────────────────────────────────────────────────── */
 
+/**
+ * The mark beside "Event Details".
+ *
+ * Redrawn so the large star sits on the box's own centre line and the small
+ * one rides above it to the right. It was the other way round — the big star
+ * high in the box and the small one low — which put the glyph's visual weight
+ * well above the middle of its own square, so every attempt to align it with
+ * the heading beside it was aligning the wrong thing. A mark whose ink is
+ * off-centre inside its box cannot be centred by layout; it has to be redrawn.
+ *
+ * `shrink-0` because it lives in a flex row next to text that can wrap: without
+ * it a narrow rail squeezes the star into an oval.
+ */
 function SparkleIcon() {
   return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5 text-gold-frame" fill="currentColor" aria-hidden="true">
-      <path d="M12 2.5l1.7 5.1 5.1 1.7-5.1 1.7L12 16.1l-1.7-5.1L5.2 9.3l5.1-1.7L12 2.5Z" />
-      <path d="M18.5 15l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9.9-2.6Z" opacity=".6" />
+    <svg
+      viewBox="0 0 24 24"
+      className="h-[1.15rem] w-[1.15rem] shrink-0 translate-y-[0.14rem] text-gold-frame"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M10 4.4l1.95 5.65L17.6 12l-5.65 1.95L10 19.6l-1.95-5.65L2.4 12l5.65-1.95L10 4.4Z" />
+      <path
+        d="M18.7 2.2l.86 2.44 2.44.86-2.44.86-.86 2.44-.86-2.44-2.44-.86 2.44-.86.86-2.44Z"
+        opacity=".62"
+      />
     </svg>
   );
 }

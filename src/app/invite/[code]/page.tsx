@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ThemeStyle } from "@/components/ThemeStyle";
 import { InvitationPage } from "@/components/invitation/InvitationPage";
-import { getGuestByCode, getGuestRsvpStatus, getInvitationData, getWedding } from "@/lib/queries";
+import { getGuestByCode, getGuestRsvp, getInvitationData, getWedding } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
@@ -26,14 +26,24 @@ export default async function GuestInvitation({ params }: Params) {
   const guest = await getGuestByCode(decodeURIComponent(code));
   if (!guest) notFound();
 
-  const [data, rsvpStatus] = await Promise.all([
-    getInvitationData(),
-    getGuestRsvpStatus(guest.code),
-  ]);
+  const [data, reply] = await Promise.all([getInvitationData(), getGuestRsvp(guest.code)]);
+  const rsvpStatus = reply ? (reply.attending ? "attending" : "declined") : "pending";
   return (
     <>
       <ThemeStyle wedding={data.wedding} />
-      <InvitationPage data={data} guest={guest} rsvpStatus={rsvpStatus} />
+      <InvitationPage
+        data={data}
+        guest={guest}
+        rsvpStatus={rsvpStatus}
+        rsvpReply={
+          reply && {
+            name: reply.name,
+            attending: reply.attending,
+            guestCount: reply.guestCount,
+            message: reply.message,
+          }
+        }
+      />
     </>
   );
 }

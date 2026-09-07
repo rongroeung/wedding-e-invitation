@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { Wedding } from "@/lib/db/schema";
 import { mediaSrc } from "@/lib/media";
+import { MonogramFontPicker } from "./MonogramFontPicker";
 import { Button, Card, Field, Input, MediaUpload, StatusMessage, Textarea, Toggle, useApi } from "./ui";
 
 /** Master form for every piece of wedding content shown on the invitation. */
@@ -57,13 +58,28 @@ export function WeddingForm({ wedding }: { wedding: Wedding }) {
           <Field label="អក្សរលើប៊ូតុងបើកសំបុត្រ">
             <Input value={form.openButton} onChange={(e) => set("openButton", e.target.value)} />
           </Field>
-          <Field label="អក្សរផ្ចិត (Monogram)" hint="ឧ. S&L — បង្ហាញនៅលើគម្របសំបុត្រ">
+          <Field label="អក្សរផ្ចិត (Monogram)" hint="ឧ. S&L ឬ ស ក — បង្ហាញនៅលើគម្របសំបុត្រ">
             <Input value={form.monogram} maxLength={12} onChange={(e) => set("monogram", e.target.value)} />
           </Field>
           <Field label="រូបភាពគម្រប (URL)" hint="ឬផ្ទុករូបភាពខាងក្រោម">
             <Input value={form.coverPhotoUrl} onChange={(e) => set("coverPhotoUrl", e.target.value)} />
           </Field>
         </div>
+        <div className="mt-5">
+          <Field
+            label="ពុម្ពអក្សរផ្ចិត (Monogram font)"
+            hint="ចុចជ្រើសរើស — រូបភាពខាងក្រោមគឺជាអក្សរផ្ចិតរបស់អ្នកពិតប្រាកដ"
+          >
+            <MonogramFontPicker
+              value={form.monogramFont}
+              monogram={form.monogram}
+              groom={form.groomName}
+              bride={form.brideName}
+              onChange={(id) => set("monogramFont", id)}
+            />
+          </Field>
+        </div>
+
         <div className="mt-4">
           <MediaUpload
             label="ផ្ទុករូបភាពគម្រប"

@@ -95,7 +95,7 @@ export function Button({
   return (
     <button
       {...props}
-      className={`inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed ${styles} ${props.className ?? ""}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50 ${styles} ${props.className ?? ""}`}
     />
   );
 }
@@ -184,7 +184,7 @@ export function MediaUpload({
   onClear,
 }: {
   label: string;
-  kind?: "image" | "audio";
+  kind?: "image" | "audio" | "video";
   currentSrc?: string;
   onUploaded: (mediaId: string) => void;
   onClear?: () => void;
@@ -219,12 +219,16 @@ export function MediaUpload({
           <img src={currentSrc} alt="" className="h-16 w-16 rounded-lg border border-slate-200 object-cover" />
         )}
         {currentSrc && kind === "audio" && <audio src={currentSrc} controls className="h-9" />}
+        {currentSrc && kind === "video" && (
+          // eslint-disable-next-line jsx-a11y/media-has-caption
+          <video src={currentSrc} controls muted playsInline className="h-24 rounded-lg border border-slate-200" />
+        )}
         <label className="cursor-pointer rounded-lg border border-dashed border-slate-300 px-4 py-2 text-sm text-slate-600 transition hover:border-amber-400 hover:text-amber-700">
           {busy ? "កំពុងផ្ទុក..." : currentSrc ? "ប្ដូរឯកសារ" : "ជ្រើសរើសឯកសារ"}
           <input
             type="file"
             className="hidden"
-            accept={kind === "audio" ? "audio/*" : "image/*"}
+            accept={kind === "audio" ? "audio/*" : kind === "video" ? "video/mp4,video/webm,video/quicktime" : "image/*"}
             disabled={busy}
             onChange={(event) => {
               const file = event.target.files?.[0];

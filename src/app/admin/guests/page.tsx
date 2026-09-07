@@ -10,7 +10,7 @@ export default async function AdminGuestsPage() {
   const db = await getDb();
   const [guestRows, rsvpRows] = await Promise.all([
     db.select().from(guests).orderBy(desc(guests.createdAt)),
-    db.select().from(rsvps).orderBy(desc(rsvps.createdAt)),
+    db.select().from(rsvps).orderBy(desc(rsvps.updatedAt)),
   ]);
   return <GuestManager guests={guestRows} rsvps={rsvpRows} siteUrl={siteUrl()} />;
 }

@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { getDb } from "@/lib/db";
 import { rsvps } from "@/lib/db/schema";
@@ -29,15 +30,40 @@ export async function POST(request: Request) {
   const input = parsed.data;
   const guest = input.guestCode ? await getGuestByCode(input.guestCode) : null;
 
-  const db = await getDb();
-  await db.insert(rsvps).values({
+  const values = {
     guestId: guest?.id ?? null,
     guestCode: guest?.code ?? "",
     name: input.name,
     attending: input.attending,
     guestCount: input.attending ? Math.max(1, input.guestCount) : 0,
     message: input.message,
-  });
+  };
 
-  return ok({ received: true });
+  const db = await getDb();
+
+  /*
+   * A guest holding an invitation code gets exactly one reply, edited in place.
+   *
+   * Filing a second row instead would leave the invitation guessing which of
+   * two rows with the same timestamp is current, and would show the couple the
+   * same guest twice in the RSVP list. An anonymous submission has no identity
+   * to update, so it is simply recorded.
+   */
+  if (guest) {
+    const existing = await db
+      .select({ id: rsvps.id })
+      .from(rsvps)
+      .where(eq(rsvps.guestCode, guest.code))
+      .limit(1);
+    if (existing[0]) {
+      await db
+        .update(rsvps)
+        .set({ ...values, updatedAt: new Date() })
+        .where(eq(rsvps.id, existing[0].id));
+      return ok({ received: true, updated: true });
+    }
+  }
+
+  await db.insert(rsvps).values(values);
+  return ok({ received: true, updated: false });
 }

@@ -18,6 +18,261 @@
   font-display: swap;
 }
 
+/*
+ * The twenty faces a monogram can be set in — see `src/lib/monogram-fonts.ts`
+ * for which and why, and `public/fonts/monogram/README.md` for their licences.
+ *
+ * Declaring twenty costs a guest nothing. A browser downloads a `@font-face`
+ * only when something on the page is actually set in it, so an invitation pulls
+ * exactly one of these; it is the dashboard's picker, which shows all twenty at
+ * once, that fetches the set.
+ *
+ * `font-display: block` on every one, and it is not a detail. `swap` shows the
+ * mark in a fallback serif and then re-sets it a moment later, and at 236px on
+ * an otherwise empty card that is not a subtle reflow — it is the first thing a
+ * guest sees changing shape under them. `block` holds the mark invisible for
+ * the short time a file takes to arrive from our own origin and shows it once.
+ *
+ * **Every Khmer face is declared twice, and both halves carry a
+ * `unicode-range`.** The two halves are the vendor's own subsets — one Khmer,
+ * one Latin — and without a range they are simply two faces of the same family
+ * that both claim every codepoint, so the browser takes whichever was declared
+ * last and a Khmer monogram set in Moul renders in a fallback serif. Nothing
+ * errors; the letters are just quietly the wrong shape. The ranges are what
+ * make a face's two files behave as one font.
+ */
+
+@font-face {
+  font-family: "Great Vibes";
+  src: url("/fonts/monogram/GreatVibes.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Pinyon Script";
+  src: url("/fonts/monogram/PinyonScript.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Parisienne";
+  src: url("/fonts/monogram/Parisienne.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Italianno";
+  src: url("/fonts/monogram/Italianno.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Tangerine";
+  src: url("/fonts/monogram/Tangerine.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Alex Brush";
+  src: url("/fonts/monogram/AlexBrush.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Allura";
+  src: url("/fonts/monogram/Allura.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Petit Formal Script";
+  src: url("/fonts/monogram/PetitFormalScript.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Cormorant Garamond";
+  src: url("/fonts/monogram/CormorantGaramond.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: block;
+}
+@font-face {
+  font-family: "Playfair Display";
+  src: url("/fonts/monogram/PlayfairDisplay.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Moul";
+  src: url("/fonts/monogram/Moul.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+  unicode-range: U+1780-17FF, U+19E0-19FF, U+200C-200D, U+25CC;
+}
+@font-face {
+  font-family: "Moul";
+  src: url("/fonts/monogram/Moul-latin.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2122, U+2212;
+}
+@font-face {
+  font-family: "Moulpali";
+  src: url("/fonts/monogram/Moulpali.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+  unicode-range: U+1780-17FF, U+19E0-19FF, U+200C-200D, U+25CC;
+}
+@font-face {
+  font-family: "Moulpali";
+  src: url("/fonts/monogram/Moulpali-latin.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2122, U+2212;
+}
+@font-face {
+  font-family: "Koulen";
+  src: url("/fonts/monogram/Koulen.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+  unicode-range: U+1780-17FF, U+19E0-19FF, U+200C-200D, U+25CC;
+}
+@font-face {
+  font-family: "Koulen";
+  src: url("/fonts/monogram/Koulen-latin.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2122, U+2212;
+}
+@font-face {
+  font-family: "Bokor";
+  src: url("/fonts/monogram/Bokor.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+  unicode-range: U+1780-17FF, U+19E0-19FF, U+200C-200D, U+25CC;
+}
+@font-face {
+  font-family: "Bokor";
+  src: url("/fonts/monogram/Bokor-latin.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2122, U+2212;
+}
+@font-face {
+  font-family: "Taprom";
+  src: url("/fonts/monogram/Taprom.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+  unicode-range: U+1780-17FF, U+19E0-19FF, U+200C-200D, U+25CC;
+}
+@font-face {
+  font-family: "Taprom";
+  src: url("/fonts/monogram/Taprom-latin.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2122, U+2212;
+}
+@font-face {
+  font-family: "Fasthand";
+  src: url("/fonts/monogram/Fasthand.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+  unicode-range: U+1780-17FF, U+19E0-19FF, U+200C-200D, U+25CC;
+}
+@font-face {
+  font-family: "Fasthand";
+  src: url("/fonts/monogram/Fasthand-latin.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2122, U+2212;
+}
+@font-face {
+  font-family: "Odor Mean Chey";
+  src: url("/fonts/monogram/OdorMeanChey.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+  unicode-range: U+1780-17FF, U+19E0-19FF, U+200C-200D, U+25CC;
+}
+@font-face {
+  font-family: "Odor Mean Chey";
+  src: url("/fonts/monogram/OdorMeanChey-latin.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2122, U+2212;
+}
+@font-face {
+  font-family: "Preahvihear";
+  src: url("/fonts/monogram/Preahvihear.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+  unicode-range: U+1780-17FF, U+19E0-19FF, U+200C-200D, U+25CC;
+}
+@font-face {
+  font-family: "Preahvihear";
+  src: url("/fonts/monogram/Preahvihear-latin.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2122, U+2212;
+}
+@font-face {
+  font-family: "Suwannaphum";
+  src: url("/fonts/monogram/Suwannaphum.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+  unicode-range: U+1780-17FF, U+19E0-19FF, U+200C-200D, U+25CC;
+}
+@font-face {
+  font-family: "Suwannaphum";
+  src: url("/fonts/monogram/Suwannaphum-latin.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2122, U+2212;
+}
+@font-face {
+  font-family: "Hanuman";
+  src: url("/fonts/monogram/Hanuman.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+  unicode-range: U+1780-17FF, U+19E0-19FF, U+200C-200D, U+25CC;
+}
+@font-face {
+  font-family: "Hanuman";
+  src: url("/fonts/monogram/Hanuman-latin.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2122, U+2212;
+}
+
 /* ── Theme tokens (overridden at runtime by the admin “Theme” page) ─────── */
 :root {
   --c-primary: #4a3527;
@@ -36,6 +291,11 @@
   --gold-1: #83683e;
   --gold-2: #a8874e;
   --gold-3: #cba374;
+  /* The catchlight in the foil ramp. Not part of the ink ramp above — this is
+     the pale champagne a polished die throws back where the light hits it, and
+     without it a "bright" band drawn in --gold-1 comes out darker than the
+     paper around it. */
+  --gold-lite: #e7d1aa;
 
   /*
    * Tailwind can only apply its `/opacity` modifier to a colour whose channels
@@ -53,6 +313,7 @@
   --gold-deep-rgb: 97 77 46;
   --gold-1-rgb: 131 104 62;
   --gold-3-rgb: 203 163 116;
+  --gold-lite-rgb: 231 209 170;
 }
 
 @layer base {
@@ -172,6 +433,63 @@
    * which keeps every highlight and shadow while taking the hue from below.
    * `isolation` keeps the blend inside the frame, off the paper.
    */
+  /* ── Frame artwork as pressed foil ───────────────────────────────────
+   * See FrameArt for what each layer is for. Everything here is driven by
+   * custom properties the component sets, and every animation is transform,
+   * opacity or mask-position — nothing that forces layout.
+   */
+  .frame-art {
+    position: relative;
+    display: block;
+    isolation: isolate;
+  }
+
+  /*
+   * Relief. `drop-shadow` follows the artwork's alpha rather than its box, so
+   * the shadow traces the ornament itself. Two passes: the paper's shadow
+   * beneath, and the lit edge where the foil catches the key light above.
+   *
+   * The offsets are constants. They used to answer to the pointer, which made
+   * the gold look raised — and made the invitation look like a web page. On
+   * printed stationery the light does not move, so neither does this.
+   */
+  .frame-emboss > :first-child {
+    filter:
+      drop-shadow(0 var(--frame-emb) 0.5px rgba(74, 53, 39, 0.42))
+      drop-shadow(0 calc(var(--frame-emb) * -0.55) 0 rgba(255, 249, 232, 0.6));
+  }
+
+  /*
+   * The hairlines running in from each corner to the lotus at the centre.
+   * Printed at full length, like everything else on this card.
+   */
+  .frame-rule {
+    background: linear-gradient(90deg, rgb(var(--gold-frame-rgb) / 0.55), rgb(var(--gold-frame-rgb) / 0.12));
+  }
+
+  .frame-rule-right {
+    background: linear-gradient(270deg, rgb(var(--gold-frame-rgb) / 0.55), rgb(var(--gold-frame-rgb) / 0.12));
+  }
+
+  .frame-centre {
+    opacity: 0.9;
+  }
+
+  /*
+   * Breathing room between the ornament and the first or last thing written on
+   * the card.
+   *
+   * The frame is structural — it sits above and below the scrolling region
+   * rather than floating over it — so content cannot pass beneath it whatever
+   * happens. This is the second guarantee: even at the tightest width, the
+   * title never comes up against the gold. It scales with the viewport, and it
+   * is the one measurement on this card that content wins by default.
+   */
+  .frame-safe {
+    padding-top: clamp(0.75rem, 3.2vh, 2rem);
+    padding-bottom: clamp(0.75rem, 3.2vh, 2rem);
+  }
+
   .frame-tint {
     position: relative;
     isolation: isolate;
@@ -182,7 +500,7 @@
     content: "";
     position: absolute;
     inset: 0;
-    background-color: var(--gold-1);
+    background-color: var(--frame-ink, var(--gold-1));
     -webkit-mask-image: var(--frame-art);
     mask-image: var(--frame-art);
     -webkit-mask-size: 100% 100%;
@@ -362,6 +680,598 @@
   }
 
   .no-scroll { overflow: hidden; height: 100%; }
+
+  /* ── The sealed envelope ─────────────────────────────────────────────
+   *
+   * A guest opens a physical card before the invitation itself. The whole
+   * piece is built from CSS 3D transforms — no WebGL, no canvas — because it
+   * has to be smooth on a mid-range phone over a Cambodian mobile connection,
+   * and `transform`/`opacity` are the only two properties a browser can
+   * animate entirely on the compositor.
+   *
+   * Depth is `z-index`, and it used to be `translateZ` inside one `preserve-3d`
+   * stage. That was right when a card rose out of the envelope and passed
+   * *behind* its front panel, which z-index genuinely cannot express, and when
+   * two hinged panels turned through 140 degrees. Neither exists any more: the
+   * cover slides, so every layer is coplanar and the only question is what is
+   * in front of what.
+   *
+   * Flattening it is not tidying, it is the single biggest thing keeping this
+   * smooth. Inside a `preserve-3d` context a transformed child cannot be
+   * promoted to its own compositor layer, so every frame of the slide
+   * re-rasterised both panels — and each panel carries a full blind-emboss
+   * drawing, five instanced passes over the same geometry, at whatever size
+   * the envelope happens to be. On a large screen that is most of a megapixel
+   * of vector art repainted per frame for the whole of the opening. Flat, each
+   * panel is a texture the compositor slides.
+   *
+   * Colours all come from custom properties the component sets, so a style is
+   * data rather than another branch of markup.
+   */
+  .env-stage {
+    perspective: 1500px;
+    perspective-origin: 50% 42%;
+  }
+
+  .env-piece {
+    position: relative;
+    /*
+     * `isolation` and not `transform-style`. The piece still takes the stage's
+     * perspective for its own tilt — a transform on this element is a 3D
+     * transform and looks like one — but its children flatten into it, which
+     * is what lets them be composited separately. What `isolation` is here for
+     * is the stacking context: the contact shadow below sits at `z-index: -1`
+     * and has to stay inside the envelope rather than falling behind the room.
+     */
+    isolation: isolate;
+    /*
+     * One length governs the whole piece. Everything inside is sized in `em`
+     * against this, so the envelope scales as a single drawing from a 320px
+     * phone to a desktop — no breakpoint ever redraws it, and nothing can
+     * drift out of proportion.
+     */
+    width: var(--env-w);
+    height: calc(var(--env-w) * 1.28);
+    font-size: calc(var(--env-w) / 26);
+    /* The camera: one transform for the whole piece, moved per phase. */
+    transition:
+      transform var(--env-move, 900ms) cubic-bezier(0.22, 0.61, 0.28, 1),
+      opacity var(--env-move, 900ms) ease;
+    will-change: transform;
+  }
+
+  /*
+   * Idle. Three or four pixels of rise and about a degree of turn over six
+   * seconds — slow enough that it is felt rather than seen, which is the
+   * difference between an object being held and a UI element bouncing. It is
+   * suppressed the moment the pointer takes over.
+   */
+  .env-idle {
+    animation: env-float 6.2s ease-in-out infinite;
+  }
+
+  @keyframes env-float {
+    0%, 100% { transform: translate3d(0, 0, 0) rotateX(0.5deg) rotateY(-0.6deg); }
+    50%      { transform: translate3d(0, -4px, 0) rotateX(-0.4deg) rotateY(0.6deg); }
+  }
+
+  /*
+   * The envelope's flat layers, stacked in the order they are drawn.
+   *
+   * `backface-visibility` has gone with the rotation: nothing here ever turns
+   * far enough to show its back, so there is no back to hide.
+   */
+  .env-layer {
+    position: absolute;
+    inset: 0;
+  }
+
+  /*
+   * Paper fibre. The same turbulence the invitation's own stock uses, so the
+   * envelope and the card are visibly cut from one sheet — and the reason the
+   * surface reads as pressed paper rather than a coloured rectangle.
+   */
+  .env-grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23f)' opacity='0.3'/%3E%3C/svg%3E");
+    mix-blend-mode: multiply;
+    opacity: 0.55;
+  }
+
+  /*
+   * The envelope's body — the sheet everything else is folded from.
+   *
+   * Three shadows, not one: a tight dark line where the paper meets itself, a
+   * broad soft cast, and a very wide faint one. Real objects sit in exactly
+   * that stack of shadows, and it is what stops the envelope reading as a
+   * rectangle pasted onto a background.
+   */
+  .env-body {
+    /*
+     * Light at the head and falling away below. What shows of this layer is the
+     * two shoulders beside the closed flap, which are near the top — so the ramp
+     * has to stay on the paper's own tone for the whole of its first half. Ramped
+     * from the very top it made those shoulders read as a darker band behind the
+     * flap instead of as more of the same sheet.
+     */
+    background:
+      linear-gradient(160deg, var(--env-paper) 0%, var(--env-paper) 44%, var(--env-paper-shade) 74%, var(--env-paper-deep) 100%);
+    border-radius: 9px;
+    box-shadow:
+      0 1px 2px rgb(58 40 26 / 0.14),
+      0 18px 34px -18px rgb(58 40 26 / 0.42),
+      0 44px 90px -44px rgb(58 40 26 / 0.5),
+      0 90px 160px -80px rgb(58 40 26 / 0.4);
+  }
+
+  /*
+   * The panel the guest reads.
+   *
+   * Two things give it paper rather than card: a cross-page key light that
+   * falls off towards the lower right, and a hairline of white along the top
+   * edge with a hairline of shadow along the bottom — the read of a sheet with
+   * thickness, lit from above.
+   */
+  /*
+   * The pocket — the front of the envelope, starting a little under a third of
+   * the way down.
+   *
+   * That line is the envelope's mouth, and what shows above it is the lining
+   * rather than the card: the lining stands between them, so the card can wait
+   * entirely out of sight and the guest is given the pattern instead. Before
+   * the liner existed this had to be full height, because the flap narrows as
+   * it falls and anything above the mouth would have been exposed at the sides
+   * while the envelope was still sealed.
+   */
+  /* The full-height layers: the body, and the lining inside it. */
+  .env-layer {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+  }
+
+  /*
+   * Paper thickness. A sliver of the body's own edge showing past the front
+   * panel, which is what you actually see along the side of a real envelope —
+   * cheaper and more convincing than a bevel drawn on the face.
+   */
+  .env-edge {
+    position: absolute;
+    inset: -1.5px -2px -2.5px;
+    border-radius: 10px;
+    background: linear-gradient(160deg, var(--env-paper-shade), var(--env-paper-deep));
+    box-shadow: inset 0 -1px 1px rgb(58 40 26 / 0.18);
+  }
+
+  /*
+   * The die: the botanical relief pressed into the paper.
+   *
+   * It fills the face it is laid on and is drawn in a viewBox of the same
+   * aspect ratio, so nothing in it is ever stretched.
+   *
+   * Composited normally, not blended. `multiply` is the reflex here and it is
+   * wrong: white is multiply's identity, so the lit half of every emboss —
+   * which is the half that makes it read as raised — disappears entirely and
+   * what is left is a flat grey stencil.
+   */
+  .env-botanical {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+
+  /*
+   * The lining. A shade under the outside, and carrying the pattern the
+   * outside does not — which is what makes opening the envelope worth doing.
+   */
+  /*
+   * The lining. It is the *inside* of the envelope, and the inside of anything
+   * is darker at its opening than at its floor — light gets in from above and
+   * falls away. Lit evenly it came out as a pale slab across the mouth with the
+   * card rising behind it, which read as a card going behind a wall rather than
+   * a card coming out of a pocket. The top third is deep now, and that shadow
+   * is what makes the mouth a mouth.
+   */
+  .env-liner {
+    background:
+      linear-gradient(
+        176deg,
+        rgb(58 40 26 / 0.55) 0%,
+        rgb(58 40 26 / 0.22) 14%,
+        var(--env-paper-deep) 34%,
+        var(--env-paper-shade) 62%,
+        var(--env-paper-deep) 100%
+      ),
+      linear-gradient(172deg, var(--env-paper-deep), var(--env-paper-shade) 46%, var(--env-paper-deep));
+    border-radius: 9px;
+  }
+
+  /* Undecorated: the lining is a deeper shade of the same paper, nothing more. */
+  .env-liner::before {
+    content: none;
+  }
+
+
+  /*
+   * The seams where the back flaps are folded in: two diagonals rising from
+   * the bottom corners to meet under the seal, which is how a square-flap
+   * envelope is actually put together.
+   *
+   * Each seam is a fold, not a line, so it is drawn as a *pair* — a hairline
+   * of the paper's own deep tone with a lighter one immediately above it. That
+   * is what a crease does to light: one side of it turns away and the other
+   * turns towards. A single dark rule in the same place reads as something
+   * drawn on the envelope rather than something the envelope was folded into,
+   * and at this weight the difference is the whole effect.
+   */
+  .env-seams {
+    position: absolute;
+    inset: 0;
+    border-radius: 9px;
+    pointer-events: none;
+    /*
+     * The bottom flap, folded up: two creases running from the foot corners to
+     * a point under the seal. Each gradient fills **half** the width, so what it
+     * draws is one edge of a triangle rather than a diagonal across the whole
+     * paper — drawn full width the two of them crossed in a great X over the
+     * middle of the envelope, which is not how any envelope has ever been folded.
+     *
+     * Each crease is a *pair* of hairlines, a light one immediately above a dark
+     * one. That is what a fold does to light: one side of it turns away and the
+     * other turns towards. A single dark rule in the same place reads as a line
+     * drawn on the envelope rather than as a fold the envelope was made by, and
+     * at this weight that difference is the entire effect.
+     */
+    background:
+      linear-gradient(
+        to top right,
+        transparent calc(50% - 1.1px),
+        rgb(58 40 26 / 0.12) 50%,
+        rgb(255 253 246 / 0.8) calc(50% + 1px),
+        transparent calc(50% + 2px)
+      ),
+      linear-gradient(
+        to top left,
+        transparent calc(50% - 1.1px),
+        rgb(58 40 26 / 0.12) 50%,
+        rgb(255 253 246 / 0.8) calc(50% + 1px),
+        transparent calc(50% + 2px)
+      );
+    background-size: 50% 46%, 50% 46%;
+    background-position: bottom left, bottom right;
+    background-repeat: no-repeat;
+  }
+
+  /*
+   * The shadow the envelope casts on the surface it is resting above. It sits
+   * behind everything, blurred, and it moves with the idle float — a shadow
+   * that stays put while its object drifts is the fastest way to make a
+   * floating object look pasted on.
+   */
+  .env-contact {
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    bottom: -5%;
+    height: 9%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(58 40 26 / 0.34), transparent 78%);
+    filter: blur(9px);
+    /* Behind the paper, and kept inside the envelope by the stacking context
+       `.env-piece` establishes — a bare negative z-index would otherwise fall
+       through to the room. */
+    z-index: -1;
+    animation: env-contact 5.8s ease-in-out infinite;
+  }
+
+  @keyframes env-contact {
+    0%, 100% { opacity: 0.85; transform: scale(1); }
+    50%      { opacity: 0.62; transform: scale(0.94); }
+  }
+
+  /*
+   * One panel of the sliding cover.
+   *
+   * A translation, not a rotation, and everything simpler about this block
+   * follows from that. A hinged panel turns about a vertical axis, shows its
+   * edge halfway round and ends up presenting its *back* — which is why the
+   * version this replaces needed two faces per panel, `backface-visibility` to
+   * sort them, and a lining drawn for a surface visible only at the end of the
+   * movement. A sliding panel stays square to the camera throughout and never
+   * shows anything but its printed front, so none of that exists here.
+   *
+   * `transform-origin` is likewise gone: a translation has no pivot. What is
+   * left is where each panel starts and how far it travels.
+   */
+  .slide-panel {
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    /*
+     * The panels are in front of the lining and behind the seal, and that is
+     * all the depth a sliding cover needs. They used to be lifted from 32px to
+     * 44 as they travelled, on the grounds that paper drawn aside is picked up
+     * before it moves — but that lift was invisible at this scale and it cost
+     * the flat stacking that keeps both panels on the compositor. The growing
+     * shadow below says the same thing for nothing.
+     */
+    z-index: 3;
+    /*
+     * Heavy paper drawn by hand: a foot, a run, and a long settle. A symmetric
+     * ease reads as a mechanism.
+     *
+     * The foot used to be much softer — 0.42 on the first handle — and it cost
+     * the scene its subject. The panels spent their first half-second doing
+     * almost nothing visible, by which time the dissolve to the velvet had
+     * already carried most of the envelope away, so the slide happened inside
+     * a fade. Paper drawn aside does start gently, but it starts.
+     */
+    transition:
+      transform var(--env-door, 1600ms) cubic-bezier(0.26, 0.02, 0.2, 1),
+      box-shadow var(--env-door, 1600ms) ease-out;
+    will-change: transform;
+    box-shadow: 0 4px 9px -5px rgb(107 58 72 / 0.28);
+  }
+
+  .slide-left {
+    left: 0;
+  }
+
+  .slide-right {
+    right: 0;
+  }
+
+  /*
+   * 88% of a panel's own width, not 100%.
+   *
+   * A sliver of each staying inside the envelope's own footprint keeps them
+   * reading as *this* envelope's front rather than as two rectangles that have
+   * left the scene. And the number has to hold at the narrowest viewport: the
+   * pair spans 1.88 × the envelope at full travel, which at the camera's 0.8
+   * is 1.5 × the envelope, and the envelope is 62vw. That is what keeps both
+   * panels on a 360px phone.
+   */
+  .slide-left.slide-open {
+    transform: translate3d(-88%, 0, 0);
+    box-shadow: 0 10px 22px -8px rgb(107 58 72 / 0.4);
+  }
+
+  .slide-right.slide-open {
+    transform: translate3d(88%, 0, 0);
+    box-shadow: 0 10px 22px -8px rgb(107 58 72 / 0.4);
+  }
+
+  .slide-face {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .env-fade {
+    transition: opacity var(--env-move, 900ms) ease;
+  }
+
+  /*
+   * The seal over the join. It releases first and is gone before the panels
+   * have travelled far: a seal still sitting in the air over an open cover is
+   * the detail that undoes all the others.
+   */
+  .slide-seal {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    transition:
+      opacity 420ms ease-out,
+      transform 520ms cubic-bezier(0.3, 0, 0.4, 1);
+  }
+
+  /*
+   * Gone, and lifted as it goes. Fading in place left a soft round stain
+   * sitting in the widening gap between the panels for half a second — the wax
+   * has released, so it should read as leaving rather than as dissolving where
+   * it lies.
+   */
+  .slide-seal-gone {
+    opacity: 0;
+    /* Up and away rather than out of the screen: with the envelope flat there
+       is no z for it to lift into, and a wax seal that has given lifts off the
+       join anyway. */
+    transform: translate3d(0, -7%, 0) scale(1.12);
+  }
+
+  /*
+   * The shade inside the envelope. Deep while the panels are closed over it,
+   * and lifting as they open — light that does not change as paper moves off
+   * it is the single thing that most reliably gives away a fake envelope.
+   */
+  .env-mouth {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: 9px;
+    background:
+      radial-gradient(78% 62% at 50% 44%, rgb(107 58 72 / 0.34), rgb(107 58 72 / 0.1) 70%, transparent);
+    opacity: 0.5;
+    transition: opacity var(--env-door, 1600ms) ease;
+  }
+
+  .env-mouth-open {
+    opacity: 0.3;
+  }
+
+  /* ── Gold foil ───────────────────────────────────────────────────────
+   * Real foil is a mirror: it is dark where it faces shadow and near-white
+   * where it catches the light, and the two swap as the card moves. A flat
+   * yellow reads as printed ink, so the gold here is always a ramp, and a
+   * slow highlight travels across it.
+   */
+  .env-foil {
+    background-image: linear-gradient(
+      104deg,
+      var(--env-gold-deep) 0%,
+      var(--env-gold) 26%,
+      var(--env-gold-light) 44%,
+      var(--env-gold) 60%,
+      var(--env-gold-deep) 100%
+    );
+    background-size: 260% 100%;
+    background-position: 30% 0;
+    -webkit-background-clip: text;
+    background-clip: text;
+    /* Khmer coeng subscripts fall outside the em box, and background-clip
+       paints only inside the element — so give the box room to breathe or the
+       glyphs come out transparent. */
+    display: inline-block;
+    padding: 0.14em 0.1em 0.3em;
+    color: transparent;
+    animation: env-foil-sweep 9s ease-in-out infinite;
+  }
+
+  @keyframes env-foil-sweep {
+    0%, 100% { background-position: 78% 0; }
+    50%      { background-position: 12% 0; }
+  }
+
+  /* The same travelling highlight, for the ornament artwork rather than text. */
+  .env-shimmer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      104deg,
+      transparent 40%,
+      rgb(255 250 232 / 0.5) 48%,
+      rgb(255 253 244 / 0.72) 50%,
+      rgb(255 250 232 / 0.5) 52%,
+      transparent 60%
+    );
+    background-size: 280% 100%;
+    mix-blend-mode: overlay;
+    animation: env-shine 9s ease-in-out infinite;
+  }
+
+  @keyframes env-shine {
+    0%, 8%   { background-position: 132% 0; }
+    58%, 100% { background-position: -34% 0; }
+  }
+
+  /*
+   * The seal.
+   *
+   * Large, because on premium stationery it is the focal point rather than a
+   * fastening — a third of the envelope's width, struck across the join where
+   * the two front panels meet. It belongs to neither panel: it is the thing
+   * holding the pair of them to each other, so it is centred on the front and
+   * releases on its own before either of them moves.
+   *
+   * `margin-top` is a percentage, and percentages on the vertical margins
+   * resolve against the containing block's **width**, not its height. That is
+   * a CSS quirk and here it is the useful one: the seal is as tall as it is
+   * wide, so -15% of the width is exactly half its own height and it centres
+   * without anything needing to know how tall the envelope is.
+   */
+  .env-seal {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 30%;
+    margin-left: -15%;
+    margin-top: -15%;
+    aspect-ratio: 1;
+    transition:
+      transform var(--env-seal-t, 620ms) cubic-bezier(0.34, 0.9, 0.3, 1);
+    will-change: transform;
+  }
+
+  .env-seal-face {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    filter: drop-shadow(0 3px 5px rgb(58 40 26 / 0.4));
+  }
+
+  .env-seal-sheen {
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+
+  .env-seal-lit .env-seal-sheen {
+    animation: env-seal-sheen 11s ease-in-out infinite;
+    animation-delay: 1.6s;
+  }
+
+  @keyframes env-seal-sheen {
+    0%   { transform: translateX(0); opacity: 0; }
+    3%   { opacity: 0.9; }
+    14%  { transform: translateX(560px); opacity: 0; }
+    100% { transform: translateX(560px); opacity: 0; }
+  }
+
+  /*
+   * The lean pass, for a phone that cannot spare the frames.
+   *
+   * Blur and stacked drop-shadows are what cost; the geometry, the paper and
+   * the gold all stay. It looks like the same envelope in slightly flatter
+   * light rather than like a different, cheaper one.
+   */
+  .env-lite .env-contact {
+    filter: none;
+    opacity: 0.5;
+  }
+  .env-lite .env-grain::after {
+    opacity: 0.35;
+  }
+  .env-lite .frame-emboss > :first-child {
+    filter: drop-shadow(0 var(--frame-emb) 0 rgba(74, 53, 39, 0.36));
+  }
+
+  /* The veil that carries the last step: the card fills the screen and the
+     invitation is already live underneath it. */
+  .env-veil {
+    /*
+     * Not `ease`. That curve is front-loaded — two thirds of the fade in the
+     * first third of its run — which is right for something leaving on its own
+     * and wrong for a hand-over: it took the envelope off the screen while the
+     * panels were still opening. This one holds, then goes, so the last thing
+     * seen of the envelope is the cover most of the way open rather than a
+     * ghost of it.
+     */
+    transition: opacity var(--env-veil, 700ms) cubic-bezier(0.4, 0.06, 0.5, 1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /*
+   * The frame is absent from this list, and that is the point: it no longer
+   * animates for anybody, so there is nothing here to switch off. What follows
+   * is all envelope.
+   */
+  .env-idle,
+  .env-foil,
+  .env-shimmer,
+  .env-contact {
+    animation: none !important;
+  }
+  .env-shimmer { opacity: 0; }
+  .env-seal-sheen { opacity: 0; }
+  .env-seal-lit .env-seal-sheen { animation: none !important; }
+  .env-piece,
+  .slide-panel,
+  .env-seal {
+    transition-duration: 1ms !important;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -381,3 +1291,979 @@
 
 /* Khmer text should never be broken mid-cluster */
 .khmer-wrap { word-break: keep-all; overflow-wrap: break-word; }
+
+/* ══ The monogram ════════════════════════════════════════════════════════
+ *
+ * The mark itself is drawn in `Monogram`. What lives here is how it is pressed
+ * into the paper, and how it is drawn in the first time a guest sees it.
+ */
+
+/**
+ * How big the mark is on the cover.
+ *
+ * Against the viewport's *height* as well as its width, because the cover is a
+ * stack — mark, greeting, name, button — and height is what runs out first. A
+ * width-only rule (a `sm:` breakpoint, say) reads the 740px of a phone held
+ * sideways as "wide screen, use the large mark", and the large mark then eats
+ * the 380px there are to spend, pushing its own head off the top of the card.
+ */
+.cover-monogram {
+  width: clamp(104px, min(44vw, 30vh), 236px);
+  height: auto;
+  aspect-ratio: 1;
+}
+
+/*
+ * The die's impression.
+ *
+ * A `drop-shadow` filter and not a second copy of the drawing underneath, and
+ * the reason is the paper cuts: every letter is struck in the paper's colour at
+ * a heavier weight before it is filled, and that halo is wider than the offset,
+ * so a copy underneath would be painted out by the copy on top almost exactly
+ * where it was supposed to show. A filter draws behind whatever the group
+ * finally is, cuts included.
+ *
+ * Two shadows: a hard one at no blur, which is the wall of the channel the die
+ * left, and a soft one under it, which is the paper lifting around it.
+ */
+.mg-foil {
+  /*
+   * One soft shadow, and a light one.
+   *
+   * This mark is engraved rather than stamped: most of its area is hairlines
+   * under a unit wide, and the hard offset copy that gave the old blind-emboss
+   * its die-cut channel simply doubles every one of them into a smear. What is
+   * wanted here is the lift of ink sitting on a rag paper, which is a single
+   * shadow at almost no offset.
+   */
+  filter: drop-shadow(0 0.9px 1.1px rgb(var(--c-primary-rgb) / 0.16));
+}
+
+/*
+ * Drawn in, once, when the guest first sees it.
+ *
+ * The order is the order it would be made: the ring is ruled, the ornaments are
+ * set into its breaks, the swashes are swept in, the second initial is written,
+ * the ampersand is written through it, the first initial is written over that,
+ * and only when the mark is whole does the light cross it.
+ *
+ * Everything animates on `opacity`, `transform` or `stroke-dashoffset`. The
+ * dash lengths are 1 because every drawn path carries `pathLength="1"`, so a
+ * path's own geometry never has to be known here — change a radius and the
+ * draw-in still takes exactly as long.
+ */
+.monogram-draw .mg-first,
+.monogram-draw .mg-second,
+.monogram-draw .mg-amp {
+  animation: mg-ink 900ms cubic-bezier(0.32, 0, 0.3, 1) both;
+}
+
+/*
+ * Reading order — first initial, second, ampersand — which is *not* the order
+ * they are painted in. Painting order is fixed by the overlap: whatever is
+ * behind has to go down first. Opacity is not, so the two are free to disagree,
+ * and what a guest sees is the mark being written rather than assembled.
+ */
+.monogram-draw .mg-first { animation-delay: 240ms; }
+.monogram-draw .mg-second { animation-delay: 820ms; }
+.monogram-draw .mg-amp { animation-delay: 1360ms; }
+
+/*
+ * Ink arriving on paper: it darkens into place and settles a hair, rather than
+ * sliding or scaling in from nothing. A monogram that flies in is a logo sting;
+ * this one is meant to look like it was always going to be there.
+ */
+@keyframes mg-ink {
+  from { opacity: 0; transform: translateY(2px) scale(0.985); }
+  to   { opacity: 1; transform: none; }
+}
+
+/*
+ * The light crossing the finished mark, once.
+ *
+ * Slow, and only once: a monogram that keeps glinting is a website element, and
+ * a foil-stamped card catches the light when you tilt it, not on a timer.
+ */
+.monogram-draw .mg-sweep {
+  animation: mg-sweep 2200ms 2300ms cubic-bezier(0.45, 0, 0.5, 1) both;
+}
+
+@keyframes mg-sweep {
+  from { transform: translateX(0); }
+  to   { transform: translateX(520px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /*
+   * No drawing in. Not "faster" — the mark is simply already made, which is
+   * what someone who has asked for less movement is asking to be given.
+   */
+  .monogram-draw .mg-first,
+  .monogram-draw .mg-second,
+  .monogram-draw .mg-amp,
+  .monogram-draw .mg-sweep {
+    animation: none !important;
+    stroke-dashoffset: 0 !important;
+  }
+}
+
+/* ══ The pre-wedding film ════════════════════════════════════════════════
+ *
+ * One beat between the envelope and the curtains. It sits *above* the velvet
+ * and below the envelope's veil, so the envelope dissolves onto a film that is
+ * already there and the film dissolves onto curtains that are already hanging —
+ * three scenes and not one cut between them.
+ */
+.film {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.9rem, 3vh, 1.8rem);
+  padding: clamp(1rem, 4vh, 2.5rem) 1rem;
+  overscroll-behavior: contain;
+  /*
+   * The room, not black. A black field between a blush envelope and blush
+   * velvet is a hole punched in the middle of the sequence — whatever the film
+   * itself looks like, the ground it is shown on has to belong to the same set
+   * as the two scenes either side of it.
+   */
+  background:
+    radial-gradient(120% 84% at 50% 38%, var(--room-near) 0%, var(--room-far) 68%, var(--room-far) 100%);
+  transition: opacity 900ms ease;
+}
+
+.film-gone {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* A little of the room's own light falling across the top of the screen. */
+.film-air {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(78% 46% at 50% 0%, rgb(255 252 246 / 0.4), transparent 70%);
+}
+
+/*
+ * The film's own frame.
+ *
+ * `aspect-ratio: 16 / 9` with `contain` inside it rather than a bare video
+ * filling the screen: a portrait phone film and a landscape drone edit are
+ * both likely here, and letting the element take its own shape means the frame
+ * moves and the buttons under it jump the moment the metadata arrives.
+ */
+.film-frame {
+  position: relative;
+  width: min(100%, 1180px);
+  max-height: 76vh;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 6px;
+  background: rgb(var(--vel-dark-rgb) / 0.9);
+  box-shadow:
+    0 0 0 1px rgb(var(--gold-frame-rgb) / 0.5),
+    0 0 0 6px rgb(var(--room-far-rgb) / 0.45),
+    0 26px 60px -26px rgb(var(--room-far-rgb) / 0.9);
+}
+
+.film-media {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  /*
+   * `contain`, so a portrait film is letterboxed inside the frame rather than
+   * cropped to its middle. A pre-wedding film is the couple's own footage and
+   * cutting the sides off it to fill a rectangle is not a decision this
+   * component gets to make.
+   */
+  object-fit: contain;
+}
+
+.film-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.film-sound,
+.film-skip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border-radius: 999px;
+  padding: 0.6rem 1.25rem;
+  font-size: 0.85rem;
+  line-height: 1.9;
+  transition:
+    background-color 220ms ease,
+    border-color 220ms ease,
+    color 220ms ease;
+  /* Not smaller: many of these guests are elderly and holding one phone in
+     one hand inside a chat app. */
+  min-height: 2.75rem;
+}
+
+.film-sound {
+  border: 1px solid rgb(var(--gold-frame-rgb) / 0.45);
+  color: rgb(var(--c-primary-rgb) / 0.9);
+  background: rgb(255 255 255 / 0.42);
+}
+
+.film-sound:hover {
+  border-color: rgb(var(--gold-frame-rgb) / 0.8);
+}
+
+.film-skip {
+  border: 1px solid transparent;
+  background: rgb(var(--c-primary-rgb) / 0.92);
+  color: var(--c-bg);
+  padding-inline: 1.6rem;
+  box-shadow: 0 8px 20px -10px rgb(var(--c-primary-rgb) / 0.7);
+}
+
+.film-skip:hover {
+  background: rgb(var(--c-primary-rgb) / 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .film {
+    transition: none !important;
+  }
+}
+
+/* ══ The cinematic set ═══════════════════════════════════════════════════
+ *
+ * Three pieces, in the order the guest meets them: the dark room the envelope
+ * is opened in, the velvet that parts afterwards, and the stage behind it.
+ *
+ * One rule governs all of it. **Only `transform` and `opacity` animate.**
+ * Every blur here is a fixed value on a fixed element, set once and never
+ * touched again, so each blurred thing is rasterised a single time and then
+ * only moved. An animated `filter` is a full-frame recomposite on every frame
+ * and it is the one thing that will take this from sixty frames a second to
+ * eight on the phones these invitations are actually opened on.
+ */
+
+/* ── The room ─────────────────────────────────────────────────────────── */
+
+.room {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  /*
+   * `isolate` matters: the particles are screen-blended so they add light
+   * rather than paint over it, and without a stacking context of their own
+   * they would blend against the invitation behind the overlay instead of
+   * against the room.
+   */
+  isolation: isolate;
+  background:
+    radial-gradient(128% 92% at 50% 34%, var(--room-near) 0%, var(--room-far) 68%, var(--room-far) 100%);
+}
+
+/* The air itself — a warm haze low in the frame, where the light pools. */
+.room-air {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(66% 42% at 50% 76%, rgb(var(--gold-3-rgb) / 0.26), transparent 70%),
+    radial-gradient(46% 36% at 24% 12%, rgb(255 253 251 / 0.7), transparent 72%);
+}
+
+/*
+ * The key light: the pool the envelope stands in. It grows a little as the
+ * envelope opens, which is the light "coming up" — a set that stays evenly lit
+ * from the first frame to the last has no drama in it at all.
+ */
+.room-key {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 116%;
+  aspect-ratio: 1.35;
+  transform: translate(-50%, -50%) scale(0.92);
+  border-radius: 50%;
+  background:
+    radial-gradient(closest-side, rgb(255 252 246 / 0.72), rgb(var(--gold-3-rgb) / 0.2) 46%, transparent 74%);
+  transition: transform 2600ms ease-out, opacity 2600ms ease-out;
+  opacity: 0.75;
+}
+
+.room-key-on {
+  transform: translate(-50%, -50%) scale(1.14);
+  opacity: 1;
+}
+
+/*
+ * Bokeh on a *light* ground.
+ *
+ * `screen` was right when the room was near-black and is useless now: screening
+ * a pale gold disc onto pale pink paper changes almost nothing. On a light set
+ * an out-of-focus highlight reads by being slightly *warmer and denser* than
+ * what is behind it, not brighter — so these are soft-light blended and carry a
+ * little of the room's own deep tone at their edge.
+ */
+.room-bokeh {
+  position: absolute;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(closest-side, rgb(255 253 250 / 0.9), rgb(var(--gold-3-rgb) / 0.45) 62%, rgb(var(--gold-3-rgb) / 0) 100%);
+  mix-blend-mode: soft-light;
+  animation-name: room-drift;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+.room-dust {
+  position: absolute;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: rgb(255 253 248);
+  animation-name: room-rise;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+.room-spark {
+  position: absolute;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, #fffdf4, rgb(var(--gold-3-rgb) / 0.95) 42%, transparent 74%);
+  opacity: 0;
+  animation-name: room-spark;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes room-drift {
+  0%   { transform: translate3d(0, 0, 0); }
+  50%  { transform: translate3d(2.6rem, -1.9rem, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes room-rise {
+  0%   { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(1.4rem, -18rem, 0); }
+}
+
+@keyframes room-spark {
+  0%, 100% { transform: scale(0.4); opacity: 0; }
+  8%       { opacity: 0; }
+  22%      { transform: scale(1); opacity: 0.95; }
+  40%      { transform: scale(0.55); opacity: 0; }
+}
+
+/*
+ * The light spilling out of the envelope as the flap comes back.
+ *
+ * It is behind the card and in front of the pocket, so the card rises out of
+ * it. Scaled and faded rather than resized, and it never becomes bright enough
+ * to compete with the wax — the brief asks for a *subtle* warm glow, and the
+ * moment this reads as a lamp the paper stops reading as paper.
+ */
+.env-glow {
+  position: absolute;
+  left: 50%;
+  top: 26%;
+  width: 132%;
+  aspect-ratio: 1.5;
+  /*
+   * In front of the lining and behind the cover. It used to carry its depth as
+   * a `--env-z` custom property composed into this transform, because an
+   * inline `translateZ` would have replaced the whole declaration and thrown
+   * the centring away — with the envelope flat, it is one number in one place.
+   */
+  z-index: 2;
+  transform: translate(-50%, -50%) scale(0.34);
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(closest-side, rgb(255 244 214 / 0.85), rgb(var(--gold-3-rgb) / 0.34) 46%, transparent 74%);
+  mix-blend-mode: screen;
+  transition: transform 1500ms ease-out, opacity 1500ms ease-out;
+  will-change: transform, opacity;
+}
+
+.env-glow-on {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 0.9;
+}
+
+/* ── The velvet ───────────────────────────────────────────────────────── */
+
+/*
+ * Absolute, inside the card's column — not fixed to the viewport. See the
+ * `curtains` prop on CardShell for why that distinction is the whole thing.
+ */
+/*
+ * Absolute, inside the card's column — not fixed to the viewport. See the
+ * `curtains` prop on CardShell for why that distinction is the whole thing.
+ *
+ * Fully opaque from the first paint, with no arrival of its own. The velvet
+ * hangs behind the envelope's overlay, which is opaque, so nobody can see it
+ * appear — and the fade it used to have was a race between a CSS transition
+ * and a React render of the whole page that the render sometimes won.
+ */
+.curtains {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/*
+ * Struck. The velvet goes once it has finished opening — it has revealed what
+ * it was hiding and nothing is owed to it after that. It carries on drawing
+ * outward while it fades rather than stopping and then disappearing, so the
+ * last thing the eye sees it do is still the same movement.
+ */
+.curtains-struck {
+  opacity: 0;
+  transition: opacity 800ms ease-in;
+}
+
+.curtain {
+  position: absolute;
+  top: 0;
+  /*
+   * Each panel is drawn a little over half the screen so the two overlap at
+   * the centre line while closed. Butted exactly edge to edge they show a
+   * hairline of the page between them on fractional device pixel ratios, and
+   * that hairline is the first thing anyone notices.
+   */
+  width: 54%;
+  height: 100%;
+  /*
+   * The long, slow ease is the point. Cloth this heavy does not accelerate
+   * quickly and does not stop abruptly; it starts almost imperceptibly, runs,
+   * and settles. `cubic-bezier(0.5, 0, 0.15, 1)` is a curve with a very soft
+   * foot and a long tail, which is what weight looks like.
+   */
+  transition: transform 2300ms cubic-bezier(0.5, 0, 0.15, 1);
+  will-change: transform;
+}
+
+.curtain-left {
+  left: 0;
+  /*
+   * Gathering, not sliding. The panel compresses horizontally about its *outer*
+   * edge at the same time as it travels, so the folds crowd together at the
+   * side of the frame exactly as real ones do when a curtain is drawn back. A
+   * panel that only translates reads as a flat card sliding off screen, and it
+   * is the single thing that most gives away a curtain built in a browser.
+   */
+  transform-origin: 0% 50%;
+}
+
+.curtain-right {
+  right: 0;
+  transform-origin: 100% 50%;
+}
+
+/*
+ * Gathered down to about a twentieth of the frame each side.
+ *
+ * They were left far wider, and on a phone that cost real content: the card
+ * runs the full width beneath them, so anything the open curtain still covers
+ * is covered for the rest of the visit — including the invitation's own corner
+ * ornaments. Bunched this tight they read as what they are, a curtain held
+ * back at the edge of a stage, and the invitation gets the whole frame.
+ */
+.curtains-open .curtain-left {
+  transform: translateX(-16%) scaleX(0.25);
+}
+
+.curtains-open .curtain-right {
+  transform: translateX(16%) scaleX(0.25);
+}
+
+/* Still travelling as they fade, so the exit is one movement and not two. */
+.curtains-struck .curtain-left {
+  transform: translateX(-64%) scaleX(0.16);
+}
+
+.curtains-struck .curtain-right {
+  transform: translateX(64%) scaleX(0.16);
+}
+
+/*
+ * The pelmet across the top, which is what makes the two panels one set. The
+ * curtains hang from something; without it they read as two separate objects
+ * that happen to be near each other.
+ */
+.curtain-pelmet {
+  position: absolute;
+  left: 0;
+  top: 0;
+  /*
+   * `width: 100%` explicitly, not `inset: 0 0 auto 0`.
+   *
+   * An `<svg>` is a *replaced* element, so `width: auto` resolves to its
+   * intrinsic size — the viewBox's aspect against whatever height it was given
+   * — and the `left: 0; right: 0` pair is quietly ignored. The pelmet came out
+   * nine times its own height and stopped two thirds of the way across the
+   * opening, with the curtains it is supposed to hang from carrying on past it.
+   */
+  width: 100%;
+  /*
+   * Taller than the flat band it replaces, because it now has a scalloped hem
+   * to hang and a braid to carry, and a swag with nothing between the board and
+   * the scallop is a scalloped line rather than a pelmet.
+   */
+  /*
+   * Taller than the flat band it replaces, and taller again than the swag
+   * itself: the last quarter of it is empty room for the shadow the scallops
+   * throw onto the cloth below, which is drawn inside the SVG. See `Pelmet` —
+   * a `box-shadow` here follows the element's rectangle and lays a hard line
+   * straight across the curtains.
+   */
+  height: 13%;
+}
+
+/*
+ * The seam down the middle of a closed set.
+ *
+ * Two panels drawn independently and butted together meet in a join that is
+ * lit from both sides, which is the one thing a closed curtain never is: where
+ * the leading edges overlap, no light reaches the cloth at all. It is a narrow
+ * band rather than a line, because the shadow falls on the folds either side of
+ * the join as well as in it.
+ */
+.curtain-seam {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 16%;
+  transform: translateX(-50%);
+  background:
+    linear-gradient(
+      to right,
+      rgb(var(--vel-dark-rgb) / 0) 0%,
+      rgb(var(--vel-dark-rgb) / 0.34) 34%,
+      rgb(var(--vel-dark-rgb) / 0.66) 48%,
+      rgb(var(--vel-dark-rgb) / 0.72) 50%,
+      rgb(var(--vel-dark-rgb) / 0.66) 52%,
+      rgb(var(--vel-dark-rgb) / 0.34) 66%,
+      rgb(var(--vel-dark-rgb) / 0) 100%
+    );
+  transition: opacity 900ms ease-out;
+}
+
+.curtain-seam-gone {
+  opacity: 0;
+}
+
+/* ── The stage ────────────────────────────────────────────────────────── */
+
+.stage-set {
+  position: relative;
+  isolation: isolate;
+  min-height: 100dvh;
+  background:
+    radial-gradient(108% 78% at 50% 24%, var(--room-near) 0%, var(--room-far) 62%, var(--room-far) 100%);
+}
+
+/*
+ * The set has to sit a shade under the velvet hanging on it. Pale cloth on an
+ * equally pale ground is one flat field with some faint stripes in it — the
+ * curtain only reads as an object standing in front of a room if the room is
+ * darker than the cloth, however slightly.
+ */
+.stage-set::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(104% 74% at 50% 34%, transparent 36%, rgb(var(--room-far-rgb) / 0.6) 100%);
+}
+
+.stage-plane {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/*
+ * The two particle planes sit *in front of* the invitation, which is the whole
+ * reason the depth reads: something out of focus in front of the subject is
+ * unmistakable evidence of a shallow plane of focus, where the same thing
+ * behind the subject is just a background.
+ */
+.stage-far { z-index: 0; filter: blur(7px); }
+.stage-mid { z-index: 1; filter: blur(2.4px); }
+/*
+ * The invitation is behind the curtains the whole time — never faded in, and
+ * never scaled either.
+ *
+ * A 2% scale on this element looked like a free way to carry the camera's
+ * forward push through the reveal, and it put a horizontal scrollbar on every
+ * screen size: the subject is the full width of the page, so scaling it up at
+ * all makes the document wider than the window. The push continues on the
+ * curtains instead, which arrive from 1.05 and have somewhere to shrink *to*.
+ *
+ * An earlier pass held it back for a beat so the parting velvet would disclose
+ * the set before the card arrived, and that was wrong twice over. It is not
+ * what a curtain does: the thing behind a curtain is already there, and the
+ * curtain only stops hiding it. And it was hiding the curtains themselves,
+ * because they hang inside this element — so the velvet spent the whole
+ * approach at zero opacity and the hand-off had nothing in it.
+ *
+ * What is left is the shot's forward movement carrying on through the reveal:
+ * a hair over scale, settling as the velvet draws back. Nothing appears.
+ */
+.stage-subject {
+  position: relative;
+  z-index: 2;
+}
+
+.stage-near { z-index: 3; }
+
+.stage-air {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(64% 44% at 50% 72%, rgb(var(--gold-3-rgb) / 0.16), transparent 72%),
+    radial-gradient(46% 34% at 50% 10%, rgb(var(--gold-3-rgb) / 0.12), transparent 74%);
+}
+
+/* A colonnade, only ever seen as soft warm verticals behind the arch. */
+.stage-column {
+  position: absolute;
+  top: -4%;
+  bottom: 0;
+  width: 7%;
+  transform: translateX(-50%);
+  background:
+    linear-gradient(to right,
+      rgb(var(--room-far-rgb) / 0.6) 0%,
+      rgb(var(--c-accent-rgb) / 0.16) 42%,
+      rgb(var(--c-accent-rgb) / 0.06) 60%,
+      rgb(var(--room-far-rgb) / 0.6) 100%);
+}
+
+/* The glow that reads as the whole set being lit from behind the arch. */
+.stage-halo {
+  position: absolute;
+  left: 50%;
+  top: 34%;
+  width: 92%;
+  aspect-ratio: 1.2;
+  transform: translate(-50%, -50%) scale(0.86);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(var(--gold-3-rgb) / 0.3), transparent 70%);
+  transition: transform 3000ms ease-out, opacity 3000ms ease-out;
+  opacity: 0.5;
+}
+
+.stage-lit .stage-halo {
+  transform: translate(-50%, -50%) scale(1.1);
+  opacity: 1;
+}
+
+.stage-arch {
+  position: absolute;
+  inset: -2% -2% auto -2%;
+  width: 104%;
+  opacity: 0.9;
+}
+
+/*
+ * A candle. Two things move: the flame's own flicker and nothing else. Real
+ * candlelight varies in *brightness* far more than in position, so this is
+ * mostly an opacity animation with a hair of scale on it — a candle that
+ * wobbles about looks like a firefly.
+ */
+.stage-candle {
+  position: absolute;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  background: radial-gradient(closest-side, rgb(255 240 200 / 0.9), rgb(var(--gold-3-rgb) / 0.4) 40%, transparent 72%);
+  mix-blend-mode: screen;
+  animation-name: stage-flicker;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  will-change: opacity, transform;
+}
+
+@keyframes stage-flicker {
+  0%, 100% { opacity: 0.72; transform: translateX(-50%) scale(1); }
+  32%      { opacity: 1;    transform: translateX(-50%) scale(1.06); }
+  58%      { opacity: 0.62; transform: translateX(-50%) scale(0.97); }
+  76%      { opacity: 0.92; transform: translateX(-50%) scale(1.03); }
+}
+
+.stage-bokeh {
+  position: absolute;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(var(--gold-3-rgb) / 0.8), rgb(var(--gold-3-rgb) / 0.1) 70%, transparent);
+  mix-blend-mode: screen;
+  animation-name: room-drift;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+.stage-mote {
+  position: absolute;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, #fff8e2, rgb(var(--gold-3-rgb) / 0.7) 50%, transparent);
+  mix-blend-mode: screen;
+  animation-name: stage-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+/* Gold does not float; it falls, and it drifts sideways as it goes. */
+@keyframes stage-fall {
+  0%   { transform: translate3d(0, -12vh, 0); }
+  100% { transform: translate3d(2.2rem, 96vh, 0); }
+}
+
+/*
+ * The lean pass. A phone that reported a coarse pointer and little memory gets
+ * the same set with the expensive parts turned off rather than a different,
+ * plainer one: the composition survives, the compositing cost does not.
+ */
+.env-lite .room-bokeh,
+.env-lite .stage-bokeh {
+  filter: none !important;
+  opacity: 0.1 !important;
+}
+
+.env-lite .stage-far,
+.env-lite .stage-mid {
+  filter: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /*
+   * Reduced motion takes the *movement* away and leaves the *picture*. The set
+   * is not decoration that can be dropped — it is the page's background, and a
+   * guest who asked for less motion still needs somewhere for the invitation
+   * to sit. So the particles stop where they are and the curtains simply start
+   * open, with no travel at all.
+   */
+  .room-bokeh,
+  .room-dust,
+  .room-spark,
+  .stage-bokeh,
+  .stage-mote,
+  .stage-candle {
+    animation: none !important;
+  }
+  .room-spark { opacity: 0.5 !important; }
+  .curtain,
+  .curtain-seam,
+  .curtains { transition: none !important; }
+  .room-key,
+  .stage-halo,
+  .env-glow {
+    transition: none !important;
+  }
+}
+
+/*
+ * The two bits of chrome that live on the dark set.
+ *
+ * Everything else on the invitation is dark ink on ivory paper, and both of
+ * these inherited that — which made them invisible the moment the backdrop
+ * became a dark room. They are the only place in the app where the type has to
+ * be light, so they say so here rather than borrowing the page's colours.
+ */
+/*
+ * The two bits of chrome that live on the set.
+ *
+ * They were briefly light-on-dark, for a set that was briefly a dark room. The
+ * set is a blush one now, so they are back to the invitation's own ink — which
+ * is the point: these are the only two pieces of type outside the paper, and
+ * they should look like they were printed by the same press as everything on it.
+ */
+.env-hint {
+  color: rgb(var(--c-primary-rgb) / 0.62);
+}
+
+.env-skip {
+  color: rgb(var(--c-primary-rgb) / 0.5);
+}
+
+.env-skip:hover {
+  color: rgb(var(--c-primary-rgb) / 0.85);
+}
+
+/*
+ * (c) The invitation asking to be opened.
+ *
+ * A slow swell of light around the button rather than a bounce or a wobble:
+ * the guest is being invited, not prodded. Six seconds a cycle and a shadow
+ * that only ever grows and shrinks, so nothing on the page actually moves —
+ * which is also why it costs nothing to run.
+ */
+.env-open-pulse {
+  animation: env-open-pulse 5.6s ease-in-out infinite;
+}
+
+@keyframes env-open-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgb(var(--gold-3-rgb) / 0.34), 0 6px 18px -8px rgb(var(--c-primary-rgb) / 0.5); }
+  50%      { box-shadow: 0 0 0 14px rgb(var(--gold-3-rgb) / 0), 0 10px 26px -8px rgb(var(--c-primary-rgb) / 0.42); }
+}
+
+/* (d) A deeper falloff at the edges, so the middle of the room reads as lit. */
+.room-vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(116% 78% at 50% 44%, transparent 40%, rgb(var(--room-far-rgb) / 0.55) 100%);
+}
+
+/*
+ * The address on the envelope: who the invitation is issued to, read before the
+ * seal is broken.
+ *
+ * It sits above the envelope in the room rather than printed on the paper,
+ * because the paper splits down the middle and swings apart — see
+ * `EnvelopeAddress` for why a name across that join is the one thing that must
+ * not be there. It leaves as the seal gives, upward and slightly back, which is
+ * the direction the camera is already travelling.
+ */
+.env-address {
+  /*
+   * As wide as the envelope it addresses, within reason. A fixed 30rem looked
+   * right when the envelope was 455px across and looks like a caption under a
+   * poster now that it can be 760.
+   */
+  max-width: clamp(20rem, var(--env-w, 30rem), 44rem);
+  margin-bottom: clamp(0.75rem, 2.6vh, 1.6rem);
+  padding-inline: 1.5rem;
+  text-align: center;
+  transition:
+    opacity 700ms ease-out,
+    transform 900ms cubic-bezier(0.4, 0, 0.5, 1);
+}
+
+.env-address-gone {
+  opacity: 0;
+  transform: translate3d(0, -0.6rem, 0);
+}
+
+.env-address-lead {
+  font-size: clamp(0.82rem, calc(var(--env-w, 20rem) / 27), 1.3rem);
+  letter-spacing: 0.02em;
+  line-height: 2;
+  color: rgb(var(--gold-1-rgb) / 0.9);
+}
+
+.env-address-name {
+  margin-top: 0.15rem;
+  font-family: var(--f-heading), "Khmer OS Muol Light", serif;
+  /*
+   * The honorific runs to a dozen titles and has to stay on the envelope
+   * screen next to a 3D object that also has to fit. It is sized against the
+   * viewport rather than the root so it gives ground on a small phone instead
+   * of pushing the envelope off the bottom, and it is never allowed to grow
+   * past the point where it would compete with the couple's own names inside.
+   */
+  /*
+   * Sized against the envelope rather than the viewport. The honorific runs to
+   * a dozen titles and has to stand next to a 3D object that is itself sized
+   * to the screen — tie it to the viewport instead and the two drift apart,
+   * with a large envelope carrying a small label on a wide desktop.
+   */
+  font-size: clamp(0.94rem, calc(var(--env-w, 20rem) / 17), 1.95rem);
+  line-height: 1.95;
+  color: rgb(var(--c-primary-rgb) / 0.86);
+}
+
+.env-address-latin {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .env-address,
+  .curtains-struck {
+    transition: none !important;
+  }
+}
+
+/*
+ * A short viewport — a phone held sideways, or a small laptop window.
+ *
+ * The address is what gives ground, because it is the one element here that
+ * can lose a few points and still be read. The envelope cannot shrink much
+ * further before its embossing stops registering, and the button has a minimum
+ * touch target that is not negotiable: many of these guests are elderly and
+ * opening this one-handed inside Telegram.
+ */
+@media (max-height: 620px) {
+  /*
+   * Everything below takes room out of the furniture, so the constant the
+   * envelope's width is fitted against comes down by the same amount. Lower it
+   * without shrinking the furniture and the three of them overlap; shrink the
+   * furniture without lowering it and the envelope stays small for no reason.
+   */
+  .env-veil {
+    --env-chrome: 176px;
+  }
+
+  .env-address {
+    margin-bottom: 0.5rem;
+  }
+
+  /*
+   * The address gives back most of what it was given on a tall screen.
+   *
+   * The worst case here is not a guest's own name but the *generic* link, whose
+   * honorific runs to a dozen titles and wraps to three lines — at the sizes a
+   * portrait phone gets, that pushed the whole block off the top of a phone
+   * held sideways. Tighter leading does as much of the work as the smaller
+   * size: three lines at 1.55 rather than 1.95 is a line and a half of height
+   * recovered without the type getting any harder to read.
+   */
+  .env-address-lead {
+    font-size: 0.7rem;
+    line-height: 1.5;
+  }
+
+  .env-address-name {
+    font-size: clamp(0.74rem, 1.9vw, 0.9rem);
+    line-height: 1.55;
+  }
+
+  /* The button comes up closer to the envelope. */
+  .env-open {
+    margin-top: 0.5rem;
+  }
+
+  /*
+   * And the hint goes entirely. It reads "tap to open the invitation" directly
+   * beneath a button that says "open the invitation" — on a screen this short
+   * that line is the cheapest thing in the frame to lose, and losing it is what
+   * keeps the address on screen at all.
+   */
+  .env-hint {
+    display: none;
+  }
+}

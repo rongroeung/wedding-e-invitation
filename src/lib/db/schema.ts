@@ -55,6 +55,15 @@ export const wedding = pgTable("wedding", {
   openButton: text("open_button").notNull().default("បើកលិខិត"),
   /** Decorative monogram on the cover, e.g. "S&K" or "ស ក". */
   monogram: text("monogram").notNull().default(""),
+  /**
+   * The face it is set in — a catalogue id, not a CSS family name.
+   *
+   * See `src/lib/monogram-fonts.ts`. Storing the id means a face can be
+   * renamed or re-filed without rewriting rows, and an id that is no longer
+   * offered resolves to the default rather than asking a guest's browser for a
+   * font that no longer exists.
+   */
+  monogramFont: text("monogram_font").notNull().default("great-vibes"),
   coverPhotoId: text("cover_photo_id"),
   coverPhotoUrl: text("cover_photo_url").notNull().default(""),
 
@@ -155,6 +164,57 @@ export const wedding = pgTable("wedding", {
   /** Overall type size for the invitation, as a percentage. */
   fontScale: integer("font_scale").notNull().default(100),
 
+  /* ── The 3D envelope shown before the invitation ──────────────────────
+     Guests should feel they are opening a physical card, so the invitation
+     arrives sealed. Everything here is optional: turned off, the guest lands
+     on the cover exactly as before. */
+  envelopeEnabled: boolean("envelope_enabled").notNull().default(true),
+  envelopeStyle: text("envelope_style").notNull().default("royal-khmer"),
+  /** Overrides for the chosen style; empty means "use the style's own". */
+  envelopePaper: text("envelope_paper").notNull().default(""),
+  envelopeGold: text("envelope_gold").notNull().default(""),
+  envelopeSeal: boolean("envelope_seal").notNull().default(true),
+  /** Empty means the couple's initials. */
+  envelopeSealText: text("envelope_seal_text").notNull().default(""),
+  envelopeAnimate: boolean("envelope_animate").notNull().default(true),
+  /** Length of the opening sequence, in milliseconds. */
+  envelopeDuration: integer("envelope_duration").notNull().default(2800),
+  envelopeMusic: boolean("envelope_music").notNull().default(true),
+  envelopeSkip: boolean("envelope_skip").notNull().default(true),
+  /** Off: opened once, the envelope stays open for the rest of the visit. */
+  envelopeEveryVisit: boolean("envelope_every_visit").notNull().default(false),
+  /* Wording on the envelope, so the couple can phrase the invitation to open
+     it however they wish. */
+  envelopeOpenLabel: text("envelope_open_label").notNull().default("បើកសំបុត្រអញ្ជើញ"),
+  envelopeHint: text("envelope_hint").notNull().default("សូមចុចដើម្បីបើកសំបុត្រអញ្ជើញ"),
+  envelopeSkipLabel: text("envelope_skip_label").notNull().default("រំលង"),
+
+  /* ── The pre-wedding film, played between the envelope and the curtains ──
+     One beat, in the one place it belongs: the envelope has just been opened
+     and the invitation has not been read yet, which is the only moment in the
+     visit where a guest is watching rather than reading. Off by default, and
+     off costs nothing — the envelope hands straight to the curtains exactly as
+     it did before. */
+  videoEnabled: boolean("video_enabled").notNull().default(false),
+  /** A link — YouTube, Vimeo, Facebook, or a direct .mp4 / .webm file. */
+  videoUrl: text("video_url").notNull().default(""),
+  /** Or an uploaded file, which wins over the link when both are set. */
+  videoMediaId: text("video_media_id"),
+  /** Shown while the film loads, and it is worth setting: a black rectangle
+      between the envelope and the curtains undoes both of them. */
+  videoPosterId: text("video_poster_id"),
+  videoSkipLabel: text("video_skip_label").notNull().default("រំលងវីដេអូ"),
+  /** Wording on the button that carries on to the invitation. */
+  videoContinueLabel: text("video_continue_label").notNull().default("បន្តទៅលិខិតអញ្ជើញ"),
+
+  /* ── The gold frame as pressed foil rather than a flat picture ─────────
+     The artwork is the couple's own; these settle how it is lit and how far
+     it is raised off the paper. Both static: the invitation is stationery,
+     and the envelope is where the animation lives. */
+  frameEmboss: boolean("frame_emboss").notNull().default(true),
+  /** How far the ornament stands off the paper, 0–100. */
+  frameDepth: integer("frame_depth").notNull().default(55),
+
   // SEO
   metaDescription: text("meta_description").notNull().default(""),
 
@@ -217,6 +277,9 @@ export const rsvps = pgTable("rsvps", {
   guestCount: integer("guest_count").notNull().default(1),
   message: text("message").notNull().default(""),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  /* A guest who changes their mind edits their reply rather than filing a
+     second one, so the list needs to know when it last moved. */
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
 /* ── Page views ────────────────────────────────────────────────────────── */

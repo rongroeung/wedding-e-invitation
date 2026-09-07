@@ -9,5 +9,5 @@ export async function GET(request: Request) {
   const { response } = await requireAdmin(request);
   if (response) return response;
   const db = await getDb();
-  return ok(await db.select().from(rsvps).orderBy(desc(rsvps.createdAt)));
+  return ok(await db.select().from(rsvps).orderBy(desc(rsvps.updatedAt)));
 }
