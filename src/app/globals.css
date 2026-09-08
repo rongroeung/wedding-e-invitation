@@ -730,6 +730,37 @@
      * phone to a desktop — no breakpoint ever redraws it, and nothing can
      * drift out of proportion.
      */
+    /*
+     * Fitted to the *height* of the screen rather than picked from a table of
+     * breakpoints, because the envelope is portrait and stands between two
+     * pieces of furniture — the address above it and the open button below.
+     * Those two are close to a fixed number of pixels tall whatever the screen
+     * is (type does not scale with the viewport and a touch target must not),
+     * so the space actually left for the envelope is the screen's height minus
+     * a constant, and dividing that by the piece's own 1.28 aspect is exactly
+     * how wide it can be. A plain `vh` fraction cannot express this: whatever
+     * fraction fits a laptop leaves a tall desktop half empty, and vice versa.
+     * `--env-chrome` is that constant, lowered by the one short-viewport media
+     * query after it takes the same room out of the address and the hint.
+     *
+     * The 62vw ceiling is not taste either. The two panels travel 88% of their
+     * own width, so the pair spans 1.88 × the envelope at the widest moment of
+     * the opening, and the camera holds at 0.8 — 1.88 × 0.62 × 0.8 is 0.93,
+     * which keeps both panels on screen with a margin on the narrowest phone.
+     * The 760px cap is the width of the invitation's own centre column: past
+     * that the envelope stops being an object in a room and becomes a wall.
+     *
+     * **`vh` first, `dvh` only where it is supported.** This used to be set as
+     * an inline custom property in `dvh` alone, which is a quiet trap: a
+     * browser that does not know the unit throws out the whole `clamp()`, the
+     * declarations that consume it become invalid at computed-value time, and
+     * `width` and `height` silently fall back to `auto` — an envelope with no
+     * size, on exactly the old phones least able to tell you why. `vh` is the
+     * honest fallback (it measures the viewport with the toolbars *hidden*, so
+     * the envelope is a little large on a phone rather than absent), and the
+     * `@supports` block below upgrades it wherever `dvh` actually works.
+     */
+    --env-w: clamp(150px, min(62vw, (100vh - var(--env-chrome, 268px)) / 1.28), 760px);
     width: var(--env-w);
     height: calc(var(--env-w) * 1.28);
     font-size: calc(var(--env-w) / 26);
@@ -738,6 +769,19 @@
       transform var(--env-move, 900ms) cubic-bezier(0.22, 0.61, 0.28, 1),
       opacity var(--env-move, 900ms) ease;
     will-change: transform;
+  }
+
+  /*
+   * The dynamic viewport unit, where the browser has it.
+   *
+   * `dvh` follows the phone's toolbars as they hide and show, which is what the
+   * envelope actually wants — but it is the newer unit, and the `vh` above is
+   * what keeps the piece sized on anything that lacks it.
+   */
+  @supports (height: 100dvh) {
+    .env-piece {
+      --env-w: clamp(150px, min(62vw, (100dvh - var(--env-chrome, 268px)) / 1.28), 760px);
+    }
   }
 
   /*
@@ -1308,9 +1352,14 @@
  * the 380px there are to spend, pushing its own head off the top of the card.
  */
 .cover-monogram {
-  width: clamp(104px, min(44vw, 30vh), 236px);
+  width: clamp(104px, min(46vw, 32vh), 260px);
+  /*
+   * Height follows the drawing, and there is no `aspect-ratio` here on purpose.
+   * The mark's viewBox is cut to the initials, so its intrinsic ratio *is* the
+   * ratio of the couple's own monogram; forcing a square back on top of that
+   * would letterbox the thing the viewBox was cut to avoid letterboxing.
+   */
   height: auto;
-  aspect-ratio: 1;
 }
 
 /*
@@ -1390,7 +1439,10 @@
 
 @keyframes mg-sweep {
   from { transform: translateX(0); }
-  to   { transform: translateX(520px); }
+  /* In user units, set by the component from the mark's own width — a fixed
+     distance under-runs a wide mark and over-runs a narrow one, and the sheen
+     is meant to cross the drawing exactly once. */
+  to   { transform: translateX(var(--mg-travel, 520px)); }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -37,28 +37,29 @@ import {
 /* ── Where things sit, in the 200-unit box the mark is drawn in ─────────── */
 
 /**
- * The box the initials are fitted into, and the row the ampersand stands on.
+ * The mark is drawn at a nominal size and the **viewBox is cut to fit it**.
  *
- * Nothing here is a font size, and that is the point. Twenty faces are on offer
- * and no two measure alike — Great Vibes puts 83% of the em above the baseline
- * and a tail 39% below; Playfair 73% and almost nothing; Moul's ស is a third
- * wider than its ក. Set at one size they would range from running off the card
- * to sitting in the middle of it like a postage stamp. So the *box* is fixed
- * and the size is solved for.
+ * It used to be laid out inside a fixed 200×200 square, and that square was the
+ * problem. Two initials are almost always wider than they are tall — a pair of
+ * script capitals runs about two ems across and one down — so fitting them into
+ * a square meant fitting them to the *width* and leaving half the height empty.
+ * On a phone, where the mark is 172px wide, that put about 80px of actual ink
+ * on the card with a band of nothing above and below it, and the monogram
+ * looked small and lost on its own cover.
+ *
+ * Cut to the drawing, the box has no empty band to give away: the mark fills
+ * whatever width it is given, and its height simply follows. Everything else in
+ * here is expressed against that box rather than against 200, which is why the
+ * gradients and the sweep take their coordinates from the layout.
  */
-const BOX = {
-  w: 178,
-  cx: 100,
-  /* With an ampersand the letters give up the bottom of the box to it; without
-     one they have the whole square. Reserving the row either way leaves a Khmer
-     pair — which has no ampersand and few descenders — sitting in the top half
-     of the card with an empty strip under it. */
-  amp: { h: 136, cy: 76 },
-  plain: { h: 168, cy: 100 },
-};
-/** Where the ampersand's own baseline sits, and its share of the letter size. */
-const AMP_BASE = 183;
+const NOMINAL = 100;
+/** Air around the drawing, so a swash never touches the edge. */
+const PAD = 8;
+/** The ampersand: its share of the letter size, and the gap above it. */
 const AMP_SHARE = 0.36;
+const AMP_GAP = 10;
+/** Great Vibes' `&`, measured — it is the only character always set in it. */
+const AMP_INK = { asc: 719, desc: 47 };
 
 /** A glyph's ink, per 1000 units of font size. */
 type Ink = { asc: number; desc: number; left: number; right: number };
@@ -69,9 +70,11 @@ type Ink = { asc: number; desc: number; left: number; right: number };
  * A capital's measured descent is the descent of *that capital*. Several faces
  * report none, which is true of the letter probed and not of the alphabet — a
  * Khmer subscript hangs well below the line, a script's J and G carry tails —
- * and an initial that happens to have one would print through the floor.
+ * and an initial that happens to have one would print through the floor. Only
+ * the SSR estimate leans on this; once the real letters are measured their own
+ * descent is what the box is cut to.
  */
-const FLOOR = { latin: 120, khmer: 170 };
+const FLOOR = { latin: 90, khmer: 140 };
 
 /**
  * The layout, solved for a face and the ink of the letters actually being set.
@@ -82,50 +85,49 @@ const FLOOR = { latin: 120, khmer: 170 };
  * overlap collides two solid letterforms into a blot; Khmer's are wide, upright
  * and stand clear. Each face carries its own figure.
  *
- * Everything is measured and placed on **ink**, never on advance widths. A
- * script capital's advance has little to do with where its swashes actually
- * reach — Great Vibes' S carries ink a long way left of its own origin — so a
- * pair centred on advances sits visibly off-centre, and a pair *sized* on them
+ * The overlap is taken against the **narrower** of the two letters and then
+ * capped, because ink width is a poor proxy for where a letter's body ends. A
+ * Great Vibes K is two thirds wider than its D — almost all of it exit swash —
+ * so a generous fraction of the narrower letter still buries the wider one's
+ * body under the other's. Half of the smaller letter is as far as this can go
+ * before the pair stops reading as two letters.
+ *
+ * Everything is measured and placed on **ink**, never advance widths. A script
+ * capital's advance has little to do with where its swashes actually reach, so
+ * a pair centred on advances sits visibly off-centre and a pair *sized* on them
  * either overflows the card or floats in the middle of it.
  */
 function layout(font: MonogramFont, inks: Ink[], hasAmp: boolean) {
-  const room = hasAmp ? BOX.amp : BOX.plain;
-  const asc = Math.max(...inks.map((i) => i.asc));
-  const desc = Math.max(...inks.map((i) => i.desc));
-  const widths = inks.map((i) => (i.left + i.right) / 1000);
+  const asc = Math.max(...inks.map((i) => i.asc)) / 10;
+  const desc = Math.max(...inks.map((i) => i.desc)) / 10;
+  const widths = inks.map((i) => (i.left + i.right) / 10);
 
-  /* Where each letter's ink starts, in em, running left to right. */
+  /* Where each letter's ink starts, running left to right. */
   const starts: number[] = [];
   let cursor = 0;
   for (const [i, w] of widths.entries()) {
     starts.push(cursor);
     const next = widths[i + 1];
-    cursor += next === undefined ? w : w - font.lap * Math.min(w, next);
+    cursor += next === undefined ? w : w - Math.min(font.lap, 0.5) * Math.min(w, next);
   }
-  const wide = starts[starts.length - 1] + widths[widths.length - 1];
+  const ink = { w: starts[starts.length - 1] + widths[widths.length - 1], h: asc + desc };
 
-  /*
-   * Two heights, and they do different jobs.
-   *
-   * `safe` includes the floor, and it is what the *size* is solved against, so
-   * a face whose next initial has a tail cannot print through the bottom of the
-   * card. `real` is what the letters actually occupy, and it is what the mark is
-   * *centred* on — centre it on the safe height instead and a Khmer pair, which
-   * has almost no descent, floats above the middle of the box with a strip of
-   * reserved paper under it that nothing ever uses.
-   */
-  const real = (asc + desc) / 1000;
-  const safe = (asc + Math.max(desc, FLOOR[font.script])) / 1000;
-  const size = Math.min(BOX.w / wide, room.h / safe);
-  const top = room.cy - (size * real) / 2;
+  const ampSize = NOMINAL * AMP_SHARE;
+  const ampH = hasAmp ? AMP_GAP + ((AMP_INK.asc + AMP_INK.desc) * ampSize) / 1000 : 0;
 
   return {
-    size,
-    base: top + (size * asc) / 1000,
+    size: NOMINAL,
+    /** The viewBox, cut to the drawing. */
+    vb: { w: ink.w + PAD * 2, h: ink.h + ampH + PAD * 2 },
+    base: PAD + asc,
     /* `textAnchor` is "start", so each letter's origin is its ink start pushed
        back by however far its ink reaches to the *left* of that origin. */
-    xs: starts.map((st, i) => BOX.cx - (size * wide) / 2 + size * st + (size * inks[i].left) / 1000),
-    amp: size * AMP_SHARE,
+    xs: starts.map((st, i) => PAD + st + inks[i].left / 10),
+    amp: {
+      size: ampSize,
+      x: (ink.w + PAD * 2) / 2,
+      y: PAD + ink.h + AMP_GAP + (AMP_INK.asc * ampSize) / 1000,
+    },
   };
 }
 
@@ -135,15 +137,14 @@ function layout(font: MonogramFont, inks: Ink[], hasAmp: boolean) {
  * A canvas is the only thing in a browser that will report where a glyph's ink
  * actually is: `getBBox()` on an SVG `<text>` gives the font's *layout* box, so
  * a script whose em is mostly empty space measures as overflowing a box it sits
- * comfortably inside. This is the same measurement the catalogue's baked
- * figures came from, run again on the letters the couple actually chose.
+ * comfortably inside.
  */
 function measure(spec: string, chars: string[]): Ink[] | null {
   if (typeof document === "undefined") return null;
   const c = document.createElement("canvas").getContext("2d");
   if (!c) return null;
   c.font = spec;
-  return chars.map((ch) => {
+  const inks = chars.map((ch) => {
     const m = c.measureText(ch);
     return {
       asc: m.actualBoundingBoxAscent,
@@ -152,13 +153,16 @@ function measure(spec: string, chars: string[]): Ink[] | null {
       right: m.actualBoundingBoxRight,
     };
   });
+  /* A measurement of nothing is worse than an estimate: a face that has not
+     arrived yet reports zeroes, and a box cut to zero has no drawing in it. */
+  return inks.every((i) => i.asc + i.desc > 0 && i.left + i.right > 0) ? inks : null;
 }
 
 /** The catalogue's figures, standing in until the real ones can be measured. */
 function estimate(font: MonogramFont, n: number): Ink[] {
   return Array.from({ length: n }, () => ({
     asc: font.m.asc,
-    desc: font.m.desc,
+    desc: Math.max(font.m.desc, FLOOR[font.script]),
     left: 0,
     right: font.m.adv,
   }));
@@ -224,8 +228,12 @@ export function Monogram({
 
   return (
     <svg
-      viewBox="0 0 200 200"
+      viewBox={`0 0 ${box.vb.w.toFixed(1)} ${box.vb.h.toFixed(1)}`}
       className={`monogram ${play ? "monogram-draw" : ""} ${className}`}
+      /* How far the sheen has to travel to cross a mark of this width. A fixed
+         distance in the keyframe would under-run a wide mark and over-run a
+         narrow one, and the sweep is meant to cross the drawing exactly once. */
+      style={{ ["--mg-travel" as string]: `${(box.vb.w * 2.4).toFixed(1)}px` }}
       aria-hidden="true"
     >
       <defs>
@@ -249,10 +257,10 @@ export function Monogram({
         <linearGradient
           id={`mg-${uid}`}
           gradientUnits="userSpaceOnUse"
-          x1="14"
-          y1="8"
-          x2="186"
-          y2="192"
+          x1={0}
+          y1={0}
+          x2={box.vb.w}
+          y2={box.vb.h}
         >
           <stop offset="0" stopColor="var(--gold-deep, currentColor)" />
           <stop offset="0.12" stopColor="var(--gold-1, currentColor)" />
@@ -284,8 +292,22 @@ export function Monogram({
           <stop offset="0.66" stopColor="#000" />
           <stop offset="1" stopColor="#000" />
         </linearGradient>
-        <mask id={`sweep-${uid}`} maskUnits="userSpaceOnUse" x="-260" y="-20" width="720" height="240">
-          <rect className="mg-sweep" x="-260" y="-20" width="240" height="240" fill={`url(#sheen-${uid})`} />
+        <mask
+          id={`sweep-${uid}`}
+          maskUnits="userSpaceOnUse"
+          x={-box.vb.w * 1.3}
+          y={0}
+          width={box.vb.w * 3.6}
+          height={box.vb.h}
+        >
+          <rect
+            className="mg-sweep"
+            x={-box.vb.w * 1.3}
+            y={0}
+            width={box.vb.w * 1.2}
+            height={box.vb.h}
+            fill={`url(#sheen-${uid})`}
+          />
         </mask>
 
         {set.kind === "pair" && (
@@ -301,9 +323,16 @@ export function Monogram({
            * meet; cleared wide, the gap stops reading as an overlap and starts
            * reading as a piece missing out of the letter behind.
            */
-          <mask id={`cut-${uid}`} maskUnits="userSpaceOnUse" x="0" y="0" width="200" height="200">
-            <rect x="0" y="0" width="200" height="200" fill="#fff" />
-            <Letter ch={set.first} face={face} box={box} x={box.xs[0]} fill="#000" bump={2.4} />
+          <mask
+            id={`cut-${uid}`}
+            maskUnits="userSpaceOnUse"
+            x={0}
+            y={0}
+            width={box.vb.w}
+            height={box.vb.h}
+          >
+            <rect x={0} y={0} width={box.vb.w} height={box.vb.h} fill="#fff" />
+            <Letter ch={set.first} face={face} box={box} x={box.xs[0]} fill="#000" bump={2.2} />
           </mask>
         )}
       </defs>
@@ -374,9 +403,9 @@ function Mark({
             ch="&"
             face={AMPERSAND}
             box={box}
-            x={BOX.cx}
-            y={AMP_BASE}
-            size={box.amp}
+            x={box.amp.x}
+            y={box.amp.y}
+            size={box.amp.size}
             centred
           />
         </g>

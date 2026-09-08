@@ -54,7 +54,7 @@ export function CoverContent({
         play={reveal}
         className={
           compact
-            ? "aspect-square h-[34%] max-h-[160px] w-auto text-gold-frame"
+            ? "h-auto w-[62%] max-w-[210px] text-gold-frame"
             : "cover-monogram text-gold-frame"
         }
       />

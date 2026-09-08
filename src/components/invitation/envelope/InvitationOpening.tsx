@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { Guest, Wedding } from "@/lib/db/schema";
 import type { EnvelopeConfig } from "@/lib/envelope";
 import type { FrameConfig } from "@/lib/frame";
@@ -11,6 +11,15 @@ import { OpenButton } from "./OpenButton";
 import { OpeningTransition } from "./OpeningTransition";
 import { SkipButton } from "./SkipButton";
 import { usePointerTilt, useRichDevice } from "./usePointerTilt";
+
+/**
+ * `useLayoutEffect` on the client, `useEffect` on the server.
+ *
+ * React warns about `useLayoutEffect` during server rendering, correctly: there
+ * is no layout pass to run before. This is the standard way to ask for
+ * "before paint, if there is a paint" without the warning.
+ */
+const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 /** Steps of the opening, in order. Each one only ever moves forward. */
 type Step = "closed" | "unsealed" | "doors" | "fill" | "done";
@@ -105,10 +114,24 @@ export function InvitationOpening({
   /** The envelope has left the screen. Called once, after `onOpen`. */
   onFinished: () => void;
 }) {
-  /* Rendered on the server so a first-time guest never sees the invitation
-     flash past before the envelope arrives; `ready` reveals it after mount,
-     once we know whether this guest has opened it already this visit. */
-  const [ready, setReady] = useState(false);
+  /*
+   * The scene is visible from the server's own HTML, and nothing client-side
+   * has to happen for a guest to see it.
+   *
+   * It used to be rendered at `opacity: 0` and revealed by an effect once we
+   * knew whether this guest had opened the envelope already this visit. That
+   * put the entire opening behind a single client-side signal, and when that
+   * signal did not arrive — a chunk that failed to load on a phone's
+   * connection, a browser old enough to choke on something in the bundle, an
+   * extension — the guest was left looking at an empty room with a skip button
+   * in the corner and no way to tell anything was wrong. For an invitation that
+   * is the worst failure there is: it does not look broken, it looks *empty*.
+   *
+   * The visit check now runs in a layout effect, which fires before the browser
+   * paints, so a returning guest still never sees a frame of an envelope they
+   * have already opened — and a guest whose JavaScript never runs at all gets a
+   * still envelope they can tap rather than a blank screen.
+   */
   /*
    * The push begins before the guest does anything.
    *
@@ -155,31 +178,34 @@ export function InvitationOpening({
     onFinishedRef.current();
   }, []);
 
-  /* Was this envelope already opened during this visit? Asked once, on mount. */
-  useEffect(() => {
+  /*
+   * Was this envelope already opened during this visit? Asked once, before the
+   * first paint — `useLayoutEffect`, not `useEffect`, because the whole point
+   * is to take the overlay away before the browser has drawn it. On the server
+   * there is no layout pass and no `sessionStorage` either, so it degrades to
+   * `useEffect` there and the check simply happens on the client as before.
+   */
+  useIsomorphicLayoutEffect(() => {
     if (checked.current) return;
     checked.current = true;
+    if (envelope.everyVisit) return;
     let seen = false;
-    if (!envelope.everyVisit) {
-      try {
-        seen = window.sessionStorage.getItem(envelopeSeenKey(guest?.code ?? "")) === "1";
-      } catch {
-        // Private mode, or storage blocked by the in-app browser: show it.
-      }
+    try {
+      seen = window.sessionStorage.getItem(envelopeSeenKey(guest?.code ?? "")) === "1";
+    } catch {
+      // Private mode, or storage blocked by the in-app browser: show it.
     }
     if (seen) {
       finish();
       clear();
     }
-    setReady(true);
   }, [envelope.everyVisit, guest?.code, finish]);
 
-  /* One frame after the room is up, start the camera moving. */
+  /* A beat after the room is up, start the camera moving. */
   useEffect(() => {
-    if (!ready) return;
     const timer = setTimeout(() => setPushed(true), 240);
     return () => clearTimeout(timer);
-  }, [ready]);
+  }, []);
 
   useEffect(() => {
     const list = timers.current;
@@ -296,9 +322,7 @@ export function InvitationOpening({
       <CinemaRoom lit={index >= at("doors")} rich={rich} />
 
       <div
-        className={`env-stage flex h-full w-full items-center justify-center px-4 transition-opacity duration-500 ${
-          ready ? "opacity-100" : "opacity-0"
-        }`}
+        className="env-stage flex h-full w-full items-center justify-center px-4"
       >
         <div className="env-column flex w-full flex-col items-center">
           <EnvelopeAddress wedding={wedding} guest={guest} gone={index >= at("unsealed")} />
@@ -306,38 +330,9 @@ export function InvitationOpening({
           <div
             className={`env-piece ${closed && !tilt ? "env-idle" : ""} ${rich ? "" : "env-lite"}`}
             style={{
-              /*
-               * One length drives the whole drawing; see .env-piece.
-               *
-               * It is fitted to the *height* of the screen rather than picked
-               * from a table of breakpoints, because the envelope is portrait
-               * and stands between two pieces of furniture — the address above
-               * it and the open button below. Those two are close to a fixed
-               * number of pixels tall whatever the screen is (type does not
-               * scale with the viewport and a touch target must not), so the
-               * space actually left for the envelope is the screen's height
-               * minus a constant, and dividing that by the piece's own 1.28
-               * aspect is exactly how wide it can be. A plain `vh` fraction
-               * cannot express this: whatever fraction fits a laptop leaves a
-               * tall desktop half empty, and vice versa.
-               *
-               * `--env-chrome` is that constant, and the one short-viewport
-               * media query lowers it after taking the same room out of the
-               * address and the hint.
-               *
-               * The 62vw ceiling is not a taste decision either. The two
-               * panels travel 88% of their own width, so the pair spans
-               * 1.88 × the envelope at the widest moment of the opening, and
-               * the camera holds at 0.8 — 1.88 × 0.62 × 0.8 is 0.93, which is
-               * what keeps both panels on screen with a margin to spare on the
-               * narrowest phone. Raise it and the cover slides out of frame.
-               *
-               * The 760px cap is the width of the invitation's own centre
-               * column on a wide screen: past that the envelope stops being an
-               * object standing in a room and becomes a wall.
-               */
-              ["--env-w" as string]:
-                "clamp(150px, min(62vw, (100dvh - var(--env-chrome, 268px)) / 1.28), 760px)",
+              /* How wide the piece is — and why that number is what it is —
+                 lives in `.env-piece` in the stylesheet, because it needs a
+                 `@supports` guard that an inline style cannot carry. */
               ["--env-paper" as string]: envelope.paper,
               ["--env-paper-shade" as string]: envelope.paperShade,
               ["--env-paper-deep" as string]: envelope.paperDeep,
