@@ -59,7 +59,7 @@ export function Gallery({ images }: { images: GalleryImage[] }) {
    */
   const lightbox = current && (
     <div
-      className="fixed inset-0 z-[70] flex animate-fadeIn items-center justify-center bg-brown/95 backdrop-blur-sm"
+      className="tappable fixed inset-0 z-[70] flex animate-fadeIn items-center justify-center bg-brown/95 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       onClick={close}
@@ -110,8 +110,11 @@ export function Gallery({ images }: { images: GalleryImage[] }) {
         </>
       )}
 
+      {/* `tappable` here is not decoration: without a pointer cursor iOS never
+          dispatches this click, the stop-propagation never runs, and tapping
+          the photo itself closes the lightbox. */}
       <figure
-        className="flex max-h-[92vh] w-full max-w-[94vw] flex-col items-center px-4 text-center"
+        className="tappable flex max-h-[92vh] w-full max-w-[94vw] flex-col items-center px-4 text-center"
         onClick={(e) => e.stopPropagation()}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}

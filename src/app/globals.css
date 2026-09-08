@@ -273,6 +273,29 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2122, U+2212;
 }
 
+/*
+ * What makes something tappable on iOS.
+ *
+ * Safari only dispatches `click` from a handful of elements — links, form
+ * controls, anything with an `onclick` **attribute** — and from anything whose
+ * computed `cursor` is `pointer`. React attaches its listeners at the root of
+ * the tree and needs the event to bubble there, and it sets a *property* rather
+ * than an attribute, so a plain `<div onClick=…>` is simply dead to a finger on
+ * an iPhone while working perfectly with a mouse. That is how the envelope came
+ * to render correctly on a phone and do nothing at all when it was tapped.
+ *
+ * `touch-action: manipulation` drops the double-tap-to-zoom wait on the target,
+ * which is the other half of a control that feels stuck; the tap highlight goes
+ * because a grey box flashing over blush paper is not what this is.
+ */
+@layer components {
+  .tappable {
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
 /* ── Theme tokens (overridden at runtime by the admin “Theme” page) ─────── */
 :root {
   --c-primary: #4a3527;
@@ -1351,6 +1374,20 @@
  * sideways as "wide screen, use the large mark", and the large mark then eats
  * the 380px there are to spend, pushing its own head off the top of the card.
  */
+/*
+ * The mark is never clipped by its own box.
+ *
+ * An `<svg>` clips to its viewport, and this one's viewBox is cut to metrics
+ * measured at runtime — so any measurement that is even slightly short takes
+ * the top off the letters, which is a far uglier failure than a mark sitting a
+ * pixel off centre. `overflow: visible` turns the one into the other. The
+ * measurement is guarded as well (see `Monogram`), but a drawing this size on
+ * an otherwise empty card should not have a single point of failure.
+ */
+.monogram {
+  overflow: visible;
+}
+
 .cover-monogram {
   width: clamp(104px, min(46vw, 32vh), 260px);
   /*

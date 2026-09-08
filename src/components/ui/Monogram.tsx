@@ -143,19 +143,49 @@ function measure(spec: string, chars: string[]): Ink[] | null {
   if (typeof document === "undefined") return null;
   const c = document.createElement("canvas").getContext("2d");
   if (!c) return null;
-  c.font = spec;
-  const inks = chars.map((ch) => {
-    const m = c.measureText(ch);
-    return {
-      asc: m.actualBoundingBoxAscent,
-      desc: m.actualBoundingBoxDescent,
-      left: m.actualBoundingBoxLeft,
-      right: m.actualBoundingBoxRight,
-    };
-  });
-  /* A measurement of nothing is worse than an estimate: a face that has not
-     arrived yet reports zeroes, and a box cut to zero has no drawing in it. */
-  return inks.every((i) => i.asc + i.desc > 0 && i.left + i.right > 0) ? inks : null;
+
+  const ink = (font: string) => {
+    c.font = font;
+    return chars.map((ch) => {
+      const m = c.measureText(ch);
+      return {
+        asc: m.actualBoundingBoxAscent,
+        desc: m.actualBoundingBoxDescent,
+        left: m.actualBoundingBoxLeft,
+        right: m.actualBoundingBoxRight,
+      };
+    });
+  };
+
+  const inks = ink(spec);
+  /* A measurement of nothing is worse than an estimate: a box cut to zero has
+     no drawing in it. */
+  if (!inks.every((i) => i.asc + i.desc > 0 && i.left + i.right > 0)) return null;
+
+  /*
+   * Is it actually *this* face we just measured?
+   *
+   * `document.fonts.load()` resolving is not the same as the face being the one
+   * a canvas will use, and Safari in particular will hand back a resolved
+   * promise while `measureText` is still reporting the fallback. Measuring the
+   * fallback and cutting the box to *it* is the worst of both worlds: the text
+   * then draws in a face that is taller and wider than the box it was given,
+   * and the top of every letter is sliced off — which is exactly what a
+   * reported monogram looked like on a phone and never once on a desktop,
+   * because the desktop had the font in cache before the component mounted.
+   *
+   * The same string measured in a bare `serif` is the tell. Identical numbers
+   * to the last pixel across every letter mean nothing has loaded yet.
+   */
+  const plain = ink(spec.replace(/px .*/, "px serif"));
+  const same = inks.every(
+    (a, i) =>
+      a.asc === plain[i].asc &&
+      a.desc === plain[i].desc &&
+      a.left === plain[i].left &&
+      a.right === plain[i].right,
+  );
+  return same ? null : inks;
 }
 
 /** The catalogue's figures, standing in until the real ones can be measured. */
@@ -497,11 +527,30 @@ function useInk(face: MonogramFont, chars: string[]): Ink[] | null {
       const m = measure(spec, chars);
       if (m) setInk(m);
     };
-    /* `fonts.load` resolves when the faces this text needs are usable — or
-       rejects, on a network that never answers, in which case the baked
-       estimate is what the guest keeps and the mark is merely approximate
-       rather than absent. */
-    document.fonts?.load(spec, text).then(done, done) ?? done();
+    /*
+     * Try, then keep trying for as long as it is worth trying.
+     *
+     * `fonts.load` resolving is the first chance to measure, `fonts.ready` the
+     * second, and a few animation frames after that the third — because a face
+     * can become active between any two of them and a single attempt that lands
+     * a frame early cuts the box to the wrong font. Each attempt is cheap (one
+     * canvas, a handful of `measureText` calls) and they stop the moment one
+     * succeeds. If none does — a network that never answers — the baked
+     * estimate is what the guest keeps, and the mark is approximate rather than
+     * clipped.
+     */
+    let tries = 0;
+    const attempt = () => {
+      if (!alive || tries++ > 12) return;
+      const m = measure(spec, chars);
+      if (m) {
+        setInk(m);
+        return;
+      }
+      requestAnimationFrame(attempt);
+    };
+    document.fonts?.load(spec, text).then(attempt, attempt) ?? attempt();
+    document.fonts?.ready.then(attempt, () => undefined);
     return () => {
       alive = false;
     };

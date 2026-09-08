@@ -328,7 +328,9 @@ export function InvitationOpening({
           <EnvelopeAddress wedding={wedding} guest={guest} gone={index >= at("unsealed")} />
 
           <div
-            className={`env-piece ${closed && !tilt ? "env-idle" : ""} ${rich ? "" : "env-lite"}`}
+            className={`env-piece ${closed ? "tappable" : ""} ${
+              closed && !tilt ? "env-idle" : ""
+            } ${rich ? "" : "env-lite"}`}
             style={{
               /* How wide the piece is — and why that number is what it is —
                  lives in `.env-piece` in the stylesheet, because it needs a
