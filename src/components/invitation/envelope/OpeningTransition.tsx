@@ -28,6 +28,9 @@ export function OpeningTransition({
 }) {
   return (
     <div
+      /* The `?diag=1` panel looks for this, and `InvitationOpening` stamps
+         `data-hydrated` on it from an effect. */
+      data-opening=""
       className={`env-veil fixed inset-0 z-[80] overflow-hidden overscroll-contain ${
         gone ? "pointer-events-none opacity-0" : "opacity-100"
       }`}

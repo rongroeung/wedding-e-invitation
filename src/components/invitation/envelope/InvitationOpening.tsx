@@ -207,6 +207,34 @@ export function InvitationOpening({
     return () => clearTimeout(timer);
   }, []);
 
+  /*
+   * Proof that this component's effects ran — which is proof that React
+   * hydrated, and therefore that the taps on this overlay are wired up.
+   *
+   * Written straight to the DOM rather than held in state, because the thing
+   * reading it is the `?diag=1` panel, which is deliberately not React. It
+   * costs one attribute and it is the difference between "the envelope's tap
+   * handler is broken" and "nothing on this page is interactive", which are
+   * very different bugs and look identical to a guest.
+   */
+  useEffect(() => {
+    document.querySelector("[data-opening]")?.setAttribute("data-hydrated", "yes");
+  }, []);
+
+  /*
+   * Which step the opening has reached, published to the DOM for `?diag=1`.
+   *
+   * This is the line that settles the question four rounds of bug reports have
+   * not: "stuck" can mean the tap never arrived, or it arrived and the sequence
+   * did not run, and those are entirely different faults that look identical
+   * from the other end. If the step is still `closed` after a tap, nothing
+   * reached `start`. If it advances and the screen does not, the timers are
+   * running and something else is wrong.
+   */
+  useEffect(() => {
+    document.querySelector("[data-opening]")?.setAttribute("data-step", step);
+  });
+
   useEffect(() => {
     const list = timers.current;
     return () => list.forEach(clearTimeout);

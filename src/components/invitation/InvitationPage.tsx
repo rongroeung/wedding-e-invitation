@@ -38,12 +38,21 @@ export function InvitationPage({
   guest,
   rsvpStatus: initialRsvpStatus = "pending",
   rsvpReply = null,
+  skipEnvelope = false,
 }: {
   data: InvitationData;
   guest: Guest | null;
   rsvpStatus?: "attending" | "declined" | "pending";
   /** The guest's stored reply, so a returning guest is thanked, not re-asked. */
   rsvpReply?: RsvpReply | null;
+  /**
+   * `?envelope=skip`: go straight to the invitation.
+   *
+   * Read on the server, so it works with no JavaScript at all — which is the
+   * point of it. It is what the skip link falls back to, and it means no guest
+   * can ever be trapped behind the envelope by a script that did not run.
+   */
+  skipEnvelope?: boolean;
 }) {
   const { wedding, events, story, gallery } = data;
   const [opened, setOpened] = useState(false);
@@ -382,7 +391,9 @@ export function InvitationPage({
         />
       )}
 
-      {envelope.enabled && (
+      {/* `skipEnvelope` is the server honouring `?envelope=skip` — the one way
+          past this overlay that needs no JavaScript at all. */}
+      {envelope.enabled && !skipEnvelope && (
         <InvitationOpening
           wedding={wedding}
           guest={guest}

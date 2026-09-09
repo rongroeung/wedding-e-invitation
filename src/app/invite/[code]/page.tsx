@@ -1,14 +1,29 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ThemeStyle } from "@/components/ThemeStyle";
+import { FieldReport } from "@/components/invitation/FieldReport";
 import { InvitationPage } from "@/components/invitation/InvitationPage";
 import { getGuestByCode, getGuestRsvp, getInvitationData, getWedding } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
-type Params = { params: Promise<{ code: string }> };
+type Params = {
+  params: Promise<{ code: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
 
-export async function generateMetadata({ params }: Params): Promise<Metadata> {
+/**
+ * Which build this is.
+ *
+ * Vercel sets the commit on every deployment; falling back to the build time
+ * still tells a rebuild from a stale one. It is only ever shown behind
+ * `?diag=1`, and it exists because "still broken" and "not deployed yet" look
+ * exactly alike from the other end of a bug report.
+ */
+const BUILD =
+  (process.env.VERCEL_GIT_COMMIT_SHA ?? "").slice(0, 7) || new Date().toISOString().slice(0, 16);
+
+export async function generateMetadata({ params }: Pick<Params, "params">): Promise<Metadata> {
   const { code } = await params;
   const [wedding, guest] = await Promise.all([getWedding(), getGuestByCode(decodeURIComponent(code))]);
   const title = `${wedding.title} | ${wedding.groomName} & ${wedding.brideName}`;
@@ -21,8 +36,11 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 }
 
 /** Personalised invitation: /invite/<code> */
-export default async function GuestInvitation({ params }: Params) {
+export default async function GuestInvitation({ params, searchParams }: Params) {
   const { code } = await params;
+  const query = await searchParams;
+  const diag = query.diag === "1";
+  const skipEnvelope = query.envelope === "skip";
   const guest = await getGuestByCode(decodeURIComponent(code));
   if (!guest) notFound();
 
@@ -31,10 +49,12 @@ export default async function GuestInvitation({ params }: Params) {
   return (
     <>
       <ThemeStyle wedding={data.wedding} />
+      {diag && <FieldReport build={BUILD} />}
       <InvitationPage
         data={data}
         guest={guest}
         rsvpStatus={rsvpStatus}
+        skipEnvelope={skipEnvelope}
         rsvpReply={
           reply && {
             name: reply.name,
