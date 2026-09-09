@@ -95,21 +95,35 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           * can be several seconds after the envelope is on screen and plainly
           * asking to be touched. Those taps used to go nowhere at all, which is
           * indistinguishable from a broken invitation — and it is intermittent
-          * by nature, which is exactly how it was reported. This records them
-          * against the one element that matters, and the overlay replays the
-          * tap the moment it mounts. It is a counter and a capture-phase
-          * listener: no dependency on the bundle, and nothing to go wrong if
-          * the bundle never arrives.
+          * by nature, which is exactly how it was reported. This counts them,
+          * and the overlay replays the tap the moment it mounts.
+          *
+          * It watches the *document*, not the tap target, for the same reason
+          * the mounted component does — see the long note in
+          * `InvitationOpening`. iOS resolves a touch against a cached map of
+          * which element is where, that map can be stale, and a tap resolved
+          * against the wrong element still passes through here. Nothing in this
+          * depends on the bundle, and nothing goes wrong if it never arrives.
           */}
         <script
           dangerouslySetInnerHTML={{
             __html:
               "document.documentElement.classList.add('js');" +
-              "window.__envTap=0;" +
+              "(function(){var x=0,y=0,t0=0;window.__envTap=0;" +
+              "function armed(e){var o=document.querySelector('[data-opening]');" +
+              "if(!o)return false;var s=o.getAttribute('data-step');" +
+              "if(s&&s!=='closed')return false;var t=e.target;" +
+              "return !(t&&t.closest&&t.closest('.env-skip'));}" +
+              "document.addEventListener('touchstart',function(e){" +
+              "var t=e.changedTouches&&e.changedTouches[0];if(!t)return;" +
+              "x=t.clientX;y=t.clientY;t0=Date.now();},true);" +
+              "document.addEventListener('touchend',function(e){" +
+              "var t=e.changedTouches&&e.changedTouches[0];if(!t)return;" +
+              "if(Date.now()-t0>700)return;" +
+              "if(Math.abs(t.clientX-x)>12||Math.abs(t.clientY-y)>12)return;" +
+              "if(armed(e))window.__envTap++;},true);" +
               "document.addEventListener('click',function(e){" +
-              "var t=e.target;" +
-              "if(t&&t.closest&&t.closest('.env-anywhere'))window.__envTap++;" +
-              "},true);",
+              "if(armed(e))window.__envTap++;},true);})();",
           }}
         />
       </head>

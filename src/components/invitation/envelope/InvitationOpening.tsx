@@ -148,6 +148,15 @@ export function InvitationOpening({
   const timers = useRef<number[]>([]);
   const opened = useRef(false);
   const checked = useRef(false);
+  /*
+   * The opening has been asked for. Not the same question as `step !== "closed"`:
+   * state is asynchronous, and the whole point of what follows is that several
+   * independent listeners may answer the *same* tap within one frame — a
+   * `touchend`, the `click` the browser synthesises from it, and the button's
+   * own handler. All three would read `step` as `closed` and each would schedule
+   * its own set of timers.
+   */
+  const started = useRef(false);
 
   const D = envelope.duration;
 
@@ -251,6 +260,7 @@ export function InvitationOpening({
   /** Straight to the invitation: the skip button, or a guest who asked for
    *  reduced motion, or an admin who turned the animation off. */
   const jump = useCallback(() => {
+    started.current = true;
     timers.current.forEach(clearTimeout);
     remember();
     finish();
@@ -259,7 +269,8 @@ export function InvitationOpening({
   }, [clear, finish, remember]);
 
   const start = useCallback(() => {
-    if (step !== "closed") return;
+    if (started.current || step !== "closed") return;
+    started.current = true;
     remember();
 
     const reduced =
@@ -319,6 +330,81 @@ export function InvitationOpening({
     if (opened.current) return;
     startRef.current();
   }, []);
+
+  /*
+   * A tap anywhere opens the envelope — and it is listened for on the document,
+   * not on the target.
+   *
+   * The report that produced this: *"it always works when I screen record, or
+   * when I swipe the notification panel down and back up."* Those two actions
+   * have nothing in common at the level of this component. They have exactly one
+   * thing in common at the level of the browser — both force WebKit to redo the
+   * page's layout and recomposite it, and with it the **touch-event region map**
+   * iOS keeps to decide which element a finger has landed on. A workaround that
+   * is "record your screen" is the signature of that map being stale: the taps
+   * were arriving all along and being resolved against the wrong element, or
+   * against nothing.
+   *
+   * Which is why this listens on `document`, in the capture phase, for the touch
+   * itself. Whatever the stale map decides the finger hit, it hit *something* in
+   * this document, and the event passes through here on its way down. The
+   * question "which element was under the finger" — the one question that was
+   * being answered wrongly — stops being asked at all. That is a stronger fix
+   * than any target can be, because it does not depend on hit-testing being
+   * right; it only depends on the touch being delivered.
+   *
+   * `.env-anywhere` stays, because it is what makes this a *control*: a real
+   * button with a label, reachable by keyboard and announced by a screen reader.
+   * This is the safety net under it, not a replacement for it.
+   *
+   * Both `touchend` and `click` are taken. A finger fires the first immediately;
+   * the second is synthesised a moment later, and a mouse or a keyboard fires
+   * only the second. `started` above makes answering the same gesture twice
+   * harmless. A touch that travelled or dwelt is not a tap and is ignored, so a
+   * guest brushing the screen does not open their invitation by accident.
+   */
+  useEffect(() => {
+    if (step !== "closed") return;
+
+    let x = 0;
+    let y = 0;
+    let t0 = 0;
+
+    /* The one control on this overlay that means something else. */
+    const isSkip = (target: EventTarget | null) =>
+      target instanceof Element && !!target.closest(".env-skip");
+
+    const down = (event: TouchEvent) => {
+      const touch = event.changedTouches[0];
+      if (!touch) return;
+      x = touch.clientX;
+      y = touch.clientY;
+      t0 = Date.now();
+    };
+
+    const up = (event: TouchEvent) => {
+      const touch = event.changedTouches[0];
+      if (!touch) return;
+      if (Date.now() - t0 > 700) return;
+      if (Math.abs(touch.clientX - x) > 12 || Math.abs(touch.clientY - y) > 12) return;
+      if (isSkip(event.target)) return;
+      start();
+    };
+
+    const tap = (event: MouseEvent) => {
+      if (isSkip(event.target)) return;
+      start();
+    };
+
+    document.addEventListener("touchstart", down, true);
+    document.addEventListener("touchend", up, true);
+    document.addEventListener("click", tap, true);
+    return () => {
+      document.removeEventListener("touchstart", down, true);
+      document.removeEventListener("touchend", up, true);
+      document.removeEventListener("click", tap, true);
+    };
+  }, [step, start]);
 
   /* A couple of degrees of parallax while the envelope is still closed. */
   const tilt = usePointerTilt(step === "closed");
