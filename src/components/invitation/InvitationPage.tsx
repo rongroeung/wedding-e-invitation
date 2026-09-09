@@ -104,6 +104,32 @@ export function InvitationPage({
   const giftQr = mediaSrc(wedding.giftQrMediaId, wedding.giftQrUrl);
   const frame = frameConfig(wedding);
   const envelope = envelopeConfig(wedding);
+  const envelopeShown = envelope.enabled && !skipEnvelope;
+  /*
+   * Whether the velvet has been hung yet.
+   *
+   * It used to be in the page from the very first paint, and the note that put
+   * it there is still right: a curtain faded in on a cue from the envelope was
+   * a race between a CSS transition and a React render, and on a desktop the
+   * render lost. But "not animated in" and "rasterised before anything else"
+   * are two different claims, and only the first was ever needed.
+   *
+   * The cost of the second was paid on phones. A pair of these panels carries
+   * five `feTurbulence` filters between them, and a phone was made to raster
+   * all of it *behind an opaque veil, where none of it could be seen*, in the
+   * same seconds the guest was looking at the envelope and deciding to tap.
+   * Measured on a throttled device, the first eight seconds after load were
+   * five seconds of blocked main thread — and a blocked main thread answers
+   * nothing, which is why the button, the link and the skip control were all
+   * reported dead at once.
+   *
+   * So it is hung when the page has nothing better to do, or the moment the
+   * guest starts the opening, whichever comes first. Either way it is standing,
+   * finished and static, well before the veil begins to dissolve — which is all
+   * the original note asked for.
+   */
+  const [velvetHung, setVelvetHung] = useState(!envelopeShown);
+
   const contentRef = useRef<HTMLDivElement>(null);
   const tracked = useRef(false);
   const open = useCallback(() => setOpened(true), []);
@@ -257,6 +283,29 @@ export function InvitationPage({
    * start the music is the couple's setting, not ours. Without one, the gesture
    * is the guest opening the cover.
    */
+  /*
+   * Hang the velvet on the first idle moment. `requestIdleCallback` is the
+   * right question — "is this device finished with what it was doing?" — and
+   * Safari has never implemented it, so the timeout is not a fallback for old
+   * browsers but the actual path on the platform this was fixed for. Either
+   * way it is a beat after the envelope has painted, not during.
+   */
+  useEffect(() => {
+    if (velvetHung) return;
+    type Idle = Window & {
+      requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
+    const w = window as Idle;
+    const hang = () => setVelvetHung(true);
+    if (w.requestIdleCallback) {
+      const id = w.requestIdleCallback(hang, { timeout: 1600 });
+      return () => w.cancelIdleCallback?.(id);
+    }
+    const id = window.setTimeout(hang, 900);
+    return () => clearTimeout(id);
+  }, [velvetHung]);
+
   const musicStart = envelope.enabled ? envelopeDone && envelope.music : opened;
 
   const musicButton = musicSrc ? (
@@ -285,8 +334,8 @@ export function InvitationPage({
         />
       }
       curtains={
-        curtainsGone ? null : (
-          <VelvetCurtains open={curtainsOpen} struck={curtainsStruck} />
+        curtainsGone || !velvetHung ? null : (
+          <VelvetCurtains open={curtainsOpen} struck={curtainsStruck} rich={rich} />
         )
       }
       left={<EventDetailsRail wedding={wedding} />}
@@ -399,6 +448,7 @@ export function InvitationPage({
           guest={guest}
           envelope={envelope}
           frame={frame}
+          onStart={() => setVelvetHung(true)}
           onOpen={envelopeOver}
           onFinished={veilCleared}
         />

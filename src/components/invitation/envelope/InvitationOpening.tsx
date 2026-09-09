@@ -8,6 +8,7 @@ import { CinemaRoom } from "./CinemaRoom";
 import { Envelope } from "./Envelope";
 import { EnvelopeAddress } from "./EnvelopeAddress";
 import { OpenButton } from "./OpenButton";
+import { OpenEnvelopeLink } from "./OpenEnvelopeLink";
 import { OpeningTransition } from "./OpeningTransition";
 import { SkipButton } from "./SkipButton";
 import { usePointerTilt, useRichDevice } from "./usePointerTilt";
@@ -99,6 +100,7 @@ export function InvitationOpening({
   guest,
   envelope,
   frame,
+  onStart,
   onOpen,
   onFinished,
 }: {
@@ -111,6 +113,11 @@ export function InvitationOpening({
    * anything cued to it (the music, say) is already running as the veil goes.
    */
   onOpen: () => void;
+  /**
+   * The guest has started the opening. Fires on the tap itself, before any of
+   * it has moved — the page above uses it to make sure the velvet is standing.
+   */
+  onStart?: () => void;
   /** The envelope has left the screen. Called once, after `onOpen`. */
   onFinished: () => void;
 }) {
@@ -171,6 +178,8 @@ export function InvitationOpening({
   onOpenRef.current = onOpen;
   const onFinishedRef = useRef(onFinished);
   onFinishedRef.current = onFinished;
+  const onStartRef = useRef(onStart);
+  onStartRef.current = onStart;
   const cleared = useRef(false);
 
   const finish = useCallback(() => {
@@ -261,6 +270,7 @@ export function InvitationOpening({
    *  reduced motion, or an admin who turned the animation off. */
   const jump = useCallback(() => {
     started.current = true;
+    onStartRef.current?.();
     timers.current.forEach(clearTimeout);
     remember();
     finish();
@@ -271,6 +281,7 @@ export function InvitationOpening({
   const start = useCallback(() => {
     if (started.current || step !== "closed") return;
     started.current = true;
+    onStartRef.current?.();
     remember();
 
     const reduced =
@@ -442,9 +453,26 @@ export function InvitationOpening({
    * with the card. What follows the hold is the veil dissolving onto the velvet
    * that has been standing behind it since the panels started to move.
    */
+  /*
+   * The push is a luxury, and on the wrong device it is the fault.
+   *
+   * Scaling `.env-piece` for 6.2 seconds means everything inside it is
+   * re-rasterised on every frame of those 6.2 seconds — and inside it are
+   * blurred shadows, five stacked emboss passes and, until now, a four-octave
+   * turbulence filter. Measured on a throttled phone, the first eight seconds
+   * after load were five seconds of blocked main thread, with single stalls
+   * over 1.5s and frames a second and a half apart. A page in that state does
+   * not answer anything: not a div, not a button, not a link. Which is exactly
+   * what was reported, in that order, over six rounds.
+   *
+   * So a device that cannot afford the move does not get it. The envelope is
+   * simply there, at rest, and the main thread is free the moment it has
+   * painted once. Everything else about the scene is unchanged, and a desktop
+   * still gets the camera it was designed with.
+   */
   const camera = closed
     ? [
-        pushed ? "scale(1)" : "scale(0.82)",
+        !rich || pushed ? "scale(1)" : "scale(0.82)",
         tilt ? `rotateX(${tilt.x.toFixed(2)}deg) rotateY(${tilt.y.toFixed(2)}deg)` : "",
       ]
         .filter(Boolean)
@@ -490,12 +518,7 @@ export function InvitationOpening({
           * paper to open an envelope that fills the screen.
           */}
         {closed && (
-          <button
-            type="button"
-            className="env-anywhere tappable"
-            onClick={start}
-            aria-label={wedding.envelopeOpenLabel}
-          />
+          <OpenEnvelopeLink label={wedding.envelopeOpenLabel} onOpen={start} />
         )}
 
         {/* The column is a layout box and nothing else, so it lets taps
@@ -549,7 +572,9 @@ export function InvitationOpening({
               transition: closed
                 ? tilt
                   ? "transform 380ms cubic-bezier(0.22, 0.61, 0.28, 1)"
-                  : "transform 6200ms cubic-bezier(0.32, 0, 0.5, 1)"
+                  : rich
+                    ? "transform 6200ms cubic-bezier(0.32, 0, 0.5, 1)"
+                    : undefined
                 : undefined,
             }}
           >

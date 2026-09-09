@@ -807,10 +807,14 @@
     position: absolute;
     inset: 0;
     z-index: 0;
+    display: block;
     appearance: none;
     background: none;
     border: 0;
     padding: 0;
+    /* It is a link covering the whole screen, so a long press would otherwise
+       offer to copy its address. */
+    -webkit-touch-callout: none;
   }
 
   /*
@@ -1312,6 +1316,11 @@
    * the gold all stay. It looks like the same envelope in slightly flatter
    * light rather than like a different, cheaper one.
    */
+  /* The seal's four-octave grain, inside the element the camera scales. */
+  .env-lite .env-seal-grain {
+    display: none;
+  }
+
   .env-lite .env-contact {
     filter: none;
     opacity: 0.5;

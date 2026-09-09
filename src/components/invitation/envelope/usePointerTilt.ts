@@ -1,6 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+
+/** `useLayoutEffect` on the client, `useEffect` on the server. */
+const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 /**
  * A couple of degrees of turn following the pointer, on devices that have one.
@@ -62,14 +65,32 @@ export function usePointerTilt(active: boolean) {
  * frames on exactly the devices that cannot spare them.
  */
 export function useRichDevice() {
-  const [rich, setRich] = useState(true);
+  /*
+   * It starts at `false`, and the direction matters more than the test.
+   *
+   * It used to start `true`, so the server's HTML and the first client render
+   * were always the expensive scene, and a phone rasterised all of it — every
+   * blur, every stacked drop-shadow, both turbulence layers — before an effect
+   * told it not to. The device least able to afford that work was made to do it
+   * anyway, once, in the exact seconds the guest is looking at the envelope and
+   * deciding to tap. Downgrading afterwards does not give those seconds back.
+   *
+   * The other way round, the cheap scene is what everyone is served and a
+   * capable machine upgrades before its first paint. Nobody pays for a frame
+   * they were never going to keep.
+   */
+  const [rich, setRich] = useState(false);
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     type Nav = Navigator & { deviceMemory?: number };
     const nav = navigator as Nav;
     const cores = nav.hardwareConcurrency ?? 8;
+    /* Safari does not implement `deviceMemory` at all, so on the one platform
+       this most needs to be right about, the memory half of the old test was
+       always answering "8". A coarse pointer is the honest signal there. */
     const memory = nav.deviceMemory ?? 8;
-    setRich(cores > 4 && memory > 3);
+    const phone = window.matchMedia("(pointer: coarse)").matches;
+    setRich(cores > (phone ? 6 : 4) && memory > 3);
   }, []);
 
   return rich;

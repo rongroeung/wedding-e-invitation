@@ -207,8 +207,15 @@ export function WaxSeal({
         {/* the body */}
         <path d={WAX_EDGE} fill={`url(#w-${uid})`} />
 
-        {/* its grain */}
-        <g clipPath={`url(#c-${uid})`} style={{ mixBlendMode: "overlay" }} opacity={0.34}>
+        {/*
+          * Its grain — and the one piece of this drawing that a phone does not
+          * get. It is a four-octave `feTurbulence`, the most expensive filter on
+          * the page, and it lives inside the element the camera scales, so it
+          * was being re-rasterised on the CPU for every frame of a six-second
+          * push. `.env-lite` takes it away; the wax loses a little cloudiness
+          * and the page keeps answering the guest.
+          */}
+        <g className="env-seal-grain" clipPath={`url(#c-${uid})`} style={{ mixBlendMode: "overlay" }} opacity={0.34}>
           <rect x="-130" y="-130" width="260" height="260" filter={`url(#gr-${uid})`} />
         </g>
         {/* its rounded edge: light on the side facing the key, shade opposite */}

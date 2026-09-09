@@ -40,7 +40,14 @@ export default async function GuestInvitation({ params, searchParams }: Params) 
   const { code } = await params;
   const query = await searchParams;
   const diag = query.diag === "1";
-  const skipEnvelope = query.envelope === "skip";
+  /*
+   * `skip` is the guest asking to go straight in. `open` is the *envelope's own
+   * tap target*, arriving as a plain link because the page's JavaScript was not
+   * there to intercept it — see `OpenEnvelopeLink`. Both land in the same place:
+   * the invitation, with no overlay in front of it. A guest who taps an
+   * envelope must never be left looking at one.
+   */
+  const skipEnvelope = query.envelope === "skip" || query.envelope === "open";
   const guest = await getGuestByCode(decodeURIComponent(code));
   if (!guest) notFound();
 

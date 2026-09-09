@@ -155,7 +155,7 @@ function pleatPath(i: number) {
   return `M${l.toFixed(1)} 0 L${r.toFixed(1)} 0 L${(m + (r - l) * 0.22).toFixed(1)} ${HEAD} L${(m - (r - l) * 0.22).toFixed(1)} ${HEAD} Z`;
 }
 
-function Panel({ side, open }: { side: "left" | "right"; open: boolean }) {
+function Panel({ side, open, rich }: { side: "left" | "right"; open: boolean; rich: boolean }) {
   const uid = side;
   /* The leading edge is the one that faces the middle of the stage. */
   const leading = side === "left" ? "right" : "left";
@@ -254,14 +254,18 @@ function Panel({ side, open }: { side: "left" | "right"; open: boolean }) {
           * the filter is re-rasterised as it scales — this is the one place in
           * the whole sequence where an expensive paint would actually be felt.
           */}
-        <filter id={`pile-${uid}`} x="0" y="0" width="100%" height="100%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="2" seed="5" />
-          <feColorMatrix type="matrix" values={GRAIN} />
-        </filter>
-        <filter id={`nap-${uid}`} x="0" y="0" width="100%" height="100%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.22 0.025" numOctaves="2" seed="11" />
-          <feColorMatrix type="matrix" values={GRAIN} />
-        </filter>
+        {rich && (
+          <>
+            <filter id={`pile-${uid}`} x="0" y="0" width="100%" height="100%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="2" seed="5" />
+              <feColorMatrix type="matrix" values={GRAIN} />
+            </filter>
+            <filter id={`nap-${uid}`} x="0" y="0" width="100%" height="100%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.22 0.025" numOctaves="2" seed="11" />
+              <feColorMatrix type="matrix" values={GRAIN} />
+            </filter>
+          </>
+        )}
       </defs>
 
       {/* the folds, hanging */}
@@ -302,16 +306,18 @@ function Panel({ side, open }: { side: "left" | "right"; open: boolean }) {
       ))}
 
       {/* the pile, and the nap it is brushed into */}
-      <g style={{ mixBlendMode: "overlay" }}>
-        {/*
-          * These carry a fill they will never show — the filter chain starts at
-          * `feTurbulence` and never reads the source graphic. Chrome declines to
-          * render a `fill="none"` rect with no stroke at all, filter or not, so
-          * the noise silently did not ship the first time round.
-          */}
-        <rect x="0" y="0" width={W} height={H} fill="#808080" filter={`url(#pile-${uid})`} opacity={0.26} />
-        <rect x="0" y="0" width={W} height={H} fill="#808080" filter={`url(#nap-${uid})`} opacity={0.16} />
-      </g>
+      {rich && (
+        <g style={{ mixBlendMode: "overlay" }}>
+          {/*
+            * These carry a fill they will never show — the filter chain starts at
+            * `feTurbulence` and never reads the source graphic. Chrome declines to
+            * render a `fill="none"` rect with no stroke at all, filter or not, so
+            * the noise silently did not ship the first time round.
+            */}
+          <rect x="0" y="0" width={W} height={H} fill="#808080" filter={`url(#pile-${uid})`} opacity={0.26} />
+          <rect x="0" y="0" width={W} height={H} fill="#808080" filter={`url(#nap-${uid})`} opacity={0.16} />
+        </g>
+      )}
 
       {/* the fall of light down the whole sheet */}
       <rect x="-40" y={HEAD} width={W + 80} height={H - HEAD} fill={`url(#fall-${uid})`} />
@@ -379,7 +385,7 @@ const PELMET_EDGE = `M${PW} ${PH * 0.52} ${PELMET_HEM}`;
 const PELMET_DROP = 40;
 const PELMET_BODY = `M0 0 H${PW} V${PH * 0.52} ${PELMET_HEM} V0 Z`;
 
-function Pelmet() {
+function Pelmet({ rich }: { rich: boolean }) {
   return (
     <svg
       className="curtain-pelmet"
@@ -401,10 +407,12 @@ function Pelmet() {
           <feGaussianBlur stdDeviation="9" />
         </filter>
         {/* The same pile the panels have, so the swag is cut from one cloth. */}
-        <filter id="pelmet-pile" x="0" y="0" width="100%" height="100%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="2" seed="3" />
-          <feColorMatrix type="matrix" values={GRAIN} />
-        </filter>
+        {rich && (
+          <filter id="pelmet-pile" x="0" y="0" width="100%" height="100%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="2" seed="3" />
+            <feColorMatrix type="matrix" values={GRAIN} />
+          </filter>
+        )}
         {/* Foil, so the braid brightens and dims along its length like metal. */}
         <linearGradient id="pelmet-braid" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0" stopColor="var(--gold-frame)" stopOpacity="0.45" />
@@ -426,9 +434,11 @@ function Pelmet() {
 
       <path d={PELMET_BODY} fill="url(#pelmet-fall)" />
 
-      <g style={{ mixBlendMode: "overlay" }} opacity={0.15}>
-        <path d={PELMET_BODY} fill="#808080" filter="url(#pelmet-pile)" />
-      </g>
+      {rich && (
+        <g style={{ mixBlendMode: "overlay" }} opacity={0.15}>
+          <path d={PELMET_BODY} fill="#808080" filter="url(#pelmet-pile)" />
+        </g>
+      )}
 
       {/*
         * Gathers in the pelmet, at half the pitch of the scallops and offset
@@ -488,18 +498,32 @@ function Pelmet() {
 export function VelvetCurtains({
   open,
   struck,
+  rich = true,
 }: {
   open: boolean;
   /** Finished opening: fade out, and be unmounted a moment later. */
   struck: boolean;
+  /**
+   * Whether this device can afford the nap.
+   *
+   * Two `feTurbulence` filters per panel, plus one in the swag, is what makes
+   * this cloth read as velvet rather than satin — and on a phone it is also,
+   * measurably, the most expensive thing on the page. An SVG filter is
+   * rasterised on the CPU, and these sit on elements that are transformed while
+   * the curtains part, so they are re-rasterised as they scale. Without it the
+   * velvet is a shade flatter. With it, on the wrong device, the page stops
+   * answering the guest at all — and a flatter curtain is not a trade, it is
+   * the only one of the two that is still an invitation.
+   */
+  rich?: boolean;
 }) {
   return (
     <div
       className={`curtains ${open ? "curtains-open" : ""} ${struck ? "curtains-struck" : ""}`}
       aria-hidden="true"
     >
-      <Panel side="left" open={open} />
-      <Panel side="right" open={open} />
+      <Panel side="left" open={open} rich={rich} />
+      <Panel side="right" open={open} rich={rich} />
       {/*
         * The dark seam where the two panels meet — the one part of a closed set
         * that no light reaches at all, and the first thing missing from a pair
@@ -508,7 +532,7 @@ export function VelvetCurtains({
         */}
       <span className={`curtain-seam ${open ? "curtain-seam-gone" : ""}`} />
       {/* the pelmet, which is what stops the two panels reading as two objects */}
-      <Pelmet />
+      <Pelmet rich={rich} />
     </div>
   );
 }
