@@ -83,10 +83,33 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             />
           </>
         )}
-        {/* Enables the scroll-reveal animations only when JavaScript is available */}
+        {/*
+          * Two things that have to happen before React does.
+          *
+          * The first enables the scroll-reveal animations, and only when
+          * JavaScript is available to run them.
+          *
+          * The second catches taps on the sealed envelope that land before the
+          * bundle has hydrated. React attaches its listeners at the root once
+          * the page is interactive; on a mid-range phone over mobile data that
+          * can be several seconds after the envelope is on screen and plainly
+          * asking to be touched. Those taps used to go nowhere at all, which is
+          * indistinguishable from a broken invitation — and it is intermittent
+          * by nature, which is exactly how it was reported. This records them
+          * against the one element that matters, and the overlay replays the
+          * tap the moment it mounts. It is a counter and a capture-phase
+          * listener: no dependency on the bundle, and nothing to go wrong if
+          * the bundle never arrives.
+          */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `document.documentElement.classList.add('js');`,
+            __html:
+              "document.documentElement.classList.add('js');" +
+              "window.__envTap=0;" +
+              "document.addEventListener('click',function(e){" +
+              "var t=e.target;" +
+              "if(t&&t.closest&&t.closest('.env-anywhere'))window.__envTap++;" +
+              "},true);",
           }}
         />
       </head>

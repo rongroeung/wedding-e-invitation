@@ -795,23 +795,22 @@
   }
 
   /*
-   * The button that opens the envelope: the whole piece, and nothing visible.
+   * The tap target while the envelope is closed: the whole stage, invisible.
    *
-   * It sits above every layer of the drawing so a tap anywhere on the paper
-   * counts, and it is `inset: 0` on the piece rather than a wrapper so it
-   * inherits the camera transform and stays exactly over the envelope through
-   * the pre-tap push. `z-index: 5` clears the seal, which is the topmost thing
-   * in the stack (contact -1, body 0, liner 1, glow 2, cover 3, seal 4).
+   * Deliberately a sibling of the drawing rather than a child of it. The
+   * drawing runs a six-second `transform` for the camera push, and an element
+   * being transformed is exactly what a phone's hit-testing gets wrong — see
+   * `InvitationOpening` for the whole story. This carries no transform, so
+   * there is nothing to get wrong.
    */
-  .env-tap {
+  .env-anywhere {
     position: absolute;
     inset: 0;
-    z-index: 5;
+    z-index: 0;
     appearance: none;
     background: none;
     border: 0;
     padding: 0;
-    border-radius: inherit;
   }
 
   /*

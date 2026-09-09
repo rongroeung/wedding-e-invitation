@@ -293,6 +293,33 @@ export function InvitationOpening({
     });
   }, [step, D, envelope.animate, clear, finish, jump, remember]);
 
+  /*
+   * A tap that arrived before this component existed.
+   *
+   * The envelope is in the server's HTML and looks ready long before the
+   * bundle has hydrated, and a guest who taps in that window used to get
+   * nothing — the target was there, it just had no handler yet. How long the
+   * window is depends entirely on the phone and the connection, so the same
+   * invitation opens instantly for one guest and ignores two or three taps for
+   * another. That is the "stuck, often" this has been reported as.
+   *
+   * A capture-phase listener in the document head counts those taps (see
+   * `layout.tsx`). Here we spend the count, once, on mount. It runs after the
+   * "already seen this visit" check above, so a returning guest — whose
+   * overlay is being taken away in a layout effect — never has a stale tap
+   * replayed into an opening they have already watched.
+   */
+  const startRef = useRef(start);
+  startRef.current = start;
+
+  useEffect(() => {
+    const w = window as unknown as { __envTap?: number };
+    if (!w.__envTap) return;
+    w.__envTap = 0;
+    if (opened.current) return;
+    startRef.current();
+  }, []);
+
   /* A couple of degrees of parallax while the envelope is still closed. */
   const tilt = usePointerTilt(step === "closed");
 
@@ -352,13 +379,52 @@ export function InvitationOpening({
       <div
         className="env-stage flex h-full w-full items-center justify-center px-4"
       >
-        <div className="env-column flex w-full flex-col items-center">
+        {/*
+          * The whole screen opens the envelope, and the target does not move.
+          *
+          * The tap used to be on the envelope drawing itself — which spends the
+          * first 6.2 seconds after load running a `transform` transition, the
+          * slow camera push. Hit-testing an element mid-transform is where
+          * WebKit and the compositor disagree: the tap resolves against where
+          * the element *was*, not where it is drawn, so it lands on nothing.
+          * Wait for the push to finish and the same tap works, which is exactly
+          * the "stuck, often" it was reported as.
+          *
+          * It never showed on a desktop, and that is the tell rather than a
+          * coincidence: a mouse moving over the page gives `usePointerTilt` a
+          * value, which swaps the camera to the 380ms parallax transition and
+          * cancels the six-second one within moments of the page loading. A
+          * finger produces no such event, so on a phone the long transition
+          * runs its full course — through precisely the window in which anybody
+          * would tap.
+          *
+          * This target is a sibling of the drawing, `inset: 0` on the stage, and
+          * carries no transform of its own, so there is nothing to disagree
+          * about. It is also simply better: a guest should not have to hit the
+          * paper to open an envelope that fills the screen.
+          */}
+        {closed && (
+          <button
+            type="button"
+            className="env-anywhere tappable"
+            onClick={start}
+            aria-label={wedding.envelopeOpenLabel}
+          />
+        )}
+
+        {/* The column is a layout box and nothing else, so it lets taps
+            through to the target behind it; only the controls inside it take
+            pointer events back. */}
+        <div className="env-column pointer-events-none relative z-[1] flex w-full flex-col items-center">
           <EnvelopeAddress wedding={wedding} guest={guest} gone={index >= at("unsealed")} />
 
           <div
-            className={`env-piece ${closed && !tilt ? "env-idle" : ""} ${
-              rich ? "" : "env-lite"
-            }`}
+            /* While it is closed the drawing takes no pointer events at all,
+               so a tap can only ever land on the static target above — the
+               moving element is never hit-tested. */
+            className={`env-piece ${closed ? "pointer-events-none" : ""} ${
+              closed && !tilt ? "env-idle" : ""
+            } ${rich ? "" : "env-lite"}`}
             style={{
               /* How wide the piece is — and why that number is what it is —
                  lives in `.env-piece` in the stylesheet, because it needs a
@@ -409,38 +475,9 @@ export function InvitationOpening({
               }}
             />
 
-            {/*
-              * The envelope is opened by a real `<button>` laid over it, not by
-              * a click handler on the drawing.
-              *
-              * This is the second attempt at making it tappable, and the first
-              * one was a guess. Safari dispatches `click` from a small set of
-              * elements — links, form controls, anything with an `onclick`
-              * *attribute* — and from anything whose computed cursor is
-              * `pointer`; React listens at the root of the tree and sets a
-              * property rather than an attribute, so a `<div onClick>` is dead
-              * to a finger on an iPhone while working perfectly with a mouse.
-              * `cursor: pointer` is supposed to be enough. A `<button>` is not
-              * *supposed* to be enough, it simply is: there is no rule, no
-              * heuristic and no browser version in which a tap on a button
-              * fails to produce a click.
-              *
-              * It also replaces the `role`, `tabIndex` and hand-rolled
-              * Enter/Space handling that were standing in for a button, so
-              * keyboard and screen-reader behaviour stop being this file's
-              * problem.
-              */}
-            {closed && (
-              <button
-                type="button"
-                className="env-tap tappable"
-                onClick={start}
-                aria-label={wedding.envelopeOpenLabel}
-              />
-            )}
           </div>
 
-          <div className="env-open mt-6 sm:mt-10">
+          <div className="env-open pointer-events-auto mt-6 sm:mt-10">
             <OpenButton
               label={wedding.envelopeOpenLabel}
               hint={wedding.envelopeHint}
