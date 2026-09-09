@@ -97,36 +97,70 @@ const FLOOR = { latin: 90, khmer: 140 };
  * a pair centred on advances sits visibly off-centre and a pair *sized* on them
  * either overflows the card or floats in the middle of it.
  */
-function layout(font: MonogramFont, inks: Ink[], hasAmp: boolean) {
-  const asc = Math.max(...inks.map((i) => i.asc)) / 10;
-  const desc = Math.max(...inks.map((i) => i.desc)) / 10;
-  const widths = inks.map((i) => (i.left + i.right) / 10);
+function layout(font: MonogramFont, inks: Ink[], frame: Ink[], hasAmp: boolean) {
+  const span = (list: Ink[]) => {
+    const asc = Math.max(...list.map((i) => i.asc)) / 10;
+    const desc = Math.max(...list.map((i) => i.desc)) / 10;
+    const widths = list.map((i) => (i.left + i.right) / 10);
+    const starts: number[] = [];
+    let cursor = 0;
+    for (const [i, w] of widths.entries()) {
+      starts.push(cursor);
+      const next = widths[i + 1];
+      cursor += next === undefined ? w : w - Math.min(font.lap, 0.5) * Math.min(w, next);
+    }
+    return {
+      asc,
+      desc,
+      starts,
+      w: starts[starts.length - 1] + widths[widths.length - 1],
+      h: asc + desc,
+    };
+  };
 
-  /* Where each letter's ink starts, running left to right. */
-  const starts: number[] = [];
-  let cursor = 0;
-  for (const [i, w] of widths.entries()) {
-    starts.push(cursor);
-    const next = widths[i + 1];
-    cursor += next === undefined ? w : w - Math.min(font.lap, 0.5) * Math.min(w, next);
-  }
-  const ink = { w: starts[starts.length - 1] + widths[widths.length - 1], h: asc + desc };
+  /*
+   * Two spans, and they are not the same thing.
+   *
+   * `box` is built from the catalogue's figures — the widest and tallest
+   * capitals of this face — so it is a size no pair of initials in this font
+   * can exceed. `art` is the letters actually being set, measured. The viewBox
+   * is cut to the **box**; the drawing is laid out from **art** and centred
+   * inside it.
+   *
+   * Splitting them is what makes a wrong measurement harmless. Cut the viewBox
+   * to the measurement and a measurement that comes back short — a canvas still
+   * reporting the fallback face, which is a thing Safari does — takes the tops
+   * off the letters, and no amount of `overflow` on an SVG is reliable enough
+   * to lean on across browsers. Cut it to the worst case instead and the same
+   * bad measurement can only make the mark a little small inside a box that is
+   * still the right shape. It also means the element's intrinsic aspect ratio
+   * is fixed from the server's first render, so the card never reflows when the
+   * font finally lands.
+   */
+  const box = span(frame);
+  const art = span(inks);
 
   const ampSize = NOMINAL * AMP_SHARE;
   const ampH = hasAmp ? AMP_GAP + ((AMP_INK.asc + AMP_INK.desc) * ampSize) / 1000 : 0;
+  /* A few per cent of slack, because the catalogue's figures come from a spread
+     of capitals and not from all of them. */
+  const room = { w: box.w * 1.04, h: box.h * 1.04 };
+  const vb = { w: room.w + PAD * 2, h: room.h + ampH + PAD * 2 };
+
+  const left = vb.w / 2 - art.w / 2;
+  const top = PAD + (room.h - art.h) / 2;
 
   return {
     size: NOMINAL,
-    /** The viewBox, cut to the drawing. */
-    vb: { w: ink.w + PAD * 2, h: ink.h + ampH + PAD * 2 },
-    base: PAD + asc,
+    vb,
+    base: top + art.asc,
     /* `textAnchor` is "start", so each letter's origin is its ink start pushed
        back by however far its ink reaches to the *left* of that origin. */
-    xs: starts.map((st, i) => PAD + st + inks[i].left / 10),
+    xs: art.starts.map((st, i) => left + st + inks[i].left / 10),
     amp: {
       size: ampSize,
-      x: (ink.w + PAD * 2) / 2,
-      y: PAD + ink.h + AMP_GAP + (AMP_INK.asc * ampSize) / 1000,
+      x: vb.w / 2,
+      y: PAD + room.h + AMP_GAP + (AMP_INK.asc * ampSize) / 1000,
     },
   };
 }
@@ -254,7 +288,8 @@ export function Monogram({
   const set = compose(text?.trim() || initials(groom, bride));
   const face = monogramFont(font);
   const chars = set.kind === "pair" ? [set.first, set.second] : [set.text];
-  const box = layout(face, useInk(face, chars) ?? estimate(face, chars.length), set.kind === "pair" && set.amp);
+  const frame = estimate(face, chars.length);
+  const box = layout(face, useInk(face, chars) ?? frame, frame, set.kind === "pair" && set.amp);
 
   return (
     <svg

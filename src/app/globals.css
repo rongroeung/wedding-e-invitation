@@ -795,6 +795,26 @@
   }
 
   /*
+   * The button that opens the envelope: the whole piece, and nothing visible.
+   *
+   * It sits above every layer of the drawing so a tap anywhere on the paper
+   * counts, and it is `inset: 0` on the piece rather than a wrapper so it
+   * inherits the camera transform and stays exactly over the envelope through
+   * the pre-tap push. `z-index: 5` clears the seal, which is the topmost thing
+   * in the stack (contact -1, body 0, liner 1, glow 2, cover 3, seal 4).
+   */
+  .env-tap {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    appearance: none;
+    background: none;
+    border: 0;
+    padding: 0;
+    border-radius: inherit;
+  }
+
+  /*
    * The dynamic viewport unit, where the browser has it.
    *
    * `dvh` follows the phone's toolbars as they hide and show, which is what the
@@ -1389,7 +1409,13 @@
 }
 
 .cover-monogram {
-  width: clamp(104px, min(46vw, 32vh), 260px);
+  /*
+   * A shade wider than the drawing strictly needs, because the viewBox is cut
+   * to the *widest* pair this face could set rather than to the couple's own
+   * two letters — see `Monogram` for why the box is deliberately the worst case
+   * and not the measurement.
+   */
+  width: clamp(120px, min(58vw, 40vh), 320px);
   /*
    * Height follows the drawing, and there is no `aspect-ratio` here on purpose.
    * The mark's viewBox is cut to the initials, so its intrinsic ratio *is* the

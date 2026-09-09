@@ -283,12 +283,26 @@ export function WaxSeal({
           clipPath={`url(#c-${uid})`}
         />
 
-        {/* the monogram, struck into the wax: cut below, lit above */}
-        <g textAnchor="middle" dominantBaseline="central" fontFamily="var(--f-heading), serif">
-          <text y={2.5} fontSize={size} fill="rgb(255 252 240 / 0.5)">
+        {/*
+          * The monogram, struck into the wax: cut below, lit above.
+          *
+          * Centred with an explicit `dy`, **not** `dominant-baseline: central`.
+          * WebKit's support for `dominant-baseline` on SVG text has never been
+          * dependable, and when it is ignored the text falls back to its
+          * alphabetic baseline — which puts the letters a third of their own
+          * size above the middle of the seal. Measured here: on a 40px seal the
+          * ink centre lands at −10.7 instead of +2.5, so the initials sit high
+          * in the wax on a phone and dead centre on a desktop, which is exactly
+          * what was reported.
+          *
+          * 0.33em is that same measurement expressed as a shift from the
+          * alphabetic baseline, and every browser honours `dy`.
+          */}
+        <g textAnchor="middle" fontFamily="var(--f-heading), serif">
+          <text y={2.5} dy="0.33em" fontSize={size} fill="rgb(255 252 240 / 0.5)">
             {text}
           </text>
-          <text y={0} fontSize={size} fill="var(--env-gold-deep)">
+          <text y={0} dy="0.33em" fontSize={size} fill="var(--env-gold-deep)">
             {text}
           </text>
         </g>

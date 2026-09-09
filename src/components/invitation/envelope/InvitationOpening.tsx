@@ -328,9 +328,9 @@ export function InvitationOpening({
           <EnvelopeAddress wedding={wedding} guest={guest} gone={index >= at("unsealed")} />
 
           <div
-            className={`env-piece ${closed ? "tappable" : ""} ${
-              closed && !tilt ? "env-idle" : ""
-            } ${rich ? "" : "env-lite"}`}
+            className={`env-piece ${closed && !tilt ? "env-idle" : ""} ${
+              rich ? "" : "env-lite"
+            }`}
             style={{
               /* How wide the piece is — and why that number is what it is —
                  lives in `.env-piece` in the stylesheet, because it needs a
@@ -372,20 +372,6 @@ export function InvitationOpening({
                   : "transform 6200ms cubic-bezier(0.32, 0, 0.5, 1)"
                 : undefined,
             }}
-            onClick={closed ? start : undefined}
-            role={closed ? "button" : undefined}
-            tabIndex={closed ? 0 : undefined}
-            aria-label={closed ? wedding.envelopeOpenLabel : undefined}
-            onKeyDown={
-              closed
-                ? (event) => {
-                    if (event.key === "Enter" || event.key === " ") {
-                      event.preventDefault();
-                      start();
-                    }
-                  }
-                : undefined
-            }
           >
             <Envelope
               envelope={envelope}
@@ -394,6 +380,36 @@ export function InvitationOpening({
                 doorsOpen: index >= at("doors"),
               }}
             />
+
+            {/*
+              * The envelope is opened by a real `<button>` laid over it, not by
+              * a click handler on the drawing.
+              *
+              * This is the second attempt at making it tappable, and the first
+              * one was a guess. Safari dispatches `click` from a small set of
+              * elements — links, form controls, anything with an `onclick`
+              * *attribute* — and from anything whose computed cursor is
+              * `pointer`; React listens at the root of the tree and sets a
+              * property rather than an attribute, so a `<div onClick>` is dead
+              * to a finger on an iPhone while working perfectly with a mouse.
+              * `cursor: pointer` is supposed to be enough. A `<button>` is not
+              * *supposed* to be enough, it simply is: there is no rule, no
+              * heuristic and no browser version in which a tap on a button
+              * fails to produce a click.
+              *
+              * It also replaces the `role`, `tabIndex` and hand-rolled
+              * Enter/Space handling that were standing in for a button, so
+              * keyboard and screen-reader behaviour stop being this file's
+              * problem.
+              */}
+            {closed && (
+              <button
+                type="button"
+                className="env-tap tappable"
+                onClick={start}
+                aria-label={wedding.envelopeOpenLabel}
+              />
+            )}
           </div>
 
           <div className="env-open mt-6 sm:mt-10">
