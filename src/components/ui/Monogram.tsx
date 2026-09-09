@@ -52,6 +52,18 @@ import {
  * here is expressed against that box rather than against 200, which is why the
  * gradients and the sweep take their coordinates from the layout.
  */
+/**
+ * How far every mask region is bled past the viewBox, as a fraction of it.
+ *
+ * A mask clips. The mark is measured at render time and is occasionally a
+ * little larger than the box computed for it — which `overflow: visible` is
+ * there to forgive — so every mask has to cover more ground than the drawing
+ * can possibly reach. Half a box in each direction is far past any script's
+ * longest swash and costs nothing: the masks are filled with a flat rect and a
+ * single glyph either way.
+ */
+const BLEED = 0.5;
+
 const NOMINAL = 100;
 /** Air around the drawing, so a swash never touches the edge. */
 const PAD = 8;
@@ -361,16 +373,16 @@ export function Monogram({
           id={`sweep-${uid}`}
           maskUnits="userSpaceOnUse"
           x={-box.vb.w * 1.3}
-          y={0}
+          y={-box.vb.h * BLEED}
           width={box.vb.w * 3.6}
-          height={box.vb.h}
+          height={box.vb.h * (1 + BLEED * 2)}
         >
           <rect
             className="mg-sweep"
             x={-box.vb.w * 1.3}
-            y={0}
+            y={-box.vb.h * BLEED}
             width={box.vb.w * 1.2}
-            height={box.vb.h}
+            height={box.vb.h * (1 + BLEED * 2)}
             fill={`url(#sheen-${uid})`}
           />
         </mask>
@@ -391,12 +403,38 @@ export function Monogram({
           <mask
             id={`cut-${uid}`}
             maskUnits="userSpaceOnUse"
-            x={0}
-            y={0}
-            width={box.vb.w}
-            height={box.vb.h}
+            /*
+             * The region is bled well past the viewBox, and that is the whole
+             * point of these four numbers.
+             *
+             * **A mask region is a clip.** Anything outside it is not merely
+             * unmasked, it is erased — and this mask is worn by the second
+             * initial alone. So a mark whose drawing runs past the viewBox came
+             * out with its first letter whole and its second letter sliced off
+             * at the box edge: one hard straight cut through a script capital,
+             * on a pair that looked perfectly centred. Reported as "the
+             * monogram renders incomplete", and the giveaway is that it is
+             * always the *second* letter, because the first one wears no mask.
+             *
+             * `.monogram` carries `overflow: visible` precisely so that a mark
+             * a shade larger than its computed box is drawn slightly proud
+             * rather than clipped — and that promise was quietly cancelled
+             * here, one element deep, by a mask region nobody thought of as
+             * geometry. The viewBox is a *view*; a mask is a *scissors*. They
+             * must never be given the same numbers.
+             */
+            x={-box.vb.w * BLEED}
+            y={-box.vb.h * BLEED}
+            width={box.vb.w * (1 + BLEED * 2)}
+            height={box.vb.h * (1 + BLEED * 2)}
           >
-            <rect x={0} y={0} width={box.vb.w} height={box.vb.h} fill="#fff" />
+            <rect
+              x={-box.vb.w * BLEED}
+              y={-box.vb.h * BLEED}
+              width={box.vb.w * (1 + BLEED * 2)}
+              height={box.vb.h * (1 + BLEED * 2)}
+              fill="#fff"
+            />
             <Letter ch={set.first} face={face} box={box} x={box.xs[0]} fill="#000" bump={2.2} />
           </mask>
         )}
