@@ -8,6 +8,7 @@ import {
   MAX_VIDEO_BYTES,
   fail,
   ok,
+  guard,
   requireAdmin,
 } from "@/lib/api";
 import { getDb } from "@/lib/db";
@@ -40,6 +41,7 @@ export const maxDuration = 60;
  * cheaper than a scheme where a half-file is indistinguishable from a whole one.
  */
 export async function POST(request: Request) {
+  return guard(async () => {
   const { response } = await requireAdmin(request);
   if (response) return response;
 
@@ -139,4 +141,5 @@ export async function POST(request: Request) {
     return fail(`ឯកសារធំពេក អតិបរមា ${Math.round(maxBytes / 1024 / 1024)}MB`, 413);
   }
   return ok({ id: uploadId, received: index + 1, of: total, size: appended[0].size });
+  });
 }

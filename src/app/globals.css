@@ -1446,17 +1446,29 @@
  * Two shadows: a hard one at no blur, which is the wall of the channel the die
  * left, and a soft one under it, which is the paper lifting around it.
  */
-.mg-foil {
-  /*
-   * One soft shadow, and a light one.
-   *
-   * This mark is engraved rather than stamped: most of its area is hairlines
-   * under a unit wide, and the hard offset copy that gave the old blind-emboss
-   * its die-cut channel simply doubles every one of them into a smear. What is
-   * wanted here is the lift of ink sitting on a rag paper, which is a single
-   * shadow at almost no offset.
-   */
-  filter: drop-shadow(0 0.9px 1.1px rgb(var(--c-primary-rgb) / 0.16));
+/*
+ * The lift of ink sitting on a rag paper: one soft shadow, at almost no offset.
+ *
+ * This used to be a CSS `filter: drop-shadow(...)` on the same group, and that
+ * one line is what cut the monogram in half on every iPhone for six rounds.
+ *
+ * **A filter region clips.** Applying a CSS filter to an SVG group gives it a
+ * filter region derived from the group's object bounding box, and anything
+ * outside that region is not drawn — and WebKit computes that region tighter
+ * than Blink does. So the mark rendered whole in Chrome and lost its last
+ * swash to a hard vertical edge in Safari, on the same build, from the same
+ * geometry. Every fix aimed at the drawing's size was aimed at the wrong
+ * thing: the drawing was inside its box the whole time. The *shadow's* box was
+ * the small one.
+ *
+ * It is an SVG `<filter>` now, with an explicit `userSpaceOnUse` region bled
+ * well past the viewBox — the same treatment the masks needed, for exactly the
+ * same reason. The colour lives here because it is themed and a presentation
+ * attribute cannot read a custom property.
+ */
+.mg-lift {
+  flood-color: rgb(var(--c-primary-rgb));
+  flood-opacity: 0.16;
 }
 
 /*

@@ -7,6 +7,7 @@ import {
   MAX_VIDEO_BYTES,
   fail,
   ok,
+  guard,
   requireAdmin,
 } from "@/lib/api";
 import { getDb } from "@/lib/db";
@@ -18,6 +19,7 @@ export const maxDuration = 60;
 
 /** Validated upload endpoint — stores the file as a row in the media table. */
 export async function POST(request: Request) {
+  return guard(async () => {
   const { response } = await requireAdmin(request);
   if (response) return response;
 
@@ -68,4 +70,5 @@ export async function POST(request: Request) {
     .returning({ id: media.id, filename: media.filename, mimeType: media.mimeType, size: media.size });
 
   return ok({ ...row, url: `/api/media/${row.id}` }, { status: 201 });
+  });
 }

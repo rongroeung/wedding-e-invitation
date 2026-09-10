@@ -29,7 +29,9 @@ async function createDb(): Promise<DrizzleDb> {
         ? { rejectUnauthorized: false }
         : undefined,
     });
-    return drizzle(pool, { schema }) as unknown as DrizzleDb;
+    const db = drizzle(pool, { schema }) as unknown as DrizzleDb;
+    await ensureSchema(db, true);
+    return db;
   }
 
   const { PGlite } = await import("@electric-sql/pglite");
@@ -43,8 +45,32 @@ async function createDb(): Promise<DrizzleDb> {
   return db;
 }
 
-/** Brings the embedded database up to date on first use. */
-async function ensureSchema(db: DrizzleDb) {
+/**
+ * Brings the database up to date on first use — **both** databases.
+ *
+ * The embedded one always did this. The real one did not, and that asymmetry
+ * is a trap with a long fuse: everything works in development, the deploy
+ * succeeds, and then one endpoint fails with a bare 500 because the code knows
+ * about a column the database has never heard of. It cost a couple their film
+ * upload on a live invitation, and the next schema change would have cost them
+ * something else at a worse moment. `npm run db:migrate` still exists and is
+ * still the right thing to run deliberately; this is what happens when nobody
+ * remembers to.
+ *
+ * **The advisory lock is not optional on a serverless host.** A deploy wakes
+ * several instances at once and each one arrives here with the same work to do;
+ * without the lock they interleave their DDL and race the ledger. `pg_advisory_lock`
+ * is held on the connection, so the losers wait and then find nothing left to
+ * apply. The key is an arbitrary constant — it only has to be the same in every
+ * instance of this app.
+ *
+ * The migrations themselves are written to be safe to run twice (`IF NOT
+ * EXISTS`, and a ledger of what has been applied), so the worst case is a
+ * wasted round trip.
+ */
+const MIGRATION_LOCK = 8_314_527;
+
+async function ensureSchema(db: DrizzleDb, lock = false) {
   const { adoptExistingSchema, applyMigrations } = await import("./migrate");
   const runner = {
     exec: (sql: string) => db.execute(sql as never),
@@ -53,8 +79,18 @@ async function ensureSchema(db: DrizzleDb) {
       return result?.rows ?? [];
     },
   };
-  await adoptExistingSchema(runner);
-  await applyMigrations(runner);
+  if (!lock) {
+    await adoptExistingSchema(runner);
+    await applyMigrations(runner);
+    return;
+  }
+  await runner.exec(`SELECT pg_advisory_lock(${MIGRATION_LOCK})`);
+  try {
+    await adoptExistingSchema(runner);
+    await applyMigrations(runner);
+  } finally {
+    await runner.exec(`SELECT pg_advisory_unlock(${MIGRATION_LOCK})`);
+  }
 }
 
 export async function getDb(): Promise<DrizzleDb> {

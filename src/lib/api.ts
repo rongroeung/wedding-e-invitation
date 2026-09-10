@@ -11,6 +11,40 @@ export function fail(message: string, status = 400, extra?: Record<string, unkno
   return NextResponse.json({ ok: false, error: message, ...extra }, { status });
 }
 
+/**
+ * Run a route body and turn anything it throws into an answer.
+ *
+ * An unhandled throw in a route becomes a bare 500 with an **empty body**, and
+ * an empty body is the worst possible reply to a dashboard: it cannot be parsed
+ * as JSON, so it reaches the couple as `ការផ្ទុកបានបរាជ័យ (500)` — a number and
+ * nothing else. That is what a missing database migration looked like when the
+ * chunked upload shipped: the column existed in the code, not in their
+ * database, and every attempt to upload a film died silently.
+ *
+ * These endpoints are behind an admin session, so the error itself is safe to
+ * show — the person reading it owns the wedding and the database. And the one
+ * cause worth naming is named: Postgres says `42703` for a column that does not
+ * exist and `42P01` for a missing table, and both mean the same thing to
+ * whoever is running this, which is that the deploy shipped code newer than the
+ * schema.
+ */
+export async function guard<T extends Response>(run: () => Promise<T>): Promise<T | Response> {
+  try {
+    return await run();
+  } catch (error) {
+    const e = error as { code?: string; message?: string };
+    if (e?.code === "42703" || e?.code === "42P01") {
+      return fail(
+        "មូលដ្ឋានទិន្នន័យចាស់ជាងកូដ។ សូមរត់ `npm run db:migrate` រួចព្យាយាមម្ដងទៀត។ " +
+          `(${e.message ?? e.code})`,
+        500,
+      );
+    }
+    console.error("route failed:", error);
+    return fail(e?.message ? `មានបញ្ហា៖ ${e.message}` : "មានបញ្ហាមិនស្គាល់", 500);
+  }
+}
+
 /** Returns the signed-in admin, or null. */
 export async function getSession(): Promise<SessionPayload | null> {
   const store = await cookies();

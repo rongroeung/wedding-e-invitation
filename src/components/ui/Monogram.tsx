@@ -1,9 +1,6 @@
 "use client";
 
-import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
-
-/** `useLayoutEffect` on the client, `useEffect` on the server. */
-const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
+import { useEffect, useId, useState } from "react";
 import {
   monogramFont,
   monogramStack,
@@ -72,28 +69,13 @@ const NOMINAL = 100;
 /**
  * Headroom between the drawing and the edge of the viewBox.
  *
- * Raised from 8, and the reason is a bug that could not be reproduced here.
- *
- * The mark is laid out from ink measured on a `<canvas>` — the one input this
- * component cannot verify. It is a different engine's number on every device,
- * taken at a different size from the one the mark is drawn at, and on Safari it
- * can be taken against the fallback face while `fonts.load()` reports the real
- * one ready. If it under-reports, the drawing is larger than the box computed
- * for it and leaves the viewBox.
- *
- * On Chromium that was survivable, because `overflow: visible` on the `<svg>`
- * means it is simply drawn proud. WebKit is far less dependable about honouring
- * that on inline SVG, and a mark that overflows there is cut at the viewBox
- * edge — a straight line through a capital, on a phone, while the same build
- * looks perfect on a desktop. Which is exactly how it was reported, twice.
- *
- * Twelve units on a nominal of 100 is roughly a fifth of the box in slack once
- * the 1.04 is counted, so a measurement would have to be wrong by a fifth
- * before anything could reach the edge. It costs a few per cent of drawn size
- * inside the same CSS width, which is not a trade worth hesitating over
- * against a sliced letter.
+ * It was raised to 12 while the monogram was being cut on iPhones and nobody
+ * could see why — margin is the right instinct when the cause is unknown. The
+ * cause is known now (see `Bounds`: a filter and a mask were being clipped to
+ * WebKit's bounding box for the text, which leaves out a script's swashes), so
+ * the mark gets its designed size back.
  */
-const PAD = 12;
+const PAD = 8;
 /** The ampersand: its share of the letter size, and the gap above it. */
 const AMP_SHARE = 0.36;
 const AMP_GAP = 10;
@@ -136,7 +118,7 @@ const FLOOR = { latin: 90, khmer: 140 };
  * a pair centred on advances sits visibly off-centre and a pair *sized* on them
  * either overflows the card or floats in the middle of it.
  */
-function layout(font: MonogramFont, inks: Ink[], frame: Ink[], hasAmp: boolean, squeeze = 1) {
+function layout(font: MonogramFont, inks: Ink[], frame: Ink[], hasAmp: boolean) {
   const span = (list: Ink[]) => {
     const asc = Math.max(...list.map((i) => i.asc)) / 10;
     const desc = Math.max(...list.map((i) => i.desc)) / 10;
@@ -179,22 +161,8 @@ function layout(font: MonogramFont, inks: Ink[], frame: Ink[], hasAmp: boolean, 
   const box = span(frame);
   const art = span(inks);
 
-  /*
-   * The ampersand is measured at full size and *drawn* at the squeezed one.
-   *
-   * The distinction is the whole reason the box can be promised not to move:
-   * `ampH` feeds the viewBox, so if it followed the squeeze the box would
-   * shrink with the drawing, the element's aspect ratio would change, and the
-   * cover would reflow under the guest — which is exactly the failure that
-   * ruled out growing the viewBox in the first place. The band reserved for the
-   * ampersand stays the size it always was; the ampersand inside it gets
-   * smaller along with the initials, which is what stops a squeeze that fixes
-   * the letters from leaving the ampersand hanging out of the bottom on its
-   * own.
-   */
-  const ampFull = NOMINAL * AMP_SHARE;
-  const ampSize = ampFull * squeeze;
-  const ampH = hasAmp ? AMP_GAP + ((AMP_INK.asc + AMP_INK.desc) * ampFull) / 1000 : 0;
+  const ampSize = NOMINAL * AMP_SHARE;
+  const ampH = hasAmp ? AMP_GAP + ((AMP_INK.asc + AMP_INK.desc) * ampSize) / 1000 : 0;
   /* A few per cent of slack, because the catalogue's figures come from a spread
      of capitals and not from all of them. */
   const room = { w: box.w * 1.04, h: box.h * 1.04 };
@@ -222,7 +190,7 @@ function layout(font: MonogramFont, inks: Ink[], frame: Ink[], hasAmp: boolean, 
    * A measurement that comes back *short* is still harmless, because `fit` is
    * capped at 1: it can shrink the mark to fit, never inflate it to fill.
    */
-  const fit = Math.min(1, room.w / art.w, room.h / art.h) * squeeze;
+  const fit = Math.min(1, room.w / art.w, room.h / art.h);
   const aw = art.w * fit;
   const ah = art.h * fit;
 
@@ -368,11 +336,9 @@ export function Monogram({
   const face = monogramFont(font);
   const chars = set.kind === "pair" ? [set.first, set.second] : [set.text];
   const frame = estimate(face, chars.length);
-  const [svg, squeeze] = useFitInside(`${face.id}:${chars.join("")}`);
-  const box = layout(face, useInk(face, chars) ?? frame, frame, set.kind === "pair" && set.amp, squeeze);
+  const box = layout(face, useInk(face, chars) ?? frame, frame, set.kind === "pair" && set.amp);
   return (
     <svg
-      ref={svg}
       viewBox={`0 0 ${box.vb.w.toFixed(1)} ${box.vb.h.toFixed(1)}`}
       className={`monogram ${play ? "monogram-draw" : ""} ${className}`}
       /* How far the sheen has to travel to cross a mark of this width. A fixed
@@ -455,6 +421,30 @@ export function Monogram({
           />
         </mask>
 
+        {/*
+          * The shadow that lifts the foil off the paper.
+          *
+          * `userSpaceOnUse`, with the region bled half a box past the viewBox
+          * in every direction, and both of those are the fix rather than
+          * decoration. A filter region **clips** — everything outside it is
+          * simply not drawn — and the default region is a percentage of the
+          * object bounding box, which WebKit computes tighter than Blink. As a
+          * CSS `drop-shadow()` on this same group it took the last swash off
+          * the mark on every iPhone while looking perfect on every desktop.
+          * Pinned to the user space and bled, there is no bounding box left to
+          * disagree about.
+          */}
+        <filter
+          id={`lift-${uid}`}
+          filterUnits="userSpaceOnUse"
+          x={-box.vb.w * BLEED}
+          y={-box.vb.h * BLEED}
+          width={box.vb.w * (1 + BLEED * 2)}
+          height={box.vb.h * (1 + BLEED * 2)}
+        >
+          <feDropShadow className="mg-lift" dx="0" dy="0.9" stdDeviation="0.55" />
+        </filter>
+
         {set.kind === "pair" && (
           /*
            * What the first initial takes out of the second: a dilated copy of
@@ -509,7 +499,7 @@ export function Monogram({
       </defs>
 
       {/* the mark, in foil, pressed into the paper */}
-      <g className="mg-foil" fill={`url(#mg-${uid})`}>
+      <g className="mg-foil" fill={`url(#mg-${uid})`} filter={`url(#lift-${uid})`}>
         <Mark set={set} uid={uid} face={face} box={box} />
       </g>
 
@@ -527,6 +517,45 @@ export function Monogram({
 /** Everything the mark is made of. */
 type Box = ReturnType<typeof layout>;
 
+/**
+ * Invisible geometry that tells the browser how big this group really is.
+ *
+ * This is the fix for the bug that survived six rounds, and it is worth setting
+ * out in full because nothing about it is guessable from the symptom.
+ *
+ * A `<filter>` and a `<mask>` both clip: whatever falls outside their region is
+ * not drawn. Their region is a percentage of the **object bounding box** of the
+ * element wearing them — and WebKit's bounding box for `<text>` is the *advance*
+ * of the glyphs, which for a formal script excludes the swashes that run past
+ * it. Blink includes them. So the same mark, from the same geometry, keeps its
+ * last flourish in Chrome and has it sliced off at a hard vertical edge in
+ * Safari.
+ *
+ * That is why every earlier fix missed. The drawing was never too large for its
+ * viewBox; making it smaller, padding the box, bleeding the mask regions and
+ * measuring the layout box all left the *bounding box of the text* exactly as
+ * wrong as it was, and the clip with it.
+ *
+ * A rectangle with no paint still counts as geometry, so one spanning the whole
+ * viewBox — and a little past it, for the shadow — makes the group's bounding
+ * box the box we intended all along, in every engine. It draws nothing and
+ * takes no events. It is here purely so that the browser stops asking the font
+ * how wide the mark is.
+ */
+function Bounds({ box }: { box: Box }) {
+  return (
+    <rect
+      x={-box.vb.w * BLEED}
+      y={-box.vb.h * BLEED}
+      width={box.vb.w * (1 + BLEED * 2)}
+      height={box.vb.h * (1 + BLEED * 2)}
+      fill="none"
+      stroke="none"
+      pointerEvents="none"
+    />
+  );
+}
+
 function Mark({
   set,
   uid,
@@ -540,19 +569,27 @@ function Mark({
 }) {
   if (set.kind === "run") {
     return (
-      <g className="mg-first">
-        <Letter ch={set.text} face={face} box={box} x={box.xs[0]} />
-      </g>
+      <>
+        <Bounds box={box} />
+        <g className="mg-first">
+          <Letter ch={set.text} face={face} box={box} x={box.xs[0]} />
+        </g>
+      </>
     );
   }
 
   return (
     <>
+      {/* See `Bounds`: without it a filter or mask on any of this is cut to
+          WebKit's idea of how wide the text is, which leaves out the swashes. */}
+      <Bounds box={box} />
       {/*
         * The second initial goes down first and the first crosses over it —
         * reading order for the eye, painting order for the overlap.
         */}
       <g className="mg-second" mask={`url(#cut-${uid})`}>
+        {/* This group wears the knockout, so it needs its own honest bounds. */}
+        <Bounds box={box} />
         <Letter ch={set.second} face={face} box={box} x={box.xs[1] ?? box.xs[0]} />
       </g>
 
@@ -654,148 +691,6 @@ function Letter({
  * curtains part, seconds later. Measuring before the font loads would measure
  * the fallback serif, which is why it waits rather than running on mount.
  */
-/**
- * Shrink the mark, if the browser says it did not fit.
- *
- * Every number above this comes from ink measured on a `<canvas>` — the one
- * input this component cannot check. It is a different engine's answer on every
- * device, taken at a size other than the one the mark is drawn at, and on
- * Safari it can be taken against the fallback face while `fonts.load()` reports
- * the real one ready. Under-report it and the drawing is larger than the box
- * built for it and hangs outside the viewBox. Chromium then simply draws it
- * proud, because `overflow: visible` says so. **WebKit is far less dependable
- * about honouring that on inline SVG**, and there the same mark is cut at the
- * box edge: a straight line through a capital, on a phone, on a build that is
- * perfect on a desktop. Reported three times; reproducible here never.
- *
- * So the arithmetic stops being trusted and the browser is asked instead. After
- * the mark is drawn, `getBBox` says where it actually went, and if any of it is
- * outside the viewBox the whole setting is scaled down until it is not.
- *
- * Two things make this safe where growing the viewBox was not:
- *
- *   **The box never changes**, so the element's intrinsic aspect ratio stays
- *   what the server rendered and the card cannot reflow under the guest when
- *   the font lands. An earlier attempt grew the viewBox to fit and moved the
- *   cover by 10px a second after it appeared.
- *
- *   **`getBBox` over-reports, and that is the right direction to be wrong in.**
- *   It is the *layout* box — the font's full ascent and descent — so it is
- *   larger than the ink, and this will sometimes shrink a mark that would have
- *   been fine. Measured here that costs about two per cent, which nobody can
- *   see. A capital with its tail cut off is not in the same category.
- *
- * It converges: shrinking moves the drawing strictly inward, so one pass
- * normally settles it and three is a ceiling rather than a target.
- */
-function useFitInside(key: string): [React.RefObject<SVGSVGElement | null>, number] {
-  const svg = useRef<SVGSVGElement>(null);
-  const [squeeze, setSqueeze] = useState(1);
-  const tries = useRef(0);
-
-  /* A new setting is a new question; nothing carries over. */
-  const asked = useRef(key);
-  if (asked.current !== key) {
-    asked.current = key;
-    tries.current = 0;
-    if (squeeze !== 1) setSqueeze(1);
-  }
-
-  useIsomorphicLayoutEffect(() => {
-    let frames = 0;
-    let raf = 0;
-    /* Set only by the cleanup below. It used to be set as soon as the mark
-       fit — which meant a face arriving *after* that moment, in a browser
-       where `fonts.ready` is the late signal it exists to be, resized the
-       drawing and was never looked at again. The mark fit the fallback and
-       was measured against nothing thereafter. */
-    let gone = false;
-    /* Whether the current setting has been found to fit. Stops the frame
-       loop; does not stop a later signal from asking again. */
-    let settled = false;
-
-    const look = () => {
-      if (gone || tries.current >= 8) return;
-      const el = svg.current;
-      if (!el) return;
-      const vb = el.viewBox?.baseVal;
-      if (!vb || !vb.width || !vb.height) return;
-
-      let x0 = Infinity;
-      let y0 = Infinity;
-      let x1 = -Infinity;
-      let y1 = -Infinity;
-      for (const g of el.querySelectorAll<SVGGElement>(".mg-first, .mg-second, .mg-amp")) {
-        let b: DOMRect;
-        try {
-          b = g.getBBox();
-        } catch {
-          return; // not laid out yet
-        }
-        if (!b.width && !b.height) continue;
-        x0 = Math.min(x0, b.x);
-        y0 = Math.min(y0, b.y);
-        x1 = Math.max(x1, b.x + b.width);
-        y1 = Math.max(y1, b.y + b.height);
-      }
-      if (!Number.isFinite(x0)) return;
-
-      /*
-       * How far the drawing reaches from the middle, as a fraction of the box's
-       * own half-width and half-height — because a scale is about the centre,
-       * so it is the worst half-span that sets it, not the worst edge.
-       */
-      const cx = vb.width / 2;
-      const cy = vb.height / 2;
-      const reach = Math.max((cx - x0) / cx, (x1 - cx) / cx, (cy - y0) / cy, (y1 - cy) / cy);
-      if (!Number.isFinite(reach) || reach <= 1.002) {
-        settled = true;
-        return;
-      }
-      settled = false;
-
-      tries.current += 1;
-      /*
-       * A shade more than the arithmetic asks for.
-       *
-       * Shrinking also re-centres the drawing — the layout re-derives its
-       * origin from the new size — so a scale taken about the box's middle does
-       * not remove an off-centre overflow in one clean step, and a bare
-       * `was / reach` approaches the edge without ever crossing it. Three
-       * thousandths a pass turns an asymptote into an arrival.
-       *
-       * Never below two thirds: past that something is wrong that scaling
-       * cannot fix, and a small legible mark beats a vanishing one.
-       */
-      setSqueeze((was) => Math.max(0.66, (was / reach) * 0.995));
-    };
-
-    const again = () => {
-      look();
-      if (!settled && frames++ < 14) raf = requestAnimationFrame(again);
-    };
-    again();
-
-    /*
-     * The face arrives late far more often than it arrives on time, and on the
-     * platform this was written for it can arrive *after* `fonts.ready` has
-     * already resolved once. So: the promise, and then two plain timers, which
-     * cost nothing and are the only thing that catches a face that lands a
-     * second after the page looked finished.
-     */
-    document.fonts?.ready.then(look).catch(() => undefined);
-    const later = [window.setTimeout(look, 700), window.setTimeout(look, 2000)];
-
-    return () => {
-      gone = true;
-      cancelAnimationFrame(raf);
-      later.forEach(clearTimeout);
-    };
-  }, [key, squeeze]);
-
-  return [svg, squeeze];
-}
-
 function useInk(face: MonogramFont, chars: string[]): Ink[] | null {
   const [ink, setInk] = useState<Ink[] | null>(null);
   const key = `${face.id}:${chars.join("")}`;
