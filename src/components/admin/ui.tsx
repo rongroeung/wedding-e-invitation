@@ -5,6 +5,24 @@ import { useState, type ReactNode } from "react";
 
 /* ── Primitives ─────────────────────────────────────────────────────────── */
 
+/**
+ * The largest request the *host* will pass through to the application.
+ *
+ * This is not our limit — `MAX_VIDEO_BYTES` is 64 MB and the route honours it
+ * — it is the serverless platform's, and it is enforced before any code here
+ * runs. Vercel's is 4.5 MB. A wedding film is far larger than that, which is
+ * why the link field is the normal way to add one and the upload is for the
+ * couple who does not want their film on YouTube: they will need a host
+ * without this cap.
+ *
+ * A little under the true figure, so the message comes from us with an
+ * explanation rather than from the edge as a wall of plain text.
+ */
+const HOST_UPLOAD_CAP = 4 * 1024 * 1024;
+
+const TOO_BIG =
+  "ឯកសារធំពេក។ ម៉ាស៊ីនបម្រើទទួលបានត្រឹម ៤ MB ប៉ុណ្ណោះ។ សូមប្រើតំណភ្ជាប់វីដេអូ (YouTube, Vimeo, Facebook) ជំនួសវិញ។";
+
 export function Field({
   label,
   hint,
@@ -193,6 +211,14 @@ export function MediaUpload({
   const [error, setError] = useState("");
 
   async function upload(file: File) {
+    /*
+     * Refuse it here rather than after a minute of uploading over a phone's
+     * connection, only for the host to refuse it at the door.
+     */
+    if (kind === "video" && file.size > HOST_UPLOAD_CAP) {
+      setError(TOO_BIG);
+      return;
+    }
     setBusy(true);
     setError("");
     const body = new FormData();
@@ -200,8 +226,35 @@ export function MediaUpload({
     body.append("kind", kind);
     try {
       const response = await fetch("/api/admin/upload", { method: "POST", body });
-      const payload = await response.json();
+      /*
+       * Not `await response.json()`.
+       *
+       * The reply is only ours when the request actually reached us. A file
+       * too large is refused by the host *in front of* the application — on
+       * Vercel that is a 413 whose body is the plain words "Request Entity
+       * Too Large" — and parsing that as JSON throws `Unexpected token 'R'`,
+       * which is what the couple saw when they tried to upload their film.
+       * It is the worst kind of error message: it names a character, blames
+       * the thing that was working, and says nothing about the file being too
+       * big or what to do instead.
+       */
+      type Reply = { ok?: boolean; error?: string; data?: { id: string } };
+      const raw = await response.text();
+      let payload: Reply | null;
+      try {
+        payload = JSON.parse(raw) as Reply;
+      } catch {
+        payload = null;
+      }
+
+      if (!payload) {
+        if (response.status === 413) throw new Error(TOO_BIG);
+        throw new Error(
+          `ការផ្ទុកមិនបានសម្រេច (${response.status}). សូមព្យាយាមម្ដងទៀត ឬប្រើតំណភ្ជាប់វីដេអូជំនួស។`,
+        );
+      }
       if (!response.ok || !payload.ok) throw new Error(payload.error || "Upload failed");
+      if (!payload.data) throw new Error("Upload failed");
       onUploaded(payload.data.id);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");
