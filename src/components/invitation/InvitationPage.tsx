@@ -65,7 +65,7 @@ export function InvitationPage({
    * monogram, the same names, the same gold frame — so the guest arrives on a
    * cover that is whole and still closed, and opens it themselves.
    */
-  const [envelopeDone, setEnvelopeDone] = useState(false);
+  const [envelopeDone, setEnvelopeDone] = useState(skipEnvelope);
   /*
    * The velvet is across the invitation until this is true.
    *
@@ -74,9 +74,9 @@ export function InvitationPage({
    * dissolve, and curtains that start moving in the middle of that dissolve
    * read as two things happening at once rather than as one shot carrying on.
    */
-  const [curtainsOpen, setCurtainsOpen] = useState(false);
-  const [curtainsStruck, setCurtainsStruck] = useState(false);
-  const [curtainsGone, setCurtainsGone] = useState(false);
+  const [curtainsOpen, setCurtainsOpen] = useState(skipEnvelope);
+  const [curtainsStruck, setCurtainsStruck] = useState(skipEnvelope);
+  const [curtainsGone, setCurtainsGone] = useState(skipEnvelope);
   /*
    * The envelope's veil has actually left the screen.
    *
@@ -86,7 +86,23 @@ export function InvitationPage({
    * stage the velvet was already a quarter drawn, so the one movement the whole
    * second half of the sequence is built around happened off screen.
    */
-  const [veilGone, setVeilGone] = useState(false);
+  /*
+   * Every one of these starts *finished* when the envelope was skipped
+   * server-side, and that is not a shortcut — it is the only correct state.
+   *
+   * `?envelope=skip` and `?envelope=open` mean the overlay is never rendered at
+   * all, so nothing is ever going to call `onOpen` or `onFinished`. Left at
+   * `false`, the curtains hung closed across the invitation and waited forever
+   * for a cue from a component that does not exist on this page: a guest who
+   * used either escape landed on a wall of velvet with the invitation sealed
+   * behind it. The escape hatch had its own trap door.
+   *
+   * Starting them at `skipEnvelope` makes the skipped page identical to a page
+   * where the envelope has already played and left — which is exactly what the
+   * guest asked for — and it needs no JavaScript to get there, since the
+   * curtains are simply not rendered.
+   */
+  const [veilGone, setVeilGone] = useState(skipEnvelope);
   /*
    * The pre-wedding film has finished, or the guest has carried on past it.
    *
@@ -165,7 +181,7 @@ export function InvitationPage({
   }, [curtainsOpen]);
 
   useEffect(() => {
-    if (envelope.enabled && !veilGone) return;
+    if (envelopeShown && !veilGone) return;
     /*
      * And not while the film is still running. With no film this is true from
      * the first render and the timing is exactly what it was.
@@ -192,10 +208,10 @@ export function InvitationPage({
        * sequence having ended and then started again; not waiting at all shows
        * the guest a curtain already half open when the film clears.
        */
-      !envelope.enabled ? 900 : film ? 700 : 60,
+      !envelopeShown ? 900 : film ? 700 : 60,
     );
     return () => clearTimeout(timer);
-  }, [envelope.enabled, veilGone, filmDone, film]);
+  }, [envelopeShown, veilGone, filmDone, film]);
 
   /*
    * The film's exit: fade, then unmount.
@@ -306,7 +322,7 @@ export function InvitationPage({
     return () => clearTimeout(id);
   }, [velvetHung]);
 
-  const musicStart = envelope.enabled ? envelopeDone && envelope.music : opened;
+  const musicStart = envelopeShown ? envelopeDone && envelope.music : opened;
 
   const musicButton = musicSrc ? (
     <MusicPlayer src={musicSrc} title={wedding.musicTitle} autoStart={musicStart} inline />
@@ -430,7 +446,7 @@ export function InvitationPage({
         * guest lands directly on the invitation and a film in front of it
         * would be a splash screen.
         */}
-      {film && envelope.enabled && envelopeDone && !filmGone && (
+      {film && envelopeShown && envelopeDone && !filmGone && (
         <PreWeddingVideo
           source={film}
           skipLabel={wedding.videoSkipLabel}
@@ -442,7 +458,7 @@ export function InvitationPage({
 
       {/* `skipEnvelope` is the server honouring `?envelope=skip` — the one way
           past this overlay that needs no JavaScript at all. */}
-      {envelope.enabled && !skipEnvelope && (
+      {envelopeShown && (
         <InvitationOpening
           wedding={wedding}
           guest={guest}

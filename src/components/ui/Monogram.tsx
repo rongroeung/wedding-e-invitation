@@ -66,7 +66,31 @@ const BLEED = 0.5;
 
 const NOMINAL = 100;
 /** Air around the drawing, so a swash never touches the edge. */
-const PAD = 8;
+/**
+ * Headroom between the drawing and the edge of the viewBox.
+ *
+ * Raised from 8, and the reason is a bug that could not be reproduced here.
+ *
+ * The mark is laid out from ink measured on a `<canvas>` — the one input this
+ * component cannot verify. It is a different engine's number on every device,
+ * taken at a different size from the one the mark is drawn at, and on Safari it
+ * can be taken against the fallback face while `fonts.load()` reports the real
+ * one ready. If it under-reports, the drawing is larger than the box computed
+ * for it and leaves the viewBox.
+ *
+ * On Chromium that was survivable, because `overflow: visible` on the `<svg>`
+ * means it is simply drawn proud. WebKit is far less dependable about honouring
+ * that on inline SVG, and a mark that overflows there is cut at the viewBox
+ * edge — a straight line through a capital, on a phone, while the same build
+ * looks perfect on a desktop. Which is exactly how it was reported, twice.
+ *
+ * Twelve units on a nominal of 100 is roughly a fifth of the box in slack once
+ * the 1.04 is counted, so a measurement would have to be wrong by a fifth
+ * before anything could reach the edge. It costs a few per cent of drawn size
+ * inside the same CSS width, which is not a trade worth hesitating over
+ * against a sliced letter.
+ */
+const PAD = 12;
 /** The ampersand: its share of the letter size, and the gap above it. */
 const AMP_SHARE = 0.36;
 const AMP_GAP = 10;
@@ -159,16 +183,42 @@ function layout(font: MonogramFont, inks: Ink[], frame: Ink[], hasAmp: boolean) 
   const room = { w: box.w * 1.04, h: box.h * 1.04 };
   const vb = { w: room.w + PAD * 2, h: room.h + ampH + PAD * 2 };
 
-  const left = vb.w / 2 - art.w / 2;
-  const top = PAD + (room.h - art.h) / 2;
+  /*
+   * If the letters actually measured are larger than the worst case the
+   * catalogue promised, the mark is set a little smaller so that it still fits.
+   *
+   * The box is deliberately not grown to meet it, and that is the point of
+   * doing it this way round. The viewBox is what gives the element its
+   * intrinsic aspect ratio, and it is fixed at the server's first render;
+   * growing it when the measurement lands would reflow the card under the
+   * guest a second after they arrived. Scaling the drawing changes nothing but
+   * the drawing.
+   *
+   * And the alternative to both is what was shipped: let the mark overflow and
+   * rely on `overflow: visible` to show it. That is not a promise a page can
+   * keep. Anything above it with `overflow: hidden` — a card, a scroll region,
+   * a rounded panel — cuts it, and whether it does depends on how much room the
+   * mark has, which is why this only ever showed on a phone, where the cover is
+   * tight, and never on a desktop, where it is not. **A drawing that stays
+   * inside its own box cannot be clipped by anything.**
+   *
+   * A measurement that comes back *short* is still harmless, because `fit` is
+   * capped at 1: it can shrink the mark to fit, never inflate it to fill.
+   */
+  const fit = Math.min(1, room.w / art.w, room.h / art.h);
+  const aw = art.w * fit;
+  const ah = art.h * fit;
+
+  const left = vb.w / 2 - aw / 2;
+  const top = PAD + (room.h - ah) / 2;
 
   return {
-    size: NOMINAL,
+    size: NOMINAL * fit,
     vb,
-    base: top + art.asc,
+    base: top + art.asc * fit,
     /* `textAnchor` is "start", so each letter's origin is its ink start pushed
        back by however far its ink reaches to the *left* of that origin. */
-    xs: art.starts.map((st, i) => left + st + inks[i].left / 10),
+    xs: art.starts.map((st, i) => left + (st + inks[i].left / 10) * fit),
     amp: {
       size: ampSize,
       x: vb.w / 2,
@@ -302,7 +352,6 @@ export function Monogram({
   const chars = set.kind === "pair" ? [set.first, set.second] : [set.text];
   const frame = estimate(face, chars.length);
   const box = layout(face, useInk(face, chars) ?? frame, frame, set.kind === "pair" && set.amp);
-
   return (
     <svg
       viewBox={`0 0 ${box.vb.w.toFixed(1)} ${box.vb.h.toFixed(1)}`}

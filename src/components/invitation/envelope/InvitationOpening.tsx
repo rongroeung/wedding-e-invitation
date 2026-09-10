@@ -393,22 +393,49 @@ export function InvitationOpening({
       t0 = Date.now();
     };
 
+    /*
+     * Hold the navigation, because this listener is the reason it would happen.
+     *
+     * The tap target is an `<a href="?envelope=open">` so that it still works
+     * when the page's JavaScript does not, and its own React `onClick` calls
+     * `preventDefault`. But *this* listener runs in the capture phase, at the
+     * document, which is before that handler — and starting the opening
+     * unmounts the link. So the element was gone before its own handler could
+     * run, nothing prevented anything, and the browser did what a browser does
+     * with a link: it navigated. The invitation was answered by a page reload
+     * to `?envelope=open` instead of by the animation, on every desktop, where
+     * hydration is fast enough that this listener always wins.
+     *
+     * Whoever cancels the default has to be whoever handles the event. The link
+     * still navigates for a guest with no JavaScript, which is the entire point
+     * of it, because then there is no listener here to hold it back.
+     */
+    const hold = (event: Event) => {
+      const target = event.target;
+      if (target instanceof Element && target.closest(".env-anywhere")) {
+        event.preventDefault();
+      }
+    };
+
     const up = (event: TouchEvent) => {
       const touch = event.changedTouches[0];
       if (!touch) return;
       if (Date.now() - t0 > 700) return;
       if (Math.abs(touch.clientX - x) > 12 || Math.abs(touch.clientY - y) > 12) return;
       if (isSkip(event.target)) return;
+      hold(event);
       start();
     };
 
     const tap = (event: MouseEvent) => {
       if (isSkip(event.target)) return;
+      hold(event);
       start();
     };
 
     document.addEventListener("touchstart", down, true);
-    document.addEventListener("touchend", up, true);
+    /* Not passive: this one cancels the click the browser would synthesise. */
+    document.addEventListener("touchend", up, { capture: true, passive: false });
     document.addEventListener("click", tap, true);
     return () => {
       document.removeEventListener("touchstart", down, true);
