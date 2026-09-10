@@ -1,0 +1,16 @@
+-- Whether every part of an uploaded file has arrived.
+--
+-- A wedding film is far larger than the request body a serverless host will
+-- pass to a function — Vercel refuses anything over about 4.5 MB before the
+-- application sees it — so a large upload is now cut into pieces by the browser
+-- and appended to this row one piece at a time.
+--
+-- Between the first piece and the last, the row exists and is not yet the file.
+-- Served in that state it would be a video that plays for a second and stops,
+-- which is worse than one that is plainly still uploading. `/api/media/[id]`
+-- refuses an incomplete row.
+--
+-- It defaults to true so that every row written before this column existed —
+-- every photo, every QR code, every song already uploaded — stays exactly as
+-- valid as it was.
+ALTER TABLE "media" ADD COLUMN IF NOT EXISTS "complete" boolean NOT NULL DEFAULT true;

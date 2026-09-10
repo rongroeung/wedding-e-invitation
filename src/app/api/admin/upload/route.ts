@@ -11,6 +11,7 @@ import {
 } from "@/lib/api";
 import { getDb } from "@/lib/db";
 import { media } from "@/lib/db/schema";
+import { looksLikeImage, looksLikeVideo } from "@/lib/media-magic";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -67,33 +68,4 @@ export async function POST(request: Request) {
     .returning({ id: media.id, filename: media.filename, mimeType: media.mimeType, size: media.size });
 
   return ok({ ...row, url: `/api/media/${row.id}` }, { status: 201 });
-}
-
-/**
- * Does this actually look like the video it claims to be?
- *
- * MP4 and MOV are both ISO base media: a length-prefixed `ftyp` box at offset
- * 4. WebM is Matroska, whose EBML header is a fixed four bytes. A declared
- * content type is a claim made by the browser from the file extension, and an
- * extension is a claim made by whoever named the file.
- */
-function looksLikeVideo(buffer: Buffer, mimeType: string) {
-  const head = buffer.subarray(4, 12).toString("ascii");
-  if (mimeType === "video/mp4" || mimeType === "video/quicktime") return head.startsWith("ftyp");
-  if (mimeType === "video/webm") return buffer.subarray(0, 4).toString("hex") === "1a45dfa3";
-  return false;
-}
-
-function looksLikeImage(buffer: Buffer, mimeType: string) {
-  const hex = buffer.subarray(0, 12).toString("hex");
-  if (mimeType === "image/jpeg") return hex.startsWith("ffd8ff");
-  if (mimeType === "image/png") return hex.startsWith("89504e470d0a1a0a");
-  if (mimeType === "image/gif") return hex.startsWith("474946383");
-  if (mimeType === "image/webp") return hex.startsWith("52494646") && hex.includes("57454250");
-  if (mimeType === "image/avif") return buffer.subarray(4, 12).toString("ascii").includes("ftyp");
-  if (mimeType === "image/svg+xml") {
-    const head = buffer.subarray(0, 400).toString("utf8").toLowerCase();
-    return head.includes("<svg") || head.includes("<?xml");
-  }
-  return true;
 }

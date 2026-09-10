@@ -42,6 +42,18 @@ export const media = pgTable("media", {
   size: integer("size").notNull().default(0),
   kind: text("kind").notNull().default("image"), // image | audio
   data: bytea("data").notNull(),
+  /*
+   * Whether every part of this file has arrived.
+   *
+   * A wedding film is far larger than the request a serverless host will pass
+   * to a function — Vercel stops at 4.5 MB — so a large upload is cut into
+   * pieces by the browser and appended here one at a time. Between the first
+   * piece and the last, the row exists and is *not* the file: served then, it
+   * would be a video that plays for two seconds and stops. Defaults to true so
+   * every row written before this column existed stays exactly as valid as it
+   * was.
+   */
+  complete: boolean("complete").notNull().default(true),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

@@ -6,22 +6,39 @@ import { useState, type ReactNode } from "react";
 /* ── Primitives ─────────────────────────────────────────────────────────── */
 
 /**
- * The largest request the *host* will pass through to the application.
+ * How much of a file goes in one request.
  *
- * This is not our limit — `MAX_VIDEO_BYTES` is 64 MB and the route honours it
- * — it is the serverless platform's, and it is enforced before any code here
- * runs. Vercel's is 4.5 MB. A wedding film is far larger than that, which is
- * why the link field is the normal way to add one and the upload is for the
- * couple who does not want their film on YouTube: they will need a host
- * without this cap.
+ * Not our limit: a serverless host refuses a request body over its own cap
+ * before the application runs at all, and Vercel's is 4.5 MB. That is the
+ * whole reason a 64 MB film could not be uploaded — raising `MAX_VIDEO_BYTES`
+ * could never have helped, because nothing of ours was being asked.
  *
- * A little under the true figure, so the message comes from us with an
- * explanation rather than from the edge as a wall of plain text.
+ * So anything larger than one request goes up in pieces of this size and is
+ * appended server-side. Three megabytes leaves comfortable room under the cap
+ * for the multipart envelope around it, and makes a 64 MB film 22 requests
+ * rather than 200.
  */
-const HOST_UPLOAD_CAP = 4 * 1024 * 1024;
+const CHUNK = 3 * 1024 * 1024;
 
-const TOO_BIG =
-  "ឯកសារធំពេក។ ម៉ាស៊ីនបម្រើទទួលបានត្រឹម ៤ MB ប៉ុណ្ណោះ។ សូមប្រើតំណភ្ជាប់វីដេអូ (YouTube, Vimeo, Facebook) ជំនួសវិញ។";
+type Reply = { ok?: boolean; error?: string; data?: { id: string } };
+
+/**
+ * Read a reply that might not be ours.
+ *
+ * `response.json()` assumes the request reached the application. When a host
+ * refuses it at the door the body is that host's plain prose — Vercel answers
+ * an oversized upload with the words "Request Entity Too Large" — and parsing
+ * it throws `Unexpected token 'R'`: a message that names a character, blames
+ * the parser, and tells a couple nothing about their film being too big.
+ */
+async function read(response: Response): Promise<Reply | null> {
+  const raw = await response.text();
+  try {
+    return JSON.parse(raw) as Reply;
+  } catch {
+    return null;
+  }
+}
 
 export function Field({
   label,
@@ -208,58 +225,63 @@ export function MediaUpload({
   onClear?: () => void;
 }) {
   const [busy, setBusy] = useState(false);
+  const [sent, setSent] = useState(0);
   const [error, setError] = useState("");
 
-  async function upload(file: File) {
-    /*
-     * Refuse it here rather than after a minute of uploading over a phone's
-     * connection, only for the host to refuse it at the door.
-     */
-    if (kind === "video" && file.size > HOST_UPLOAD_CAP) {
-      setError(TOO_BIG);
-      return;
+  /**
+   * A file too large for one request, sent as several.
+   *
+   * Sequentially, and that is not laziness: the pieces are *appended* to one
+   * row in the order they arrive, so two in flight at once would interleave and
+   * produce a file that is the right length and unplayable.
+   */
+  async function uploadInPieces(file: File) {
+    const uploadId = crypto.randomUUID();
+    const total = Math.ceil(file.size / CHUNK);
+    for (let index = 0; index < total; index++) {
+      const body = new FormData();
+      body.append("uploadId", uploadId);
+      body.append("index", String(index));
+      body.append("total", String(total));
+      body.append("kind", kind);
+      body.append("filename", file.name.slice(0, 160) || "upload");
+      body.append("mimeType", file.type);
+      body.append("chunk", file.slice(index * CHUNK, (index + 1) * CHUNK));
+
+      const response = await fetch("/api/admin/upload/chunk", { method: "POST", body });
+      const payload = await read(response);
+      if (!payload?.ok) throw new Error(payload?.error || `ការផ្ទុកបានបរាជ័យ (${response.status})`);
+      setSent(Math.round(((index + 1) / total) * 100));
     }
+    return uploadId;
+  }
+
+  async function upload(file: File) {
     setBusy(true);
     setError("");
-    const body = new FormData();
-    body.append("file", file);
-    body.append("kind", kind);
+    setSent(0);
     try {
+      if (file.size > CHUNK) {
+        onUploaded(await uploadInPieces(file));
+        return;
+      }
+      const body = new FormData();
+      body.append("file", file);
+      body.append("kind", kind);
       const response = await fetch("/api/admin/upload", { method: "POST", body });
-      /*
-       * Not `await response.json()`.
-       *
-       * The reply is only ours when the request actually reached us. A file
-       * too large is refused by the host *in front of* the application — on
-       * Vercel that is a 413 whose body is the plain words "Request Entity
-       * Too Large" — and parsing that as JSON throws `Unexpected token 'R'`,
-       * which is what the couple saw when they tried to upload their film.
-       * It is the worst kind of error message: it names a character, blames
-       * the thing that was working, and says nothing about the file being too
-       * big or what to do instead.
-       */
-      type Reply = { ok?: boolean; error?: string; data?: { id: string } };
-      const raw = await response.text();
-      let payload: Reply | null;
-      try {
-        payload = JSON.parse(raw) as Reply;
-      } catch {
-        payload = null;
-      }
-
+      const payload = await read(response);
       if (!payload) {
-        if (response.status === 413) throw new Error(TOO_BIG);
-        throw new Error(
-          `ការផ្ទុកមិនបានសម្រេច (${response.status}). សូមព្យាយាមម្ដងទៀត ឬប្រើតំណភ្ជាប់វីដេអូជំនួស។`,
-        );
+        throw new Error(`ការផ្ទុកមិនបានសម្រេច (${response.status}). សូមព្យាយាមម្ដងទៀត។`);
       }
-      if (!response.ok || !payload.ok) throw new Error(payload.error || "Upload failed");
-      if (!payload.data) throw new Error("Upload failed");
+      if (!response.ok || !payload.ok || !payload.data) {
+        throw new Error(payload.error || "Upload failed");
+      }
       onUploaded(payload.data.id);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");
     } finally {
       setBusy(false);
+      setSent(0);
     }
   }
 
@@ -277,7 +299,15 @@ export function MediaUpload({
           <video src={currentSrc} controls muted playsInline className="h-24 rounded-lg border border-slate-200" />
         )}
         <label className="cursor-pointer rounded-lg border border-dashed border-slate-300 px-4 py-2 text-sm text-slate-600 transition hover:border-amber-400 hover:text-amber-700">
-          {busy ? "កំពុងផ្ទុក..." : currentSrc ? "ប្ដូរឯកសារ" : "ជ្រើសរើសឯកសារ"}
+          {/* A film goes up in pieces and can take minutes; a button that just
+              says "loading" for that long looks like one that has died. */}
+          {busy
+            ? sent > 0
+              ? `កំពុងផ្ទុក... ${sent}%`
+              : "កំពុងផ្ទុក..."
+            : currentSrc
+              ? "ប្ដូរឯកសារ"
+              : "ជ្រើសរើសឯកសារ"}
           <input
             type="file"
             className="hidden"

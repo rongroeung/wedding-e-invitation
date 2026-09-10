@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { media } from "@/lib/db/schema";
 
@@ -18,15 +18,64 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const db = await getDb();
-  const rows = await db.select().from(media).where(eq(media.id, id)).limit(1);
+  /*
+   * Everything except the bytes.
+   *
+   * `select()` used to bring the whole column back and then slice it in
+   * JavaScript, which is fine for a QR code and quietly disastrous for a
+   * wedding film: every request for two bytes of a 64 MB video read 64 MB out
+   * of the database into the function's memory first. The embedded database
+   * used in development does not survive it at all — it fails with
+   * `memory access out of bounds`, which is a WASM heap giving up — and a
+   * serverless instance in production would be paying for it on every seek.
+   *
+   * The size is a column, so the range arithmetic below needs no bytes at all,
+   * and `slice()` fetches only the window that was actually asked for.
+   */
+  const rows = await db
+    .select({
+      filename: media.filename,
+      mimeType: media.mimeType,
+      size: media.size,
+      complete: media.complete,
+    })
+    .from(media)
+    .where(eq(media.id, id))
+    .limit(1);
   const file = rows[0];
   if (!file) return new Response("Not found", { status: 404 });
+  /*
+   * A file still arriving is not a file.
+   *
+   * Large uploads are appended piece by piece, so between the first piece and
+   * the last this row holds a prefix of a video. Served, that is a film which
+   * plays for a second and stops — which looks like a broken invitation rather
+   * than an upload still in progress. Rows written before chunking existed are
+   * `complete` by default, so nothing that worked before changes.
+   */
+  if (file.complete === false) return new Response("Still uploading", { status: 404 });
 
-  const body = Buffer.isBuffer(file.data) ? file.data : Buffer.from(file.data as unknown as Uint8Array);
+  /**
+   * One window of the file, read in the database rather than in memory here.
+   *
+   * `substring(bytea from x for n)` is 1-indexed, which is the only sharp edge.
+   */
+  const slice = async (start: number, length: number): Promise<Buffer> => {
+    const [row] = await db
+      .select({ part: sql<Buffer>`substring(${media.data} from ${start + 1} for ${length})` })
+      .from(media)
+      .where(eq(media.id, id))
+      .limit(1);
+    const part = row?.part;
+    if (!part) return Buffer.alloc(0);
+    return Buffer.isBuffer(part) ? part : Buffer.from(part as unknown as Uint8Array);
+  };
+
+  const size = file.size;
 
   const headers: Record<string, string> = {
     "Content-Type": file.mimeType,
-    "Content-Length": String(body.byteLength),
+    "Content-Length": String(size),
     "Cache-Control": "public, max-age=31536000, immutable",
     "Content-Disposition": `inline; filename="${encodeURIComponent(file.filename)}"`,
     "X-Content-Type-Options": "nosniff",
@@ -50,7 +99,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   const range = request.headers.get("range");
   const match = range && /^bytes=(\d*)-(\d*)$/.exec(range.trim());
   if (match && !range.includes(",")) {
-    const size = body.byteLength;
     const hasStart = match[1] !== "";
     // `bytes=-500` means the *last* 500 bytes, not "from 0 to 500".
     const start = hasStart ? Number(match[1]) : Math.max(0, size - Number(match[2] || 0));
@@ -63,16 +111,39 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       });
     }
 
-    const slice = body.subarray(start, end + 1);
-    return new Response(new Uint8Array(slice), {
+    const part = await slice(start, end - start + 1);
+    return new Response(new Uint8Array(part), {
       status: 206,
       headers: {
         ...headers,
-        "Content-Length": String(slice.byteLength),
+        "Content-Length": String(part.byteLength),
         "Content-Range": `bytes ${start}-${end}/${size}`,
       },
     });
   }
 
-  return new Response(new Uint8Array(body), { headers });
+  /*
+   * No range asked for, so the whole file — streamed a window at a time rather
+   * than assembled. A browser playing a video always sends a range and never
+   * reaches this; a direct link, a download or a poster image does, and there
+   * is no reason for a 64 MB file to exist in memory even then.
+   */
+  const WINDOW = 1024 * 1024;
+  let at = 0;
+  const stream = new ReadableStream<Uint8Array>({
+    async pull(controller) {
+      if (at >= size) {
+        controller.close();
+        return;
+      }
+      const part = await slice(at, Math.min(WINDOW, size - at));
+      if (!part.byteLength) {
+        controller.close();
+        return;
+      }
+      at += part.byteLength;
+      controller.enqueue(new Uint8Array(part));
+    },
+  });
+  return new Response(stream, { headers });
 }
