@@ -1,5 +1,9 @@
 "use client";
 
+import { useEffect, useLayoutEffect, useState } from "react";
+
+const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
+
 /**
  * The velvet curtains that frame the invitation, and part to reveal it.
  *
@@ -51,45 +55,148 @@
  */
 const PANEL_SIDE = { left: "curtain-left", right: "curtain-right" } as const;
 
+/** One way of gathering the cloth: where the folds are, and how each is lit. */
+type FoldSet = {
+  seams: number[];
+  flare: number[];
+  sway: number[];
+  crest: number[];
+  gain: number[];
+};
+
 /**
  * Where the folds meet, as fractions of the panel's width.
  *
- * **Seven**, not eleven, and that number is the difference between cloth and
- * corrugated iron. Two panels of eleven folds each put twenty-two of them
- * across a phone — one every eighteen pixels — and at that pitch the eye stops
- * reading individual folds of fabric and starts reading a ribbed surface. Real
- * curtain folds are roughly a hand's width apart whatever they are hung on.
+ * **Six per panel**, and the number is the difference between cloth and
+ * corrugated iron. What matters is not how many folds one panel has but how
+ * many cross the screen: two panels of nine put eighteen of them over a phone,
+ * one every twenty pixels, and at that pitch the eye stops reading folds of
+ * fabric and starts reading a ribbed surface. Nine looked right in isolation —
+ * a single panel the full width of the window — and wrong the moment there were
+ * two of them, which is the trap. Real curtain folds are roughly a hand's width
+ * apart whatever they are hung on.
  *
  * The spacing is hand-set and deliberately uneven: gathered cloth never falls
  * into equal parts, and equal parts are the other half of why the first attempt
  * looked machined. They widen towards the leading edge, which is the part
  * hanging free rather than pulled towards the wall.
  */
-const SEAMS = [0, 0.115, 0.255, 0.395, 0.54, 0.69, 0.85, 1];
-
-/** How far each seam wanders outward between the heading and the hem. */
-const FLARE = [0, 0.04, 0.068, 0.082, 0.08, 0.062, 0.036, 0];
+const WIDE: FoldSet = {
+  seams: [0, 0.135, 0.295, 0.44, 0.6, 0.79, 1],
+  /**
+   * How far each seam wanders outward between the heading and the hem.
+   *
+   * Flare is how much *wider* a fold gets on the way down, so it has to stay
+   * small: six folds each spreading by eight per cent of the panel add up to a
+   * hem half again as wide as the heading, which is cloth cut as a fan rather
+   * than hung as a sheet.
+   */
+  flare: [0, 0.035, 0.058, 0.07, 0.066, 0.04, 0],
+  /**
+   * How far each fold bows sideways on its way down.
+   *
+   * Different for every seam, so no two folds hang alike. Hanging cloth sways:
+   * a fold whose sides are straight lines from top to bottom is a folded sheet
+   * of card.
+   */
+  sway: [0, 13, -10, 16, -9, 12, 0],
+  /**
+   * Where the crest of each fold sits, as a fraction across it.
+   *
+   * Not the same number for all of them. One light crossing a rank of cylinders
+   * strikes each at a slightly different angle depending on how far round the
+   * curve it stands, so the highlight walks across the panel — near the middle
+   * of the folds facing the light and crowded to one side of those turning
+   * away. Giving every fold an identical crest is the most common way this
+   * effect fails, and it fails by reading as a row of matching tubes.
+   */
+  crest: [0.46, 0.4, 0.44, 0.36, 0.42, 0.34],
+  /**
+   * How much light each fold actually catches.
+   *
+   * The missing ingredient, and the one that separates a photograph of a
+   * curtain from a diagram of one. A stage light is a *point* off to the side:
+   * the two or three folds turned towards it flare, and the rest sit in their
+   * own shade with barely a crest at all. Giving every fold the same crest —
+   * which is what one gradient recipe applied six times does — produces a rank
+   * of identical lit cylinders, and no amount of wandering the crest *position*
+   * fixes it, because the brightness is what the eye reads as lighting.
+   *
+   * So two folds here are catch-lights and the other four are quiet.
+   */
+  gain: [0.32, 0.6, 0.28, 0.36, 0.64, 0.3],
+};
 
 /**
- * How far each fold bows sideways on its way down.
+ * The same cloth on a phone, gathered into four folds instead of six.
  *
- * Different for every seam, so no two folds hang alike. Hanging cloth sways: a
- * fold whose sides are straight lines from top to bottom is a folded sheet of
- * card.
+ * Not a performance setting — this one is purely about width, and it is the
+ * mistake that survived every previous round. A fold is a physical size: about
+ * a hand across, whatever it is hung on. On a laptop each panel is five hundred
+ * pixels wide and six folds is a hand apiece; on a phone the same panel is a
+ * hundred and eighty, the same six folds are thirty pixels each, and a curtain
+ * becomes corduroy. It looked right every time it was checked because it was
+ * checked one panel at a time, filling the window — and there are always two.
+ *
+ * Four folds over a hundred and eighty pixels is about forty-five each, which
+ * is as close to a hand's width as a phone gets.
  */
-const SWAY = [0, 15, -11, 19, -13, 16, -9, 0];
+const NARROW: FoldSet = {
+  seams: [0, 0.2, 0.44, 0.71, 1],
+  flare: [0, 0.045, 0.072, 0.055, 0],
+  sway: [0, 14, -11, 15, 0],
+  crest: [0.46, 0.4, 0.44, 0.36],
+  gain: [0.34, 0.62, 0.3, 0.42],
+};
 
 /**
- * Where the crest of each fold sits, as a fraction across it.
+ * The cross-section of one fold, as a curve rather than as five stops.
  *
- * Not the same number for all of them. One light crossing a rank of cylinders
- * strikes each at a slightly different angle depending on how far round the
- * curve it stands, so the highlight walks across the panel — near the middle of
- * the folds facing the light and crowded to one side of those turning away.
- * Giving every fold an identical crest is the most common way this effect
- * fails, and it fails by reading as a row of matching tubes.
+ * Hand-placed stops were the previous approach and they are why the folds read
+ * as corduroy: five colours with hard offsets between them make a ridge with a
+ * bright wire down the middle, because the ramp jumps a whole tone in the space
+ * of a few per cent of the fold's width. Cloth does not do that. The section of
+ * a hanging fold is a rounded body with a *soft* peak somewhere on it, and the
+ * only honest way to draw it is to evaluate that shape and let the colour
+ * follow.
+ *
+ * Three terms:
+ *
+ * - `ed`, the seam darkening. Smoothstepped over the outer tenth of the fold,
+ *   so the cloth turns back into the valley instead of arriving there.
+ * - `body`, a wide Gaussian: the fold's own curvature, most of a tone across
+ *   the whole width.
+ * - `peak`, a narrow one at the crest, scaled by how much light this
+ *   particular fold catches.
+ *
+ * The result is 0 in the valleys and a little under 1 on a catch-light, which
+ * indexes straight into the theme's velvet scale.
  */
-const CREST = [0.42, 0.38, 0.33, 0.3, 0.28, 0.26, 0.24];
+function section(t: number, crest: number, gain: number) {
+  const d = Math.min(t, 1 - t);
+  const e = Math.max(0, Math.min(1, d / 0.1));
+  const ed = e * e * (3 - 2 * e);
+  const body = 0.34 * Math.exp(-(((t - crest) / 0.46) ** 2));
+  const peak = gain * Math.exp(-(((t - crest) / 0.15) ** 2));
+  return ed * (body + peak);
+}
+
+/** How many tones `ThemeStyle` resamples the velvet into. */
+const TONES = 33;
+
+/** The stops of one fold's gradient, with runs of a single tone collapsed. */
+function sectionStops(crest: number, gain: number) {
+  const steps = 18;
+  const out: { at: number; tone: number }[] = [];
+  for (let k = 0; k <= steps; k += 1) {
+    const at = k / steps;
+    const v = section(at, crest, gain);
+    const tone = Math.max(0, Math.min(TONES - 1, Math.round(v * (TONES - 1))));
+    if (k > 0 && k < steps && out[out.length - 1].tone === tone) continue;
+    out.push({ at, tone });
+  }
+  return out;
+}
 
 /**
  * Turbulence into grey, and the one line that decides whether any of this is
@@ -137,20 +244,20 @@ const HEAD = 0;
  * way down instead of tapering evenly. Fabric hanging under its own weight is
  * never a trapezium.
  */
-function seamPath(i: number) {
-  const top = SEAMS[i] * W;
-  const bot = (SEAMS[i] + FLARE[i]) * W;
-  const sway = SWAY[i];
+function seamPath(f: FoldSet, i: number) {
+  const top = f.seams[i] * W;
+  const bot = (f.seams[i] + f.flare[i]) * W;
+  const sway = f.sway[i];
   return `C${(top + sway).toFixed(1)} ${H * 0.38} ${(bot + sway * 0.6).toFixed(1)} ${H * 0.74} ${bot.toFixed(1)} ${H}`;
 }
 
-function foldPath(i: number) {
-  const topR = SEAMS[i + 1] * W;
-  const botR = (SEAMS[i + 1] + FLARE[i + 1]) * W;
-  const swayR = SWAY[i + 1];
+function foldPath(f: FoldSet, i: number) {
+  const topR = f.seams[i + 1] * W;
+  const botR = (f.seams[i + 1] + f.flare[i + 1]) * W;
+  const swayR = f.sway[i + 1];
   return [
-    `M${(SEAMS[i] * W).toFixed(1)} ${HEAD}`,
-    seamPath(i),
+    `M${(f.seams[i] * W).toFixed(1)} ${HEAD}`,
+    seamPath(f, i),
     `L${botR.toFixed(1)} ${H}`,
     `C${(botR + swayR * 0.6).toFixed(1)} ${H * 0.74} ${(topR + swayR).toFixed(1)} ${H * 0.38} ${topR.toFixed(1)} ${HEAD}`,
     "Z",
@@ -158,19 +265,54 @@ function foldPath(i: number) {
 }
 
 /** Just the crease between two folds, for drawing the valley on its own. */
-function creasePath(i: number) {
-  return `M${(SEAMS[i] * W).toFixed(1)} ${HEAD} ${seamPath(i)}`;
+function creasePath(f: FoldSet, i: number) {
+  return `M${(f.seams[i] * W).toFixed(1)} ${HEAD} ${seamPath(f, i)}`;
 }
 
 /** One pleat in the heading, where the cloth is bunched onto the track. */
-function pleatPath(i: number) {
-  const l = SEAMS[i] * W;
-  const r = SEAMS[i + 1] * W;
+function pleatPath(f: FoldSet, i: number) {
+  const l = f.seams[i] * W;
+  const r = f.seams[i + 1] * W;
   const m = (l + r) / 2;
   return `M${l.toFixed(1)} 0 L${r.toFixed(1)} 0 L${(m + (r - l) * 0.22).toFixed(1)} ${HEAD} L${(m - (r - l) * 0.22).toFixed(1)} ${HEAD} Z`;
 }
 
-function Panel({ side, open, rich }: { side: "left" | "right"; open: boolean; rich: boolean }) {
+/**
+ * Which way the cloth is gathered, decided by how wide the panels actually are.
+ *
+ * The narrow set is the default and the server's answer, for the same reason
+ * `useRichDevice` starts at `false`: if the two disagree it should be the phone
+ * that is right first. A wide window upgrades in a layout effect, before the
+ * first paint, so nothing is ever seen being re-gathered.
+ *
+ * The threshold is the panel, not the window — each is half of it, and 900
+ * pixels of window is where a panel passes 450 and six folds stop being narrow.
+ */
+function useFoldSet(): FoldSet {
+  const [wide, setWide] = useState(false);
+
+  useIsomorphicLayoutEffect(() => {
+    const query = window.matchMedia("(min-width: 900px)");
+    const sync = () => setWide(query.matches);
+    sync();
+    query.addEventListener("change", sync);
+    return () => query.removeEventListener("change", sync);
+  }, []);
+
+  return wide ? WIDE : NARROW;
+}
+
+function Panel({
+  side,
+  open,
+  rich,
+  folds,
+}: {
+  side: "left" | "right";
+  open: boolean;
+  rich: boolean;
+  folds: FoldSet;
+}) {
   const uid = side;
   /* The leading edge is the one that faces the middle of the stage. */
   const leading = side === "left" ? "right" : "left";
@@ -185,43 +327,78 @@ function Panel({ side, open, rich }: { side: "left" | "right"; open: boolean; ri
     >
       <defs>
         {/*
-          * One gradient per fold, and each is a cylinder of *velvet*: valley,
-          * body, a narrow crest, body, valley. The crest takes about a tenth of
-          * the fold's width and everything either side of it falls away fast,
-          * which is the whole difference between pile and a smooth weave — and
-          * the reason the stops are bunched rather than evenly spread.
+          * One gradient per fold, sampled from `section` rather than written
+          * out, and tilted six per cent off vertical so the crest runs down the
+          * cloth at a slight angle — fabric that hangs and sways is never lit
+          * in a line exactly parallel to the seam beside it.
           */}
-        {CREST.map((c, i) => (
-          <linearGradient key={i} id={`fold-${uid}-${i}`} x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0" stopColor="var(--vel-dark)" />
-            <stop offset="0.05" stopColor="var(--vel-deep)" />
-            <stop offset={Math.max(0.1, c - 0.16).toFixed(3)} stopColor="var(--vel-mid)" />
-            <stop offset={Math.max(0.12, c - 0.035).toFixed(3)} stopColor="var(--vel-lit)" />
-            <stop offset={c.toFixed(3)} stopColor="var(--vel-glint)" />
-            <stop offset={(c + 0.04).toFixed(3)} stopColor="var(--vel-lit)" />
-            <stop offset={(c + 0.2).toFixed(3)} stopColor="var(--vel-mid)" />
-            <stop offset="0.82" stopColor="var(--vel-deep)" />
-            <stop offset="1" stopColor="var(--vel-dark)" />
+        {folds.crest.map((c, i) => (
+          <linearGradient key={i} id={`fold-${uid}-${i}`} x1="0" y1="0" x2="1" y2="0.06">
+            {sectionStops(c, folds.gain[i]).map((stop) => (
+              <stop
+                key={stop.at}
+                offset={stop.at.toFixed(4)}
+                stopColor={`var(--vel-t${stop.tone})`}
+              />
+            ))}
           </linearGradient>
         ))}
 
         {/*
-          * The vertical fall of light. Deep under the heading, where the pelmet
-          * shades the cloth; brightest at chest height where the key light
-          * reaches; deep again into the floor, where the cloth pools and the
-          * light never gets in. This is laid over every fold at once, so it
-          * ties seven separately shaded folds into one hanging sheet — without
-          * it they read as seven ribbons side by side.
+          * The vertical fall of light: deep under the heading, brightest at
+          * chest height where the key light reaches, deep again into the floor.
+          * This is laid over every fold at once, so it ties six separately
+          * shaded folds into one hanging sheet — without it they read as six
+          * ribbons side by side.
+          *
+          * The hem is lighter than it was. Now that the velvet's own dark tone
+          * is genuinely dark, 0.92 of it across the bottom fifth was not a
+          * shadow but a black band, and the folds simply stopped being visible
+          * before they reached the floor.
           */}
         <linearGradient id={`fall-${uid}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="rgb(var(--vel-dark-rgb) / 0.8)" />
-          <stop offset="0.12" stopColor="rgb(var(--vel-dark-rgb) / 0.22)" />
-          <stop offset="0.34" stopColor="rgb(var(--vel-glint-rgb) / 0.2)" />
-          <stop offset="0.56" stopColor="rgb(var(--vel-dark-rgb) / 0.08)" />
-          <stop offset="0.8" stopColor="rgb(var(--vel-dark-rgb) / 0.42)" />
-          <stop offset="0.94" stopColor="rgb(var(--vel-dark-rgb) / 0.74)" />
-          <stop offset="1" stopColor="rgb(var(--vel-dark-rgb) / 0.92)" />
+          <stop offset="0" stopColor="rgb(var(--vel-dark-rgb) / 0.66)" />
+          <stop offset="0.16" stopColor="rgb(var(--vel-dark-rgb) / 0.14)" />
+          <stop offset="0.4" stopColor="rgb(var(--vel-glint-rgb) / 0.2)" />
+          <stop offset="0.62" stopColor="rgb(var(--vel-dark-rgb) / 0.04)" />
+          <stop offset="0.86" stopColor="rgb(var(--vel-dark-rgb) / 0.3)" />
+          <stop offset="1" stopColor="rgb(var(--vel-dark-rgb) / 0.62)" />
         </linearGradient>
+
+        {/*
+          * The key light falling off across the panel, and the bounce coming
+          * back up off the floor.
+          *
+          * A lamp lights the near side of a set and the far side goes away into
+          * the wings; a curtain lit evenly from edge to edge is a curtain lit by
+          * a photocopier. `key` darkens towards the outer edge — away from the
+          * middle of the stage, where the light is — and `pool` puts a thin
+          * lift along the very bottom, which is the floor throwing a little of
+          * it back. Together they are most of what makes the two panels read as
+          * standing in a room rather than as wallpaper.
+          */}
+        <linearGradient
+          id={`key-${uid}`}
+          x1={leading === "right" ? "1" : "0"}
+          y1="0"
+          x2={leading === "right" ? "0" : "1"}
+          y2="0"
+        >
+          <stop offset="0" stopColor="rgb(var(--vel-dark-rgb) / 0)" />
+          <stop offset="0.55" stopColor="rgb(var(--vel-dark-rgb) / 0.15)" />
+          <stop offset="1" stopColor="rgb(var(--vel-dark-rgb) / 0.34)" />
+        </linearGradient>
+        <linearGradient id={`pool-${uid}`} x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0" stopColor="rgb(var(--vel-glint-rgb) / 0.13)" />
+          <stop offset="0.12" stopColor="rgb(var(--vel-glint-rgb) / 0)" />
+        </linearGradient>
+
+        {/* A wide, weak sheen where the key light actually lands. */}
+        <radialGradient id={`sheen-${uid}`}>
+          <stop offset="0" stopColor="rgb(var(--vel-glint-rgb) / 0.08)" />
+          <stop offset="0.55" stopColor="rgb(var(--vel-glint-rgb) / 0.03)" />
+          <stop offset="1" stopColor="rgb(var(--vel-glint-rgb) / 0)" />
+        </radialGradient>
 
         {/* The pile going bright at the grazing angle of the leading edge. */}
         <linearGradient
@@ -231,9 +408,9 @@ function Panel({ side, open, rich }: { side: "left" | "right"; open: boolean; ri
           x2={leading === "right" ? "0" : "1"}
           y2="0"
         >
-          <stop offset="0" stopColor="var(--vel-glint)" stopOpacity="0.62" />
-          <stop offset="0.06" stopColor="var(--vel-glint)" stopOpacity="0.22" />
-          <stop offset="0.24" stopColor="var(--vel-glint)" stopOpacity="0.06" />
+          <stop offset="0" stopColor="var(--vel-glint)" stopOpacity="0.4" />
+          <stop offset="0.06" stopColor="var(--vel-glint)" stopOpacity="0.16" />
+          <stop offset="0.24" stopColor="var(--vel-glint)" stopOpacity="0.05" />
           <stop offset="1" stopColor="var(--vel-glint)" stopOpacity="0" />
         </linearGradient>
 
@@ -271,8 +448,11 @@ function Panel({ side, open, rich }: { side: "left" | "right"; open: boolean; ri
           */}
         {rich && (
           <>
+            <filter id={`ao-${uid}`} x="-10%" y="-5%" width="120%" height="110%">
+              <feGaussianBlur stdDeviation="9" />
+            </filter>
             <filter id={`pile-${uid}`} x="0" y="0" width="100%" height="100%">
-              <feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="2" seed="5" />
+              <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="5" />
               <feColorMatrix type="matrix" values={GRAIN} />
             </filter>
             <filter id={`nap-${uid}`} x="0" y="0" width="100%" height="100%">
@@ -284,41 +464,38 @@ function Panel({ side, open, rich }: { side: "left" | "right"; open: boolean; ri
       </defs>
 
       {/* the folds, hanging */}
-      {CREST.map((_, i) => (
-        <path key={i} d={foldPath(i)} fill={`url(#fold-${uid}-${i})`} />
+      {folds.crest.map((_, i) => (
+        <path key={i} d={foldPath(folds, i)} fill={`url(#fold-${uid}-${i})`} />
       ))}
 
       {/*
-        * The valleys, struck on their own. The fold gradients already darken
-        * towards their edges, but two gradients meeting still meet in a
-        * straight seam; a crease drawn over the join is what turns that seam
-        * into a place where the cloth turns back on itself.
+        * The valleys, struck on their own — and *blurred*, which is the whole
+        * point of them.
         *
-        * Two weights, and the wide one matters more: a fold casts a soft
-        * shadow into the hollow beside it for some distance, and only the last
-        * few threads of it are the hard dark line. A single narrow crease is a
-        * pen stroke on a gradient.
+        * There used to be two hard strokes here, a wide soft one and a narrow
+        * dark one, and the narrow one is what made the seams look drawn: a
+        * crease of constant width running the full height is a pen line, and a
+        * pen line down a gradient is exactly what the eye picks out as a rib.
+        * What is actually happening in a fold's hollow is ambient occlusion —
+        * the two faces shade each other, strongest where they are closest and
+        * fading over some distance — and that has no edge at all. One wide
+        * stroke through a nine-unit blur has none either.
+        *
+        * On a phone the blur is skipped and the soft stroke is drawn alone.
+        * It reads a little flatter and costs nothing, which is the trade this
+        * whole component makes everywhere `rich` appears.
         */}
-      {SEAMS.slice(1, -1).map((_, i) => (
-        <path
-          key={`w${i}`}
-          d={creasePath(i + 1)}
-          fill="none"
-          stroke="var(--vel-deep)"
-          strokeWidth={13}
-          opacity={0.4}
-        />
-      ))}
-      {SEAMS.slice(1, -1).map((_, i) => (
-        <path
-          key={`n${i}`}
-          d={creasePath(i + 1)}
-          fill="none"
-          stroke="var(--vel-dark)"
-          strokeWidth={3.4}
-          opacity={0.6}
-        />
-      ))}
+      <g filter={rich ? `url(#ao-${uid})` : undefined} opacity={rich ? 0.55 : 0.32}>
+        {folds.seams.slice(1, -1).map((_, i) => (
+          <path
+            key={`ao${i}`}
+            d={creasePath(folds, i + 1)}
+            fill="none"
+            stroke="var(--vel-t0)"
+            strokeWidth={rich ? 11 : 16}
+          />
+        ))}
+      </g>
 
       {/* the pile, and the nap it is brushed into */}
       {rich && (
@@ -329,14 +506,20 @@ function Panel({ side, open, rich }: { side: "left" | "right"; open: boolean; ri
             * render a `fill="none"` rect with no stroke at all, filter or not, so
             * the noise silently did not ship the first time round.
             */}
-          <rect x="0" y="0" width={W} height={H} fill="#808080" filter={`url(#pile-${uid})`} opacity={0.26} />
-          <rect x="0" y="0" width={W} height={H} fill="#808080" filter={`url(#nap-${uid})`} opacity={0.16} />
+          <rect x="0" y="0" width={W} height={H} fill="#808080" filter={`url(#pile-${uid})`} opacity={0.2} />
+          <rect x="0" y="0" width={W} height={H} fill="#808080" filter={`url(#nap-${uid})`} opacity={0.12} />
         </g>
       )}
+
+      {/* where the key light lands, before it is shaped by the fall */}
+      <ellipse cx={W * 0.5} cy={H * 0.33} rx={W * 0.85} ry={H * 0.42} fill={`url(#sheen-${uid})`} />
 
       {/* the fall of light down the whole sheet */}
       <rect x="-40" y={HEAD} width={W + 80} height={H - HEAD} fill={`url(#fall-${uid})`} />
 
+      {/* the lamp falling off towards the wings, and the floor bouncing back */}
+      <rect x="0" y="0" width={W} height={H} fill={`url(#key-${uid})`} />
+      <rect x="0" y="0" width={W} height={H} fill={`url(#pool-${uid})`} />
 
       {/* the pile catching the light along the leading edge */}
       <rect x="0" y="0" width={W} height={H} fill={`url(#edge-${uid})`} />
@@ -527,13 +710,15 @@ export function VelvetCurtains({
    */
   rich?: boolean;
 }) {
+  const folds = useFoldSet();
+
   return (
     <div
       className={`curtains ${open ? "curtains-open" : ""} ${struck ? "curtains-struck" : ""}`}
       aria-hidden="true"
     >
-      <Panel side="left" open={open} rich={rich} />
-      <Panel side="right" open={open} rich={rich} />
+      <Panel side="left" open={open} rich={rich} folds={folds} />
+      <Panel side="right" open={open} rich={rich} folds={folds} />
       {/*
         * The dark seam where the two panels meet — the one part of a closed set
         * that no light reaches at all, and the first thing missing from a pair

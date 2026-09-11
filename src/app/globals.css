@@ -2085,11 +2085,11 @@
     linear-gradient(
       to right,
       rgb(var(--vel-dark-rgb) / 0) 0%,
-      rgb(var(--vel-dark-rgb) / 0.34) 34%,
-      rgb(var(--vel-dark-rgb) / 0.66) 48%,
-      rgb(var(--vel-dark-rgb) / 0.72) 50%,
-      rgb(var(--vel-dark-rgb) / 0.66) 52%,
-      rgb(var(--vel-dark-rgb) / 0.34) 66%,
+      rgb(var(--vel-dark-rgb) / 0.2) 34%,
+      rgb(var(--vel-dark-rgb) / 0.4) 48%,
+      rgb(var(--vel-dark-rgb) / 0.44) 50%,
+      rgb(var(--vel-dark-rgb) / 0.4) 52%,
+      rgb(var(--vel-dark-rgb) / 0.2) 66%,
       rgb(var(--vel-dark-rgb) / 0) 100%
     );
   transition: opacity 900ms ease-out;

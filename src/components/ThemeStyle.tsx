@@ -59,12 +59,40 @@ export function ThemeStyle({ wedding }: { wedding: Wedding }) {
      * crest stays where it was, and the distance between them is what does the
      * work.
      */
-    dark: mix(accent, primary, 0.92),
-    deep: mix(accent, primary, 0.66),
-    mid: mix(accent, primary, 0.3),
-    lit: mix(accent, primary, 0.06),
-    glint: shade(accent, 0.5),
+    /*
+     * And the dark end goes *past* the primary, not up to it.
+     *
+     * Mixing at 0.92 lands on the primary itself, which on a blush theme is a
+     * dusty rose — so the whole ramp ran between a mid rose and a pale one, a
+     * span of about a third of the luminance scale. Shading a fold inside that
+     * span cannot produce depth however the stops are arranged: the valleys
+     * come out only slightly darker than the crests, and two panels of it read
+     * as a flat pink wall with stripes on it rather than as hanging cloth.
+     * Darkening the full mix by 0.44 roughly doubles the range while keeping
+     * the hue, which is what actually makes the folds turn.
+     */
+    dark: shade(mix(accent, primary, 1), -0.44),
+    deep: shade(mix(accent, primary, 0.86), -0.18),
+    mid: mix(accent, primary, 0.42),
+    lit: mix(accent, primary, 0.05),
+    glint: shade(accent, 0.55),
   };
+  /*
+   * The same five tones resampled into a continuous scale.
+   *
+   * The curtain shades each fold from a *function* — a broad body with a soft
+   * crest riding on it — rather than from five hand-placed stops, and a
+   * function needs to be able to ask for the colour at 0.63 of the way up the
+   * ramp. `color-mix()` would do it in CSS, but every stop of every fold would
+   * then be one more thing that has to work on the phone, and the five-stop
+   * version already fails there in ways that took a week to find. Resolving
+   * the scale here, once, to plain hex leaves the SVG referencing nothing but
+   * `var()`.
+   *
+   * Thirty-three steps: fine enough that no two adjacent gradient stops land
+   * on the same tone and flatten a section of the curve.
+   */
+  const tones = velvetScale(velvet, 33);
   /*
    * The room the envelope opens in, and the set behind the curtains.
    *
@@ -117,6 +145,7 @@ export function ThemeStyle({ wedding }: { wedding: Wedding }) {
     --vel-mid:${velvet.mid};
     --vel-lit:${velvet.lit};
     --vel-glint:${velvet.glint};
+    ${tones.map((t, i) => `--vel-t${i}:${t};`).join("")}
     --vel-dark-rgb:${channels(velvet.dark)};
     --vel-deep-rgb:${channels(velvet.deep)};
     --vel-lit-rgb:${channels(velvet.lit)};
@@ -199,6 +228,28 @@ function channels(hex: string): string {
 }
 
 /** Blends `t` of `b` into `a`. */
+/**
+ * Resamples the five velvet tones into an evenly spaced scale of `steps`.
+ *
+ * Piecewise-linear through the anchors rather than a single interpolation
+ * between the ends, because the anchors are not evenly spaced in luminance —
+ * the gap from `dark` to `deep` is much larger than the one from `lit` to
+ * `glint`, and that uneven spacing *is* the velvet. Straightening it out would
+ * give the ramp of a smooth weave.
+ */
+function velvetScale(
+  velvet: { dark: string; deep: string; mid: string; lit: string; glint: string },
+  steps: number,
+): string[] {
+  const anchors = [velvet.dark, velvet.deep, velvet.mid, velvet.lit, velvet.glint];
+  const last = anchors.length - 1;
+  return Array.from({ length: steps }, (_, i) => {
+    const at = (i / (steps - 1)) * last;
+    const lower = Math.min(last - 1, Math.floor(at));
+    return mix(anchors[lower], anchors[lower + 1], at - lower);
+  });
+}
+
 function mix(a: string, b: string, t: number): string {
   const read = (hex: string) => {
     const value = hex.replace("#", "");
