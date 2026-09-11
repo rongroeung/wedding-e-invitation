@@ -10,11 +10,11 @@ import type { Wedding } from "@/lib/db/schema";
  */
 export function ThemeStyle({ wedding }: { wedding: Wedding }) {
   const gold = sanitize(wedding.colorSecondary, "#C29A5B");
-  const ramp = goldRamp(gold);
-
   const primary = sanitize(wedding.colorPrimary, "#4A3527");
   const accent = sanitize(wedding.colorAccent, "#E3D3B8");
   const background = sanitize(wedding.colorBackground, "#F6F3EE");
+  /* The ramp needs the paper: its catchlight is capped against it. */
+  const ramp = goldRamp(gold, background);
   const text = sanitize(wedding.colorText, "#4A3A2C");
   // The surface the card sits on: the paper stock, a shade deeper.
   const stage = shade(background, -0.1);
@@ -131,7 +131,7 @@ export function ThemeStyle({ wedding }: { wedding: Wedding }) {
 }
 
 /** Builds the metallic ramp around the chosen gold. */
-function goldRamp(hex: string) {
+function goldRamp(hex: string, background: string) {
   return {
     deep: shade(hex, -0.5),  // ~7:1 on ivory — safe for small text
     dark: shade(hex, -0.32), // ~4.5:1 — the body of the foil gradient
@@ -146,9 +146,46 @@ function goldRamp(hex: string) {
      * its ground, the flash a polished die throws back where the light hits it
      * square. Built by mixing toward a warm ivory rather than white so it stays
      * champagne rather than going chalky.
+     *
+     * **And it is now capped against the paper, which is the whole story of a
+     * monogram reported "cut" for eight rounds.** That flash sits at the middle
+     * of the foil gradient, so on a pale theme it landed within a few points of
+     * the background — and the middle of the mark simply disappeared. What is
+     * left reads as two disconnected pieces of letter, which is exactly what
+     * "render incomplete" looks like and is nothing whatever to do with
+     * clipping. It is bright enough to be a flash *against the gold around it*;
+     * it must never be bright enough to be paper.
+     *
+     * A metal highlight brighter than the ground is right for a large surface
+     * and wrong for hairline script on ivory — the catchlight is a third of the
+     * mark's width, and a third of a letter is not a highlight, it is a hole.
      */
-    lite: mix(hex, "#fff6df", 0.6),
+    lite: capToward(mix(hex, "#fff6df", 0.6), background, 16),
   };
+}
+
+/**
+ * Keep `colour` at least `gap` points of luminance away from `ground`.
+ *
+ * Only ever darkens, and only when it has to: a tone already clear of the
+ * background is returned untouched, so a deep theme keeps its full catchlight
+ * and only a pale one is reined in.
+ */
+function capToward(colour: string, ground: string, gap: number): string {
+  const lum = (hex: string) => {
+    const v = hex.replace("#", "");
+    const full = v.length === 3 ? v.split("").map((c) => c + c).join("") : v.slice(0, 6).padEnd(6, "0");
+    const [r, g, b] = [0, 2, 4].map((i) => parseInt(full.slice(i, i + 2), 16));
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const ceiling = lum(ground) - gap;
+  let out = colour;
+  /* Step it down rather than solving for it: the mix is not linear in
+     luminance, and eight small steps land closer than one clever one. */
+  for (let i = 0; i < 8 && lum(out) > ceiling; i++) {
+    out = mix(out, "#000000", 0.06);
+  }
+  return out;
 }
 
 /** "#7B1F2F" → "123 31 47", the form Tailwind's opacity modifier needs. */

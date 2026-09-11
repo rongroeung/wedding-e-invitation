@@ -1423,7 +1423,15 @@
    * two letters — see `Monogram` for why the box is deliberately the worst case
    * and not the measurement.
    */
-  width: clamp(120px, min(58vw, 40vh), 320px);
+  /*
+   * Wider on a phone than it used to be (58vw), and the reason is legibility
+   * rather than presence. This face is drawn with hairlines — the thinnest
+   * parts of a script capital are a fraction of a unit wide — and at 58vw on a
+   * 390px screen those fall below one device pixel and antialias away to
+   * nothing. A letter with its hairlines missing does not read as thin; it
+   * reads as broken, which is how it was reported.
+   */
+  width: clamp(120px, min(70vw, 44vh), 340px);
   /*
    * Height follows the drawing, and there is no `aspect-ratio` here on purpose.
    * The mark's viewBox is cut to the initials, so its intrinsic ratio *is* the
