@@ -1466,9 +1466,26 @@
  * same reason. The colour lives here because it is themed and a presentation
  * attribute cannot read a custom property.
  */
-.mg-lift {
-  flood-color: rgb(var(--c-primary-rgb));
-  flood-opacity: 0.16;
+/*
+ * The gap that lets the first initial cross over the second.
+ *
+ * The paper's own colour, so it is invisible everywhere except where the two
+ * letters overlap — which is the only place it is meant to do anything. It
+ * replaces a `<mask>`, and that is the whole point: a mask clips to a region
+ * taken from the bounding box of what wears it, engines disagree about the
+ * bounding box of `<text>`, and that disagreement cut this monogram in half on
+ * a phone for seven rounds while every desktop showed it whole. A stroke has no
+ * region and cannot clip anything.
+ *
+ * `--c-bg` is the invitation's paper. The fallback matters: this component is
+ * also used in the dashboard's font picker, on plain white.
+ */
+.mg-cross text {
+  stroke: var(--c-bg, #fffaf6);
+  stroke-width: 1.8;
+  /* Under the fill, not over it: the gap is carved out of what is *behind*
+     this letter, and the letter's own foil is untouched. */
+  paint-order: stroke;
 }
 
 /*

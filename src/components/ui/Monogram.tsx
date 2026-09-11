@@ -421,86 +421,11 @@ export function Monogram({
           />
         </mask>
 
-        {/*
-          * The shadow that lifts the foil off the paper.
-          *
-          * `userSpaceOnUse`, with the region bled half a box past the viewBox
-          * in every direction, and both of those are the fix rather than
-          * decoration. A filter region **clips** — everything outside it is
-          * simply not drawn — and the default region is a percentage of the
-          * object bounding box, which WebKit computes tighter than Blink. As a
-          * CSS `drop-shadow()` on this same group it took the last swash off
-          * the mark on every iPhone while looking perfect on every desktop.
-          * Pinned to the user space and bled, there is no bounding box left to
-          * disagree about.
-          */}
-        <filter
-          id={`lift-${uid}`}
-          filterUnits="userSpaceOnUse"
-          x={-box.vb.w * BLEED}
-          y={-box.vb.h * BLEED}
-          width={box.vb.w * (1 + BLEED * 2)}
-          height={box.vb.h * (1 + BLEED * 2)}
-        >
-          <feDropShadow className="mg-lift" dx="0" dy="0.9" stdDeviation="0.55" />
-        </filter>
-
-        {set.kind === "pair" && (
-          /*
-           * What the first initial takes out of the second: a dilated copy of
-           * it, so where the two overlap the paper shows through and the pair
-           * reads as one crossing over the other. A halo painted round the
-           * front letter would do the same job at the crossing and ring the
-           * whole letter everywhere else.
-           *
-           * Under two units. A script's letters are *meant* to touch, and their
-           * swashes run alongside each other for some distance wherever they
-           * meet; cleared wide, the gap stops reading as an overlap and starts
-           * reading as a piece missing out of the letter behind.
-           */
-          <mask
-            id={`cut-${uid}`}
-            maskUnits="userSpaceOnUse"
-            /*
-             * The region is bled well past the viewBox, and that is the whole
-             * point of these four numbers.
-             *
-             * **A mask region is a clip.** Anything outside it is not merely
-             * unmasked, it is erased — and this mask is worn by the second
-             * initial alone. So a mark whose drawing runs past the viewBox came
-             * out with its first letter whole and its second letter sliced off
-             * at the box edge: one hard straight cut through a script capital,
-             * on a pair that looked perfectly centred. Reported as "the
-             * monogram renders incomplete", and the giveaway is that it is
-             * always the *second* letter, because the first one wears no mask.
-             *
-             * `.monogram` carries `overflow: visible` precisely so that a mark
-             * a shade larger than its computed box is drawn slightly proud
-             * rather than clipped — and that promise was quietly cancelled
-             * here, one element deep, by a mask region nobody thought of as
-             * geometry. The viewBox is a *view*; a mask is a *scissors*. They
-             * must never be given the same numbers.
-             */
-            x={-box.vb.w * BLEED}
-            y={-box.vb.h * BLEED}
-            width={box.vb.w * (1 + BLEED * 2)}
-            height={box.vb.h * (1 + BLEED * 2)}
-          >
-            <rect
-              x={-box.vb.w * BLEED}
-              y={-box.vb.h * BLEED}
-              width={box.vb.w * (1 + BLEED * 2)}
-              height={box.vb.h * (1 + BLEED * 2)}
-              fill="#fff"
-            />
-            <Letter ch={set.first} face={face} box={box} x={box.xs[0]} fill="#000" bump={2.2} />
-          </mask>
-        )}
       </defs>
 
       {/* the mark, in foil, pressed into the paper */}
-      <g className="mg-foil" fill={`url(#mg-${uid})`} filter={`url(#lift-${uid})`}>
-        <Mark set={set} uid={uid} face={face} box={box} />
+      <g className="mg-foil" fill={`url(#mg-${uid})`}>
+        <Mark set={set} face={face} box={box} halo />
       </g>
 
       {/*
@@ -508,7 +433,7 @@ export function Monogram({
         * crosses it once.
         */}
       <g className="mg-sheen" mask={`url(#sweep-${uid})`} fill="rgb(255 251 240 / 0.85)">
-        <Mark set={set} uid={uid} face={face} box={box} />
+        <Mark set={set} face={face} box={box} />
       </g>
     </svg>
   );
@@ -517,83 +442,61 @@ export function Monogram({
 /** Everything the mark is made of. */
 type Box = ReturnType<typeof layout>;
 
-/**
- * Invisible geometry that tells the browser how big this group really is.
- *
- * This is the fix for the bug that survived six rounds, and it is worth setting
- * out in full because nothing about it is guessable from the symptom.
- *
- * A `<filter>` and a `<mask>` both clip: whatever falls outside their region is
- * not drawn. Their region is a percentage of the **object bounding box** of the
- * element wearing them — and WebKit's bounding box for `<text>` is the *advance*
- * of the glyphs, which for a formal script excludes the swashes that run past
- * it. Blink includes them. So the same mark, from the same geometry, keeps its
- * last flourish in Chrome and has it sliced off at a hard vertical edge in
- * Safari.
- *
- * That is why every earlier fix missed. The drawing was never too large for its
- * viewBox; making it smaller, padding the box, bleeding the mask regions and
- * measuring the layout box all left the *bounding box of the text* exactly as
- * wrong as it was, and the clip with it.
- *
- * A rectangle with no paint still counts as geometry, so one spanning the whole
- * viewBox — and a little past it, for the shadow — makes the group's bounding
- * box the box we intended all along, in every engine. It draws nothing and
- * takes no events. It is here purely so that the browser stops asking the font
- * how wide the mark is.
- */
-function Bounds({ box }: { box: Box }) {
-  return (
-    <rect
-      x={-box.vb.w * BLEED}
-      y={-box.vb.h * BLEED}
-      width={box.vb.w * (1 + BLEED * 2)}
-      height={box.vb.h * (1 + BLEED * 2)}
-      fill="none"
-      stroke="none"
-      pointerEvents="none"
-    />
-  );
-}
-
 function Mark({
   set,
-  uid,
   face,
   box,
+  halo = false,
 }: {
   set: Composed;
-  uid: string;
   face: MonogramFont;
   box: Box;
+  /**
+   * Draw the paper-coloured gap under the first initial.
+   *
+   * Only the foil layer wants it. The sheen is a near-white copy behind a
+   * travelling band, and a paper-coloured stroke inside it would print a dull
+   * outline through the highlight as it passed.
+   */
+  halo?: boolean;
 }) {
   if (set.kind === "run") {
     return (
-      <>
-        <Bounds box={box} />
-        <g className="mg-first">
-          <Letter ch={set.text} face={face} box={box} x={box.xs[0]} />
-        </g>
-      </>
+      <g className="mg-first">
+        <Letter ch={set.text} face={face} box={box} x={box.xs[0]} />
+      </g>
     );
   }
 
   return (
     <>
-      {/* See `Bounds`: without it a filter or mask on any of this is cut to
-          WebKit's idea of how wide the text is, which leaves out the swashes. */}
-      <Bounds box={box} />
       {/*
         * The second initial goes down first and the first crosses over it —
         * reading order for the eye, painting order for the overlap.
         */}
-      <g className="mg-second" mask={`url(#cut-${uid})`}>
-        {/* This group wears the knockout, so it needs its own honest bounds. */}
-        <Bounds box={box} />
+      <g className="mg-second">
         <Letter ch={set.second} face={face} box={box} x={box.xs[1] ?? box.xs[0]} />
       </g>
 
-      <g className="mg-first">
+      {/*
+        * The gap that makes the first initial read as crossing *over* the
+        * second: the same letter, drawn once in the paper's own colour with a
+        * stroke on it, immediately under itself.
+        *
+        * This was a `<mask>` — a dilated copy of this letter subtracted from
+        * the one behind — and the mask is why the monogram was reported cut on
+        * a phone for seven rounds. A mask clips to a region derived from the
+        * bounding box of the element wearing it, engines disagree about the
+        * bounding box of text, and every attempt to make the drawing fit left
+        * that disagreement exactly where it was.
+        *
+        * A stroke cannot clip anything. On the paper it is invisible, being the
+        * paper's colour; where it crosses the second initial it opens the gap.
+        * The old note here objected that a halo "rings the whole letter
+        * everywhere else" — true of a halo in some *other* colour, and the
+        * reason to use this one.
+        */}
+      <g className={`mg-first ${halo ? "mg-cross" : ""}`}>
         <Letter ch={set.first} face={face} box={box} x={box.xs[0]} />
       </g>
 
