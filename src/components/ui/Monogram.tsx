@@ -424,7 +424,38 @@ export function Monogram({
       </defs>
 
       {/* the mark, in foil, pressed into the paper */}
-      <g className="mg-foil" fill={`url(#mg-${uid})`}>
+      {/*
+        * A hairline of the mark's own foil, stroked around the mark's own fill.
+        *
+        * This is the one change in this whole component that can only ever
+        * *add* ink, and that is deliberate — everything before it tried to stop
+        * something being taken away, and each attempt was a guess at a
+        * mechanism that could not be observed.
+        *
+        * What the couple's `?diag=1` panel finally showed is that there is no
+        * mechanism: the same build, the same viewBox (300.2 x 131.3), the same
+        * face, and mark boxes agreeing to within three per cent — and yet on
+        * the phone the drawing stops at 233.0 where the desktop reaches 237.9.
+        * The missing five units are the *tips*: a copperplate script tapers its
+        * terminals to nothing, and a tip thinner than the device can resolve is
+        * simply not painted, leaving a blunt flat end where a flourish should
+        * taper away. That reads as a letter with its end cut off, which is
+        * exactly how it was reported, over and over, correctly.
+        *
+        * Six tenths of a unit — three hundredths of a millimetre of drawn
+        * width — is nothing on the thick strokes and is the difference between
+        * existing and not existing on the thin ones. It uses the same gradient
+        * as the fill, so it is invisible as a stroke; it only keeps the
+        * hairlines above the floor.
+        */}
+      <g
+        className="mg-foil"
+        fill={`url(#mg-${uid})`}
+        stroke={`url(#mg-${uid})`}
+        strokeWidth={0.6}
+        strokeLinejoin="round"
+        strokeLinecap="round"
+      >
         <Mark set={set} face={face} box={box} halo />
       </g>
 
