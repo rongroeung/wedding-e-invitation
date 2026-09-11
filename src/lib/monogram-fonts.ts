@@ -59,21 +59,21 @@ export type MonogramFont = {
 /** The Latin faces: eight formal scripts and two serifs. */
 const LATIN: MonogramFont[] = [
   { id: "great-vibes", label: "Great Vibes", family: "Great Vibes", script: "latin",
-    note: "Flowing formal script — the default", m: { asc: 828, desc: 391, adv: 1453 }, lap: 0.32 },
+    note: "Flowing formal script — the default", m: { asc: 828, desc: 391, adv: 1453 }, lap: 0.14 },
   { id: "pinyon-script", label: "Pinyon Script", family: "Pinyon Script", script: "latin",
-    note: "Fine copperplate, very light", m: { asc: 734, desc: 375, adv: 1469 }, lap: 0.3 },
+    note: "Fine copperplate, very light", m: { asc: 734, desc: 375, adv: 1469 }, lap: 0.14 },
   { id: "parisienne", label: "Parisienne", family: "Parisienne", script: "latin",
-    note: "Ornate, generous swashes", m: { asc: 781, desc: 375, adv: 1344 }, lap: 0.32 },
+    note: "Ornate, generous swashes", m: { asc: 781, desc: 375, adv: 1344 }, lap: 0.14 },
   { id: "italianno", label: "Italianno", family: "Italianno", script: "latin",
-    note: "Light italic script", m: { asc: 594, desc: 359, adv: 1266 }, lap: 0.3 },
+    note: "Light italic script", m: { asc: 594, desc: 359, adv: 1266 }, lap: 0.14 },
   { id: "tangerine", label: "Tangerine", family: "Tangerine", script: "latin",
-    note: "Delicate and airy", m: { asc: 656, desc: 188, adv: 1250 }, lap: 0.28 },
+    note: "Delicate and airy", m: { asc: 656, desc: 188, adv: 1250 }, lap: 0.14 },
   { id: "alex-brush", label: "Alex Brush", family: "Alex Brush", script: "latin",
-    note: "Brush script, softer edges", m: { asc: 719, desc: 156, adv: 1297 }, lap: 0.3 },
+    note: "Brush script, softer edges", m: { asc: 719, desc: 156, adv: 1297 }, lap: 0.14 },
   { id: "allura", label: "Allura", family: "Allura", script: "latin",
-    note: "Flowing, wide swashes", m: { asc: 625, desc: 375, adv: 1188 }, lap: 0.32 },
+    note: "Flowing, wide swashes", m: { asc: 625, desc: 375, adv: 1188 }, lap: 0.14 },
   { id: "petit-formal-script", label: "Petit Formal Script", family: "Petit Formal Script",
-    script: "latin", note: "Engraved formal script", m: { asc: 844, desc: 266, adv: 1156 }, lap: 0.26 },
+    script: "latin", note: "Engraved formal script", m: { asc: 844, desc: 266, adv: 1156 }, lap: 0.14 },
   { id: "cormorant", label: "Cormorant Garamond", family: "Cormorant Garamond", script: "latin",
     note: "Serif italic — quiet and classical", italic: true,
     m: { asc: 641, desc: 203, adv: 844 }, lap: 0.12 },
@@ -106,6 +106,25 @@ const KHMER: MonogramFont[] = [
     note: "Clean and even", m: { asc: 766, desc: 250, adv: 1173 }, lap: 0.06 },
 ];
 
+/**
+ * How far a pair of initials is allowed to interlock.
+ *
+ * The script faces carried 0.26–0.32 — about a third of the narrower letter —
+ * because a formal script's capitals are drawn to run into each other and a
+ * generous overlap is what makes two letters read as one mark.
+ *
+ * That is true on a display that draws them at the weight they were designed
+ * at. Measured off the couple's own phone against their own desktop, the same
+ * mark came out with **70% more ink and strokes a fifth thicker** — and heavier
+ * strokes eat the very gaps a deep interlock depends on, so the two capitals
+ * closed up into a single congested shape and read as one letter with a piece
+ * missing. Rendered side by side at both weights, a light overlap survives the
+ * heavy rendering intact where a deep one does not.
+ *
+ * 0.14 keeps the pair related without letting either letter's body reach the
+ * other's. The Khmer faces (0.06) and the serifs (0.12) were always in this
+ * range, which is why neither was ever reported.
+ */
 export const MONOGRAM_FONTS: MonogramFont[] = [...LATIN, ...KHMER];
 
 export const DEFAULT_MONOGRAM_FONT = "great-vibes";

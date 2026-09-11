@@ -1489,7 +1489,20 @@
  * also used in the dashboard's font picker, on plain white.
  */
 .mg-cross text {
-  stroke: var(--c-bg, #fffaf6);
+  /*
+   * Off, now that the initials only lightly overlap.
+   *
+   * A stroke is one more thing painted over the letter behind, and on the
+   * reported phone — which draws this mark with about 70% more ink than the
+   * same page on a desktop — anything extra laid across the join is what
+   * closes the pair into a single congested shape. With `lap` down to 0.14
+   * there is barely a crossing left to carve, so the cleanest gap is the one
+   * that is simply left there by the letters not reaching each other.
+   *
+   * To bring the crossing effect back, restore:
+   *   stroke: var(--c-bg, #fffaf6);
+   */
+  stroke: none;
   stroke-width: 1.8;
   /* Under the fill, not over it: the gap is carved out of what is *behind*
      this letter, and the letter's own foil is untouched. */
