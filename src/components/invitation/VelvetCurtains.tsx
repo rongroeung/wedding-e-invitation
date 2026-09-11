@@ -112,8 +112,23 @@ const GRAIN = "1.6 0 0 0 -0.3 1.6 0 0 0 -0.3 1.6 0 0 0 -0.3 0 0 0 0 1";
 const W = 500;
 const H = 1000;
 
-/** The heading the fabric is gathered into. */
-const HEAD = 74;
+/**
+ * Where the cloth starts.
+ *
+ * This was 74 — a band across the top where the fabric was gathered into
+ * tighter pleats and washed darker, because a pelmet hung over it and a heading
+ * in shadow is what a curtain looks like under a board.
+ *
+ * The pelmet is gone, and the heading went from a detail nobody could see to a
+ * hard horizontal seam across the top of the screen: triangular gathers above,
+ * hanging folds below, and a straight line where the two met. Asked for a
+ * seamless surface, and it is the right ask — without something above it to
+ * cast the shadow, a heading is just a join.
+ *
+ * At 0 the folds run the full height and the cloth is one continuous sheet. The
+ * pleat geometry below is kept, unused, for whoever puts a pelmet back.
+ */
+const HEAD = 0;
 
 /**
  * One fold, as a closed path from the heading down to the hem.
@@ -322,11 +337,6 @@ function Panel({ side, open, rich }: { side: "left" | "right"; open: boolean; ri
       {/* the fall of light down the whole sheet */}
       <rect x="-40" y={HEAD} width={W + 80} height={H - HEAD} fill={`url(#fall-${uid})`} />
 
-      {/* the heading: tighter pleats, and deeper because the pelmet shades them */}
-      {CREST.map((_, i) => (
-        <path key={i} d={pleatPath(i)} fill={`url(#fold-${uid}-${i})`} />
-      ))}
-      <rect x="0" y="0" width={W} height={HEAD} fill="rgb(var(--vel-dark-rgb) / 0.62)" />
 
       {/* the pile catching the light along the leading edge */}
       <rect x="0" y="0" width={W} height={H} fill={`url(#edge-${uid})`} />
