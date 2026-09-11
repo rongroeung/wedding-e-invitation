@@ -531,8 +531,21 @@ export function VelvetCurtains({
         * part, because by then there is no join for it to be in.
         */}
       <span className={`curtain-seam ${open ? "curtain-seam-gone" : ""}`} />
-      {/* the pelmet, which is what stops the two panels reading as two objects */}
-      <Pelmet rich={rich} />
+      {/*
+        * No pelmet.
+        *
+        * There was a scalloped swag across the top, on the reasoning that
+        * curtains hang from *something* and two panels without a board above
+        * them read as two separate sheets rather than one set. That is sound
+        * for a stage, and wrong for this: on a phone the swag ate an eighth of
+        * the height before the invitation had begun, and the first thing a
+        * guest saw after the envelope was a band of fabric rather than the
+        * curtains parting. The couple asked for it gone, and the set reads
+        * perfectly well as one because the two panels meet in the middle.
+        *
+        * `Pelmet` and its CSS are left in place, unused, so it is one line to
+        * put back.
+        */}
     </div>
   );
 }

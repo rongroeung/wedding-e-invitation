@@ -1651,6 +1651,71 @@
   object-fit: contain;
 }
 
+/*
+ * On a phone held upright, the film is the screen.
+ *
+ * Everywhere else it plays inside a 16/9 frame with a gilt edge, letterboxed
+ * rather than cropped, because a pre-wedding film is the couple's own footage
+ * and this component does not get to cut the sides off it. On a portrait phone
+ * that reasoning inverts: the footage *is* portrait, the frame is landscape,
+ * and the result was a small letterboxed rectangle floating in the middle of a
+ * tall screen with most of the phone unused. The couple asked for it full
+ * screen and they are right — a wedding film on a phone should be the phone.
+ *
+ * It stays `contain`, and that is not a hedge. A phone is far taller than a
+ * 9:16 film, so filling the screen edge to edge would scale the footage until
+ * it overflowed *sideways* and crop the left and right off every shot — which
+ * on a couple's own film can quite easily cut one of them out of frame. Tried
+ * in a mock at 390x844, that is exactly what happens.
+ *
+ * With the frame taking the whole screen and the footage still uncropped, the
+ * film goes from a small rectangle adrift in the middle of the page to the full
+ * width of the phone with a thin margin above and below. That is what "full
+ * screen" is worth here: everything the camera saw, as large as the device can
+ * show it.
+ *
+ * If edge-to-edge really is wanted, with the sides given up for it, change the
+ * one word below to `cover`.
+ */
+@media (orientation: portrait) and (max-width: 820px) {
+  .film {
+    padding: 0;
+    gap: 0;
+  }
+
+  .film-frame {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    max-height: none;
+    /* The frame takes the screen's shape, not 16/9. */
+    aspect-ratio: auto;
+    border-radius: 0;
+    /* The gilt edge and the drop shadow belong to a framed picture; edge to
+       edge there is nothing for them to sit against. */
+    box-shadow: none;
+    background: #000;
+  }
+
+  .film-media {
+    object-fit: contain;
+  }
+
+  /*
+   * The controls come off the bottom of the column and sit over the film, clear
+   * of the home indicator. Without this they would be pushed off the screen by
+   * a frame that now fills it.
+   */
+  .film-controls {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: max(1.1rem, env(safe-area-inset-bottom));
+    z-index: 2;
+    padding: 0 1rem;
+  }
+}
+
 .film-controls {
   display: flex;
   flex-wrap: wrap;
