@@ -217,7 +217,6 @@ export const wedding = pgTable("wedding", {
   videoPosterId: text("video_poster_id"),
   videoSkipLabel: text("video_skip_label").notNull().default("រំលងវីដេអូ"),
   /** Wording on the button that carries on to the invitation. */
-  videoContinueLabel: text("video_continue_label").notNull().default("បន្តទៅលិខិតអញ្ជើញ"),
 
   /* ── The gold frame as pressed foil rather than a flat picture ─────────
      The artwork is the couple's own; these settle how it is lit and how far

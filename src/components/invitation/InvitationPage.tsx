@@ -450,7 +450,6 @@ export function InvitationPage({
         <PreWeddingVideo
           source={film}
           skipLabel={wedding.videoSkipLabel}
-          continueLabel={wedding.videoContinueLabel}
           gone={filmDone}
           onDone={() => setFilmDone(true)}
         />

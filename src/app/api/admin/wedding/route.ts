@@ -133,7 +133,6 @@ const schema = z.object({
   videoMediaId: z.string().max(64).nullable().optional(),
   videoPosterId: z.string().max(64).nullable().optional(),
   videoSkipLabel: z.string().max(40).optional(),
-  videoContinueLabel: z.string().max(60).optional(),
 
   frameEmboss: z.boolean().optional(),
   frameDepth: z.number().int().min(0).max(100).optional(),

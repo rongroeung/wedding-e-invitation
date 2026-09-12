@@ -41,7 +41,6 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
     videoMediaId: wedding.videoMediaId,
     videoPosterId: wedding.videoPosterId,
     videoSkipLabel: wedding.videoSkipLabel,
-    videoContinueLabel: wedding.videoContinueLabel,
 
     frameEmboss: wedding.frameEmboss,
     frameDepth: wedding.frameDepth,
@@ -323,20 +322,22 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
                 onClear={() => set("videoPosterId", null)}
               />
 
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="អក្សរប៊ូតុងរំលង">
-                  <Input
-                    value={form.videoSkipLabel}
-                    onChange={(e) => set("videoSkipLabel", e.target.value)}
-                  />
-                </Field>
-                <Field label="អក្សរប៊ូតុងបន្ត">
-                  <Input
-                    value={form.videoContinueLabel}
-                    onChange={(e) => set("videoContinueLabel", e.target.value)}
-                  />
-                </Field>
-              </div>
+              {/*
+                * One wording, not two.
+                *
+                * There used to be a second label here for a "carry on" button,
+                * shown when the film could not report its own ending — an
+                * embed, or a file the browser refused to autoplay. It is the
+                * same button doing the same job, and asking a couple to write
+                * two names for it meant the guest saw whichever one the
+                * browser happened to produce.
+                */}
+              <Field label="អក្សរប៊ូតុងរំលង">
+                <Input
+                  value={form.videoSkipLabel}
+                  onChange={(e) => set("videoSkipLabel", e.target.value)}
+                />
+              </Field>
 
               {/*
                 * What will actually happen, in words, before it is saved.
@@ -359,7 +360,7 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
                   if (source.kind === "file") {
                     return "ឯកសារវីដេអូ៖ ចាក់ដោយស្វ័យប្រវត្តិ (បិទសំឡេង) ហើយបន្តទៅវាំងននដោយខ្លួនឯងពេលចប់។ ភ្ញៀវអាចបើកសំឡេង ឬរំលងបាន។";
                   }
-                  return "តំណ YouTube / Vimeo / Facebook៖ ចាក់ដោយស្វ័យប្រវត្តិ (បិទសំឡេង) ប៉ុន្តែវេទិកាខាងក្រៅមិនប្រាប់ថាចប់ទេ — ភ្ញៀវត្រូវចុច «បន្ត» ដើម្បីទៅលិខិត។";
+                  return "តំណ YouTube / Vimeo / Facebook៖ ចាក់ដោយស្វ័យប្រវត្តិ (បិទសំឡេង) ប៉ុន្តែវេទិកាខាងក្រៅមិនប្រាប់ថាចប់ទេ — ភ្ញៀវត្រូវចុចប៊ូតុងរំលង ដើម្បីទៅលិខិត។";
                 })()}
               </p>
 

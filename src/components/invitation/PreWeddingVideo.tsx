@@ -32,14 +32,11 @@ import type { VideoSource } from "@/lib/video";
 export function PreWeddingVideo({
   source,
   skipLabel,
-  continueLabel,
   gone,
   onDone,
 }: {
   source: VideoSource;
   skipLabel: string;
-  /** Wording for the button that carries on to the invitation. */
-  continueLabel: string;
   /** Finished: fade out, and be unmounted a moment later. */
   gone: boolean;
   /** Called once, when the film has finished or the guest has said carry on. */
@@ -48,17 +45,6 @@ export function PreWeddingVideo({
   const video = useRef<HTMLVideoElement>(null);
   const done = useRef(false);
   const [muted, setMuted] = useState(true);
-  /*
-   * Whether the film is actually running.
-   *
-   * Used only to decide *which* button to offer — "skip" while it plays,
-   * "carry on" once it has clearly failed to. A browser can refuse to autoplay
-   * even a muted video (a data-saver mode, a locked-down enterprise profile),
-   * and the failure is silent: no error, no event, just a first frame that
-   * never becomes a second. Offering the same button either way is what stops
-   * that being a dead end.
-   */
-  const [playing, setPlaying] = useState(source.kind === "embed");
 
   const finish = useCallback(() => {
     if (done.current) return;
@@ -70,27 +56,27 @@ export function PreWeddingVideo({
    * Ask to play, and do not assume the answer.
    *
    * `autoPlay` on the element is not enough on its own: it is honoured only
-   * when the element is muted *at the moment the source is attached*, and it
-   * gives back nothing to check. Calling `play()` returns a promise that
-   * rejects when the browser says no, which is the only way to find out.
+   * when the element is muted *at the moment the source is attached*, and a
+   * browser can still refuse — a data-saver mode, a locked-down enterprise
+   * profile — silently, with no error and no event, just a first frame that
+   * never becomes a second. The rejection is swallowed rather than acted on:
+   * the way out of the film is the same button either way, so there is nothing
+   * left for the answer to change.
    */
   useEffect(() => {
     const el = video.current;
     if (!el) return;
     el.muted = true;
-    el.play().then(
-      () => setPlaying(true),
-      () => setPlaying(false),
-    );
+    void el.play().catch(() => undefined);
   }, []);
 
   /*
    * An embed cannot tell us when it has ended.
    *
    * It is a cross-origin iframe, and asking it would mean loading YouTube's or
-   * Vimeo's own JavaScript into the invitation. So the guest carries on when
-   * they are ready, and the button says so rather than saying "skip" — there
-   * is nothing to skip, it is simply the way out.
+   * Vimeo's own JavaScript into the invitation. So the guest leaves it when
+   * they are ready, by the same button a file offers — one exit, worded one
+   * way, whatever the source is and whether or not it ever started playing.
    */
   const embed = source.kind === "embed";
 
@@ -155,7 +141,7 @@ export function PreWeddingVideo({
               setMuted(el.muted);
               /* Unmuting is a gesture, so this is also the moment a browser
                  that refused to autoplay will finally agree to. */
-              void el.play().then(() => setPlaying(true), () => undefined);
+              void el.play().catch(() => undefined);
             }}
             aria-pressed={!muted}
           >
@@ -165,7 +151,7 @@ export function PreWeddingVideo({
         )}
 
         <button type="button" className="film-skip" onClick={finish}>
-          {embed || !playing ? continueLabel : skipLabel}
+          {skipLabel}
         </button>
       </div>
     </div>
