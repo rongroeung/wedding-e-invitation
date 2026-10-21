@@ -347,6 +347,24 @@
 
   body {
     background-color: var(--c-bg);
+    /*
+     * The page's own picture is *not* here — see `.page-backdrop`. It is on a
+     * fixed element instead, because the only way to stop a background on
+     * `body` scrolling away down an invitation this long is
+     * `background-attachment: fixed`, and that is the one declaration mobile
+     * Safari has never handled: it either ignores it outright or repaints the
+     * whole image on every scroll frame.
+     *
+     * `isolation: isolate` is what makes that element land where it is meant
+     * to, and it is not a precaution — it was measured failing without it.
+     * `.page-backdrop` sits at `z-index: -1` so it goes behind the page's
+     * content and in front of the page's colour, and "in front of the colour"
+     * is only true if the element carrying that colour establishes a stacking
+     * context. Without one the backdrop is painted behind the nearest ancestor
+     * that does, which means behind the background it was supposed to cover,
+     * and the picture simply never appears.
+     */
+    isolation: isolate;
     color: var(--c-text);
     font-family: var(--f-body), "Noto Sans Khmer", system-ui, sans-serif;
     /* Khmer script needs generous leading to stay readable on small screens */
@@ -419,13 +437,17 @@
   .paper {
     background-color: var(--c-bg);
     /*
-     * Fibre only — no vignette or gradient. Anything positional makes the
-     * frame's strip read as a different tone from the scrolling content, and
-     * the two must be ស្មើសាច់: one continuous sheet of paper.
+     * One seamless relief tile (`/kit/paper-card.webp`: fine grain and sparse,
+     * faint fibres, mean exactly mid-grey) laid over the colour with `overlay`.
+     * Overlay of mid-grey is the identity, so the tile adds tooth without
+     * shifting the paper's tone. The old turbulence was blended with
+     * `multiply`, which can only darken — and it darkened whichever region
+     * carried it into a visibly greyer rectangle than the regions that did not.
      */
-    background-image:
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23f)' opacity='0.22'/%3E%3C/svg%3E");
-    background-blend-mode: multiply;
+    background-image: url(/kit/paper-card.webp);
+    background-size: 512px 512px;
+    background-repeat: repeat;
+    background-blend-mode: overlay;
   }
 
   /* The muted surface the card sits on, seen only on tablet and desktop */
@@ -483,7 +505,7 @@
   }
 
   /*
-   * The hairlines running in from each corner to the lotus at the centre.
+   * The hairlines running in from each corner to the fleuron at the centre.
    * Printed at full length, like everything else on this card.
    */
   .frame-rule {
@@ -541,9 +563,57 @@
   /* The invitation card itself */
   .card-stock {
     background-color: var(--c-bg);
+    /*
+     * The couple's own paper, if they uploaded one.
+     *
+     * Two background layers: their picture, and a flat wash of the card's own
+     * colour over it (`ThemeStyle` builds both into `--card-bg`). The wash is
+     * what keeps the writing readable, and it defaults high for exactly that
+     * reason — a photograph at full strength behind Khmer body text is not a
+     * design choice, it is an invitation nobody can read.
+     *
+     * `none` is a valid `background-image`, so an invitation with no upload
+     * takes this rule and paints nothing.
+     */
+    background-image: var(--card-bg, none);
+    background-size: var(--card-bg-size, auto);
+    background-repeat: var(--card-bg-repeat, no-repeat);
+    background-position: var(--card-bg-position, center);
+    /*
+     * `.paper` sits on this same element and blends its grain tile in
+     * `overlay`. That blend mode carried over to these layers — the couple's
+     * picture and its wash — and overlaid the picture into the paper colour
+     * until it all but vanished. The grain is drawn by `::before` below, so
+     * these layers are simply painted.
+     */
+    background-blend-mode: normal;
     box-shadow:
       0 1px 2px rgba(74, 53, 39, 0.08),
       0 18px 50px -20px rgba(74, 53, 39, 0.28);
+  }
+
+  /*
+   * The sheet's paper, painted once for the whole card.
+   *
+   * The card is one piece of stationery, so its grain is one layer covering it
+   * from the top edge to the bottom — under the frame's ornament strips, the
+   * cover and the scrolling invitation alike. It is a pseudo-element rather
+   * than a background so that it composes with the couple's own uploaded paper
+   * (`--card-bg`, above) instead of replacing it, which is what the `.paper`
+   * class on this same element was silently losing: `background-image` above
+   * overrides `.paper`'s, so the frame strips were flat colour while the cover
+   * painted its own textured, darker paper between them.
+   *
+   * It does not scroll: the writing moves, the sheet stays put.
+   */
+  .card-stock::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: url(/kit/paper-card.webp) 0 0 / 512px 512px repeat;
+    mix-blend-mode: overlay;
   }
 
   /*
@@ -646,7 +716,13 @@
     left: 50%;
     border-radius: 9999px;
     transform: translateX(-50%);
-    background: radial-gradient(circle, rgba(var(--gold-3-rgb) / 0.4), transparent 68%);
+    /*
+     * `closest-side`: the glow fades to nothing inside its own box. A circle
+     * sized to the far corner ran past the top and bottom of a wide, short box
+     * (a phone held sideways) and was cut off there in a hard line across the
+     * paper. On tall screens the two are within a few pixels of each other.
+     */
+    background: radial-gradient(closest-side, rgba(var(--gold-3-rgb) / 0.4), transparent);
     filter: blur(22px);
     animation: breathe 7.5s ease-in-out infinite;
     will-change: opacity, transform;
@@ -1823,8 +1899,13 @@
   aspect-ratio: 1.35;
   transform: translate(-50%, -50%) scale(0.92);
   border-radius: 50%;
+  /*
+   * A restrained warm light behind the envelope — not a halo. Low alpha and a
+   * falloff that runs all the way to the edge of the ellipse, so there is no
+   * ring where it ends.
+   */
   background:
-    radial-gradient(closest-side, rgb(255 252 246 / 0.72), rgb(var(--gold-3-rgb) / 0.2) 46%, transparent 74%);
+    radial-gradient(closest-side, rgb(255 228 210 / 0.2), rgb(236 190 170 / 0.1) 45%, rgb(236 190 170 / 0.03) 75%, transparent 100%);
   transition: transform 2600ms ease-out, opacity 2600ms ease-out;
   opacity: 0.75;
 }
@@ -1984,8 +2065,91 @@
    * and settles. `cubic-bezier(0.5, 0, 0.15, 1)` is a curve with a very soft
    * foot and a long tail, which is what weight looks like.
    */
-  transition: transform 2300ms cubic-bezier(0.5, 0, 0.15, 1);
+  transition: transform 3000ms cubic-bezier(0.5, 0, 0.15, 1);
   will-change: transform;
+}
+
+/*
+ * A panel with the couple's own cloth on it.
+ *
+ * The class list moves from the `<svg>` to a wrapper `<div>`, because there are
+ * now two things to stack inside one panel — the picture and the light on it —
+ * and `transform-origin` has to sit on whichever element the pair travels as.
+ * Every rule above applies to either element without change; only these are new.
+ */
+.curtain-face {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/*
+ * The drawn folds over a photograph: blended, not painted.
+ *
+ * The blend takes the curtain's light and shade and applies it to whatever the
+ * couple uploaded, so their fabric keeps its own colour. It needs a *grey*
+ * light map or it tints as well as shades, which is what `ThemeStyle`'s
+ * `--vel-t*` override is for — the velvet's own pink ramp would print pink onto
+ * a blue silk. `--curtain-shade` is the couple's dial on how much of it lands.
+ *
+ * `overlay` and not `soft-light`, measured rather than assumed: side by side
+ * over the same photograph, soft-light at full strength was weaker than overlay
+ * at half, and at the 55% this defaults to it was not visible at all. A setting
+ * whose default does nothing is a setting nobody believes in. Overlay
+ * multiplies where the map is dark and screens where it is light, which is what
+ * a fold does; soft-light does the same thing so gently that a photograph with
+ * any contrast of its own simply swallows it.
+ */
+.curtain-skinned .curtain-face {
+  mix-blend-mode: overlay;
+  opacity: var(--curtain-shade, 0.55);
+}
+
+/*
+ * The picture, spanning the whole stage from inside a panel that is 54% of it.
+ *
+ * 100 / 54 = 185.2%. Anchored to each panel's *outer* edge — the edge that does
+ * not move when the panel gathers — so both panels lay the same picture over the
+ * same stage and the join between them falls inside the image rather than
+ * between two crops of it.
+ */
+.curtain-skin {
+  position: absolute;
+  top: 0;
+  display: block;
+  width: 185.2%;
+  height: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  object-fit: cover;
+  object-position: center;
+}
+
+.curtain-left .curtain-skin {
+  left: 0;
+}
+
+.curtain-right .curtain-skin {
+  right: 0;
+}
+
+.curtain-skin-cover {
+  background-size: cover;
+  object-fit: cover;
+}
+
+.curtain-skin-contain {
+  background-size: contain;
+  object-fit: contain;
+}
+
+.curtain-skin-tile {
+  background-size: auto;
+  background-repeat: repeat;
+  background-position: top left;
+  object-fit: cover;
 }
 
 .curtain-left {
@@ -2097,6 +2261,109 @@
 
 .curtain-seam-gone {
   opacity: 0;
+}
+
+/* ── The drape: pre-rendered cloth, gathered fold by fold ────────────────
+ *
+ * See `Drape.tsx`. Each panel is a size container so a fold can lay the
+ * panel-wide fabric map across itself in `cqw` and line up exactly with its
+ * neighbours; the weave is sized in pixels and never stretched.
+ */
+.drape-set {
+  position: absolute;
+  inset: 0;
+}
+
+.drape {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  /* a little over half each, so the leading edges overlap while closed */
+  width: 53%;
+  container-type: inline-size;
+  transition: transform 850ms cubic-bezier(0.4, 0, 0.7, 0.2);
+}
+
+.drape-left {
+  left: 0;
+  z-index: 1;
+}
+
+/* The same construction hung mirrored: its light comes from the middle too. */
+.drape-right {
+  right: 0;
+  z-index: 2;
+  transform: scaleX(-1);
+}
+
+.drape-fold {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background-color: var(--curtain-cloth, #a3917b);
+  background-image: url(/kit/curtain-weave.webp), var(--drape-map);
+  background-size: 288px 288px, 100cqw 100%;
+  background-position:
+    calc(var(--x0) * -100cqw) 0,
+    calc(var(--x0) * -100cqw) 0;
+  background-repeat: repeat, no-repeat;
+  background-blend-mode: overlay, luminosity;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* A gathered fold is a deeper fold: its valleys close and shade each other. */
+.drape-ao {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: linear-gradient(
+    to right,
+    rgb(var(--vel-dark-rgb) / 0.75) 0%,
+    rgb(var(--vel-dark-rgb) / 0.3) 30%,
+    rgb(var(--vel-dark-rgb) / 0.18) 60%,
+    rgb(var(--vel-dark-rgb) / 0.42) 100%
+  );
+}
+
+/* The shade a fold throws on the one it has slid over. Soft, no edge. */
+.drape-shade {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  opacity: 0;
+  transform-origin: 100% 0;
+  background: linear-gradient(to left, rgb(var(--vel-dark-rgb) / 0.7), rgb(var(--vel-dark-rgb) / 0));
+  will-change: transform, opacity;
+}
+
+/*
+ * The shadow the leading edge throws beyond itself: across the other panel
+ * while they meet, then onto the stage as they part. It is the reason the
+ * middle of a closed curtain is a little deeper than the rest.
+ */
+.drape-cast {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 100%;
+  width: 9%;
+  z-index: 0;
+  opacity: 0.55;
+  background: linear-gradient(to right, rgb(var(--vel-dark-rgb) / 0.5), rgb(var(--vel-dark-rgb) / 0));
+  will-change: transform, opacity;
+}
+
+/*
+ * Struck: the gathered cloth is drawn the rest of the way off while the set
+ * fades, so the exit is the same movement carried on rather than a cut.
+ */
+.curtains-struck .drape-left {
+  transform: translateX(-70%);
+}
+
+.curtains-struck .drape-right {
+  transform: scaleX(-1) translateX(-70%);
 }
 
 /* ── The stage ────────────────────────────────────────────────────────── */
@@ -2307,6 +2574,7 @@
   .room-spark { opacity: 0.5 !important; }
   .curtain,
   .curtain-seam,
+  .drape,
   .curtains { transition: none !important; }
   .room-key,
   .stage-halo,
@@ -2364,8 +2632,24 @@
 .room-vignette {
   position: absolute;
   inset: 0;
+  /* the lens falling off: deep wine at the corners, the middle untouched */
   background:
-    radial-gradient(116% 78% at 50% 44%, transparent 40%, rgb(var(--room-far-rgb) / 0.55) 100%);
+    radial-gradient(120% 86% at 50% 46%, transparent 48%, rgb(20 6 11 / 0.32) 78%, rgb(14 4 8 / 0.62) 100%);
+}
+
+/*
+ * The room's surface: the same seamless, mid-grey paper grain as the card
+ * (`/kit/paper-card.webp`) laid in `overlay`, so it adds tooth without moving
+ * the colour. Fine and quiet — it reads as a material at arm's length and as
+ * nothing at all from across the room. It is fixed to the room, never to the
+ * envelope, so it does not swim while the camera moves.
+ */
+.room-grain {
+  position: absolute;
+  inset: 0;
+  background: url(/kit/paper-card.webp) 0 0 / 384px 384px repeat;
+  mix-blend-mode: overlay;
+  opacity: 0.55;
 }
 
 /*
@@ -2496,4 +2780,1735 @@
   .env-hint {
     display: none;
   }
+}
+
+/*
+ * The room the invitation stands in, when the couple has uploaded one.
+ *
+ * Fixed and behind everything: `z-index: -1` on a child of `<body>` puts it
+ * behind body's own content but still in front of body's background colour, so
+ * the colour shows through wherever the picture does not reach — which is what
+ * makes "contain" a usable fit rather than a black letterbox.
+ *
+ * It is only rendered at all when there is something to paint, so an invitation
+ * that uploads nothing does not get an extra element it has no use for.
+ */
+.page-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: var(--page-bg, none);
+  background-size: var(--page-bg-size, auto);
+  background-repeat: var(--page-bg-repeat, no-repeat);
+  background-position: var(--page-bg-position, center);
+}
+
+/* ══ The envelope: a small physical scene ════════════════════════════════════
+ *
+ * Unlayered on purpose: these follow, and override, the gatefold's sizing in
+ * `@layer components` above without editing it.
+ *
+ * One key light, from the upper left. Every highlight is on an upper-left
+ * edge and every shadow falls down and to the right; nothing has an outline.
+ * Paper is a flat colour from the envelope style, modulated by a neutral,
+ * seamless relief map (`paper-cotton`, `paper-card`, `paper-lining-fine`)
+ * through `overlay`, so any style keeps the same tooth.
+ *
+ * Sizes are in `em` against the piece (1em = 1/26 of its width), so the whole
+ * object scales as one from a 320px phone to a desktop.
+ */
+.env-piece {
+  --env-w: clamp(220px, min(86vw, (100vh - var(--env-chrome, 330px)) * 1.42), 600px);
+  width: var(--env-w);
+  height: calc(var(--env-w) / 1.42);
+  font-size: calc(var(--env-w) / 26);
+}
+@supports (height: 100dvh) {
+  .env-piece {
+    --env-w: clamp(220px, min(86vw, (100dvh - var(--env-chrome, 330px)) * 1.42), 600px);
+  }
+}
+/* A desktop has the room: the envelope may grow past 600px, still held by the
+   screen's height (the heading above it and the button below it keep their
+   space), so a 1920×1080 screen gets a 720px envelope instead of a small one
+   in a large empty room. Every part is sized in em, so it scales as one. */
+@media (min-width: 1200px) and (min-height: 860px) {
+  .env-piece {
+    --env-w: clamp(220px, min(60vw, (100dvh - var(--env-chrome, 330px)) * 1.42), 720px);
+  }
+}
+
+/* `.env-piece` is a flattening element (it isolates and is moved by the
+   camera), so the scene brings its own perspective and world inside it. */
+.pe {
+  position: absolute;
+  inset: 0;
+  /* close enough that a flap turning toward the camera keystones visibly —
+     at 2200px the turn read as a flat squash */
+  perspective: 1000px;
+  perspective-origin: 50% 30%;
+  --pe-paper: url(/kit/paper-cotton.webp);
+  /* the key light, in envelope coordinates: brighter toward the upper left,
+     falling off toward the lower right. Laid over every full-size surface. */
+  --pe-key:
+    radial-gradient(120% 95% at 12% 6%, rgb(255 250 246 / 0.26), rgb(255 250 246 / 0.06) 48%, transparent 70%),
+    linear-gradient(135deg, transparent 45%, rgb(70 30 40 / 0.1));
+}
+.pe-world,
+.pe-body {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+.pe-body {
+  transform: translate3d(0, 0, 0);
+  transition: transform var(--pe-card-t, 1600ms) cubic-bezier(0.45, 0.05, 0.3, 1);
+}
+/* drawing the card out pulls the envelope down a little with it */
+.pe-card-out .pe-body { transform: translate3d(0, 4%, 0); }
+/* and then it drops out of the shot */
+.pe-lowered .pe-body {
+  transform: translate3d(0, 165%, 0);
+  /* a gentle drop: it lets go, then falls clear before the room goes dark */
+  transition: transform calc(var(--pe-near-t, 1300ms) * 0.8) cubic-bezier(0.45, 0, 0.6, 1);
+}
+
+/* ── The envelope's shadow on the table ─────────────────────────────────── */
+.pe-table-shadow {
+  position: absolute;
+  left: 4%;
+  right: -2%;
+  top: 9%;
+  bottom: -5%;
+  border-radius: 6%;
+  transform: translateZ(-2px);
+  background: radial-gradient(closest-side, rgb(20 6 10 / 0.6), rgb(20 6 10 / 0.25) 70%, transparent);
+  filter: blur(1em);
+  transition: opacity var(--pe-near-t, 1300ms) ease-in, transform var(--pe-card-t, 1600ms) ease;
+}
+.pe-card-out .pe-table-shadow { transform: translate3d(0, 4%, -2px); }
+.pe-lowered .pe-table-shadow { opacity: 0; }
+
+/* ── z 0 · rear panel ───────────────────────────────────────────────────── */
+.pe-back {
+  position: absolute;
+  inset: 0;
+  border-radius: 0.14em;
+  transform: translateZ(0);
+  background:
+    linear-gradient(135deg, rgb(255 255 255 / 0.1), transparent 45%, rgb(60 25 30 / 0.08)),
+    var(--pe-paper) 0 0 / 18em,
+    var(--env-paper-shade);
+  background-blend-mode: normal, overlay, normal;
+  box-shadow:
+    0 0 0 0.5px rgb(90 50 50 / 0.16),
+    0.05em 0.07em 0 0 var(--env-paper-deep),
+    0.1em 0.16em 0.25em rgb(40 15 20 / 0.32),
+    0.45em 0.75em 1.7em -0.2em rgb(30 10 15 / 0.32);
+}
+/* the inside, seen only when the flap is open: the same paper in shade,
+   darkest under the hinge where least light reaches */
+.pe-back-inside {
+  position: absolute;
+  inset: 0.3em 0.3em 0.2em;
+  border-radius: 0.1em;
+  background:
+    linear-gradient(180deg, rgb(50 20 25 / 0.34), rgb(50 20 25 / 0.12) 34%, rgb(50 20 25 / 0.04) 70%),
+    linear-gradient(90deg, rgb(50 20 25 / 0.1), transparent 22%, transparent 78%, rgb(50 20 25 / 0.14)),
+    var(--pe-paper) 7em 3em / 18em,
+    var(--env-paper-deep);
+  background-blend-mode: normal, normal, overlay, normal;
+}
+/* the fold along the top edge, where the flap is joined to the back */
+.pe-hinge {
+  position: absolute;
+  left: 0.2em;
+  right: 0.2em;
+  top: 0;
+  height: 0.16em;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.32), rgb(80 40 45 / 0.22));
+}
+
+/* ── z 3 · the pocket ───────────────────────────────────────────────────── */
+.pe-pocket {
+  position: absolute;
+  inset: 0;
+  transform: translateZ(3px);
+}
+/* each fold casts onto what is under it — down and to the right, short and
+   soft — through a drop-shadow that follows the fold's own shape */
+.pe-fold-wrap {
+  position: absolute;
+  inset: 0;
+  filter:
+    drop-shadow(0.03em 0.06em 0.04em rgb(70 25 35 / 0.34))
+    drop-shadow(0.1em 0.18em 0.32em rgb(70 25 35 / 0.14));
+}
+.pe-fold {
+  position: absolute;
+  inset: 0;
+  background-blend-mode: normal, normal, normal, overlay, normal;
+}
+/* faces turned toward the light are a touch lighter, away a touch darker */
+.pe-fold-left {
+  background:
+    var(--pe-key),
+    linear-gradient(100deg, rgb(255 255 255 / 0.2), rgb(255 255 255 / 0.07) 45%, rgb(80 35 40 / 0.04)),
+    var(--pe-paper) 3em 1em / 18em,
+    var(--env-paper);
+}
+.pe-fold-right {
+  background:
+    var(--pe-key),
+    linear-gradient(260deg, rgb(80 35 40 / 0.16), rgb(80 35 40 / 0.07) 50%, rgb(80 35 40 / 0.02)),
+    var(--pe-paper) 11em 5em / 18em,
+    var(--env-paper);
+}
+.pe-fold-bottom {
+  background:
+    var(--pe-key),
+    linear-gradient(172deg, rgb(255 255 255 / 0.1), rgb(255 255 255 / 0.02) 45%, rgb(80 35 40 / 0.06)),
+    var(--pe-paper) 5em 9em / 18em,
+    var(--env-paper);
+}
+.pe-contours {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.pe-contours polyline {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.pe-edge-lit  { stroke: rgb(255 250 248 / 0.7); stroke-width: 1; }
+.pe-edge-soft { stroke: rgb(255 250 248 / 0.35); stroke-width: 0.9; }
+.pe-edge-dark { stroke: rgb(90 35 45 / 0.22); stroke-width: 0.9; }
+
+/* the closed flap's shadow on the pocket: separates and softens as it lifts */
+.pe-flap-shade-wrap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 58%;
+  filter: blur(0.1em);
+  transform: translate(0.05em, 0.12em);
+  transition:
+    transform calc(var(--pe-flap-t, 1400ms) * 0.45) ease-in,
+    opacity calc(var(--pe-flap-t, 1400ms) * 0.45) ease-in,
+    filter calc(var(--pe-flap-t, 1400ms) * 0.45) ease-in;
+}
+.pe-flap-shade {
+  position: absolute;
+  inset: 0;
+  background: rgb(70 25 35 / 0.38);
+}
+.pe-open .pe-flap-shade-wrap {
+  opacity: 0;
+  transform: translate(0.3em, 0.9em);
+  filter: blur(0.6em);
+}
+
+/* ── z 4 → −1 · the flap ────────────────────────────────────────────────── *
+ * Hinged on its top edge. `transform-origin` puts the axis 2.5px behind the
+ * flap's plane — at z 1.5 once the flap's own translateZ(4px) is applied — so
+ * a half turn lands it at z −1: behind the card, in front of nothing it should
+ * cover. Positive rotateX brings the point toward the camera first, as a flap
+ * lifted by hand does. */
+.pe-flap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 58%;
+  transform-style: preserve-3d;
+  transform-origin: 50% 0 -2.5px;
+  transform: translateZ(4px) rotateX(0deg);
+  transition: transform var(--pe-flap-t, 1400ms) cubic-bezier(0.5, 0.02, 0.22, 1);
+}
+.pe-open .pe-flap { transform: translateZ(4px) rotateX(180deg); }
+
+/* The light on the flap changes as it turns. The outside turns its face down
+   and away from the key light as it rises to upright — the half of the turn
+   in which it can be seen — and the lining comes round out of that shade into
+   the light over the other half. Transitions, not keyframes: a keyframe
+   animation applies its easing per segment, which put the shading out of step
+   with the turn. The 90° moment on this curve is at 45% of its time. */
+.pe-flap-out::before,
+.pe-flap-in::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgb(40 12 20 / 0.5), rgb(40 12 20 / 0.32));
+}
+.pe-flap-out::before {
+  opacity: 0;
+  transition: opacity calc(var(--pe-flap-t, 1400ms) * 0.45) cubic-bezier(0.55, 0, 0.9, 0.5);
+}
+.pe-flap-in::before {
+  opacity: 0.6;
+  transition: opacity calc(var(--pe-flap-t, 1400ms) * 0.55) cubic-bezier(0.1, 0.5, 0.3, 1) calc(var(--pe-flap-t, 1400ms) * 0.45);
+}
+.pe-open .pe-flap-out::before { opacity: 0.6; }
+.pe-open .pe-flap-in::before { opacity: 0; }
+
+.pe-flap-out,
+.pe-flap-in {
+  position: absolute;
+  inset: 0;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  background-blend-mode: normal, overlay, normal;
+}
+.pe-flap-out {
+  background:
+    /* the fold along the top catches the light */
+    linear-gradient(180deg, rgb(255 252 248 / 0.4), rgb(255 252 248 / 0) 2.2%),
+    radial-gradient(120% 160% at 12% 6%, rgb(255 250 246 / 0.28), rgb(255 250 246 / 0.06) 50%, transparent 72%),
+    linear-gradient(162deg, rgb(255 255 255 / 0.1), rgb(255 255 255 / 0.03) 40%, rgb(80 35 40 / 0.07)),
+    var(--pe-paper) 2em 0 / 18em,
+    var(--env-paper);
+  background-blend-mode: normal, normal, normal, overlay, normal;
+}
+/* the cut edge of the flap faces away from the light: a fine shade along it */
+.pe-flap-edge {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.pe-flap-edge polyline {
+  fill: none;
+  stroke: rgb(90 35 45 / 0.28);
+  stroke-width: 1.4;
+  vector-effect: non-scaling-stroke;
+}
+/* the lining: the flap's other face — same piece, same hinge — warmer cream,
+   finer paper, a little shade along the fold */
+.pe-flap-in {
+  transform: rotateY(180deg);
+  background:
+    linear-gradient(180deg, rgb(80 50 30 / 0.2), rgb(80 50 30 / 0.04) 22%, transparent 60%),
+    url(/kit/paper-lining-fine.webp) 0 0 / 16em,
+    #f2e5cf;
+}
+.pe-foil,
+.pe-lining-rule {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.pe-foil polyline {
+  fill: none;
+  stroke-width: 1.3;
+  vector-effect: non-scaling-stroke;
+  stroke-linejoin: round;
+}
+.pe-lining-rule polyline {
+  fill: none;
+  stroke: rgb(176 140 90 / 0.5);
+  stroke-width: 0.9;
+  vector-effect: non-scaling-stroke;
+}
+.pe-flap-mono {
+  position: absolute;
+  left: 50%;
+  top: 18%;
+  width: 17%;
+  transform: translateX(-50%);
+}
+
+/* the couple's own artwork, printed on the outside of the paper */
+.pe-has-art .pe-fold::after,
+.pe-has-art .pe-flap-out::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--pe-art) center / cover no-repeat;
+  opacity: calc(1 - var(--pe-art-scrim, 0));
+  pointer-events: none;
+}
+.pe-has-art .pe-flap-out::after {
+  bottom: auto;
+  height: calc(100% / 0.58);
+}
+
+/* ── z 1 · the card ─────────────────────────────────────────────────────── */
+.pe-card {
+  position: absolute;
+  left: 6.5%;
+  right: 6.5%;
+  top: 4.5%;
+  height: 90%;
+  transform: translate3d(0, 0, 1px);
+  transition: transform var(--pe-card-t, 1600ms) cubic-bezier(0.42, 0, 0.2, 1);
+}
+.pe-card-face {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 5% 9%;
+  border-radius: 0.12em;
+  text-align: center;
+  background:
+    linear-gradient(150deg, rgb(255 255 255 / 0.35), transparent 40%, rgb(120 90 60 / 0.06)),
+    url(/kit/paper-card.webp) 0 0 / 16em,
+    #fbf5ea;
+  background-blend-mode: normal, overlay, normal;
+  box-shadow:
+    inset 0.03em 0.03em 0 rgb(255 255 255 / 0.8),
+    inset -0.03em -0.04em 0 rgb(170 140 100 / 0.3),
+    0.03em 0.05em 0 #e2d4bd,
+    0.08em 0.14em 0.3em rgb(60 30 30 / 0.2);
+  transition: box-shadow var(--pe-card-t, 1600ms) ease;
+}
+.pe-card-face::after {
+  content: "";
+  position: absolute;
+  inset: 0.55em;
+  border: 1px solid rgb(201 169 110 / 0.55);
+  border-radius: 0.06em;
+  pointer-events: none;
+}
+.pe-card-crest { width: calc(34% * var(--orn-crest-scale, 1)); height: auto; margin-inline: auto; }
+.pe-card-title {
+  margin: 0.1em 0 0;
+  font-family: var(--f-heading), "Khmer OS Muol Light", serif;
+  font-size: 0.86em;
+  line-height: 2;
+  color: rgb(var(--c-primary-rgb));
+}
+.pe-card .pe-card-names { width: 50%; }
+.pe-card-lead {
+  margin: 0.3em 0 0;
+  font-size: 0.64em;
+  line-height: 1.9;
+  color: rgb(var(--gold-1-rgb));
+}
+/* drawn out by hand: up, a little to the side, a degree and a half of turn;
+   in the air its shadow is longer and softer */
+.pe-card-out .pe-card { transform: translate3d(1.5%, -98%, 1px) rotate(-1.4deg); }
+.pe-card-out .pe-card-face {
+  box-shadow:
+    inset 0.03em 0.03em 0 rgb(255 255 255 / 0.8),
+    inset -0.03em -0.04em 0 rgb(170 140 100 / 0.3),
+    0.03em 0.05em 0 #e2d4bd,
+    0.35em 0.6em 1.1em rgb(30 10 15 / 0.32);
+}
+/* then toward the camera — real depth, so the perspective does the scaling */
+.pe-lowered .pe-card {
+  transform: translate3d(0, -58%, 400px) rotate(0deg);
+  transition: transform var(--pe-near-t, 1300ms) cubic-bezier(0.45, 0, 0.2, 1);
+}
+
+/* ── z 6 · the seal ─────────────────────────────────────────────────────── */
+.pe-seal,
+.pe-seal-shadow {
+  position: absolute;
+  left: 50%;
+  top: 51%;
+  width: 20%;
+  aspect-ratio: 1;
+}
+.pe-seal {
+  transform: translate3d(-50%, -50%, 6px);
+  transition: transform var(--pe-press-t, 300ms) cubic-bezier(0.3, 0, 0.2, 1);
+}
+.pe-wax {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.pe-wax svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.pe-wax-text {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--f-heading), "Khmer OS Muol Light", serif;
+  font-size: 1.05em;
+  line-height: 1.9;
+  color: #8a6733;
+  /* pressed in: shade toward the light, a lit lip away from it */
+  text-shadow: -0.03em -0.03em 0 rgb(60 40 15 / 0.55), 0.03em 0.03em 0 rgb(255 240 210 / 0.55);
+}
+.pe-seal-shadow {
+  border-radius: 50%;
+  transform: translate3d(-47%, -45%, 5px) scale(0.98);
+  background: radial-gradient(closest-side, rgb(40 15 10 / 0.5), rgb(40 15 10 / 0.22) 72%, transparent);
+  filter: blur(0.07em);
+  transition: transform var(--pe-press-t, 300ms) ease, filter var(--pe-press-t, 300ms) ease;
+}
+/* pressed: the wax gives a fraction, the shadow tightens under it */
+.pe-pressed .pe-seal { transform: translate3d(-50%, -50%, 5.5px) scale(0.975); }
+.pe-pressed .pe-seal-shadow { transform: translate3d(-48.5%, -47.5%, 5px) scale(0.96); filter: blur(0.04em); }
+/* released, lifted, and carried away by hand — not shrunk, not faded on the
+   spot: it travels, and it only fades once it is off the envelope */
+.pe-lifted .pe-seal { animation: pe-seal-away var(--pe-lift-t, 930ms) cubic-bezier(0.4, 0, 0.3, 1) forwards; }
+.pe-lifted .pe-seal-shadow { animation: pe-seal-shadow-away var(--pe-lift-t, 930ms) cubic-bezier(0.4, 0, 0.3, 1) forwards; }
+@keyframes pe-seal-away {
+  0%   { transform: translate3d(-50%, -50%, 5.5px) scale(0.975); opacity: 1; }
+  12%  { transform: translate3d(-50%, -51%, 9px) scale(1); opacity: 1; }
+  30%  { transform: translate3d(-49%, -60%, 46px) rotate(-2deg); opacity: 1; }
+  82%  { transform: translate3d(230%, -230%, 150px) rotate(-11deg); opacity: 1; }
+  100% { transform: translate3d(330%, -290%, 170px) rotate(-13deg); opacity: 0; }
+}
+@keyframes pe-seal-shadow-away {
+  0%   { transform: translate3d(-48.5%, -47.5%, 5px) scale(0.96); filter: blur(0.04em); opacity: 1; }
+  12%  { transform: translate3d(-46%, -44%, 5px) scale(1.02); filter: blur(0.12em); opacity: 0.9; }
+  30%  { transform: translate3d(-38%, -34%, 5px) scale(1.12); filter: blur(0.4em); opacity: 0.55; }
+  60%  { transform: translate3d(10%, -60%, 5px) scale(1.2); filter: blur(0.8em); opacity: 0; }
+  100% { opacity: 0; }
+}
+
+/* ── The set: dusk, a heading, and light type ──────────────────────────── */
+.room-dusk {
+  position: absolute;
+  inset: 0;
+  /*
+   * Burgundy in layers rather than one disc. A warm, muted wine field; a
+   * faint dusty-mauve lift where the envelope stands; the floor falling into
+   * brown-burgundy below; deep wine at the edges. Every layer is a wide
+   * ellipse with a long falloff, so none of them shows its own edge.
+   */
+  background:
+    radial-gradient(70% 52% at 50% 48%, rgb(132 86 98 / 0.42), rgb(132 86 98 / 0) 100%),
+    radial-gradient(130% 70% at 50% 108%, rgb(36 16 18 / 0.75), rgb(36 16 18 / 0) 70%),
+    radial-gradient(150% 115% at 50% 42%, #5e2b38 0%, #4a1f2b 42%, #2e1119 78%, #1d0a10 100%);
+}
+.room-dusk-photo {
+  inset: -48px;
+  background:
+    linear-gradient(rgb(22 11 16 / 0.6), rgb(22 11 16 / 0.8)),
+    var(--room-photo) center / cover no-repeat;
+  filter: blur(14px) saturate(0.85);
+}
+.env-lite .room-dusk-photo { filter: blur(8px); }
+
+.env-heading {
+  margin-bottom: clamp(0.2rem, 1.2vh, 0.8rem);
+  padding-inline: 1rem;
+  text-align: center;
+  transition:
+    opacity 700ms ease-out,
+    transform 900ms cubic-bezier(0.4, 0, 0.5, 1);
+}
+.env-heading-gone {
+  opacity: 0;
+  transform: translate3d(0, -0.6rem, 0);
+}
+.env-heading-title {
+  margin: 0;
+  padding-top: 0.15em;
+  font-family: "Moul", var(--f-heading), serif;
+  font-weight: 400;
+  font-size: clamp(1.1rem, 5.6vw, 2rem);
+  line-height: 2.05;
+  color: #f1dfba;
+  text-shadow: 0 1px 0 rgb(0 0 0 / 0.35), 0 0 24px rgb(201 169 110 / 0.28);
+}
+.env-heading-sub {
+  margin: -0.35em 0 0;
+  font-family: "Pinyon Script", cursive;
+  font-size: clamp(1.1rem, 4.8vw, 1.7rem);
+  line-height: 1.5;
+  color: rgb(247 214 222 / 0.88);
+}
+.env-veil .env-address-lead { color: rgb(241 223 186 / 0.86); }
+.env-veil .env-address-name { color: #fbeff2; }
+.env-veil .env-hint { color: rgb(251 239 242 / 0.7); }
+.env-veil .env-skip { color: rgb(251 239 242 / 0.6); }
+.env-veil .env-skip:hover { color: rgb(251 239 242 / 0.95); }
+
+/* The dark beat: the card comes into it, the curtains come out of it. */
+.env-dusk {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  background: #0c0608;
+  opacity: 0;
+  pointer-events: none;
+  transition-property: opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
+}
+.env-dusk-on { opacity: 1; }
+
+/* a phone held sideways: pull the camera further back while the card is out,
+   so it never leaves the top of the frame */
+@media (max-height: 520px) and (orientation: landscape) {
+  .env-veil {
+    --pe-cam-card-y: 31%;
+    --pe-cam-card-s: 0.7;
+    --pe-cam-low-y: 24%;
+    --pe-cam-low-s: 0.74;
+  }
+}
+@media (max-height: 620px) {
+  .env-veil { --env-chrome: 190px; }
+  .env-heading-title { font-size: 1rem; line-height: 1.85; }
+  .env-heading-sub { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pe-body,
+  .pe-card,
+  .pe-flap,
+  .pe-seal,
+  .pe-flap-shade-wrap { transition-duration: 1ms !important; }
+  .pe-lifted .pe-seal,
+  .pe-lifted .pe-seal-shadow { animation-duration: 1ms !important; }
+  .pe-flap-out::before,
+  .pe-flap-in::before { transition-duration: 1ms !important; transition-delay: 0ms !important; }
+}
+
+/* ══ The couple-name mark ═════════════════════════════════════════════════ */
+.namelogo {
+  position: relative;
+  container-type: inline-size;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  color: var(--env-gold, rgb(var(--gold-frame-rgb)));
+}
+.namelogo-name {
+  position: absolute;
+  white-space: nowrap;
+  font-family: var(--nl-face, "Moulpali", "Moul", serif);
+  font-weight: 400;
+  font-size: 15cqw;
+  /* Khmer needs room above and below for vowels and subscripts. */
+  line-height: 1.9;
+  padding-block: 0.1em;
+  color: #b8935a;
+  text-shadow: 0 1px 0 rgb(255 255 255 / 0.35);
+}
+.namelogo-a { left: 3%; top: -6%; }
+.namelogo-b { right: 3%; bottom: -10%; }
+.namelogo-flourish {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.namelogo-line {
+  fill: none;
+  stroke: #c9a96e;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+.namelogo-line-fine { stroke-width: 0.9; opacity: 0.7; }
+.namelogo-heart {
+  position: absolute;
+  left: 50%;
+  top: 56%;
+  width: 7%;
+  translate: -50% -50%;
+  fill: #c98a98;
+}
+.namelogo-fly {
+  position: absolute;
+  right: 6%;
+  top: 2%;
+  width: 13%;
+  height: auto;
+  rotate: 14deg;
+}
+
+/* wait: hidden until the reveal, but only when JavaScript can run it */
+.js .namelogo-wait .namelogo-name { clip-path: inset(-45% 100% -45% -12%); }
+.js .namelogo-wait .namelogo-line { stroke-dashoffset: 1; }
+.js .namelogo-wait .namelogo-heart { scale: 0; }
+.js .namelogo-wait .namelogo-fly { opacity: 0; }
+
+/* play: names left to right, the flourish draws, the heart, the butterfly */
+.namelogo-play .namelogo-name {
+  animation: nl-write 780ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+.namelogo-play .namelogo-a { animation-delay: 150ms; }
+.namelogo-play .namelogo-b { animation-delay: 620ms; }
+.namelogo-play .namelogo-line {
+  animation: nl-draw 1000ms cubic-bezier(0.45, 0, 0.25, 1) 900ms both;
+}
+.namelogo-play .namelogo-line-fine { animation-delay: 1250ms; animation-duration: 700ms; }
+.namelogo-play .namelogo-heart {
+  animation: nl-heart 520ms cubic-bezier(0.34, 1.56, 0.64, 1) 1750ms both;
+}
+.namelogo-play .namelogo-fly {
+  animation: nl-fly 1300ms cubic-bezier(0.25, 0.7, 0.3, 1) 1950ms both;
+}
+/* The mask is bled far past the line box and taken off entirely at the end,
+   so no Khmer mark is ever left cut by it. */
+@keyframes nl-write {
+  0%   { clip-path: inset(-45% 100% -45% -12%); }
+  99%  { clip-path: inset(-45% -12% -45% -12%); }
+  100% { clip-path: none; }
+}
+@keyframes nl-draw {
+  from { stroke-dashoffset: 1; }
+  to   { stroke-dashoffset: 0; }
+}
+@keyframes nl-heart {
+  from { scale: 0; }
+  to   { scale: 1; }
+}
+@keyframes nl-fly {
+  0%   { opacity: 0; translate: 70% -90%; rotate: 40deg; }
+  55%  { opacity: 1; translate: -8% 6%; rotate: 6deg; }
+  78%  { translate: 4% -3%; rotate: 18deg; }
+  100% { opacity: 1; translate: 0 0; rotate: 14deg; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .namelogo-play .namelogo-name,
+  .namelogo-play .namelogo-line,
+  .namelogo-play .namelogo-heart,
+  .namelogo-play .namelogo-fly { animation-duration: 1ms !important; animation-delay: 0ms !important; }
+}
+
+/* ══ The cover ═══════════════════════════════════════════════════════════════
+ *
+ * Sized against the cover's own box with container units, so the whole
+ * composition fits one screen on a 1280×800 desktop and still balances on a
+ * short phone held sideways — nothing here reads the viewport.
+ */
+.cover-shell {
+  container-type: size;
+  padding: 3cqh 7%;
+}
+.cv {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  /* wide enough to breathe on a desktop card, never past the frame */
+  max-width: min(40rem, 90cqw);
+}
+/* The pack's heart-loop crest is wide and low, so it is sized wider than the
+   old one to stand at about the same height. */
+.cv-crest {
+  width: calc(clamp(104px, 26cqh, 240px) * var(--orn-crest-scale, 1));
+  height: auto;
+}
+.cv-title {
+  margin: 0.2cqh 0 0;
+  font-family: var(--f-heading), "Khmer OS Muol Light", serif;
+  font-weight: 400;
+  font-size: clamp(0.95rem, min(5.4cqw, 4.4cqh), 2rem);
+  line-height: 2.05;
+  color: rgb(var(--c-primary-rgb));
+}
+.cv-names {
+  width: min(80cqw, 40cqh, 360px);
+  margin: 0.4cqh 0 1.6cqh;
+}
+.cv-lead {
+  margin: 0;
+  font-size: clamp(0.74rem, 2.4cqh, 1.08rem);
+  line-height: 1.9;
+  color: rgb(var(--gold-1-rgb));
+}
+.cv-guest {
+  max-width: 94%;
+  margin: 0 0 1.4cqh;
+  font-family: var(--f-heading), "Khmer OS Muol Light", serif;
+  font-size: clamp(0.9rem, min(5cqw, 3.9cqh), 1.75rem);
+  line-height: 1.95;
+  color: rgb(var(--c-primary-rgb));
+}
+.cv-guest-latin {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.cv-date {
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  margin: 0;
+  border-block: 1px solid rgb(var(--gold-frame-rgb) / 0.5);
+}
+.cv-date-cell {
+  padding: 0.3cqh clamp(0.55rem, 3cqw, 1.2rem);
+  text-align: center;
+}
+.cv-date-cell + .cv-date-cell { border-left: 1px solid rgb(var(--gold-frame-rgb) / 0.45); }
+.cv-date-label {
+  font-size: clamp(0.6rem, 1.8cqh, 0.86rem);
+  line-height: 1.8;
+  color: rgb(var(--gold-1-rgb));
+}
+.cv-date-value {
+  margin: 0;
+  font-family: var(--f-heading), "Khmer OS Muol Light", serif;
+  font-size: clamp(0.8rem, min(3.8cqw, 3.4cqh), 1.4rem);
+  line-height: 2;
+  color: rgb(var(--c-primary-rgb));
+}
+.cv-time,
+.cv-venue {
+  margin: 0;
+  font-size: clamp(0.7rem, 2.3cqh, 1.05rem);
+  line-height: 1.9;
+  color: rgb(var(--c-text-rgb) / 0.85);
+}
+.cv-time { margin-top: 1.2cqh; }
+.cv-open { margin-top: 2.6cqh; }
+
+/*
+ * A large card (a desktop, a tablet): the cover was sized for a phone and sat
+ * small in the middle of a wide sheet. Here the composition grows with the
+ * card and the gaps between its parts open up, so it fills the frame with the
+ * same proportions instead of leaving a band of empty paper around it. Phones
+ * never match this and keep the layout above.
+ */
+@container (min-height: 380px) and (min-width: 520px) {
+  .cv-title { margin-top: 1.6cqh; font-size: clamp(1.1rem, min(5cqw, 4.9cqh), 2.1rem); }
+  .cv-names { width: min(72cqw, 52cqh, 520px); margin: 1.4cqh 0 2.6cqh; }
+  .cv-lead { font-size: clamp(0.8rem, 2.6cqh, 1.15rem); }
+  .cv-guest { margin-bottom: 2.6cqh; font-size: clamp(1rem, min(5cqw, 4.2cqh), 1.85rem); }
+  .cv-date-cell { padding-inline: clamp(0.8rem, 3.4cqw, 1.6rem); }
+  .cv-date-label { font-size: clamp(0.65rem, 2cqh, 0.92rem); }
+  .cv-date-value { font-size: clamp(0.9rem, min(4cqw, 3.9cqh), 1.5rem); }
+  .cv-time, .cv-venue { font-size: clamp(0.8rem, 2.6cqh, 1.12rem); }
+  .cv-time { margin-top: 2.2cqh; }
+  .cv-open { margin-top: 4cqh; }
+}
+
+/* With the couple's photograph behind it, the writing turns light. */
+.cover-photo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    linear-gradient(180deg, rgb(20 10 14 / 0.62) 0%, rgb(20 10 14 / 0.4) 42%, rgb(20 10 14 / 0.74) 100%),
+    var(--cover-photo) center / cover no-repeat;
+}
+.cover-on-photo .cv-title,
+.cover-on-photo .cv-guest,
+.cover-on-photo .cv-date-value { color: #fbf1f3; text-shadow: 0 1px 8px rgb(0 0 0 / 0.45); }
+.cover-on-photo .cv-lead,
+.cover-on-photo .cv-date-label { color: #ecd9b0; }
+.cover-on-photo .cv-time,
+.cover-on-photo .cv-venue { color: rgb(251 241 243 / 0.9); }
+.cover-on-photo .namelogo-name { color: #ecd9b0; text-shadow: 0 1px 8px rgb(0 0 0 / 0.5); }
+
+/* A short screen: the crest goes before anything that carries information. */
+@container (max-height: 420px) {
+  .cv-crest { display: none; }
+}
+
+/*
+ * A short landscape screen — a phone held sideways.
+ *
+ * The frame's ornament is sized from the card's *width*, and on a 740×360
+ * phone that gave the head and foot bands more than half the height between
+ * them, leaving the cover too little room to show its own button. Capping the
+ * artwork's width caps its height with it, so the ornament stays in the
+ * corners at a size the screen can afford.
+ */
+@media (max-height: 520px) and (orientation: landscape) {
+  .frame-edge > :not(.frame-join) {
+    max-width: 13%;
+  }
+  .frame-edge-band > * {
+    max-width: 30%;
+  }
+}
+
+/* Very short covers lay out in two columns: the names on the left, and who it
+   is for, when, and the button on the right. */
+@container (max-height: 300px) {
+  .cv {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-auto-flow: dense;
+    column-gap: 5cqw;
+    align-items: center;
+    max-width: 46rem;
+  }
+  .cv > * { grid-column: 2; justify-self: center; }
+  .cv-title { grid-column: 1; grid-row: 1 / 3; align-self: end; }
+  .cv-names { grid-column: 1; grid-row: 3 / 7; width: min(42cqw, 70cqh, 320px); align-self: start; }
+  .cv-lead { font-size: 0.72rem; line-height: 1.7; }
+  .cv-guest { margin-bottom: 0.6rem; font-size: 0.92rem; line-height: 1.8; }
+  .cv-date-label { font-size: 0.58rem; line-height: 1.6; }
+  .cv-date-value { font-size: 0.8rem; line-height: 1.8; }
+  .cv-time, .cv-venue { display: none; }
+  .cv-open { margin-top: 0.7rem; min-height: 40px; padding-block: 0.4rem; }
+}
+/* On a dark photograph the dark button needs an edge to stand on. */
+.cover-on-photo .cv-open { box-shadow: 0 0 0 1px rgb(236 217 176 / 0.75), 0 8px 22px -10px rgb(0 0 0 / 0.6); }
+
+/* ══ The couple's vintage flourish pack ═════════════════════════════════════
+ *
+ * `Flourish` (Ornaments.tsx): one ornament from their sheet, its shape taken
+ * from the file through a mask and its metal from the theme's gold ramp, so
+ * every ornament on the card is struck from the same foil and a theme change
+ * recolours them all. Transparent wherever the ornament is not.
+ */
+.flourish {
+  display: block;
+  flex-shrink: 0;
+  height: auto;
+  background: linear-gradient(
+    100deg,
+    var(--gold-1) 0%,
+    var(--gold-2) 24%,
+    var(--gold-3) 44%,
+    var(--gold-2) 62%,
+    var(--gold-1) 84%,
+    var(--gold-2) 100%
+  );
+  -webkit-mask: var(--fl) center / contain no-repeat;
+  mask: var(--fl) center / contain no-repeat;
+}
+
+/*
+ * Dividers open outward from their centre as their section comes into view,
+ * the way a rule is drawn. Only where the page's own reveal is running; with
+ * no script, or reduced motion, they are simply printed.
+ */
+.js .reveal .flourish-draw,
+.js .reveal.flourish-draw {
+  clip-path: inset(0 50% 0 50%);
+  transition: clip-path 1100ms cubic-bezier(0.33, 0, 0.2, 1) 200ms;
+}
+.js .reveal.is-visible .flourish-draw,
+.js .reveal.is-visible.flourish-draw {
+  clip-path: inset(0 0 0 0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .js .reveal .flourish-draw,
+  .js .reveal.flourish-draw {
+    clip-path: none;
+    transition: none;
+  }
+}
+
+/* The scrolled end of the pack's long rule, where the name mark's line begins.
+   Only at the start: at the far end the line runs into the bride's name, and
+   a scroll there would sit on her vowel signs. */
+.namelogo-tip {
+  position: absolute;
+  width: 9%;
+}
+.namelogo-tip-a { left: 2%; top: 44%; }
+.js .namelogo-wait .namelogo-tip { opacity: 0; }
+.namelogo-play .namelogo-tip {
+  animation: nl-tip 700ms ease-out both;
+}
+.namelogo-play .namelogo-tip-a { animation-delay: 1000ms; }
+@keyframes nl-tip {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .namelogo-play .namelogo-tip { animation-duration: 1ms !important; animation-delay: 0ms !important; }
+}
+
+/* The pack's medallion on the envelope's flap, under the couple's initials. */
+.pe-flap-flourish {
+  position: absolute;
+  left: 50%;
+  /* percentages of the flap, which is 58% of the envelope: between the
+     names and the seal */
+  top: 53%;
+  width: 8%;
+  transform: translateX(-50%);
+  opacity: 0.92;
+}
+
+/* ══ The couple's name mark, foil-stamped on the envelope flap ══════════════
+ *
+ * The same `NameLogo` as the card and the cover. Sized to the flap's upper
+ * triangle (percentages of the flap: the envelope's width, 58% of its height),
+ * clear of the gold border above and the medallion and seal below.
+ *
+ * Foil: the names take a champagne-gold ramp through the glyphs
+ * (`background-clip: text`) — darker gold at the ends, a soft catchlight
+ * across the middle — and a hair of relief: a lit lip below, a shadow above,
+ * as a die pressed into the paper leaves them. The line box keeps the
+ * component's own padding and 1.9 line height, so the gradient covers every
+ * vowel sign and subscript and clips none of them.
+ */
+.pe-flap-names {
+  position: absolute;
+  left: 50%;
+  /* the groom's name sits high in the mark and its vowel signs rise above
+     the box, so the mark starts well below the flap's gold border */
+  top: 12%;
+  width: 30%;
+  transform: translateX(-50%);
+}
+.pe-flap-logo .namelogo-name {
+  color: transparent;
+  background: linear-gradient(
+    104deg,
+    #8f7140 0%,
+    #b8955c 22%,
+    #e9d6ac 44%,
+    #c9a96e 58%,
+    #9c7c45 80%,
+    #b8955c 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  text-shadow: none;
+  filter:
+    drop-shadow(0 0.6px 0 rgb(255 251 240 / 0.75))
+    drop-shadow(0 -0.4px 0 rgb(96 70 38 / 0.35));
+}
+.pe-flap-logo .namelogo-line { stroke: #b8955c; }
+.pe-flap-logo .namelogo-line-fine { opacity: 0.6; }
+.pe-flap-logo .namelogo-tip,
+.pe-flap-logo .namelogo-fly { filter: saturate(0.85); }
+
+/* The heart between the bride and the groom: it beats once as it comes in. */
+.js .reveal.is-visible .couple-heart {
+  animation: couple-heart 1100ms cubic-bezier(0.34, 1.56, 0.64, 1) 250ms both;
+}
+@keyframes couple-heart {
+  0%   { transform: scale(0.6); }
+  45%  { transform: scale(1.12); }
+  70%  { transform: scale(0.96); }
+  100% { transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .js .reveal.is-visible .couple-heart { animation: none; }
+}
+
+/* Under the smaller initials monogram the medallion sits higher and larger. */
+.pe-flap-flourish.pe-flap-flourish-mono {
+  top: 46%;
+  width: 10%;
+}
+
+/* ══ Paper themes ════════════════════════════════════════════════════════════
+ *
+ * A real sheet, in layers (PaperSurface):
+ *
+ *   tone     the paper's colour, lit softly from the upper left and falling
+ *            off a touch towards the edges;
+ *   leaf ·   the flowers, printed in three colours — leaves, petals, and
+ *   petal ·  each flower's heart — with a watercolour density (the pigment
+ *   heart    pooling at the edges, uneven across the sheet);
+ *   foil     the kbach struck in metal: a gold ramp with bright bands in it;
+ *   sheen    with motion on, a highlight now and then crossing the foil;
+ *   relief   the emboss of everything — kbach, flowers, blind ornament — as
+ *            light and shade around mid grey, blended with `overlay`, so it
+ *            presses into any paper colour and shades the foil like metal
+ *            and each petal as a cupped petal;
+ *   fibre    a cotton sheet's mottle, fibres and grain, also `overlay`.
+ *
+ * Every paper is now a composition rather than a tile: the generated CSS
+ * (paperThemes.ts, "the stationery suites") points each plate's mask at the
+ * drawings placed in that paper's corners, so the middle stays clear.
+ *
+ * The same variables are read by the swatches in the settings panel, so a
+ * swatch is a small piece of the real paper rather than a picture of it.
+ */
+[data-paper-theme] {
+  --pp-size: 460px;
+  --pp-centre: 0.1;
+  --pp-relief: 0.95;
+  --pp-fibre: 0.55;
+  --pp-bloom: 0.62;
+}
+/* Each paper's own colours, pattern and size come from src/lib/paperThemes.ts
+   (thirty papers, from paper-themes.json), injected by ThemeStyle. */
+
+/* the couple's own picture keeps the paper it had; every other theme replaces it */
+html:not([data-paper-theme="couple"]) .card-stock {
+  background: var(--pp-base, var(--c-bg)) !important;
+}
+html:not([data-paper-theme="couple"]) .card-stock::before { display: none; }
+html[data-paper-theme="couple"] .paper-surface,
+html:not([data-paper-theme]) .paper-surface { display: none; }
+
+.paper-surface,
+.paper-surface > span {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.paper-surface { z-index: 0; overflow: hidden; border-radius: inherit; isolation: isolate; }
+
+.ps-tone {
+  background:
+    radial-gradient(120% 90% at 22% 6%, var(--pp-light), transparent 58%),
+    radial-gradient(150% 120% at 50% 46%, transparent 50%, var(--pp-shade) 100%),
+    var(--pp-base);
+}
+
+/* where the words are, the ornament steps back */
+.ps-foil,
+.ps-kline,
+.ps-line,
+.ps-sheen,
+.ps-relief,
+.ps-leaf,
+.ps-petal,
+.ps-heart {
+  --pp-quiet: radial-gradient(64% 58% at 50% 48%, rgb(0 0 0 / var(--pp-centre)) 28%, #000 100%);
+}
+.ps-foil {
+  -webkit-mask: var(--pp-foil-img) 0 0 / var(--pp-size) var(--pp-size) repeat, var(--pp-quiet);
+  -webkit-mask-composite: source-in;
+  mask: var(--pp-foil-img) 0 0 / var(--pp-size) var(--pp-size) repeat, var(--pp-quiet);
+  mask-composite: intersect;
+}
+.ps-sheen {
+  -webkit-mask: var(--pp-kline-img) 0 0 / var(--pp-size) var(--pp-size) repeat, var(--pp-quiet);
+  -webkit-mask-composite: source-in;
+  mask: var(--pp-kline-img) 0 0 / var(--pp-size) var(--pp-size) repeat, var(--pp-quiet);
+  mask-composite: intersect;
+}
+/* the flowers, in their three colours */
+.ps-leaf,
+.ps-petal,
+.ps-heart {
+  opacity: var(--pp-bloom);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+.ps-leaf {
+  background: var(--pp-leaf);
+  -webkit-mask: var(--pp-leaf-img) 0 0 / var(--pp-size) var(--pp-size) repeat, var(--pp-quiet);
+  mask: var(--pp-leaf-img) 0 0 / var(--pp-size) var(--pp-size) repeat, var(--pp-quiet);
+}
+.ps-petal {
+  background: var(--pp-petal);
+  -webkit-mask: var(--pp-petal-img) 0 0 / var(--pp-size) var(--pp-size) repeat, var(--pp-quiet);
+  mask: var(--pp-petal-img) 0 0 / var(--pp-size) var(--pp-size) repeat, var(--pp-quiet);
+}
+.ps-heart {
+  background: var(--pp-heart);
+  -webkit-mask: var(--pp-heart-img) 0 0 / var(--pp-size) var(--pp-size) repeat, var(--pp-quiet);
+  mask: var(--pp-heart-img) 0 0 / var(--pp-size) var(--pp-size) repeat, var(--pp-quiet);
+}
+/* -webkit-mask shorthand resets the composite, so set it again after */
+.ps-leaf, .ps-petal, .ps-heart { -webkit-mask-composite: source-in; mask-composite: intersect; }
+
+/* metal: a gold ramp with bright bands in it, wider than the sheet, so the
+   foil reads as polished rather than painted */
+.ps-foil {
+  background: linear-gradient(
+    122deg,
+    var(--pp-metal-0) 0%, var(--pp-metal-1) 14%, var(--pp-metal-2) 22%, var(--pp-metal-1) 31%,
+    var(--pp-metal-3) 46%, var(--pp-metal-1) 60%, var(--pp-metal-2) 70%, var(--pp-metal-1) 79%,
+    var(--pp-metal-0) 100%
+  );
+  opacity: var(--pp-foil);
+}
+/* The printed line work (scripts/kbach-paper.py, "engraving"): the kbach
+   drawn in gold line, as a Khmer draughtsman draws it, and the flowers as a
+   botanical engraving — outline, hatching, veins — in the paper's own ink. */
+.ps-kline {
+  background: linear-gradient(
+    122deg,
+    var(--pp-metal-0) 0%, var(--pp-metal-3) 18%, var(--pp-metal-1) 30%, var(--pp-metal-0) 46%,
+    var(--pp-metal-3) 62%, var(--pp-metal-1) 74%, var(--pp-metal-0) 100%
+  );
+  opacity: var(--pp-kline, 0.9);
+  -webkit-mask: var(--pp-kline-img) 0 0 / var(--pp-size) var(--pp-size) repeat, var(--pp-quiet);
+  mask: var(--pp-kline-img) 0 0 / var(--pp-size) var(--pp-size) repeat, var(--pp-quiet);
+}
+.ps-line {
+  background: var(--pp-line, #4a3527);
+  opacity: var(--pp-line-a, 0.8);
+  -webkit-mask: var(--pp-line-img) 0 0 / var(--pp-size) var(--pp-size) repeat, var(--pp-quiet);
+  mask: var(--pp-line-img) 0 0 / var(--pp-size) var(--pp-size) repeat, var(--pp-quiet);
+}
+.ps-kline, .ps-line { -webkit-mask-composite: source-in; mask-composite: intersect; }
+
+/* a highlight crossing the foil now and then; only with motion on */
+.ps-sheen {
+  background: linear-gradient(112deg, transparent 40%, rgb(255 252 238 / 0.95) 50%, transparent 60%) no-repeat;
+  background-size: 260% 100%;
+  background-position: 140% 0;
+  opacity: 0;
+  mix-blend-mode: screen;
+}
+html[data-fx]:not([data-fx="none"]) .ps-sheen {
+  opacity: calc(var(--pp-kline, 0.9) * 0.85);
+  animation: ps-sheen 11s cubic-bezier(0.45, 0, 0.3, 1) 2s infinite;
+}
+@keyframes ps-sheen {
+  0%, 55% { background-position: 140% 0; }
+  85%, 100% { background-position: -40% 0; }
+}
+.ps-relief {
+  background: var(--pp-relief-img) 0 0 / var(--pp-size) var(--pp-size) repeat;
+  mix-blend-mode: overlay;
+  opacity: var(--pp-relief);
+  -webkit-mask: radial-gradient(64% 58% at 50% 48%, rgb(0 0 0 / calc(var(--pp-centre) + 0.25)) 28%, #000 100%);
+  mask: radial-gradient(64% 58% at 50% 48%, rgb(0 0 0 / calc(var(--pp-centre) + 0.25)) 28%, #000 100%);
+}
+.ps-fibre {
+  background:
+    url(/paper/paper-cotton-fine.webp) 0 0 / 512px 512px repeat,
+    url(/paper/paper-cotton-fine.webp) 211px 337px / 731px 731px repeat;
+  mix-blend-mode: overlay;
+  opacity: var(--pp-fibre);
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-fx]:not([data-fx="none"]) .ps-sheen { animation: none; opacity: 0; }
+}
+
+
+/* ── Dark papers (Deep Burgundy, Midnight Angkor): printed light on dark ── */
+html[data-paper-dark] .card-stock {
+  --c-text: #f1e2d3; --c-text-rgb: 241 226 211;
+  --c-primary: #f6e7cc; --c-primary-rgb: 246 231 204;
+  --c-bg: #5a2431; --c-bg-rgb: 90 36 49;
+  --gold-deep: #c4a066; --gold-deep-rgb: 196 160 102;
+  --gold-1: #d6b678; --gold-1-rgb: 214 182 120;
+  --gold-2: #e5cb93; --gold-3: #f2deb0; --gold-3-rgb: 242 222 176;
+  --gold-lite: #f7ebcd;
+  /* The light washes behind sections (bg-cream, bg-beige) were fixed hex
+     colours, so on this paper they printed as a pale band across the date
+     section and the blessing. Redefined here as the paper's own lifted wine,
+     they read as light falling on the sheet instead. */
+  --c-cream-rgb: 104 42 56;
+  --c-beige-rgb: 128 58 70;
+  color: var(--c-text);
+}
+
+html[data-paper-dark] .card-stock .btn-gold {
+  color: #2a1418;
+  background: linear-gradient(110deg, #c8a466, #ecd39f 50%, #c8a466);
+}
+html[data-paper-dark] .card-stock .card-panel {
+  background: rgb(255 236 220 / 0.07);
+}
+html[data-paper-dark] .card-stock .field {
+  background: rgb(255 240 228 / 0.1);
+  color: var(--c-text);
+}
+html[data-paper-dark] .card-stock .namelogo-name { color: #e2c48c; text-shadow: none; }
+
+/* ══ The live layer ══════════════════════════════════════════════════════════
+ *
+ * Above the paper, below every word and control, never in the way of a tap.
+ * Transform and opacity only; no blur on anything large. Which pieces show is
+ * decided by `data-fx` on <html>; how many there are by `data-fx-level`
+ * (`CardFx` renders them).
+ */
+.card-fx {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.card-fx > * { position: absolute; pointer-events: none; }
+/* the old motes are the new gold dust now */
+.card-stock .mote,
+.card-stock .paper-sheen { display: none; }
+
+/* the canvas the live layer draws on (fxEngine.ts) */
+.fx-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+/* Metallic shimmer: a slow highlight that crosses two corners and the crest
+   now and then — never all at once, never continuous. */
+html[data-fx="glow"] .frame-corner-tl,
+html[data-fx="full"] .frame-corner-tl,
+html[data-fx="glow"] .frame-corner-br,
+html[data-fx="full"] .frame-corner-br,
+html[data-fx="glow"] .cv-crest,
+html[data-fx="full"] .cv-crest { position: relative; }
+html[data-fx="glow"] .frame-corner-tl::after,
+html[data-fx="full"] .frame-corner-tl::after,
+html[data-fx="glow"] .frame-corner-br::after,
+html[data-fx="full"] .frame-corner-br::after,
+html[data-fx="glow"] .cv-crest::after,
+html[data-fx="full"] .cv-crest::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 38%, rgb(255 250 232 / 0.95) 50%, transparent 62%) no-repeat;
+  background-size: 300% 100%;
+  background-position: 130% 0;
+  animation: fx-shimmer 12s ease-in-out infinite;
+}
+html[data-fx] .frame-corner-tl::after,
+html[data-fx] .frame-corner-br::after {
+  -webkit-mask: var(--frame-art) 0 0 / 100% 100% no-repeat;
+  mask: var(--frame-art) 0 0 / 100% 100% no-repeat;
+}
+html[data-fx] .frame-corner-br::after { animation-delay: 6s; }
+html[data-fx] .cv-crest::after { animation-delay: 3s; }
+@keyframes fx-shimmer {
+  0%, 72%  { background-position: 130% 0; }
+  90%, 100% { background-position: -30% 0; }
+}
+
+/* ══ Appearance settings (guest) ════════════════════════════════════════════
+ * A small round button opposite the music button, and a compact panel: a
+ * bottom sheet on a phone, a card above the button on a larger screen. The
+ * panel keeps its own light colours whatever paper is chosen, so it always
+ * reads.
+ */
+.ap-trigger {
+  position: fixed;
+  left: 1rem;
+  bottom: 1.25rem;
+  z-index: 45;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 9999px;
+  border: 1px solid rgb(var(--gold-frame-rgb) / 0.45);
+  background: rgb(251 248 242 / 0.9);
+  color: #8a6a3a;
+  box-shadow: 0 8px 22px -12px rgb(74 53 39 / 0.6);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  transition: transform 300ms ease;
+}
+.ap-trigger:hover { transform: scale(1.06); }
+.ap-trigger:focus-visible { outline: 2px solid #b8955c; outline-offset: 3px; }
+.ap-trigger svg { width: 1.3rem; height: 1.3rem; }
+@media (min-width: 640px) { .ap-trigger { left: 1.5rem; bottom: 1.75rem; } }
+
+.ap-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 46;
+  background: rgb(30 18 12 / 0.18);
+  cursor: default;
+}
+.ap-panel {
+  position: fixed;
+  z-index: 47;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  max-height: min(82dvh, 640px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 1rem 1rem 1.1rem;
+  border-radius: 1.1rem;
+  border: 1px solid rgb(184 149 92 / 0.35);
+  background: #fbf8f2;
+  color: #4a3a2c;
+  box-shadow: 0 24px 60px -20px rgb(40 24 14 / 0.55);
+  font-size: 0.86rem;
+  line-height: 1.7;
+}
+@media (min-width: 640px) {
+  .ap-panel { left: 1.5rem; right: auto; bottom: 5rem; width: 400px; }
+}
+.ap-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.4rem; }
+.ap-title { margin: 0; font-family: var(--f-heading), "Khmer OS Muol Light", serif; font-size: 1.05rem; line-height: 1.9; color: #5a4128; }
+.ap-sub, .ap-legend span, .ap-option small, .ap-swatch-label small, .ap-segment small, .ap-note small, .ap-reset span {
+  font-family: "Cormorant Garamond", serif;
+  color: #8a7660;
+}
+.ap-sub { margin: -0.4rem 0 0; font-size: 0.85rem; }
+.ap-close {
+  display: grid; place-items: center;
+  width: 2.5rem; height: 2.5rem; margin: -0.3rem -0.3rem 0 0;
+  border-radius: 9999px; font-size: 1.5rem; line-height: 1; color: #7a6248;
+}
+.ap-close:hover { background: rgb(184 149 92 / 0.12); }
+.ap-group { margin: 0.75rem 0 0; padding: 0; border: 0; min-width: 0; }
+.ap-group:disabled { opacity: 0.5; }
+.ap-legend { margin-bottom: 0.4rem; padding: 0; font-weight: 600; color: #5a4128; }
+.ap-legend span { font-weight: 400; }
+
+.ap-swatches { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
+.ap-swatch { position: relative; display: block; cursor: pointer; }
+.ap-swatch input, .ap-option input, .ap-segment input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.ap-swatch-paper {
+  position: relative;
+  display: block;
+  height: 3.4rem;
+  overflow: hidden;
+  border-radius: 0.6rem;
+  border: 1px solid rgb(184 149 92 / 0.3);
+  --pp-size: 120px;
+}
+.ap-swatch-paper > span { position: absolute; inset: 0; }
+.ap-swatch-label { display: block; margin-top: 0.2rem; font-size: 0.72rem; line-height: 1.5; text-align: center; }
+.ap-swatch-label small { display: block; font-size: 0.72rem; }
+.ap-swatch input:checked + .ap-swatch-paper { border-color: #a8833f; box-shadow: 0 0 0 2px #fbf8f2, 0 0 0 4px #b8955c; }
+.ap-swatch input:focus-visible + .ap-swatch-paper { outline: 2px solid #8a6a3a; outline-offset: 4px; }
+
+/* eleven animations: two columns, the Khmer name over the English */
+.ap-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.35rem; }
+.ap-option { position: relative; display: block; cursor: pointer; }
+.ap-option > span {
+  display: flex; flex-direction: column; justify-content: center; gap: 0;
+  min-height: 2.9rem; height: 100%; padding: 0.4rem 0.7rem; line-height: 1.5;
+  border-radius: 0.7rem; border: 1px solid rgb(184 149 92 / 0.28); background: #fff;
+}
+.ap-option small { font-size: 0.72rem; color: #8a7a66; }
+.ap-option input:checked + span { border-color: #b8955c; background: rgb(232 214 178 / 0.35); box-shadow: inset 0 0 0 1px #b8955c; }
+.ap-option input:focus-visible + span { outline: 2px solid #8a6a3a; outline-offset: 2px; }
+
+.ap-segments { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.35rem; }
+.ap-segment { position: relative; display: block; cursor: pointer; }
+.ap-segment > span {
+  display: block; min-height: 2.75rem; padding: 0.35rem 0.4rem; text-align: center;
+  border-radius: 0.7rem; border: 1px solid rgb(184 149 92 / 0.28); background: #fff; line-height: 1.5;
+}
+.ap-segment small { display: block; font-size: 0.75rem; }
+.ap-segment input:checked + span { border-color: #b8955c; background: rgb(232 214 178 / 0.35); box-shadow: inset 0 0 0 1px #b8955c; }
+.ap-segment input:focus-visible + span { outline: 2px solid #8a6a3a; outline-offset: 2px; }
+
+.ap-note { margin: 0.5rem 0 0; font-size: 0.76rem; color: #6d5a44; }
+.ap-note small { display: block; }
+.ap-reset {
+  display: block; width: 100%; min-height: 2.75rem; margin-top: 0.9rem;
+  border-radius: 9999px; border: 1px solid rgb(184 149 92 / 0.5); color: #6b4e2c; background: transparent;
+}
+.ap-reset:hover { background: rgb(184 149 92 / 0.1); }
+.ap-reset:focus-visible { outline: 2px solid #8a6a3a; outline-offset: 2px; }
+
+/* ══ The card fills the screen ══════════════════════════════════════════════
+ *
+ * The invitation is the whole screen at every size: no margin of stage around
+ * it, no cap on its width, no rounded corners floating it on a mount. Below
+ * 1280px that is the entire window; from 1280px the details and controls
+ * rails sit either side (they carry the guest's QR code and RSVP status) and
+ * the card fills everything between them, edge to edge and top to bottom.
+ *
+ * Nothing here scales the card's content: the cover sizes itself against its
+ * own box (container units, below), the sections keep their reading
+ * measures, and the paper's ornament is a fixed-size tile, so a wider sheet
+ * simply shows more of it, never a stretched one.
+ */
+.card-sheet { width: 100%; max-width: none; }
+
+@media (min-width: 1280px) {
+  .stage-grid {
+    display: grid;
+    grid-template-columns: minmax(212px, 15%) minmax(0, 1fr) minmax(212px, 15%);
+  }
+}
+
+/* ── The cover on a large sheet ──────────────────────────────────────────
+ * Each part grows on its own terms rather than by one factor: the couple's
+ * names most (they are the focal point), the heading a little, the date and
+ * the details only enough to keep their weight, and the gaps between the
+ * groups open up. The column stays a reading measure, centred, never the full
+ * width of a wide sheet.
+ */
+@container (min-height: 380px) and (min-width: 520px) {
+  .cv { max-width: min(44rem, 86cqw); }
+  .cv-names { width: min(72cqw, 54cqh, 560px); }
+}
+@container (min-height: 560px) and (min-width: 680px) {
+  .cv { max-width: min(48rem, 80cqw); }
+  .cv-crest { width: calc(clamp(150px, 24cqh, 260px) * var(--orn-crest-scale, 1)); }
+  .cv-title { margin-top: 1.4cqh; font-size: clamp(1.4rem, min(4cqw, 4.6cqh), 2.45rem); }
+  .cv-names { width: min(64cqw, 58cqh, 640px); margin: 1.2cqh 0 2.8cqh; }
+  .cv-lead { font-size: clamp(0.9rem, 2.4cqh, 1.2rem); }
+  .cv-guest { font-size: clamp(1.1rem, min(3.4cqw, 4cqh), 1.95rem); }
+  .cv-date-cell { padding-inline: clamp(1.1rem, 3cqw, 2.2rem); }
+  .cv-date-label { font-size: clamp(0.72rem, 1.8cqh, 0.95rem); }
+  .cv-date-value { font-size: clamp(1rem, min(3cqw, 3.6cqh), 1.6rem); }
+  .cv-time, .cv-venue { font-size: clamp(0.85rem, 2.3cqh, 1.15rem); }
+  .cv-open { margin-top: 4.4cqh; min-width: 240px; }
+}
+
+/*
+ * A phone held sideways (the two-column cover): the time and the venue used
+ * to be dropped here for want of height. The right-hand column now has the
+ * width to keep them, small, between the date and the button.
+ */
+@container (max-height: 300px) and (min-width: 560px) {
+  .cv-time, .cv-venue { display: block; font-size: 0.68rem; line-height: 1.75; }
+  .cv-time { margin-top: 0.3rem; }
+  .cv-open { margin-top: 0.5rem; }
+}
+
+/* ── The cover on a wide sheet ───────────────────────────────────────────
+ * On a large sheet the frame's corners are tall (their size follows the
+ * card's width), and the head and foot bands they sit in reserved a third of
+ * the height while the paper between the corners stood empty, so the cover's
+ * composition was squeezed into the middle band. Here the closed cover rises
+ * into the bands — between the corners, never under them: its column is held
+ * narrower than the gap the corners leave, and it stops short of the hairline
+ * and fleuron that join them (`--band-keep`, from CardShell). The opened
+ * invitation keeps the structural frame; only the cover does this.
+ */
+@media (min-width: 900px) and (min-height: 560px) {
+  .card-sheet[data-bands] .cover-root {
+    top: calc(var(--band-top) * (var(--band-keep) - 1));
+    bottom: calc(var(--band-bottom) * (var(--band-keep) - 1));
+  }
+  /* the shell keeps its 7% side padding (its content box is 86% of the
+     sheet), so the gap between the corners, less a margin, is
+     100/0.86 cqw − 2 × corner − 2.5rem */
+  .card-sheet[data-bands] .cover-root .cv {
+    max-width: min(48rem, calc(116.28cqw - 2 * var(--corner-w, 0px) - 2.5rem));
+  }
+  /* a cover photograph stays in the panel between the bands, as before, so
+     it never paints over the gold corners */
+  .card-sheet[data-bands] .cover-root .cover-photo {
+    top: calc(var(--band-top) * (1 - var(--band-keep)));
+    bottom: calc(var(--band-bottom) * (1 - var(--band-keep)));
+  }
+}
+
+/* ══ The wedding day section ════════════════════════════════════════════════
+ * A pool of warm light behind the date instead of a flat band, the date and
+ * the countdown figures struck in foil (a gold ramp clipped to the letters,
+ * with room left below for Khmer subscripts), and the countdown cells as small
+ * glazed tablets with a gold hairline and a lit top edge. Every colour comes
+ * from the theme's gold and paper, so the same rules read on ivory and on
+ * burgundy.
+ */
+/* Light falling on the sheet, not a band across it: one soft pool that has
+   faded to nothing well inside the section's box, so the paper runs through
+   the section without an edge. (The flat wash that used to sit here, and the
+   section's own SVG pattern, both stopped at the section's edges.) */
+.section-glow {
+  background: radial-gradient(closest-side, rgb(var(--gold-3-rgb) / 0.16), rgb(var(--gold-3-rgb) / 0.06) 55%, transparent 100%);
+}
+/* With a paper theme the paper is the pattern: the old per-section pattern
+   would print a second, differently scaled one in a box. With the couple's
+   own picture it stays, faded out at the top and bottom. */
+html[data-paper-theme]:not([data-paper-theme="couple"]) .section-pattern { display: none; }
+.section-pattern {
+  -webkit-mask: linear-gradient(180deg, transparent, #000 22%, #000 78%, transparent);
+  mask: linear-gradient(180deg, transparent, #000 22%, #000 78%, transparent);
+}
+.foil-text {
+  background: linear-gradient(176deg, var(--gold-lite, #f7ebcd) 0%, var(--gold-3) 22%, var(--gold-1) 52%, var(--gold-deep) 72%, var(--gold-2) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 1px 0 rgb(255 250 236 / 0.55)) drop-shadow(0 -0.5px 0 rgb(80 52 22 / 0.25));
+}
+.date-eyebrow { letter-spacing: 0; }
+.cd-cell {
+  position: relative;
+  background: linear-gradient(165deg, rgb(255 255 255 / 0.62), rgb(255 252 244 / 0.22));
+  box-shadow:
+    inset 0 0 0 1px rgb(var(--gold-frame-rgb) / 0.55),
+    inset 0 1px 0 rgb(255 255 255 / 0.9),
+    0 10px 24px -16px rgb(74 53 39 / 0.55);
+}
+.cd-label { color: rgb(var(--gold-1-rgb)); }
+
+html[data-paper-dark] .card-stock .section-glow {
+  background: radial-gradient(closest-side, rgb(240 196 140 / 0.12), rgb(240 196 140 / 0.04) 55%, transparent 100%);
+}
+html[data-paper-dark] .card-stock .foil-text {
+  filter: drop-shadow(0 1px 0 rgb(20 4 8 / 0.6)) drop-shadow(0 0 10px rgb(240 200 140 / 0.18));
+}
+html[data-paper-dark] .card-stock .cd-cell {
+  background: linear-gradient(165deg, rgb(255 226 196 / 0.11), rgb(24 4 10 / 0.3));
+  box-shadow:
+    inset 0 0 0 1px rgb(214 182 120 / 0.55),
+    inset 0 1px 0 rgb(255 228 190 / 0.28),
+    0 14px 28px -16px rgb(0 0 0 / 0.7);
+}
+
+/* The envelope room's live layer: above the room's air and vignette, below
+   the envelope, never in the way of a tap. */
+.room-fx { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+
+/* ══ The logo's butterfly (Butterfly.tsx) ═══════════════════════════════════
+ * Two wings that fold in 3D about the body, and a body; the component writes
+ * the wing angle, the flight offset, the turn and the height as properties.
+ */
+.bf {
+  display: block;
+  aspect-ratio: 100 / 80;
+  height: auto;
+}
+.bf-flight {
+  position: absolute;
+  inset: 0;
+  perspective: 160px;
+  transform:
+    translate(var(--bf-tx, 0%), var(--bf-ty, 0%))
+    rotate(var(--bf-rot, 0deg))
+    scale(calc(1 + var(--bf-alt, 0) * 0.14));
+  /* the shadow on the paper, further and softer as it lifts off */
+  filter: drop-shadow(
+    calc(0.6px + var(--bf-alt, 0) * 7px) calc(1px + var(--bf-alt, 0) * 11px) calc(0.6px + var(--bf-alt, 0) * 3px)
+    rgb(70 46 22 / calc(0.32 - var(--bf-alt, 0) * 0.14))
+  );
+  will-change: transform;
+}
+.bf-wing {
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  filter: brightness(calc(1 - var(--bf-shade, 0)));
+}
+.bf-wing img { display: block; width: 100%; height: 100%; }
+.bf-wing-r { left: 50%; transform-origin: 0 50%; transform: rotateY(calc(var(--bf-wing, 18deg) * -1)); }
+.bf-wing-l { left: 0; transform-origin: 100% 50%; transform: rotateY(var(--bf-wing, 18deg)); }
+.bf-wing-l img { transform: scaleX(-1); }
+.bf-body { position: absolute; left: 35%; top: 12.5%; width: 30%; height: 60%; }
+
+/* the paper picker, in its three families */
+.ap-swatch-group + .ap-swatch-group { margin-top: 0.9rem; }
+.ap-swatch-group-title { margin: 0 0 0.4rem; font-size: 0.8rem; line-height: 1.6; color: #6b5a45; }
+.ap-swatch-group-title span { color: #a08f78; font-size: 0.72rem; }
+.ap-swatch-paper { background-color: #f4efe6; }
+
+/* The envelope's room in the chosen paper's own colour (when the couple keep
+   "match the envelope to the paper" on): the same layered dusk as the
+   burgundy room, built from four shades of the paper's hue (--room-0…3, from
+   paperThemes.ts), so an ivory card opens out of a warm cocoa room, a blush
+   card out of deep rose, a night card out of the night. */
+.room-synced .room-dusk {
+  background:
+    radial-gradient(70% 52% at 50% 48%, color-mix(in srgb, var(--room-0, #845662) 46%, transparent), transparent 100%),
+    radial-gradient(130% 70% at 50% 108%, color-mix(in srgb, var(--room-3, #241012) 78%, transparent), transparent 70%),
+    radial-gradient(150% 115% at 50% 42%, var(--room-0, #5e2b38) 0%, var(--room-1, #4a1f2b) 42%, var(--room-2, #2e1119) 78%, var(--room-3, #1d0a10) 100%);
+}
+.room-synced .room-vignette {
+  background: radial-gradient(120% 86% at 50% 46%, transparent 48%, color-mix(in srgb, var(--room-3, #14040b) 36%, transparent) 78%, color-mix(in srgb, var(--room-3, #0e0408) 66%, transparent) 100%);
+}
+
+/* A generated design kit's mark pressed into the seal, and its medallion
+   foil-stamped on the flap: the kit's own art (--orn-mark / --orn-medallion,
+   from ThemeStyle) used as a mask, so it takes the wax's and the foil's
+   colour. */
+.pe-wax-mark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 46%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -46%);
+  background: linear-gradient(135deg, rgb(70 46 18 / 0.75), rgb(140 104 52 / 0.65) 55%, rgb(250 232 196 / 0.55));
+  -webkit-mask: var(--orn-mark) center / contain no-repeat;
+  mask: var(--orn-mark) center / contain no-repeat;
+  filter: drop-shadow(0.6px 0.8px 0 rgb(255 240 210 / 0.55)) drop-shadow(-0.5px -0.6px 0 rgb(60 40 15 / 0.45));
+}
+.pe-flap-kitmark {
+  display: block;
+  aspect-ratio: var(--orn-medallion-ar, 2);
+  width: 12%;
+  background: linear-gradient(110deg, var(--env-gold-deep, #7d6236), var(--env-gold-light, #e8cf9c) 45%, var(--env-gold, #b18b4a) 70%, var(--env-gold-deep, #7d6236));
+  -webkit-mask: var(--orn-medallion) center / contain no-repeat;
+  mask: var(--orn-medallion) center / contain no-repeat;
+}
+
+/* ══ The stationery suites: their frame ═══════════════════════════════════════
+ *
+ * A composed paper (paperThemes.ts, "the stationery suites") brings its own
+ * frame: four corners, each its own drawing — mirrored inside the SVG, so no
+ * transform touches the element — and a fine double rule running between
+ * them along every side. The corners sit in the frame's head and foot bands
+ * exactly where the frame's own artwork would; CardShell measures the one on
+ * show into --corner-w, and the rules and the printed drawings are placed
+ * from that, so they meet the corners at any size.
+ *
+ * Shown only while a suite's paper is chosen (the generated CSS turns them on).
+ */
+.bt-frame,
+.bt-border { display: none; }
+
+.card-sheet {
+  /* the corner's height, and the inset of the inner rule */
+  --bt-ch: calc(var(--corner-w, 100px) / var(--bt-arn, 1));
+  --bt-in: calc(var(--corner-w, 100px) * var(--bt-inr, 0.095));
+}
+
+.bt-corner {
+  flex-shrink: 0;
+  width: var(--bt-cw, 18%);
+  aspect-ratio: var(--bt-ar, 1);
+  background: var(--bt-paint, var(--bt-m) center / 100% 100% no-repeat);
+  -webkit-mask: var(--bt-m) center / 100% 100% no-repeat;
+  mask: var(--bt-m) center / 100% 100% no-repeat;
+}
+/* foil is pressed, so it has an edge: a hair of light below, of shade above */
+.frame-edge.has-bt {
+  filter: drop-shadow(0 0.6px 0 rgb(255 251 240 / 0.7)) drop-shadow(0 -0.4px 0 rgb(96 70 38 / 0.28));
+}
+html[data-paper-dark] .frame-edge.has-bt {
+  filter: drop-shadow(0 0.6px 0 rgb(0 0 0 / 0.35)) drop-shadow(0 -0.4px 0 rgb(255 236 200 / 0.18));
+}
+.bt-tl { --bt-m: var(--bt-m-tl); }
+.bt-tr { --bt-m: var(--bt-m-tr); }
+.bt-bl { --bt-m: var(--bt-m-bl); }
+.bt-br { --bt-m: var(--bt-m-br); }
+
+/* the double rule: outer and inner, along each side between the corners;
+   the head and foot runs part in the middle where a suite sets a medallion */
+.bt-border {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  pointer-events: none;
+  --o: calc(var(--corner-w, 100px) * var(--bt-ro, 0.055));
+  --i: calc(var(--corner-w, 100px) * var(--bt-ri, 0.09));
+  --wo: max(1px, calc(var(--corner-w, 100px) * 0.0075));
+  --wi: max(0.6px, calc(var(--corner-w, 100px) * 0.0045));
+  --cw: var(--corner-w, 100px);
+  --mw: calc(var(--corner-w, 100px) * 0.62);
+  --run-v: calc(100% - 2 * var(--bt-ch));
+  --run-h: calc((100% - 2 * var(--cw) - var(--mw) * var(--bt-gap, 0) - 8px * var(--bt-gap, 0)) / 2 + 0.5px);
+  --g: linear-gradient(var(--pp-metal-1), var(--pp-metal-1));
+  background:
+    var(--g) left var(--o) top var(--bt-ch) / var(--wo) var(--run-v) no-repeat,
+    var(--g) right var(--o) top var(--bt-ch) / var(--wo) var(--run-v) no-repeat,
+    var(--g) left var(--i) top var(--bt-ch) / var(--wi) var(--run-v) no-repeat,
+    var(--g) right var(--i) top var(--bt-ch) / var(--wi) var(--run-v) no-repeat,
+    var(--g) left var(--cw) top var(--o) / var(--run-h) var(--wo) no-repeat,
+    var(--g) right var(--cw) top var(--o) / var(--run-h) var(--wo) no-repeat,
+    var(--g) left var(--cw) top var(--i) / var(--run-h) var(--wi) no-repeat,
+    var(--g) right var(--cw) top var(--i) / var(--run-h) var(--wi) no-repeat,
+    var(--g) left var(--cw) bottom var(--o) / var(--run-h) var(--wo) no-repeat,
+    var(--g) right var(--cw) bottom var(--o) / var(--run-h) var(--wo) no-repeat,
+    var(--g) left var(--cw) bottom var(--i) / var(--run-h) var(--wi) no-repeat,
+    var(--g) right var(--cw) bottom var(--i) / var(--run-h) var(--wi) no-repeat;
+}
+.bt-border::before,
+.bt-border::after {
+  content: "";
+  display: var(--bt-mid, none);
+  position: absolute;
+  left: 50%;
+  width: var(--mw);
+  aspect-ratio: 149.2 / 79.7;
+  background: var(--bt-paint);
+  translate: -50% -50%;
+}
+.bt-border::before {
+  top: calc((var(--o) + var(--i)) / 2);
+  -webkit-mask: url(/art/stationery/mid-top.svg) center / 100% 100% no-repeat;
+  mask: url(/art/stationery/mid-top.svg) center / 100% 100% no-repeat;
+}
+.bt-border::after {
+  top: calc(100% - (var(--o) + var(--i)) / 2);
+  -webkit-mask: url(/art/stationery/mid-bottom.svg) center / 100% 100% no-repeat;
+  mask: url(/art/stationery/mid-bottom.svg) center / 100% 100% no-repeat;
 }

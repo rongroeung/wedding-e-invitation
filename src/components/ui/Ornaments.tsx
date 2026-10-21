@@ -4,10 +4,75 @@
  * they inherit the theme colour so the admin palette applies everywhere.
  */
 import type { CSSProperties } from "react";
+import { DESIGN_KITS, type OrnamentRole } from "@/lib/designKit";
 
 type Props = { className?: string; style?: CSSProperties };
 
-/** Stylised lotus bud (ផ្កាឈូក) used as a repeating accent. */
+/**
+ * One ornament of the active design kit, by the job it does on the card.
+ *
+ * The component never knows which kit is in use: `ThemeStyle` publishes the
+ * file and proportions for every role (`--orn-<role>`, see `lib/designKit`),
+ * and this draws whatever is there. The fallbacks are the default kit, so a
+ * page without the theme (the 404) still has its ornaments.
+ *
+ * Drawn through a CSS mask: the file supplies the shape and the theme's gold
+ * ramp is the metal, so a change of theme recolours every ornament together,
+ * and the box is transparent wherever the ornament is not. `draw` makes it
+ * open outward from its centre when its section is revealed.
+ */
+export function Flourish({
+  role,
+  className = "",
+  style,
+  draw = false,
+}: {
+  role: OrnamentRole;
+  className?: string;
+  style?: CSSProperties;
+  draw?: boolean;
+}) {
+  const art = DESIGN_KITS["vintage-flourish"].ornaments[role];
+  return (
+    <span
+      className={`flourish ${draw ? "flourish-draw" : ""} ${className}`}
+      style={
+        {
+          aspectRatio: `var(--orn-${role}-ar, ${art.w} / ${art.h})`,
+          "--fl": `var(--orn-${role}, url(${art.src}))`,
+          ...style,
+        } as CSSProperties
+      }
+      aria-hidden="true"
+    />
+  );
+}
+
+/** A section divider: one ornament of the kit, centred, at a width that suits its job. */
+export function FlourishDivider({
+  role = "title",
+  width = 150,
+  className = "",
+}: {
+  role?: OrnamentRole;
+  /** Width in px at full size; it never exceeds the column. */
+  width?: number;
+  className?: string;
+}) {
+  return (
+    <Flourish
+      role={role}
+      draw
+      className={`mx-auto ${className}`}
+      style={{ width: `min(calc(${width}px * var(--orn-${role}-scale, 1)), 86%)` }}
+    />
+  );
+}
+
+/**
+ * Stylised lotus bud. Kept only so older imports compile; nothing on the
+ * invitation draws it any more (the couple asked for no lotus anywhere).
+ */
 export function Lotus({ className = "h-6 w-6", style }: Props) {
   return (
     <svg viewBox="0 0 100 100" className={className} style={style} aria-hidden="true" fill="currentColor">
@@ -56,20 +121,19 @@ export function CornerOrnament({
   );
 }
 
-/** Horizontal gold divider with a lotus at its centre. */
+/** Horizontal gold divider with a small diamond at its centre. */
 export function GoldDivider({
   className = "",
   width = "max-w-xs",
-  icon = "lotus",
+  icon = "diamond",
 }: {
   className?: string;
   width?: string;
-  icon?: "lotus" | "diamond" | "none";
+  icon?: "diamond" | "none";
 }) {
   return (
     <div className={`mx-auto flex w-full items-center justify-center gap-3 ${width} ${className}`}>
       <span className="gold-line h-px flex-1" />
-      {icon === "lotus" && <Lotus className="h-5 w-5 shrink-0 text-gold-dark" />}
       {icon === "diamond" && (
         <span className="h-2 w-2 rotate-45 bg-gold-dark" aria-hidden="true" />
       )}
@@ -78,24 +142,41 @@ export function GoldDivider({
   );
 }
 
-/** Two interlocking rings — used above the couple’s names. */
-export function WeddingRings({ className = "h-10 w-16" }: Props) {
+/**
+ * A heart in the card's gold: the shape of the heart in the couple's name
+ * mark, struck in the same foil as every other ornament on the page — the
+ * theme's gold ramp (`--gold-1` … `--gold-3`), on the same diagonal as the
+ * `Flourish` ornaments — so it follows the theme like they do.
+ */
+export function Heart({ className = "h-8 w-8" }: Props) {
   return (
-    <svg viewBox="0 0 120 70" className={className} aria-hidden="true" fill="none" stroke="currentColor">
-      <circle cx="46" cy="40" r="22" strokeWidth="2.2" />
-      <circle cx="74" cy="40" r="22" strokeWidth="2.2" opacity=".85" />
-      <path d="M60 12l4 7h-8l4-7Z" fill="currentColor" stroke="none" />
+    <svg viewBox="0 0 24 22" className={className} aria-hidden="true">
+      <defs>
+        <linearGradient id="heart-foil" x1="0" y1="0" x2="1" y2="0.35">
+          <stop offset="0" style={{ stopColor: "var(--gold-1)" }} />
+          <stop offset="0.24" style={{ stopColor: "var(--gold-2)" }} />
+          <stop offset="0.44" style={{ stopColor: "var(--gold-3)" }} />
+          <stop offset="0.62" style={{ stopColor: "var(--gold-2)" }} />
+          <stop offset="0.84" style={{ stopColor: "var(--gold-1)" }} />
+          <stop offset="1" style={{ stopColor: "var(--gold-2)" }} />
+        </linearGradient>
+      </defs>
+      <path
+        d="M12 20.6C6.2 16.2 2 12.6 2 8.1 2 5 4.4 2.6 7.3 2.6c1.9 0 3.6 1 4.7 2.6 1.1-1.6 2.8-2.6 4.7-2.6C19.6 2.6 22 5 22 8.1c0 4.5-4.2 8.1-10 12.5z"
+        fill="url(#heart-foil)"
+      />
     </svg>
   );
 }
 
 /** Subtle full-bleed background pattern. */
-export function PatternBackground({ pattern = "lotus" }: { pattern?: string }) {
-  if (pattern === "none") return null;
+export function PatternBackground({ pattern = "none" }: { pattern?: string }) {
+  // "lotus" is no longer drawn (no lotus anywhere); a wedding still set to it shows none
+  if (pattern === "none" || pattern === "lotus") return null;
   const id = `pat-${pattern}`;
   return (
     <svg
-      className="pointer-events-none absolute inset-0 h-full w-full text-gold"
+      className="section-pattern pointer-events-none absolute inset-0 h-full w-full text-gold"
       aria-hidden="true"
       style={{ opacity: 0.09 }}
     >
@@ -108,15 +189,12 @@ export function PatternBackground({ pattern = "lotus" }: { pattern?: string }) {
         )}
         {pattern === "floral" && (
           <pattern id={id} width="90" height="90" patternUnits="userSpaceOnUse">
-            <path d="M45 22c6 10 10 16 10 23a10 10 0 1 1-20 0c0-7 4-13 10-23Z" fill="none" stroke="currentColor" strokeWidth=".9" />
-            <path d="M20 68c10-6 18-6 25-2M70 68c-10-6-18-6-25-2" fill="none" stroke="currentColor" strokeWidth=".8" />
-          </pattern>
-        )}
-        {pattern === "lotus" && (
-          <pattern id={id} width="110" height="110" patternUnits="userSpaceOnUse" patternTransform="rotate(8)">
-            <path d="M55 30c7 12 11 20 11 28a11 11 0 0 1-22 0c0-8 4-16 11-28Z" fill="none" stroke="currentColor" strokeWidth=".9" />
-            <path d="M33 44c-8 8-12 16-11 23 1 6 6 10 11 10 3 0 6-2 8-5-4-7-7-16-8-28Z" fill="none" stroke="currentColor" strokeWidth=".7" />
-            <path d="M77 44c8 8 12 16 11 23-1 6-6 10-11 10-3 0-6-2-8-5 4-7 7-16 8-28Z" fill="none" stroke="currentColor" strokeWidth=".7" />
+            {/* a small five-petalled blossom and a pair of leaves */}
+            {[0, 72, 144, 216, 288].map((a) => (
+              <ellipse key={a} cx="45" cy="38" rx="4.2" ry="6.4" transform={`rotate(${a} 45 45)`} fill="none" stroke="currentColor" strokeWidth=".8" />
+            ))}
+            <circle cx="45" cy="45" r="1.6" fill="currentColor" />
+            <path d="M20 72c8-6 15-6 22-2M70 72c-8-6-15-6-22-2" fill="none" stroke="currentColor" strokeWidth=".8" />
           </pattern>
         )}
       </defs>

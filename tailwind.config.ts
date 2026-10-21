@@ -18,8 +18,9 @@ const config: Config = {
         champagne: "rgb(var(--c-accent-rgb) / <alpha-value>)",
         ivory: "rgb(var(--c-bg-rgb) / <alpha-value>)",
         ink: "rgb(var(--c-text-rgb) / <alpha-value>)",
-        cream: "#FBF9F5",
-        beige: "#EDE7DC",
+        // the card's light washes; a dark paper (deep burgundy) redefines them
+        cream: "rgb(var(--c-cream-rgb, 251 249 245) / <alpha-value>)",
+        beige: "rgb(var(--c-beige-rgb, 237 231 220) / <alpha-value>)",
         brown: "#3B2C21",
         "gold-deep": "rgb(var(--gold-deep-rgb) / <alpha-value>)",
         "gold-dark": "rgb(var(--gold-1-rgb) / <alpha-value>)",

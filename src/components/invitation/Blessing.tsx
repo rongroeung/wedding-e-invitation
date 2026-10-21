@@ -1,21 +1,21 @@
 import type { Wedding } from "@/lib/db/schema";
-import { GoldDivider, Lotus, PatternBackground } from "@/components/ui/Ornaments";
+import { Flourish, FlourishDivider, PatternBackground } from "@/components/ui/Ornaments";
 
 /** Closing blessing (ពរជ័យ) and signature. */
 export function Blessing({ wedding }: { wedding: Wedding }) {
   return (
     <section id="blessing" className="relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-beige/45" />
+      <div className="section-glow absolute inset-0" aria-hidden="true" />
       <PatternBackground pattern={wedding.pattern} />
 
       <div className="section-pad relative mx-auto max-w-2xl text-center">
-        <Lotus className="reveal mx-auto h-8 w-8 animate-floaty text-gold-dark" />
+        <Flourish role="crest" className="reveal mx-auto max-w-[70%]" style={{ width: "calc(170px * var(--orn-crest-scale, 1))" }} />
 
         <p className="reveal mt-8 text-base leading-loose text-ink/92 khmer-wrap">
           {wedding.blessingThanks}
         </p>
 
-        <GoldDivider className="my-8" width="max-w-[180px]" />
+        <FlourishDivider role="rule" width={220} className="my-8" />
 
         <p className="reveal text-base leading-loose text-ink/92 khmer-wrap">
           {wedding.blessingWish}

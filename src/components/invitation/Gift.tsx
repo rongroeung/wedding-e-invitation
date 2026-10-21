@@ -2,7 +2,7 @@
 
 import type { Wedding } from "@/lib/db/schema";
 import { mediaSrc } from "@/lib/media";
-import { GoldDivider } from "@/components/ui/Ornaments";
+import { FlourishDivider } from "@/components/ui/Ornaments";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 
 /**
@@ -37,7 +37,7 @@ export function Gift({ wedding }: { wedding: Wedding }) {
 
           {wedding.giftAccountName && (
             <>
-              <GoldDivider className="my-4" width="max-w-[110px]" icon="none" />
+              <FlourishDivider role="medallion" width={84} className="my-4" />
               <p className="text-sm font-medium tracking-wide text-heading">
                 {wedding.giftAccountName}
               </p>

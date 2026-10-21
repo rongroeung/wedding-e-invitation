@@ -8,7 +8,7 @@ import {
   sealInitials,
   type EnvelopeStyleKey,
 } from "@/lib/envelope";
-import { Button, Card, Field, Input, MediaUpload, StatusMessage, Toggle, useApi } from "./ui";
+import { ArtworkField, Button, Card, Field, Input, MediaUpload, Select, StatusMessage, Toggle, useApi } from "./ui";
 import { videoSource } from "@/lib/video";
 
 /**
@@ -26,15 +26,19 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
     envelopePaper: wedding.envelopePaper,
     envelopeGold: wedding.envelopeGold,
     envelopeSeal: wedding.envelopeSeal,
+    envelopeFlapMark: wedding.envelopeFlapMark,
     envelopeSealText: wedding.envelopeSealText,
     envelopeAnimate: wedding.envelopeAnimate,
     envelopeDuration: wedding.envelopeDuration,
     envelopeMusic: wedding.envelopeMusic,
     envelopeSkip: wedding.envelopeSkip,
     envelopeEveryVisit: wedding.envelopeEveryVisit,
+    envelopeMatchPaper: wedding.envelopeMatchPaper,
     envelopeOpenLabel: wedding.envelopeOpenLabel,
     envelopeHint: wedding.envelopeHint,
     envelopeSkipLabel: wedding.envelopeSkipLabel,
+    envelopeTitle: wedding.envelopeTitle,
+    envelopeSubtitle: wedding.envelopeSubtitle,
 
     videoEnabled: wedding.videoEnabled,
     videoUrl: wedding.videoUrl,
@@ -44,6 +48,19 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
 
     frameEmboss: wedding.frameEmboss,
     frameDepth: wedding.frameDepth,
+
+    envelopeFaceMediaId: wedding.envelopeFaceMediaId,
+    envelopeFaceFit: wedding.envelopeFaceFit,
+    envelopeFaceScrim: wedding.envelopeFaceScrim,
+    envelopeFaceOrnament: wedding.envelopeFaceOrnament,
+
+    curtainMediaId: wedding.curtainMediaId,
+    curtainMediaKind: wedding.curtainMediaKind,
+    curtainPosterId: wedding.curtainPosterId,
+    curtainFit: wedding.curtainFit,
+    curtainFolds: wedding.curtainFolds,
+    curtainEnabled: wedding.curtainEnabled,
+    curtainShade: wedding.curtainShade,
   });
 
   const set = <K extends keyof typeof form>(key: K, value: (typeof form)[K]) =>
@@ -99,6 +116,14 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
       </Card>
 
       <Card title="រូបរាងសំបុត្រ" description="ជ្រើសរើសម៉ូដ រួចកែពណ៌បើចង់">
+        <div className="mb-5">
+          <Toggle
+            label="ពណ៌ស្រោមសំបុត្រតាមក្រដាសលិខិត"
+            hint="បើក = ស្រោមសំបុត្រ ត្រាក្រមួន និងផ្ទៃខាងក្រោយ ប្រើពណ៌តាមក្រដាសដែលបានជ្រើស (ក្រដាស និងចលនា) ដើម្បីឱ្យស្រោម និងលិខិតត្រូវគ្នា។ បិទ = ប្រើម៉ូដខាងក្រោម។"
+            checked={form.envelopeMatchPaper}
+            onChange={(v) => set("envelopeMatchPaper", v)}
+          />
+        </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {ENVELOPE_STYLE_LIST.map((style) => {
             const active = form.envelopeStyle === style.key;
@@ -184,6 +209,143 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
         </div>
       </Card>
 
+      <Card
+        title="រូបភាពផ្ទាល់ខ្លួនលើសំបុត្រ"
+        description="បញ្ចូលរូបភាពរបស់អ្នក ដើម្បីបោះពុម្ពលើក្រដាសសំបុត្រ"
+      >
+        {/*
+          * What this does and does not do, said plainly, because the couple
+          * cannot see it from the field alone: the picture is *printed on the
+          * paper*. The envelope still splits down the middle and still slides
+          * apart, the seal still holds it shut, and the picture runs across
+          * both halves as one drawing — it is not a replacement for the
+          * envelope, it is what the envelope is made of.
+          */}
+        <ArtworkField
+          label="រូបភាពលើសំបុត្រ"
+          hint="រូបនឹងបោះពុម្ពពេញសំបុត្រ ហើយនៅតែបែកជាពីរផ្នែករអិលចេញដូចដើម។ ទំហំណែនាំ ១០០០ × ១២៨០ ភីកសែល (បញ្ឈរ)។"
+          mediaId={form.envelopeFaceMediaId}
+          onMedia={(id) => set("envelopeFaceMediaId", id)}
+          fit={form.envelopeFaceFit}
+          /* No "tile": this one is drawn as a single <image> inside the
+             envelope's SVG, and SVG has no repeating paint. */
+          fits={["cover", "contain", "stretch"]}
+          onFit={(fit) => set("envelopeFaceFit", fit)}
+          strength={form.envelopeFaceScrim}
+          onStrength={(value) => set("envelopeFaceScrim", value)}
+          strengthLabel={(value) => `កម្រិតពន្លឺក្រដាសលើរូប — ${value}%`}
+          strengthHint="បង្កើនបើអក្សរមាស ឬក្បាច់មើលមិនច្បាស់លើរូប"
+        >
+          <Toggle
+            label="រក្សាស៊ុមមាស និងក្បាច់ផុសលើរូប"
+            hint="បិទ បើចង់ឃើញរូបភាពសុទ្ធ គ្មានក្បាច់ពីលើ"
+            checked={form.envelopeFaceOrnament}
+            onChange={(v) => set("envelopeFaceOrnament", v)}
+          />
+        </ArtworkField>
+      </Card>
+
+      <Card
+        title="វាំងនន"
+        description="វាំងននដែលបើកចេញ បង្ហាញសំបុត្រ បន្ទាប់ពីស្រោមសំបុត្រ។ អាចបិទ ឬបញ្ចូលក្រណាត់ផ្ទាល់ខ្លួន"
+      >
+        <div className="space-y-4">
+          <Toggle
+            label="បង្ហាញវាំងនន"
+            hint="បិទ ដើម្បីបង្ហាញសំបុត្រភ្លាមៗ គ្មានវាំងននបើក"
+            checked={form.curtainEnabled}
+            onChange={(v) => set("curtainEnabled", v)}
+          />
+        </div>
+        {form.curtainEnabled && (
+        <div className="mt-6 space-y-4 border-t border-slate-100 pt-6">
+          <p className="text-sm font-medium text-slate-700">រូបភាព ឬវីដេអូលើវាំងនន</p>
+          <Field label="ប្រភេទ">
+            <Select
+              value={form.curtainMediaKind}
+              onChange={(e) => {
+                /* The two kinds are served by different elements, so switching
+                   has to clear the file as well as the label — otherwise a
+                   video id is handed to an <img> and the panel is blank. */
+                set("curtainMediaKind", e.target.value);
+                set("curtainMediaId", null);
+              }}
+            >
+              <option value="image">រូបភាព</option>
+              <option value="video">វីដេអូ (ចាក់វិលជុំ គ្មានសំឡេង)</option>
+            </Select>
+          </Field>
+
+          <ArtworkField
+            label={form.curtainMediaKind === "video" ? "វីដេអូវាំងនន" : "រូបភាពវាំងនន"}
+            kind={form.curtainMediaKind === "video" ? "video" : "image"}
+            hint={
+              form.curtainMediaKind === "video"
+                ? "វីដេអូចាក់វិលជុំ គ្មានសំឡេង។ លើទូរស័ព្ទដែលយឺត ប្រព័ន្ធនឹងបង្ហាញរូបគម្របជំនួស ដើម្បីកុំឱ្យទំព័រគាំង។"
+                : "រូបនឹងគ្របពេញឆាក ហើយវាំងននទាំងសងខាងនៅតែរួញបើកឆ្វេង-ស្ដាំដូចដើម។"
+            }
+            mediaId={form.curtainMediaId}
+            onMedia={(id) => set("curtainMediaId", id)}
+            fit={form.curtainFit}
+            onFit={(fit) => set("curtainFit", fit)}
+            strength={form.curtainShade}
+            onStrength={(value) => set("curtainShade", value)}
+            strengthLabel={(value) => `កម្រិតស្រមោលផ្នត់ — ${value}%`}
+            strengthHint="ស្រមោលផ្នត់ត្រូវបានលាយជាពន្លឺ មិនមែនគូរពីលើទេ ដូច្នេះពណ៌រូបរបស់អ្នកនៅដដែល"
+          >
+            <Toggle
+              label="ដាក់ស្រមោលផ្នត់វាំងននលើរូប"
+              hint="បិទ បើចង់ឃើញរូប ឬវីដេអូសុទ្ធ"
+              checked={form.curtainFolds}
+              onChange={(v) => set("curtainFolds", v)}
+            />
+            {form.curtainMediaKind === "video" && (
+              <MediaUpload
+                label="រូបគម្របវីដេអូ (បង្ហាញពេលកំពុងផ្ទុក ឬលើទូរស័ព្ទយឺត)"
+                kind="image"
+                currentSrc={form.curtainPosterId ? `/api/media/${form.curtainPosterId}` : undefined}
+                onUploaded={(id) => set("curtainPosterId", id)}
+                onClear={() => set("curtainPosterId", null)}
+              />
+            )}
+          </ArtworkField>
+        </div>
+        )}
+      </Card>
+
+      <Card
+        title="ក្បាច់លើគម្របស្រោមសំបុត្រ"
+        description="អ្វីដែលបោះពុម្ពជាមាសលើគម្របស្រោមសំបុត្រ"
+      >
+        <div className="grid gap-3 sm:grid-cols-2">
+          {[
+            { value: "namelogo", title: "ឡូហ្គោឈ្មោះ", text: "ឈ្មោះកូនប្រុស និងកូនស្រី ដូចនៅលើកាត និងគម្របសំបុត្រ" },
+            {
+              value: "monogram",
+              title: "អក្សរផ្ចិត (Monogram)",
+              text: wedding.monogram?.trim()
+                ? `អក្សរ «${wedding.monogram}» ពីព័ត៌មានអាពាហ៍ពិពាហ៍`
+                : "មិនទាន់មានអក្សរផ្ចិតទេ — សូមបញ្ចូលនៅទំព័រព័ត៌មានអាពាហ៍ពិពាហ៍។ បើទទេ នឹងបង្ហាញឡូហ្គោឈ្មោះ",
+            },
+          ].map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => set("envelopeFlapMark", option.value)}
+              className={`rounded-xl border p-4 text-left transition ${
+                form.envelopeFlapMark === option.value
+                  ? "border-amber-500 bg-amber-50/60 ring-1 ring-amber-300"
+                  : "border-slate-200 hover:border-amber-300"
+              }`}
+              aria-pressed={form.envelopeFlapMark === option.value}
+            >
+              <p className="text-sm font-medium text-slate-800">{option.title}</p>
+              <p className="mt-0.5 text-xs leading-relaxed text-slate-500">{option.text}</p>
+            </button>
+          ))}
+        </div>
+      </Card>
+
       <Card title="ត្រាបិទសំបុត្រ">
         <div className="space-y-4">
           <Toggle
@@ -209,7 +371,7 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
         <div className="space-y-5">
           <Field
             label={`រយៈពេលចលនា — ${(form.envelopeDuration / 1000).toFixed(1)} វិនាទី`}
-            hint="ចន្លោះ ១,៦ ដល់ ១៤ វិនាទី · រូបភាពពេញលេញប្រហែល ៩ វិនាទី"
+            hint="ចន្លោះ ១,៦ ដល់ ១៤ វិនាទី · ណែនាំ ៦ វិនាទី សម្រាប់ការបើកស្រោមសំបុត្រពេញលេញ"
           >
             <input
               type="range"
@@ -221,6 +383,23 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
               className="w-full accent-amber-600"
             />
           </Field>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="ចំណងជើងលើស្រោមសំបុត្រ" hint="ទទេ = មិនបង្ហាញ">
+              <Input
+                value={form.envelopeTitle}
+                onChange={(e) => set("envelopeTitle", e.target.value)}
+                maxLength={80}
+              />
+            </Field>
+            <Field label="អក្សរតុបតែងខាងក្រោម" hint="ឧ. The Wedding Invitation · ទទេ = មិនបង្ហាញ">
+              <Input
+                value={form.envelopeSubtitle}
+                onChange={(e) => set("envelopeSubtitle", e.target.value)}
+                maxLength={80}
+              />
+            </Field>
+          </div>
 
           <div className="grid gap-4 sm:grid-cols-3">
             <Field label="អក្សរលើប៊ូតុងបើក">

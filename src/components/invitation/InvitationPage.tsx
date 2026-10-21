@@ -23,6 +23,12 @@ import { PreWeddingVideo } from "./PreWeddingVideo";
 import { Program } from "./Program";
 import { Rsvp, type RsvpReply } from "./Rsvp";
 import { ShareBar } from "./ShareBar";
+import { cardBackdrop, curtainSkin } from "@/lib/artwork";
+import { appearanceDefaults } from "@/lib/appearance";
+import { AppearancePanel } from "./appearance/AppearancePanel";
+import { CardFx } from "./appearance/CardFx";
+
+import { CURTAIN_OPEN_MS } from "./Drape";
 import { VelvetCurtains } from "./VelvetCurtains";
 import { WeddingStage } from "./WeddingStage";
 import { Venue } from "./Venue";
@@ -164,16 +170,16 @@ export function InvitationPage({
    */
   /*
    * Fade once the parting has finished, and unmount once the fade has. Both
-   * numbers are read off the transitions they follow — the curtain's own
-   * 2300ms travel, then the 800ms fade below — so a change to either in the
-   * stylesheet has to be matched here. They are deliberately not `transitionend`
+   * numbers are read off what they follow — the curtain's own parting
+   * (`CURTAIN_OPEN_MS`, which includes the settle), then the 800ms fade in
+   * `.curtains-struck` — so a change to either has to be matched here. They are deliberately not `transitionend`
    * listeners: the panels are two elements with several animatable properties
    * between them, and a tab backgrounded mid-transition may never fire one.
    */
   useEffect(() => {
     if (!curtainsOpen) return;
-    const strike = setTimeout(() => setCurtainsStruck(true), 2400);
-    const clear = setTimeout(() => setCurtainsGone(true), 3300);
+    const strike = setTimeout(() => setCurtainsStruck(true), CURTAIN_OPEN_MS + 100);
+    const clear = setTimeout(() => setCurtainsGone(true), CURTAIN_OPEN_MS + 1000);
     return () => {
       clearTimeout(strike);
       clearTimeout(clear);
@@ -328,9 +334,12 @@ export function InvitationPage({
     <MusicPlayer src={musicSrc} title={wedding.musicTitle} autoStart={musicStart} inline />
   ) : null;
 
+  const appearance = appearanceDefaults(wedding);
+
   const card = (
     <CardShell
       frame={frame}
+      atmosphere={<CardFx defaults={appearance} rich={rich} />}
       scrollable={opened}
       cover={
         <Cover
@@ -350,8 +359,15 @@ export function InvitationPage({
         />
       }
       curtains={
-        curtainsGone || !velvetHung ? null : (
-          <VelvetCurtains open={curtainsOpen} struck={curtainsStruck} rich={rich} />
+        // Switched off in the dashboard: no velvet at all. Everything else
+        // (the cover's reveal, the stage lights) runs on the same cue as before.
+        !wedding.curtainEnabled || curtainsGone || !velvetHung ? null : (
+          <VelvetCurtains
+            open={curtainsOpen}
+            struck={curtainsStruck}
+            rich={rich}
+            skin={curtainSkin(wedding)}
+          />
         )
       }
       left={<EventDetailsRail wedding={wedding} />}
@@ -427,6 +443,11 @@ export function InvitationPage({
       <WeddingStage lit={curtainsOpen} rich={rich}>
         {card}
       </WeddingStage>
+      {/* The guest's appearance settings, once the invitation itself is in
+          view (never over the envelope), and only if the couple allow it. */}
+      {wedding.appearanceGuestPanel && envelopeDone && (
+        <AppearancePanel defaults={appearance} coupleSwatch={cardBackdrop(wedding)?.src ?? null} />
+      )}
       {/*
         * The film, mounted *before* the envelope so it is already there and
         * fully opaque when the envelope's veil dissolves onto it. This is the

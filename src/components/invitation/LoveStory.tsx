@@ -1,5 +1,5 @@
 import type { StoryItem } from "@/lib/db/schema";
-import { Lotus } from "@/components/ui/Ornaments";
+import { Flourish } from "@/components/ui/Ornaments";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 
 /**
@@ -29,7 +29,7 @@ export function LoveStory({ items }: { items: StoryItem[] }) {
                 className="absolute -left-9 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-ivory ring-1 ring-champagne"
                 aria-hidden="true"
               >
-                <Lotus className="h-3.5 w-3.5 text-gold-dark" />
+                <Flourish role="mark" className="w-3.5" />
               </span>
               <p className="gold-solid text-sm font-medium">{item.label}</p>
               <h3 className="mt-1 text-base leading-loose text-heading khmer-wrap">

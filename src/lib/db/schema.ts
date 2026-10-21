@@ -76,6 +76,8 @@ export const wedding = pgTable("wedding", {
    * font that no longer exists.
    */
   monogramFont: text("monogram_font").notNull().default("great-vibes"),
+  /** What is foil-stamped on the envelope flap: "namelogo" or "monogram". */
+  envelopeFlapMark: text("envelope_flap_mark").notNull().default("namelogo"),
   coverPhotoId: text("cover_photo_id"),
   coverPhotoUrl: text("cover_photo_url").notNull().default(""),
 
@@ -156,7 +158,9 @@ export const wedding = pgTable("wedding", {
   frameSource: text("frame_source").notNull().default("builtin"),
   /** Built-in frame: kbach (band art), royal | royal-light (corner art),
    *  lotus | flame | angkor | wheel (generated bands) */
-  frameMotif: text("frame_motif").notNull().default("kbach"),
+  frameMotif: text("frame_motif").notNull().default("flourish"),
+  /** The set of ornaments the whole invitation is decorated with (`lib/designKit`). */
+  designKit: text("design_kit").notNull().default("vintage-flourish"),
   /** How uploaded artwork is placed: "band" (head/foot) or "corner" (all four). */
   frameLayout: text("frame_layout").notNull().default("band"),
   /** Uploaded band artwork crowning the head of the card. */
@@ -190,16 +194,22 @@ export const wedding = pgTable("wedding", {
   envelopeSealText: text("envelope_seal_text").notNull().default(""),
   envelopeAnimate: boolean("envelope_animate").notNull().default(true),
   /** Length of the opening sequence, in milliseconds. */
-  envelopeDuration: integer("envelope_duration").notNull().default(2800),
+  envelopeDuration: integer("envelope_duration").notNull().default(6200),
   envelopeMusic: boolean("envelope_music").notNull().default(true),
   envelopeSkip: boolean("envelope_skip").notNull().default(true),
   /** Off: opened once, the envelope stays open for the rest of the visit. */
   envelopeEveryVisit: boolean("envelope_every_visit").notNull().default(false),
+  /** The envelope and its room in the chosen paper's colours. */
+  envelopeMatchPaper: boolean("envelope_match_paper").notNull().default(true),
   /* Wording on the envelope, so the couple can phrase the invitation to open
      it however they wish. */
   envelopeOpenLabel: text("envelope_open_label").notNull().default("បើកសំបុត្រអញ្ជើញ"),
   envelopeHint: text("envelope_hint").notNull().default("សូមចុចដើម្បីបើកសំបុត្រអញ្ជើញ"),
   envelopeSkipLabel: text("envelope_skip_label").notNull().default("រំលង"),
+  /* The heading on the set above the envelope, and the script line under it.
+     Empty hides either one. */
+  envelopeTitle: text("envelope_title").notNull().default("សិរីសួស្តីអាពាហ៍ពិពាហ៍"),
+  envelopeSubtitle: text("envelope_subtitle").notNull().default("The Wedding Invitation"),
 
   /* ── The pre-wedding film, played between the envelope and the curtains ──
      One beat, in the one place it belongs: the envelope has just been opened
@@ -216,6 +226,60 @@ export const wedding = pgTable("wedding", {
       between the envelope and the curtains undoes both of them. */
   videoPosterId: text("video_poster_id"),
   videoSkipLabel: text("video_skip_label").notNull().default("រំលងវីដេអូ"),
+
+  /*
+   * The couple's own artwork, on the four surfaces the app otherwise draws
+   * itself. All of it is optional and all of it defaults to "as before": an
+   * invitation that uploads nothing renders exactly what it rendered before
+   * any of these columns existed.
+   *
+   * The ids are nullable rather than empty strings, so "never set" and
+   * "cleared" stay distinguishable.
+   */
+
+  /* Printed on the envelope's paper, across both sliding panels. */
+  envelopeFaceMediaId: text("envelope_face_media_id"),
+  /** cover | contain | stretch */
+  envelopeFaceFit: text("envelope_face_fit").notNull().default("cover"),
+  /** How much paper colour is laid back over it, 0-100. */
+  envelopeFaceScrim: integer("envelope_face_scrim").notNull().default(0),
+  /** Whether the gilt frame and emboss are still struck over the picture. */
+  envelopeFaceOrnament: boolean("envelope_face_ornament").notNull().default(true),
+
+  /* Printed on the curtain panels, which still part and gather. */
+  curtainMediaId: text("curtain_media_id"),
+  /** image | video — video is allowed here and on no other surface. */
+  curtainMediaKind: text("curtain_media_kind").notNull().default("image"),
+  curtainPosterId: text("curtain_poster_id"),
+  /** cover | contain | tile */
+  curtainFit: text("curtain_fit").notNull().default("cover"),
+  /** Drape the drawn folds over it as shading rather than paint over it. */
+  curtainFolds: boolean("curtain_folds").notNull().default(true),
+  /** Whether the curtains hang across the invitation and part at all. */
+  curtainEnabled: boolean("curtain_enabled").notNull().default(true),
+  curtainShade: integer("curtain_shade").notNull().default(55),
+
+  /* Behind everything. */
+  pageBgMediaId: text("page_bg_media_id"),
+  /** cover | contain | tile */
+  pageBgFit: text("page_bg_fit").notNull().default("cover"),
+  pageBgScrim: integer("page_bg_scrim").notNull().default(0),
+  /** A built-in design (`lib/backgrounds`), used when nothing is uploaded. */
+  pageBgPreset: text("page_bg_preset").notNull().default(""),
+
+  /* The card's own paper. Its scrim defaults high: this one is under the
+     writing, and a photograph at full strength behind Khmer body text is an
+     invitation nobody can read. */
+  cardBgMediaId: text("card_bg_media_id"),
+  cardBgFit: text("card_bg_fit").notNull().default("cover"),
+  cardBgScrim: integer("card_bg_scrim").notNull().default(55),
+  cardBgPreset: text("card_bg_preset").notNull().default(""),
+  /* ── Appearance: the paper theme and the live layer (`lib/appearance`) ── */
+  appearancePaper: text("appearance_paper").notNull().default("classic-ivory"),
+  appearanceFx: text("appearance_fx").notNull().default("dust"),
+  appearanceLevel: text("appearance_level").notNull().default("medium"),
+  /** Whether guests see the small appearance-settings button. */
+  appearanceGuestPanel: boolean("appearance_guest_panel").notNull().default(true),
   /** Wording on the button that carries on to the invitation. */
 
   /* ── The gold frame as pressed foil rather than a flat picture ─────────

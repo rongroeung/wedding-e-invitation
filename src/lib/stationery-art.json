@@ -1,0 +1,100 @@
+{
+ "compositions": {
+  "camellia-spray": {
+   "w": 1000,
+   "h": 1000,
+   "plates": {
+    "bl": [
+     "petal",
+     "leaf",
+     "heart",
+     "line",
+     "foil"
+    ],
+    "br": [
+     "petal",
+     "leaf",
+     "heart",
+     "line",
+     "foil"
+    ]
+   }
+  },
+  "branch-hang": {
+   "w": 1000,
+   "h": 1000,
+   "plates": {
+    "tr": [
+     "petal",
+     "leaf",
+     "heart",
+     "line",
+     "foil"
+    ],
+    "tl": [
+     "petal",
+     "leaf",
+     "heart",
+     "line",
+     "foil"
+    ]
+   }
+  },
+  "camellia-single": {
+   "w": 600,
+   "h": 600,
+   "plates": {
+    "bl": [
+     "petal",
+     "leaf",
+     "heart",
+     "line",
+     "foil"
+    ],
+    "br": [
+     "petal",
+     "leaf",
+     "heart",
+     "line",
+     "foil"
+    ]
+   }
+  }
+ },
+ "ornaments": {
+  "crest": [
+   640,
+   220
+  ],
+  "divider-double": [
+   700,
+   70
+  ],
+  "divider-branch": [
+   460,
+   80
+  ],
+  "divider-scroll": [
+   "pack",
+   "scroll-diamond"
+  ],
+  "divider-grand": [
+   908.2,
+   119.7
+  ],
+  "mark-camellia": [
+   120,
+   120
+  ],
+  "mark-blossom": [
+   80,
+   80
+  ]
+ },
+ "corners": {
+  "outer": 0.055,
+  "inner": 0.09,
+  "outerW": 0.0075,
+  "innerW": 0.0045000000000000005
+ }
+}

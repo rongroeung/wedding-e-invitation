@@ -1,0 +1,1226 @@
+{
+ "kbach-phni": {
+  "label": "ក្បាច់ភ្ញី",
+  "note": "ក្បាច់ភ្ញីខ្មែរ — ស្លឹកក្បាច់អណ្ដាតភ្លើង មកុដ និងផ្កាចន្ទ",
+  "frame": "kbach",
+  "ornaments": {
+   "crest": {
+    "src": "/kit/sets/kbach-phni/crest.svg",
+    "w": 419.0,
+    "h": 267.0
+   },
+   "title": {
+    "src": "/kit/sets/kbach-phni/title.svg",
+    "w": 363.6,
+    "h": 113.3
+   },
+   "title-couple": {
+    "src": "/kit/sets/kbach-phni/title-couple.svg",
+    "w": 363.4,
+    "h": 134.5
+   },
+   "title-program": {
+    "src": "/kit/sets/kbach-phni/title-program.svg",
+    "w": 389.6,
+    "h": 97.4
+   },
+   "title-venue": {
+    "src": "/kit/sets/kbach-phni/title-venue.svg",
+    "w": 288.1,
+    "h": 86.8
+   },
+   "share": {
+    "src": "/kit/sets/kbach-phni/share.svg",
+    "w": 363.4,
+    "h": 134.5
+   },
+   "medallion": {
+    "src": "/kit/sets/kbach-phni/medallion.svg",
+    "w": 325.7,
+    "h": 161.0
+   },
+   "rule": {
+    "src": "/kit/sets/kbach-phni/rule.svg",
+    "w": 892.0,
+    "h": 34.0
+   },
+   "star": {
+    "src": "/kit/sets/kbach-phni/star.svg",
+    "w": 377.9,
+    "h": 71.7
+   },
+   "fleuron": {
+    "src": "/kit/sets/kbach-phni/fleuron.svg",
+    "w": 227.6,
+    "h": 214.0
+   },
+   "wing": {
+    "src": "/kit/sets/kbach-phni/wing.svg",
+    "w": 113.9,
+    "h": 48.1
+   },
+   "rosette": {
+    "src": "/kit/sets/kbach-phni/rosette.svg",
+    "w": 82.0,
+    "h": 82.0
+   },
+   "mark": {
+    "src": "/kit/sets/kbach-phni/mark.svg",
+    "w": 96.2,
+    "h": 96.2
+   }
+  }
+ },
+ "kbach-angkor": {
+  "label": "ផ្តែរអង្គរ",
+  "note": "ក្បាច់ផ្តែរប្រាសាទ — ផ្កាចន្ទ ខ្សែកម្រងក្បាច់ និងលំពែងព្យួរ",
+  "frame": "kbach",
+  "ornaments": {
+   "crest": {
+    "src": "/kit/sets/kbach-angkor/crest.svg",
+    "w": 347.4,
+    "h": 156.3
+   },
+   "title": {
+    "src": "/kit/sets/kbach-angkor/title.svg",
+    "w": 295.0,
+    "h": 64.9
+   },
+   "title-couple": {
+    "src": "/kit/sets/kbach-angkor/title-couple.svg",
+    "w": 293.5,
+    "h": 76.7
+   },
+   "title-program": {
+    "src": "/kit/sets/kbach-angkor/title-program.svg",
+    "w": 321.0,
+    "h": 56.2
+   },
+   "title-venue": {
+    "src": "/kit/sets/kbach-angkor/title-venue.svg",
+    "w": 231.5,
+    "h": 50.0
+   },
+   "share": {
+    "src": "/kit/sets/kbach-angkor/share.svg",
+    "w": 293.5,
+    "h": 76.7
+   },
+   "medallion": {
+    "src": "/kit/sets/kbach-angkor/medallion.svg",
+    "w": 256.7,
+    "h": 91.3
+   },
+   "rule": {
+    "src": "/kit/sets/kbach-angkor/rule.svg",
+    "w": 854.0,
+    "h": 34.0
+   },
+   "star": {
+    "src": "/kit/sets/kbach-angkor/star.svg",
+    "w": 331.0,
+    "h": 71.0
+   },
+   "fleuron": {
+    "src": "/kit/sets/kbach-angkor/fleuron.svg",
+    "w": 188.6,
+    "h": 120.0
+   },
+   "wing": {
+    "src": "/kit/sets/kbach-angkor/wing.svg",
+    "w": 83.3,
+    "h": 42.4
+   },
+   "rosette": {
+    "src": "/kit/sets/kbach-angkor/rosette.svg",
+    "w": 82.0,
+    "h": 82.0
+   },
+   "mark": {
+    "src": "/kit/sets/kbach-angkor/mark.svg",
+    "w": 96.2,
+    "h": 96.2
+   }
+  }
+ },
+ "kbach-naga": {
+  "label": "រលកនាគ",
+  "note": "ក្បាច់រលកនាគ — ខ្សែកោងបន្តជាប់ ជាមួយស្លឹកក្បាច់",
+  "frame": "kbach",
+  "ornaments": {
+   "crest": {
+    "src": "/kit/sets/kbach-naga/crest.svg",
+    "w": 441.6,
+    "h": 132.3
+   },
+   "title": {
+    "src": "/kit/sets/kbach-naga/title.svg",
+    "w": 355.2,
+    "h": 58.4
+   },
+   "title-couple": {
+    "src": "/kit/sets/kbach-naga/title-couple.svg",
+    "w": 348.0,
+    "h": 62.4
+   },
+   "title-program": {
+    "src": "/kit/sets/kbach-naga/title-program.svg",
+    "w": 386.8,
+    "h": 62.5
+   },
+   "title-venue": {
+    "src": "/kit/sets/kbach-naga/title-venue.svg",
+    "w": 283.7,
+    "h": 50.4
+   },
+   "share": {
+    "src": "/kit/sets/kbach-naga/share.svg",
+    "w": 348.0,
+    "h": 62.4
+   },
+   "medallion": {
+    "src": "/kit/sets/kbach-naga/medallion.svg",
+    "w": 300.4,
+    "h": 73.9
+   },
+   "rule": {
+    "src": "/kit/sets/kbach-naga/rule.svg",
+    "w": 891.3,
+    "h": 35.4
+   },
+   "star": {
+    "src": "/kit/sets/kbach-naga/star.svg",
+    "w": 396.9,
+    "h": 68.8
+   },
+   "fleuron": {
+    "src": "/kit/sets/kbach-naga/fleuron.svg",
+    "w": 177.7,
+    "h": 95.6
+   },
+   "wing": {
+    "src": "/kit/sets/kbach-naga/wing.svg",
+    "w": 126.4,
+    "h": 74.6
+   },
+   "rosette": {
+    "src": "/kit/sets/kbach-naga/rosette.svg",
+    "w": 82.0,
+    "h": 78.1
+   },
+   "mark": {
+    "src": "/kit/sets/kbach-naga/mark.svg",
+    "w": 96.2,
+    "h": 96.2
+   }
+  }
+ },
+ "kbach-phka-chan": {
+  "label": "ផ្កាចន្ទក្បាច់",
+  "note": "ផ្កាចន្ទបួនស្លឹក ខ្សែត្រង់ និងចំណុចគុជ",
+  "frame": "kbach",
+  "ornaments": {
+   "crest": {
+    "src": "/kit/sets/kbach-phka-chan/crest.svg",
+    "w": 371.3,
+    "h": 95.3
+   },
+   "title": {
+    "src": "/kit/sets/kbach-phka-chan/title.svg",
+    "w": 252.4,
+    "h": 41.6
+   },
+   "title-couple": {
+    "src": "/kit/sets/kbach-phka-chan/title-couple.svg",
+    "w": 238.4,
+    "h": 48.8
+   },
+   "title-program": {
+    "src": "/kit/sets/kbach-phka-chan/title-program.svg",
+    "w": 288.1,
+    "h": 36.1
+   },
+   "title-venue": {
+    "src": "/kit/sets/kbach-phka-chan/title-venue.svg",
+    "w": 200.6,
+    "h": 32.2
+   },
+   "share": {
+    "src": "/kit/sets/kbach-phka-chan/share.svg",
+    "w": 238.4,
+    "h": 48.8
+   },
+   "medallion": {
+    "src": "/kit/sets/kbach-phka-chan/medallion.svg",
+    "w": 185.1,
+    "h": 57.9
+   },
+   "rule": {
+    "src": "/kit/sets/kbach-phka-chan/rule.svg",
+    "w": 858.0,
+    "h": 34.0
+   },
+   "star": {
+    "src": "/kit/sets/kbach-phka-chan/star.svg",
+    "w": 347.7,
+    "h": 70.9
+   },
+   "fleuron": {
+    "src": "/kit/sets/kbach-phka-chan/fleuron.svg",
+    "w": 75.6,
+    "h": 75.6
+   },
+   "wing": {
+    "src": "/kit/sets/kbach-phka-chan/wing.svg",
+    "w": 94.0,
+    "h": 24.8
+   },
+   "rosette": {
+    "src": "/kit/sets/kbach-phka-chan/rosette.svg",
+    "w": 82.0,
+    "h": 82.0
+   },
+   "mark": {
+    "src": "/kit/sets/kbach-phka-chan/mark.svg",
+    "w": 96.2,
+    "h": 96.2
+   }
+  }
+ },
+ "rumduol": {
+  "label": "ផ្ការំដួល",
+  "note": "ផ្ការំដួល ស្លឹក និងមែកឈើស្ដើង — ផ្កាជាតិកម្ពុជា",
+  "frame": "flourish",
+  "ornaments": {
+   "crest": {
+    "src": "/kit/sets/rumduol/crest.svg",
+    "w": 368.5,
+    "h": 51.3
+   },
+   "title": {
+    "src": "/kit/sets/rumduol/title.svg",
+    "w": 242.4,
+    "h": 31.7
+   },
+   "title-couple": {
+    "src": "/kit/sets/rumduol/title-couple.svg",
+    "w": 227.1,
+    "h": 32.0
+   },
+   "title-program": {
+    "src": "/kit/sets/rumduol/title-program.svg",
+    "w": 279.1,
+    "h": 36.2
+   },
+   "title-venue": {
+    "src": "/kit/sets/rumduol/title-venue.svg",
+    "w": 192.8,
+    "h": 26.3
+   },
+   "share": {
+    "src": "/kit/sets/rumduol/share.svg",
+    "w": 227.1,
+    "h": 32.0
+   },
+   "medallion": {
+    "src": "/kit/sets/rumduol/medallion.svg",
+    "w": 172.1,
+    "h": 31.3
+   },
+   "rule": {
+    "src": "/kit/sets/rumduol/rule.svg",
+    "w": 857.1,
+    "h": 30.2
+   },
+   "star": {
+    "src": "/kit/sets/rumduol/star.svg",
+    "w": 345.8,
+    "h": 63.2
+   },
+   "fleuron": {
+    "src": "/kit/sets/rumduol/fleuron.svg",
+    "w": 60.3,
+    "h": 38.2
+   },
+   "wing": {
+    "src": "/kit/sets/rumduol/wing.svg",
+    "w": 93.0,
+    "h": 35.4
+   },
+   "rosette": {
+    "src": "/kit/sets/rumduol/rosette.svg",
+    "w": 77.4,
+    "h": 72.5
+   },
+   "mark": {
+    "src": "/kit/sets/rumduol/mark.svg",
+    "w": 96.2,
+    "h": 96.2
+   }
+  }
+ },
+ "champa": {
+  "label": "ផ្កាចំប៉ា",
+  "note": "ផ្កាចំប៉ាប្រាំស្លឹក ជាមួយស្លឹកវែង",
+  "frame": "flourish-loop",
+  "ornaments": {
+   "crest": {
+    "src": "/kit/sets/champa/crest.svg",
+    "w": 369.8,
+    "h": 51.6
+   },
+   "title": {
+    "src": "/kit/sets/champa/title.svg",
+    "w": 243.3,
+    "h": 32.3
+   },
+   "title-couple": {
+    "src": "/kit/sets/champa/title-couple.svg",
+    "w": 227.9,
+    "h": 32.6
+   },
+   "title-program": {
+    "src": "/kit/sets/champa/title-program.svg",
+    "w": 280.1,
+    "h": 36.6
+   },
+   "title-venue": {
+    "src": "/kit/sets/champa/title-venue.svg",
+    "w": 193.6,
+    "h": 26.7
+   },
+   "share": {
+    "src": "/kit/sets/champa/share.svg",
+    "w": 227.9,
+    "h": 32.6
+   },
+   "medallion": {
+    "src": "/kit/sets/champa/medallion.svg",
+    "w": 172.8,
+    "h": 32.1
+   },
+   "rule": {
+    "src": "/kit/sets/champa/rule.svg",
+    "w": 858.0,
+    "h": 32.9
+   },
+   "star": {
+    "src": "/kit/sets/champa/star.svg",
+    "w": 346.7,
+    "h": 68.8
+   },
+   "fleuron": {
+    "src": "/kit/sets/champa/fleuron.svg",
+    "w": 60.3,
+    "h": 40.3
+   },
+   "wing": {
+    "src": "/kit/sets/champa/wing.svg",
+    "w": 93.5,
+    "h": 37.9
+   },
+   "rosette": {
+    "src": "/kit/sets/champa/rosette.svg",
+    "w": 81.2,
+    "h": 79.2
+   },
+   "mark": {
+    "src": "/kit/sets/champa/mark.svg",
+    "w": 96.2,
+    "h": 96.2
+   }
+  }
+ },
+ "jasmine": {
+  "label": "ផ្កាម្លិះ",
+  "note": "ផ្កាម្លិះ និងខ្សែវល្លិស្ដើងៗ",
+  "frame": "flourish",
+  "ornaments": {
+   "crest": {
+    "src": "/kit/sets/jasmine/crest.svg",
+    "w": 369.8,
+    "h": 49.4
+   },
+   "title": {
+    "src": "/kit/sets/jasmine/title.svg",
+    "w": 243.3,
+    "h": 31.4
+   },
+   "title-couple": {
+    "src": "/kit/sets/jasmine/title-couple.svg",
+    "w": 227.9,
+    "h": 31.6
+   },
+   "title-program": {
+    "src": "/kit/sets/jasmine/title-program.svg",
+    "w": 280.1,
+    "h": 35.9
+   },
+   "title-venue": {
+    "src": "/kit/sets/jasmine/title-venue.svg",
+    "w": 193.6,
+    "h": 26.1
+   },
+   "share": {
+    "src": "/kit/sets/jasmine/share.svg",
+    "w": 227.9,
+    "h": 31.6
+   },
+   "medallion": {
+    "src": "/kit/sets/jasmine/medallion.svg",
+    "w": 172.8,
+    "h": 30.9
+   },
+   "rule": {
+    "src": "/kit/sets/jasmine/rule.svg",
+    "w": 858.0,
+    "h": 30.2
+   },
+   "star": {
+    "src": "/kit/sets/jasmine/star.svg",
+    "w": 346.7,
+    "h": 63.3
+   },
+   "fleuron": {
+    "src": "/kit/sets/jasmine/fleuron.svg",
+    "w": 60.3,
+    "h": 37.0
+   },
+   "wing": {
+    "src": "/kit/sets/jasmine/wing.svg",
+    "w": 93.5,
+    "h": 36.4
+   },
+   "rosette": {
+    "src": "/kit/sets/jasmine/rosette.svg",
+    "w": 82.0,
+    "h": 72.6
+   },
+   "mark": {
+    "src": "/kit/sets/jasmine/mark.svg",
+    "w": 96.2,
+    "h": 96.2
+   }
+  }
+ },
+ "rose": {
+  "label": "ផ្កាកុលាប",
+  "note": "ផ្កាកុលាបរីក ស្លឹក និងវល្លិ — បែបបុរាណអឺរ៉ុប",
+  "frame": "flourish-loop",
+  "ornaments": {
+   "crest": {
+    "src": "/kit/sets/rose/crest.svg",
+    "w": 369.8,
+    "h": 51.5
+   },
+   "title": {
+    "src": "/kit/sets/rose/title.svg",
+    "w": 243.3,
+    "h": 32.0
+   },
+   "title-couple": {
+    "src": "/kit/sets/rose/title-couple.svg",
+    "w": 227.9,
+    "h": 32.3
+   },
+   "title-program": {
+    "src": "/kit/sets/rose/title-program.svg",
+    "w": 280.1,
+    "h": 36.5
+   },
+   "title-venue": {
+    "src": "/kit/sets/rose/title-venue.svg",
+    "w": 193.6,
+    "h": 26.5
+   },
+   "share": {
+    "src": "/kit/sets/rose/share.svg",
+    "w": 227.9,
+    "h": 32.3
+   },
+   "medallion": {
+    "src": "/kit/sets/rose/medallion.svg",
+    "w": 172.8,
+    "h": 31.8
+   },
+   "rule": {
+    "src": "/kit/sets/rose/rule.svg",
+    "w": 858.0,
+    "h": 32.2
+   },
+   "star": {
+    "src": "/kit/sets/rose/star.svg",
+    "w": 346.7,
+    "h": 67.4
+   },
+   "fleuron": {
+    "src": "/kit/sets/rose/fleuron.svg",
+    "w": 60.3,
+    "h": 39.4
+   },
+   "wing": {
+    "src": "/kit/sets/rose/wing.svg",
+    "w": 93.5,
+    "h": 37.0
+   },
+   "rosette": {
+    "src": "/kit/sets/rose/rosette.svg",
+    "w": 82.0,
+    "h": 77.4
+   },
+   "mark": {
+    "src": "/kit/sets/rose/mark.svg",
+    "w": 96.2,
+    "h": 96.2
+   }
+  }
+ },
+ "peony": {
+  "label": "ផ្កាប៉េអូនី",
+  "note": "ផ្កាប៉េអូនីស្រទាប់ៗ និងស្លឹកទន់",
+  "frame": "flourish-loop",
+  "ornaments": {
+   "crest": {
+    "src": "/kit/sets/peony/crest.svg",
+    "w": 369.8,
+    "h": 53.3
+   },
+   "title": {
+    "src": "/kit/sets/peony/title.svg",
+    "w": 243.3,
+    "h": 32.6
+   },
+   "title-couple": {
+    "src": "/kit/sets/peony/title-couple.svg",
+    "w": 227.9,
+    "h": 32.9
+   },
+   "title-program": {
+    "src": "/kit/sets/peony/title-program.svg",
+    "w": 280.1,
+    "h": 36.9
+   },
+   "title-venue": {
+    "src": "/kit/sets/peony/title-venue.svg",
+    "w": 193.6,
+    "h": 26.9
+   },
+   "share": {
+    "src": "/kit/sets/peony/share.svg",
+    "w": 227.9,
+    "h": 32.9
+   },
+   "medallion": {
+    "src": "/kit/sets/peony/medallion.svg",
+    "w": 172.8,
+    "h": 32.5
+   },
+   "rule": {
+    "src": "/kit/sets/peony/rule.svg",
+    "w": 858.0,
+    "h": 33.7
+   },
+   "star": {
+    "src": "/kit/sets/peony/star.svg",
+    "w": 346.7,
+    "h": 70.7
+   },
+   "fleuron": {
+    "src": "/kit/sets/peony/fleuron.svg",
+    "w": 60.3,
+    "h": 41.3
+   },
+   "wing": {
+    "src": "/kit/sets/peony/wing.svg",
+    "w": 93.5,
+    "h": 37.5
+   },
+   "rosette": {
+    "src": "/kit/sets/peony/rosette.svg",
+    "w": 80.6,
+    "h": 81.3
+   },
+   "mark": {
+    "src": "/kit/sets/peony/mark.svg",
+    "w": 96.2,
+    "h": 96.2
+   }
+  }
+ },
+ "sakura": {
+  "label": "ផ្កាសាគូរ៉ា",
+  "note": "ផ្កាសាគូរ៉ា ប្រាំស្លឹក និងមែកឈើ",
+  "frame": "flourish",
+  "ornaments": {
+   "crest": {
+    "src": "/kit/sets/sakura/crest.svg",
+    "w": 369.8,
+    "h": 52.6
+   },
+   "title": {
+    "src": "/kit/sets/sakura/title.svg",
+    "w": 243.3,
+    "h": 32.4
+   },
+   "title-couple": {
+    "src": "/kit/sets/sakura/title-couple.svg",
+    "w": 227.9,
+    "h": 32.7
+   },
+   "title-program": {
+    "src": "/kit/sets/sakura/title-program.svg",
+    "w": 280.1,
+    "h": 36.7
+   },
+   "title-venue": {
+    "src": "/kit/sets/sakura/title-venue.svg",
+    "w": 193.6,
+    "h": 26.8
+   },
+   "share": {
+    "src": "/kit/sets/sakura/share.svg",
+    "w": 227.9,
+    "h": 32.7
+   },
+   "medallion": {
+    "src": "/kit/sets/sakura/medallion.svg",
+    "w": 172.8,
+    "h": 32.2
+   },
+   "rule": {
+    "src": "/kit/sets/sakura/rule.svg",
+    "w": 858.0,
+    "h": 33.1
+   },
+   "star": {
+    "src": "/kit/sets/sakura/star.svg",
+    "w": 346.7,
+    "h": 69.4
+   },
+   "fleuron": {
+    "src": "/kit/sets/sakura/fleuron.svg",
+    "w": 60.3,
+    "h": 40.6
+   },
+   "wing": {
+    "src": "/kit/sets/sakura/wing.svg",
+    "w": 93.5,
+    "h": 37.3
+   },
+   "rosette": {
+    "src": "/kit/sets/sakura/rosette.svg",
+    "w": 77.7,
+    "h": 79.8
+   },
+   "mark": {
+    "src": "/kit/sets/sakura/mark.svg",
+    "w": 96.2,
+    "h": 96.2
+   }
+  }
+ },
+ "daisy": {
+  "label": "ផ្កាដេស៊ី",
+  "note": "ផ្កាដេស៊ី ស្រស់ស្រាយ និងស្លឹកស្ដើង",
+  "frame": "flourish",
+  "ornaments": {
+   "crest": {
+    "src": "/kit/sets/daisy/crest.svg",
+    "w": 369.8,
+    "h": 52.7
+   },
+   "title": {
+    "src": "/kit/sets/daisy/title.svg",
+    "w": 243.3,
+    "h": 32.4
+   },
+   "title-couple": {
+    "src": "/kit/sets/daisy/title-couple.svg",
+    "w": 227.9,
+    "h": 32.7
+   },
+   "title-program": {
+    "src": "/kit/sets/daisy/title-program.svg",
+    "w": 280.1,
+    "h": 36.7
+   },
+   "title-venue": {
+    "src": "/kit/sets/daisy/title-venue.svg",
+    "w": 193.6,
+    "h": 26.8
+   },
+   "share": {
+    "src": "/kit/sets/daisy/share.svg",
+    "w": 227.9,
+    "h": 32.7
+   },
+   "medallion": {
+    "src": "/kit/sets/daisy/medallion.svg",
+    "w": 172.8,
+    "h": 32.2
+   },
+   "rule": {
+    "src": "/kit/sets/daisy/rule.svg",
+    "w": 858.0,
+    "h": 33.2
+   },
+   "star": {
+    "src": "/kit/sets/daisy/star.svg",
+    "w": 346.7,
+    "h": 69.6
+   },
+   "fleuron": {
+    "src": "/kit/sets/daisy/fleuron.svg",
+    "w": 60.3,
+    "h": 40.7
+   },
+   "wing": {
+    "src": "/kit/sets/daisy/wing.svg",
+    "w": 93.5,
+    "h": 37.3
+   },
+   "rosette": {
+    "src": "/kit/sets/daisy/rosette.svg",
+    "w": 82.0,
+    "h": 80.0
+   },
+   "mark": {
+    "src": "/kit/sets/daisy/mark.svg",
+    "w": 96.2,
+    "h": 96.2
+   }
+  }
+ },
+ "laurel": {
+  "label": "កម្រងស្លឹកឡូរ៉ែល",
+  "note": "កម្រងស្លឹកឡូរ៉ែលបុរាណ — សញ្ញានៃជ័យជម្នះ និងសេចក្ដីស្រឡាញ់",
+  "frame": "flourish",
+  "ornaments": {
+   "crest": {
+    "src": "/kit/sets/laurel/crest.svg",
+    "w": 353.4,
+    "h": 83.7
+   },
+   "title": {
+    "src": "/kit/sets/laurel/title.svg",
+    "w": 239.3,
+    "h": 40.2
+   },
+   "title-couple": {
+    "src": "/kit/sets/laurel/title-couple.svg",
+    "w": 223.5,
+    "h": 43.1
+   },
+   "title-program": {
+    "src": "/kit/sets/laurel/title-program.svg",
+    "w": 272.7,
+    "h": 40.9
+   },
+   "title-venue": {
+    "src": "/kit/sets/laurel/title-venue.svg",
+    "w": 188.4,
+    "h": 32.6
+   },
+   "share": {
+    "src": "/kit/sets/laurel/share.svg",
+    "w": 223.5,
+    "h": 43.1
+   },
+   "medallion": {
+    "src": "/kit/sets/laurel/medallion.svg",
+    "w": 173.1,
+    "h": 50.9
+   },
+   "rule": {
+    "src": "/kit/sets/laurel/rule.svg",
+    "w": 858.0,
+    "h": 32.5
+   },
+   "star": {
+    "src": "/kit/sets/laurel/star.svg",
+    "w": 337.1,
+    "h": 67.9
+   },
+   "fleuron": {
+    "src": "/kit/sets/laurel/fleuron.svg",
+    "w": 70.4,
+    "h": 66.0
+   },
+   "wing": {
+    "src": "/kit/sets/laurel/wing.svg",
+    "w": 87.7,
+    "h": 35.0
+   },
+   "rosette": {
+    "src": "/kit/sets/laurel/rosette.svg",
+    "w": 83.4,
+    "h": 78.2
+   },
+   "mark": {
+    "src": "/kit/sets/laurel/mark.svg",
+    "w": 96.2,
+    "h": 96.2
+   }
+  }
+ },
+ "acanthus": {
+  "label": "ក្បាច់បារ៉ូក",
+  "note": "ក្បាច់ស្លឹកអាកង់ធឹសបែបបារ៉ូក — ក្បាច់វង់ធំៗ ថ្លៃថ្នូរ",
+  "frame": "flourish",
+  "ornaments": {
+   "crest": {
+    "src": "/kit/sets/acanthus/crest.svg",
+    "w": 276.2,
+    "h": 78.3
+   },
+   "title": {
+    "src": "/kit/sets/acanthus/title.svg",
+    "w": 217.9,
+    "h": 40.6
+   },
+   "title-couple": {
+    "src": "/kit/sets/acanthus/title-couple.svg",
+    "w": 214.7,
+    "h": 41.3
+   },
+   "title-program": {
+    "src": "/kit/sets/acanthus/title-program.svg",
+    "w": 239.4,
+    "h": 42.7
+   },
+   "title-venue": {
+    "src": "/kit/sets/acanthus/title-venue.svg",
+    "w": 172.0,
+    "h": 32.1
+   },
+   "share": {
+    "src": "/kit/sets/acanthus/share.svg",
+    "w": 214.7,
+    "h": 41.3
+   },
+   "medallion": {
+    "src": "/kit/sets/acanthus/medallion.svg",
+    "w": 183.8,
+    "h": 47.8
+   },
+   "rule": {
+    "src": "/kit/sets/acanthus/rule.svg",
+    "w": 848.8,
+    "h": 30.6
+   },
+   "star": {
+    "src": "/kit/sets/acanthus/star.svg",
+    "w": 274.1,
+    "h": 62.8
+   },
+   "fleuron": {
+    "src": "/kit/sets/acanthus/fleuron.svg",
+    "w": 123.5,
+    "h": 63.0
+   },
+   "wing": {
+    "src": "/kit/sets/acanthus/wing.svg",
+    "w": 64.1,
+    "h": 31.1
+   },
+   "rosette": {
+    "src": "/kit/sets/acanthus/rosette.svg",
+    "w": 82.0,
+    "h": 73.5
+   },
+   "mark": {
+    "src": "/kit/sets/acanthus/mark.svg",
+    "w": 96.2,
+    "h": 96.2
+   }
+  }
+ },
+ "art-deco": {
+  "label": "អាត ដេកូ",
+  "note": "ក្បាច់ធរណីមាត្របែបអាត ដេកូ — កង្ហារ កាំរស្មី និងបន្ទាត់ស្រស់",
+  "frame": "flourish",
+  "ornaments": {
+   "crest": {
+    "src": "/kit/sets/art-deco/crest.svg",
+    "w": 348.4,
+    "h": 71.6
+   },
+   "title": {
+    "src": "/kit/sets/art-deco/title.svg",
+    "w": 248.9,
+    "h": 31.8
+   },
+   "title-couple": {
+    "src": "/kit/sets/art-deco/title-couple.svg",
+    "w": 238.6,
+    "h": 37.0
+   },
+   "title-program": {
+    "src": "/kit/sets/art-deco/title-program.svg",
+    "w": 281.7,
+    "h": 27.8
+   },
+   "title-venue": {
+    "src": "/kit/sets/art-deco/title-venue.svg",
+    "w": 196.5,
+    "h": 24.8
+   },
+   "share": {
+    "src": "/kit/sets/art-deco/share.svg",
+    "w": 238.6,
+    "h": 37.0
+   },
+   "medallion": {
+    "src": "/kit/sets/art-deco/medallion.svg",
+    "w": 190.9,
+    "h": 43.8
+   },
+   "rule": {
+    "src": "/kit/sets/art-deco/rule.svg",
+    "w": 846.8,
+    "h": 34.8
+   },
+   "star": {
+    "src": "/kit/sets/art-deco/star.svg",
+    "w": 331.7,
+    "h": 71.7
+   },
+   "fleuron": {
+    "src": "/kit/sets/art-deco/fleuron.svg",
+    "w": 99.9,
+    "h": 57.7
+   },
+   "wing": {
+    "src": "/kit/sets/art-deco/wing.svg",
+    "w": 76.8,
+    "h": 14.8
+   },
+   "rosette": {
+    "src": "/kit/sets/art-deco/rosette.svg",
+    "w": 84.0,
+    "h": 84.0
+   },
+   "mark": {
+    "src": "/kit/sets/art-deco/mark.svg",
+    "w": 96.2,
+    "h": 96.2
+   }
+  }
+ },
+ "fine-line": {
+  "label": "ខ្សែស្ដើងទំនើប",
+  "note": "បន្ទាត់ស្ដើង ពេជ្រតូច និងចំណុច — ស្អាតសាមញ្ញ ទំនើប",
+  "frame": "flourish",
+  "ornaments": {
+   "crest": {
+    "src": "/kit/sets/fine-line/crest.svg",
+    "w": 346.0,
+    "h": 58.0
+   },
+   "title": {
+    "src": "/kit/sets/fine-line/title.svg",
+    "w": 229.6,
+    "h": 25.5
+   },
+   "title-couple": {
+    "src": "/kit/sets/fine-line/title-couple.svg",
+    "w": 216.0,
+    "h": 30.0
+   },
+   "title-program": {
+    "src": "/kit/sets/fine-line/title-program.svg",
+    "w": 264.8,
+    "h": 22.2
+   },
+   "title-venue": {
+    "src": "/kit/sets/fine-line/title-venue.svg",
+    "w": 181.6,
+    "h": 19.9
+   },
+   "share": {
+    "src": "/kit/sets/fine-line/share.svg",
+    "w": 216.0,
+    "h": 30.0
+   },
+   "medallion": {
+    "src": "/kit/sets/fine-line/medallion.svg",
+    "w": 164.0,
+    "h": 35.6
+   },
+   "rule": {
+    "src": "/kit/sets/fine-line/rule.svg",
+    "w": 839.9,
+    "h": 36.3
+   },
+   "star": {
+    "src": "/kit/sets/fine-line/star.svg",
+    "w": 331.4,
+    "h": 74.7
+   },
+   "fleuron": {
+    "src": "/kit/sets/fine-line/fleuron.svg",
+    "w": 66.0,
+    "h": 46.8
+   },
+   "wing": {
+    "src": "/kit/sets/fine-line/wing.svg",
+    "w": 82.0,
+    "h": 17.5
+   },
+   "rosette": {
+    "src": "/kit/sets/fine-line/rosette.svg",
+    "w": 87.6,
+    "h": 87.6
+   },
+   "mark": {
+    "src": "/kit/sets/fine-line/mark.svg",
+    "w": 96.2,
+    "h": 96.2
+   }
+  }
+ },
+ "celestial": {
+  "label": "ផ្កាយ និងព្រះចន្ទ",
+  "note": "ផ្កាយ ព្រះចន្ទអឌ្ឍចន្ទ និងកាំរស្មី — រាត្រីមង្គល",
+  "frame": "flourish",
+  "ornaments": {
+   "crest": {
+    "src": "/kit/sets/celestial/crest.svg",
+    "w": 367.2,
+    "h": 68.2
+   },
+   "title": {
+    "src": "/kit/sets/celestial/title.svg",
+    "w": 236.9,
+    "h": 30.1
+   },
+   "title-couple": {
+    "src": "/kit/sets/celestial/title-couple.svg",
+    "w": 220.8,
+    "h": 35.3
+   },
+   "title-program": {
+    "src": "/kit/sets/celestial/title-program.svg",
+    "w": 274.2,
+    "h": 26.3
+   },
+   "title-venue": {
+    "src": "/kit/sets/celestial/title-venue.svg",
+    "w": 188.6,
+    "h": 23.5
+   },
+   "share": {
+    "src": "/kit/sets/celestial/share.svg",
+    "w": 220.8,
+    "h": 35.3
+   },
+   "medallion": {
+    "src": "/kit/sets/celestial/medallion.svg",
+    "w": 164.9,
+    "h": 41.7
+   },
+   "rule": {
+    "src": "/kit/sets/celestial/rule.svg",
+    "w": 846.0,
+    "h": 34.0
+   },
+   "star": {
+    "src": "/kit/sets/celestial/star.svg",
+    "w": 344.8,
+    "h": 70.8
+   },
+   "fleuron": {
+    "src": "/kit/sets/celestial/fleuron.svg",
+    "w": 52.4,
+    "h": 54.0
+   },
+   "wing": {
+    "src": "/kit/sets/celestial/wing.svg",
+    "w": 83.1,
+    "h": 15.7
+   },
+   "rosette": {
+    "src": "/kit/sets/celestial/rosette.svg",
+    "w": 82.0,
+    "h": 82.0
+   },
+   "mark": {
+    "src": "/kit/sets/celestial/mark.svg",
+    "w": 96.2,
+    "h": 96.2
+   }
+  }
+ },
+ "eucalyptus": {
+  "label": "ស្លឹកអ៊ឺកាលីប",
+  "note": "មែកស្លឹកមូលៗ បែបបូតានិក — ស្រស់ថ្លា ធម្មជាតិ",
+  "frame": "flourish",
+  "ornaments": {
+   "crest": {
+    "src": "/kit/sets/eucalyptus/crest.svg",
+    "w": 347.6,
+    "h": 101.6
+   },
+   "title": {
+    "src": "/kit/sets/eucalyptus/title.svg",
+    "w": 211.6,
+    "h": 44.2
+   },
+   "title-couple": {
+    "src": "/kit/sets/eucalyptus/title-couple.svg",
+    "w": 194.3,
+    "h": 52.0
+   },
+   "title-program": {
+    "src": "/kit/sets/eucalyptus/title-program.svg",
+    "w": 249.6,
+    "h": 40.1
+   },
+   "title-venue": {
+    "src": "/kit/sets/eucalyptus/title-venue.svg",
+    "w": 168.0,
+    "h": 34.3
+   },
+   "share": {
+    "src": "/kit/sets/eucalyptus/share.svg",
+    "w": 194.3,
+    "h": 52.0
+   },
+   "medallion": {
+    "src": "/kit/sets/eucalyptus/medallion.svg",
+    "w": 137.7,
+    "h": 61.8
+   },
+   "rule": {
+    "src": "/kit/sets/eucalyptus/rule.svg",
+    "w": 846.0,
+    "h": 31.7
+   },
+   "star": {
+    "src": "/kit/sets/eucalyptus/star.svg",
+    "w": 331.0,
+    "h": 66.2
+   },
+   "fleuron": {
+    "src": "/kit/sets/eucalyptus/fleuron.svg",
+    "w": 29.6,
+    "h": 81.7
+   },
+   "wing": {
+    "src": "/kit/sets/eucalyptus/wing.svg",
+    "w": 83.4,
+    "h": 24.5
+   },
+   "rosette": {
+    "src": "/kit/sets/eucalyptus/rosette.svg",
+    "w": 82.0,
+    "h": 76.3
+   },
+   "mark": {
+    "src": "/kit/sets/eucalyptus/mark.svg",
+    "w": 96.2,
+    "h": 96.2
+   }
+  }
+ }
+}

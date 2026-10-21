@@ -1,5 +1,5 @@
 import type { WeddingEvent } from "@/lib/db/schema";
-import { GoldDivider } from "@/components/ui/Ornaments";
+import { FlourishDivider } from "@/components/ui/Ornaments";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 
 /** កម្មវិធីសិរីមង្គលអាពាហ៍ពិពាហ៍ — grouped by the labels set in the dashboard. */
@@ -19,7 +19,7 @@ export function Program({ events }: { events: WeddingEvent[] }) {
   return (
     <section id="program" className="section-pad relative">
       <div className="mx-auto max-w-3xl">
-        <SectionTitle eyebrow="កម្មវិធី" title="កម្មវិធីសិរីមង្គលអាពាហ៍ពិពាហ៍" />
+        <SectionTitle eyebrow="កម្មវិធី" title="កម្មវិធីសិរីមង្គលអាពាហ៍ពិពាហ៍" flourish="title-program" />
 
         <div className="space-y-12">
           {Object.entries(groups).map(([groupName, group]) => (
@@ -28,7 +28,7 @@ export function Program({ events }: { events: WeddingEvent[] }) {
                 <span className="text-lg" aria-hidden="true">{group.icon}</span>
                 <h3 className="text-lg text-heading khmer-wrap">{groupName}</h3>
               </div>
-              <GoldDivider className="mb-8" width="max-w-[140px]" icon="none" />
+              <FlourishDivider role="medallion" width={84} className="mb-8" />
 
               <ol className="relative space-y-4 border-l border-gold/45 pl-6 sm:pl-8">
                 {group.items.map((event) => (

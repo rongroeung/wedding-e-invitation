@@ -1,6 +1,6 @@
 import type { Wedding } from "@/lib/db/schema";
 import { mediaSrc } from "@/lib/media";
-import { GoldDivider, Lotus, WeddingRings } from "@/components/ui/Ornaments";
+import { Flourish, FlourishDivider, Heart } from "@/components/ui/Ornaments";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 
 function Person({
@@ -36,7 +36,7 @@ function Person({
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-cream to-beige">
-                <Lotus className="h-14 w-14 text-gold-dark/60" />
+                <Flourish role="rosette" className="w-14 opacity-60" />
               </div>
             )}
           </div>
@@ -49,7 +49,7 @@ function Person({
         {name}
       </h3>
 
-      <GoldDivider className="my-5" width="max-w-[120px]" icon="diamond" />
+      <FlourishDivider role="wing" width={44} className="my-5" />
 
       <p className="text-sm text-ink/75 khmer-wrap">
         {align === "left" ? "កូនប្រុសរបស់" : "កូនស្រីរបស់"}
@@ -65,7 +65,7 @@ export function Couple({ wedding }: { wedding: Wedding }) {
   return (
     <section id="couple" className="section-pad relative">
       <div className="mx-auto max-w-5xl">
-        <SectionTitle eyebrow="គូស្វាមីភរិយាថ្មី" title="កូនប្រុស និង កូនស្រី" />
+        <SectionTitle eyebrow="គូស្វាមីភរិយាថ្មី" title="កូនប្រុស និង កូនស្រី" flourish="title-couple" />
 
         <div className="flex flex-col items-center gap-12">
           <Person
@@ -78,9 +78,9 @@ export function Couple({ wedding }: { wedding: Wedding }) {
             align="left"
           />
 
-          <div className="reveal flex shrink-0 flex-col items-center gap-3 self-center text-gold-dark">
-            <WeddingRings className="h-12 w-20" />
-            <span className="font-latin text-sm italic text-gold-deep">និង</span>
+          {/* the heart from the couple's name mark, joining the two of them */}
+          <div className="reveal flex shrink-0 self-center" role="img" aria-label="និង">
+            <Heart className="couple-heart h-9 w-9" />
           </div>
 
           <Person

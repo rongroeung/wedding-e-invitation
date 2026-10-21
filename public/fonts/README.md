@@ -17,3 +17,14 @@ actually chosen is ever downloaded.
 
 Body text uses Noto Sans Khmer, loaded from Google Fonts (or self-hosted via
 `npm run fonts:download`).
+
+**khmer/** — the Khmer typefaces offered under ពុម្ពអក្សរ in the dashboard
+(`src/lib/khmer-fonts.json`, built by `scripts/khmer-fonts.py`):
+- the Google Fonts Khmer families, **SIL OFL 1.1** (`OFL.txt`), taken from the
+  `@fontsource` packages in Khmer and Latin subsets;
+- the Khmer OS family (Danh Hong / Open Forum of Cambodia), **LGPL-2.1+**
+  (`KhmerOS-LICENSE.txt`), converted from Ubuntu's `fonts-khmeros` and
+  `fonts-khmeros-core` TTFs to WOFF2, with no glyphs or metrics changed.
+
+`khmer-fonts.css` declares them all with `font-display: swap`; a guest
+downloads only the faces the invitation actually uses.

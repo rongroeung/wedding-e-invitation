@@ -1,6 +1,8 @@
 "use client";
 
 import { useId } from "react";
+
+import type { EnvelopeFace } from "@/lib/artwork";
 import { BotanicalArt } from "./EnvelopeBotanical";
 import { GiltFrame } from "./GiltFrame";
 import { WaxSeal } from "./WaxSeal";
@@ -57,6 +59,7 @@ export function SlidingCover({
   seal,
   gold,
   dense,
+  face,
 }: {
   /** The seal has released. */
   unsealed: boolean;
@@ -68,13 +71,25 @@ export function SlidingCover({
   gold: boolean;
   /** The richer styles press a fuller die into the paper. */
   dense: boolean;
+  /**
+   * The couple's own picture, printed on the paper.
+   *
+   * It is drawn into the envelope's own coordinate space rather than into each
+   * panel's, which is the same trick the gilt frame and the emboss already use
+   * and is the only way one picture can run across both panels and meet exactly
+   * at the join. Compose it as two halves and they will not meet — not at any
+   * viewport, and worse at some than at others.
+   *
+   * `null` when nothing is uploaded, and then nothing about this file changes.
+   */
+  face: EnvelopeFace | null;
 }) {
   const uid = useId().replace(/:/g, "");
 
   return (
     <>
-      <Panel side="left" uid={uid} open={open} dense={dense} />
-      <Panel side="right" uid={uid} open={open} dense={dense} />
+      <Panel side="left" uid={uid} open={open} dense={dense} face={face} />
+      <Panel side="right" uid={uid} open={open} dense={dense} face={face} />
 
       {/*
         * The seal sits over the join, which means it belongs to neither panel —
@@ -97,11 +112,13 @@ function Panel({
   uid,
   open,
   dense,
+  face,
 }: {
   side: "left" | "right";
   uid: string;
   open: boolean;
   dense: boolean;
+  face: EnvelopeFace | null;
 }) {
   const left = side === "left";
   const id = `${side}-${uid}`;
@@ -169,15 +186,60 @@ function Panel({
 
         <rect x={left ? 0 : 500} y="0" width="500" height="1280" fill={`url(#p-${id})`} />
 
+        {/*
+          * The couple's own picture, over the paper and under everything else.
+          *
+          * Drawn at the *whole* envelope — 0 to 1000 — in both panels, and each
+          * panel's `viewBox` cuts it to its own half. That is what makes the
+          * two halves meet: they are not two crops that have to agree, they are
+          * one drawing seen through two windows.
+          *
+          * `preserveAspectRatio` carries the couple's fit, so "cover" crops the
+          * picture to fill the paper and "contain" shows all of it with the
+          * paper's own gradient still visible around it. The paper rect above
+          * is deliberately still drawn either way: with "contain" it is the
+          * mount the photograph sits on, and with "cover" it is what shows for
+          * the moment before the picture has loaded.
+          */}
+        {face && (
+          <>
+            <image
+              href={face.src}
+              x="0"
+              y="0"
+              width="1000"
+              height="1280"
+              preserveAspectRatio={face.preserveAspectRatio}
+            />
+            {/*
+              * A wash of the paper's own colour over the photograph.
+              *
+              * Gold on a busy picture is unreadable, and the couple cannot be
+              * asked to solve that by editing the photograph. This is the dial
+              * that takes it back towards the paper without them having to.
+              */}
+            {face.scrim > 0 && (
+              <rect
+                x={left ? 0 : 500}
+                y="0"
+                width="500"
+                height="1280"
+                fill="var(--env-paper)"
+                opacity={face.scrim}
+              />
+            )}
+          </>
+        )}
+
         {/* the embossed florals, cut off by this panel's own edges */}
-        <BotanicalArt face="pocket" dense={dense} copy={side} />
+        {(!face || face.ornament) && <BotanicalArt face="pocket" dense={dense} copy={side} />}
 
         {/*
           * The gilt frame, drawn whole in the envelope's own coordinates and
           * cut to this panel by the `viewBox` above. See `GiltFrame`: composing
           * it as two halves that meet at the join is what it replaces.
           */}
-        <GiltFrame foil={`f-${id}`} />
+        {(!face || face.ornament) && <GiltFrame foil={`f-${id}`} />}
 
         {/*
           * The gilded cut edge along the join. On a sliding cover this is the

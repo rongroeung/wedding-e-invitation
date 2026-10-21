@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Wedding } from "@/lib/db/schema";
-import { GoldDivider, Lotus } from "@/components/ui/Ornaments";
+import { Flourish, FlourishDivider } from "@/components/ui/Ornaments";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 
 /** ទីតាំងប្រារព្ធពិធី — venue details with a lazily-mounted Google Map. */
@@ -12,15 +12,15 @@ export function Venue({ wedding }: { wedding: Wedding }) {
   return (
     <section id="venue" className="section-pad relative">
       <div className="mx-auto max-w-3xl">
-        <SectionTitle eyebrow="ទីកន្លែង" title="ទីតាំងប្រារព្ធពិធី" />
+        <SectionTitle eyebrow="ទីកន្លែង" title="ទីតាំងប្រារព្ធពិធី" flourish="title-venue" />
 
         <div className="reveal card-panel gold-border overflow-hidden rounded-[26px]">
           <div className="px-6 py-10 text-center sm:px-10">
-            <Lotus className="mx-auto h-6 w-6 text-gold-dark" />
+            <Flourish role="rosette" className="mx-auto w-7" />
             <h3 className="mt-5 text-lg leading-loose text-heading khmer-wrap">
               {wedding.venueName}
             </h3>
-            <GoldDivider className="my-5" width="max-w-[140px]" icon="diamond" />
+            <FlourishDivider role="fleuron" width={64} className="my-5" />
             <p className="mx-auto max-w-md text-base leading-loose text-ink/88 khmer-wrap">
               អាសយដ្ឋាន៖ {wedding.venueAddress}
             </p>

@@ -1,7 +1,6 @@
 import type { FrameConfig } from "@/lib/frame";
 import { FrameArt } from "./FrameArt";
-import { Lotus } from "./Ornaments";
-import { OrnamentBand } from "./OrnamentBand";
+import { Flourish } from "./Ornaments";
 
 /**
  * One edge of the card's frame — the head or the foot.
@@ -25,20 +24,49 @@ export function FrameEdge({
   const foil = { emboss: frame.emboss, depth: frame.depth };
 
   /*
+   * The botanical suites' own corners (scripts/botanical-art.py), always in
+   * the markup and shown only while a suite's paper is chosen — the paper is
+   * the guest's choice and changes without a render, so CSS decides
+   * (paperThemes.ts, the composed papers). Each corner is its own drawing,
+   * mirrored in the SVG, so nothing here is flipped.
+   */
+  const suite = frame.custom ? null : (
+    <>
+      <span className={`bt-frame bt-corner ${bottom ? "bt-bl" : "bt-tl"}`} />
+      <span className={`bt-frame bt-corner ${bottom ? "bt-br" : "bt-tr"}`} />
+    </>
+  );
+  const hasBt = frame.custom ? "" : "has-bt";
+
+  /*
    * What joins the corners to one another: a hairline from each piece meeting
-   * a lotus at the centre. It is what stops four ornaments reading as four
+   * a fleuron at the centre. It is what stops four ornaments reading as four
    * unrelated pictures, and it fills the gap the band leaves when the frame is
    * scaled below full width. Printed, like the rest of it — it does not draw
    * itself on.
    */
   const join = (
     <span
-      className="frame-join pointer-events-none absolute inset-x-0 top-1/2 flex -translate-y-1/2 items-center justify-center gap-[0.55rem] text-gold-frame"
-      style={{ paddingInline: `${frame.scale / 2 + 1}%` }}
+      className="frame-join pointer-events-none absolute inset-x-0 flex -translate-y-1/2 items-center justify-center gap-[0.55rem] text-gold-frame"
+      style={{
+        // a band's hairline starts past its scaled half; a corner's runs on
+        // from the tip of the corner's own horizontal stroke. Corners are
+        // capped by the screen's height as well as the card's width, so a
+        // wide card does not hand half its height to the frame.
+        paddingInline:
+          frame.layout === "corner"
+            ? `calc(min(${(frame.cornerWidth * frame.scale) / 100}%, 17dvh) - 0.6%)`
+            : `${frame.scale / 2 + 1}%`,
+        // the corner's own run, mirrored for the foot
+        top: `${(bottom ? 1 - frame.joinY : frame.joinY) * 100}%`,
+      }}
       aria-hidden="true"
     >
       <span className="frame-rule frame-rule-left h-px flex-1" />
-      <Lotus className="frame-centre h-3 w-3 shrink-0 text-gold-1" />
+      <Flourish
+        role="fleuron"
+        className={`frame-centre w-[clamp(22px,7%,40px)] ${bottom ? "-scale-y-100" : ""}`}
+      />
       <span className="frame-rule frame-rule-right h-px flex-1" />
     </span>
   );
@@ -51,37 +79,25 @@ export function FrameEdge({
     if (!frame.cornerSrc) return null;
     return (
       <div
-        className="pointer-events-none relative flex w-full shrink-0 justify-between"
+        className={`frame-edge ${hasBt} pointer-events-none relative flex w-full shrink-0 justify-between`}
         aria-hidden="true"
       >
         {join}
+        {suite}
         <FrameArt
           src={frame.cornerSrc}
           tint={frame.tint}
           {...foil}
-          style={{ width: `${28 * scale}%` }}
-          className={bottom ? "-scale-y-100" : ""}
+          style={{ width: `min(${frame.cornerWidth * scale}%, 17dvh)` }}
+          className={bottom ? "-scale-y-100" : "frame-corner-tl"}
         />
         <FrameArt
           src={frame.cornerSrc}
           tint={frame.tint}
           {...foil}
-          style={{ width: `${28 * scale}%` }}
-          className={bottom ? "-scale-100" : "-scale-x-100"}
+          style={{ width: `min(${frame.cornerWidth * scale}%, 17dvh)` }}
+          className={bottom ? "-scale-100 frame-corner-br" : "-scale-x-100"}
         />
-      </div>
-    );
-  }
-
-  // A generated band is built around a centre motif, so it scales about the
-  // centre.
-  if (!frame.art) {
-    return (
-      <div
-        className="pointer-events-none flex w-full shrink-0 justify-center text-gold-frame"
-        aria-hidden="true"
-      >
-        <OrnamentBand motif={frame.motif} flip={bottom} style={{ width: `${frame.scale}%` }} />
       </div>
     );
   }
@@ -105,10 +121,11 @@ export function FrameEdge({
 
   return (
     <div
-      className="pointer-events-none relative flex w-full shrink-0 justify-between text-gold-frame"
+      className={`frame-edge ${hasBt} pointer-events-none relative flex w-full shrink-0 justify-between text-gold-frame`}
       aria-hidden="true"
     >
       {join}
+      {suite}
       <span className="overflow-hidden" style={half}>
         <FrameArt
           src={src}

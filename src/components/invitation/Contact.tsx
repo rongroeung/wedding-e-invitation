@@ -1,5 +1,5 @@
 import type { Wedding } from "@/lib/db/schema";
-import { GoldDivider } from "@/components/ui/Ornaments";
+import { FlourishDivider } from "@/components/ui/Ornaments";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 
 function ContactCard({
@@ -23,7 +23,7 @@ function ContactCard({
         <span className="text-sm text-ink/75">{title} </span>
         {name}
       </p>
-      <GoldDivider className="my-4" width="max-w-[100px]" icon="none" />
+      <FlourishDivider role="fleuron" width={64} className="my-4" />
       <p className="font-latin text-base tracking-wide text-ink/88">📞 {phone}</p>
       <a href={`tel:${phone.replace(/\s/g, "")}`} className="btn-gold mt-5 text-sm">
         {action}

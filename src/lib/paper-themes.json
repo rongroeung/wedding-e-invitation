@@ -1,0 +1,247 @@
+[
+ {
+  "key": "classic-ivory",
+  "km": "ភ្លុកបុរាណ ក្បាច់វល្លិ",
+  "en": "Ivory Ornamental Elegance",
+  "dark": false,
+  "base": "#f8f2e7",
+  "shade": "#e9ddc8",
+  "light": "rgb(255 253 246 / 0.9)",
+  "metal": [
+   "#8a693d",
+   "#bf9d66",
+   "#e6d2a6",
+   "#a5834f"
+  ],
+  "petal": "#e2b9ae",
+  "heart": "#e3c487",
+  "leaf": "#a8b39a",
+  "foil": 0.92,
+  "bloom": 0.42,
+  "fibre": 0.42,
+  "ink": "#4a3527",
+  "line": "#6e5341",
+  "lineAlpha": 0.74,
+  "compose": {
+   "art": [
+    {
+     "comp": "camellia-spray",
+     "corner": "bl",
+     "size": "a"
+    },
+    {
+     "comp": "branch-hang",
+     "corner": "tr",
+     "size": "b"
+    }
+   ],
+   "lineMetal": false,
+   "corner": "acanthus"
+  },
+  "size": 460,
+  "relief": 0,
+  "centre": 0,
+  "kline": 0,
+  "pattern": "none",
+  "group": "stationery"
+ },
+ {
+  "key": "vintage-gold",
+  "km": "ក្បាច់វល្លិមាសបុរាណ",
+  "en": "Vintage Gold Flourish",
+  "dark": false,
+  "base": "#f7efe1",
+  "shade": "#e6d6bb",
+  "light": "rgb(255 251 240 / 0.9)",
+  "metal": [
+   "#86643a",
+   "#bd9a60",
+   "#e8d29f",
+   "#a17d47"
+  ],
+  "petal": "#dcb5a2",
+  "heart": "#dcbd7c",
+  "leaf": "#b3ad8c",
+  "foil": 0.95,
+  "bloom": 0.22,
+  "fibre": 0.42,
+  "ink": "#47311f",
+  "line": "#7d5d38",
+  "lineAlpha": 0.9,
+  "compose": {
+   "art": [
+    {
+     "comp": "camellia-single",
+     "corner": "bl",
+     "size": "c",
+     "beside": true
+    },
+    {
+     "comp": "camellia-single",
+     "corner": "br",
+     "size": "c",
+     "beside": true
+    }
+   ],
+   "lineMetal": true,
+   "corner": "acanthus-grand",
+   "mid": true
+  },
+  "size": 460,
+  "relief": 0,
+  "centre": 0,
+  "kline": 0,
+  "pattern": "none",
+  "group": "stationery"
+ },
+ {
+  "key": "floral-branches",
+  "km": "មែកផ្កា",
+  "en": "Floral Branches",
+  "dark": false,
+  "base": "#faf4ea",
+  "shade": "#ebdfcb",
+  "light": "rgb(255 252 246 / 0.9)",
+  "metal": [
+   "#8c6c45",
+   "#c2a16f",
+   "#e8d4ab",
+   "#a8875a"
+  ],
+  "petal": "#e4b3ad",
+  "heart": "#e8c78c",
+  "leaf": "#97aea4",
+  "foil": 0.88,
+  "bloom": 0.55,
+  "fibre": 0.38,
+  "ink": "#4b3128",
+  "line": "#6c4d40",
+  "lineAlpha": 0.72,
+  "compose": {
+   "art": [
+    {
+     "comp": "camellia-spray",
+     "corner": "bl",
+     "size": "a"
+    },
+    {
+     "comp": "branch-hang",
+     "corner": "tr",
+     "size": "b"
+    },
+    {
+     "comp": "camellia-single",
+     "corner": "br",
+     "size": "c"
+    }
+   ],
+   "lineMetal": false,
+   "corner": "floral"
+  },
+  "size": 460,
+  "relief": 0,
+  "centre": 0,
+  "kline": 0,
+  "pattern": "none",
+  "group": "stationery"
+ },
+ {
+  "key": "champagne-botanical",
+  "km": "រុក្ខជាតិពណ៌សំប៉ាញ",
+  "en": "Champagne Botanical",
+  "dark": false,
+  "base": "#f1e5cf",
+  "shade": "#ddcaa8",
+  "light": "rgb(255 249 236 / 0.85)",
+  "metal": [
+   "#86643a",
+   "#bb9760",
+   "#e5cf9c",
+   "#9e7b47"
+  ],
+  "petal": "#d6b399",
+  "heart": "#d8b878",
+  "leaf": "#b9ae8b",
+  "foil": 0.92,
+  "bloom": 0.14,
+  "fibre": 0.48,
+  "ink": "#47321f",
+  "line": "#7d5d38",
+  "lineAlpha": 0.92,
+  "compose": {
+   "art": [
+    {
+     "comp": "camellia-spray",
+     "corner": "bl",
+     "size": "a"
+    },
+    {
+     "comp": "branch-hang",
+     "corner": "tr",
+     "size": "b"
+    }
+   ],
+   "blind": [
+    {
+     "comp": "camellia-single",
+     "corner": "br",
+     "size": "c"
+    }
+   ],
+   "lineMetal": true,
+   "corner": "acanthus"
+  },
+  "size": 460,
+  "relief": 0,
+  "centre": 0,
+  "kline": 0,
+  "pattern": "none",
+  "group": "stationery"
+ },
+ {
+  "key": "burgundy-gold",
+  "km": "ក្រហមទំពាំងបាយជូរ និងមាស",
+  "en": "Burgundy & Gold",
+  "dark": true,
+  "base": "#5a1f2b",
+  "shade": "#3a111b",
+  "light": "rgb(255 214 196 / 0.1)",
+  "metal": [
+   "#a07a42",
+   "#d2ae6a",
+   "#efdba4",
+   "#b48d4e"
+  ],
+  "petal": "#cf9690",
+  "heart": "#d6ad68",
+  "leaf": "#97956f",
+  "foil": 1,
+  "bloom": 0.2,
+  "fibre": 0.32,
+  "ink": "#f3e4cc",
+  "line": "#e0c38b",
+  "lineAlpha": 0.92,
+  "compose": {
+   "art": [
+    {
+     "comp": "camellia-spray",
+     "corner": "bl",
+     "size": "a"
+    },
+    {
+     "comp": "branch-hang",
+     "corner": "tr",
+     "size": "b"
+    }
+   ],
+   "lineMetal": true,
+   "corner": "acanthus"
+  },
+  "size": 460,
+  "relief": 0,
+  "centre": 0,
+  "kline": 0,
+  "pattern": "none",
+  "group": "stationery"
+ }
+]

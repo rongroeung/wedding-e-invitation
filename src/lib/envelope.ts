@@ -119,9 +119,11 @@ export const ENVELOPE_STYLES: Record<EnvelopeStyleKey, EnvelopeStyle> = {
     key: "blush-rose",
     label: "ផ្កាឈូកស្រាល",
     note: "ក្រដាសពណ៌ផ្កាឈូកស្រាល ជាមួយមាសសំប៉ាញ",
-    paper: "#fbe4e9",
-    paperShade: "#f7d6de",
-    paperDeep: "#efc1cc",
+    /* dusty blush cotton: a little grey in the pink, so it reads as paper
+       under warm light rather than as a flat sugared pink */
+    paper: "#eccdd3",
+    paperShade: "#e3bdc5",
+    paperDeep: "#cfa1ac",
     ink: "#6b3a48",
     gold: "#c9a96e",
     goldLight: "#e8d2b0",

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { COUNTDOWN_LABELS, toKhmerNumber2 } from "@/lib/khmer";
-import { GoldDivider } from "@/components/ui/Ornaments";
+import { FlourishDivider } from "@/components/ui/Ornaments";
 
 type Remaining = { days: number; hours: number; minutes: number; seconds: number };
 
@@ -51,21 +51,21 @@ export function Countdown({ date }: { date: string }) {
       <p className="text-center text-xs text-gold-deep">
         រាប់ថយក្រោយដល់ថ្ងៃមង្គលការ
       </p>
-      <GoldDivider className="my-5" width="max-w-[150px]" icon="none" />
+      <FlourishDivider role="star" width={180} className="my-5" />
 
       <div className="mx-auto grid max-w-md grid-cols-4 gap-2 sm:gap-4">
         {cells.map(([key, value]) => (
           <div
             key={key}
-            className="card-panel gold-border rounded-2xl px-1 py-4 text-center sm:py-5"
+            className="cd-cell rounded-2xl px-1 py-4 text-center sm:py-5"
           >
             <div
-              className="gold-text text-2xl tabular-nums"
+              className="gold-text foil-text text-2xl tabular-nums"
               suppressHydrationWarning
             >
               {toKhmerNumber2(value)}
             </div>
-            <div className="mt-1 text-xs text-ink/75">
+            <div className="cd-label mt-1 text-xs">
               {COUNTDOWN_LABELS[key]}
             </div>
           </div>

@@ -1,0 +1,230 @@
+[
+ {
+  "family": "Khmer OS Muol Light",
+  "role": "heading",
+  "note": "អក្សរមូលស្រាល — ប្រពៃណីសម្រាប់ចំណងជើងពិធី",
+  "license": "LGPL-2.1+"
+ },
+ {
+  "family": "Moul",
+  "role": "heading",
+  "note": "អក្សរមូល — ក្រាស់ ឧឡារិក",
+  "license": "OFL-1.1"
+ },
+ {
+  "family": "Noto Serif Khmer",
+  "role": "text",
+  "note": "អក្សរមានជើង — ស្អាតអានងាយ",
+  "license": "OFL-1.1"
+ },
+ {
+  "family": "Noto Sans Khmer",
+  "role": "text",
+  "note": "អក្សរគ្មានជើង — ទំនើប ច្បាស់",
+  "license": "OFL-1.1"
+ },
+ {
+  "family": "Kantumruy Pro",
+  "role": "text",
+  "note": "អក្សរទំនើប — ស្ដើង ស្អាត",
+  "license": "OFL-1.1"
+ },
+ {
+  "family": "Moulpali",
+  "role": "heading",
+  "note": "អក្សរមូលបាលី — ឧឡារិក",
+  "license": "OFL-1.1"
+ },
+ {
+  "family": "Koulen",
+  "role": "heading",
+  "note": "អក្សរគូលេន — ក្រាស់ ទំនើប",
+  "license": "OFL-1.1"
+ },
+ {
+  "family": "Bokor",
+  "role": "heading",
+  "note": "អក្សរបូកគោ — ស្ទីលបុរាណ",
+  "license": "OFL-1.1"
+ },
+ {
+  "family": "Taprom",
+  "role": "heading",
+  "note": "អក្សរតាព្រហ្ម — ក្បាច់ស្រស់",
+  "license": "OFL-1.1"
+ },
+ {
+  "family": "Fasthand",
+  "role": "heading",
+  "note": "អក្សរដៃ — សរសេររហ័ស",
+  "license": "OFL-1.1"
+ },
+ {
+  "family": "Odor Mean Chey",
+  "role": "heading",
+  "note": "អក្សរឧត្តរមានជ័យ",
+  "license": "OFL-1.1"
+ },
+ {
+  "family": "Preahvihear",
+  "role": "heading",
+  "note": "អក្សរព្រះវិហារ",
+  "license": "OFL-1.1"
+ },
+ {
+  "family": "Suwannaphum",
+  "role": "text",
+  "note": "អក្សរសុវណ្ណភូមិ — មានជើងស្រទន់",
+  "license": "OFL-1.1"
+ },
+ {
+  "family": "Hanuman",
+  "role": "text",
+  "note": "អក្សរហនុមាន — មានជើង អានស្រួល",
+  "license": "OFL-1.1"
+ },
+ {
+  "family": "Angkor",
+  "role": "heading",
+  "note": "អក្សរអង្គរ — ចំណងជើងក្រាស់",
+  "license": "OFL-1.1"
+ },
+ {
+  "family": "Bayon",
+  "role": "heading",
+  "note": "អក្សរបាយ័ន — ស្ទីលចំណងជើង",
+  "license": "OFL-1.1"
+ },
+ {
+  "family": "Chenla",
+  "role": "heading",
+  "note": "អក្សរចេនឡា",
+  "license": "OFL-1.1"
+ },
+ {
+  "family": "Dangrek",
+  "role": "heading",
+  "note": "អក្សរដងរែក — ក្រាស់ រឹងមាំ",
+  "license": "OFL-1.1"
+ },
+ {
+  "family": "Freehand",
+  "role": "heading",
+  "note": "អក្សរសរសេរដៃ — សេរី ស្រទន់",
+  "license": "OFL-1.1"
+ },
+ {
+  "family": "Metal",
+  "role": "heading",
+  "note": "អក្សរមេតាល់ — ស្ទីលពិសេស",
+  "license": "OFL-1.1"
+ },
+ {
+  "family": "Kdam Thmor Pro",
+  "role": "heading",
+  "note": "អក្សរក្ដាមថ្ម — ទំនើប ក្រាស់",
+  "license": "OFL-1.1"
+ },
+ {
+  "family": "Battambang",
+  "role": "text",
+  "note": "អក្សរបាត់ដំបង — ពេញនិយមសម្រាប់អត្ថបទ",
+  "license": "OFL-1.1"
+ },
+ {
+  "family": "Content",
+  "role": "text",
+  "note": "អក្សរខនថេន — អត្ថបទទូទៅ",
+  "license": "OFL-1.1"
+ },
+ {
+  "family": "Khmer",
+  "role": "text",
+  "note": "អក្សរខ្មែរ — សាមញ្ញ ច្បាស់",
+  "license": "OFL-1.1"
+ },
+ {
+  "family": "Koh Santepheap",
+  "role": "text",
+  "note": "អក្សរកោះសន្តិភាព — មានជើង",
+  "license": "OFL-1.1"
+ },
+ {
+  "family": "Nokora",
+  "role": "text",
+  "note": "អក្សរនគរ — ទំនើប ស្អាត",
+  "license": "OFL-1.1"
+ },
+ {
+  "family": "Siemreap",
+  "role": "text",
+  "note": "អក្សរសៀមរាប — អត្ថបទទូទៅ",
+  "license": "OFL-1.1"
+ },
+ {
+  "family": "Khmer OS",
+  "role": "text",
+  "note": "Khmer OS — ស្តង់ដារ ពេញនិយមបំផុត",
+  "license": "LGPL-2.1+"
+ },
+ {
+  "family": "Khmer OS System",
+  "role": "text",
+  "note": "Khmer OS System — សម្រាប់អត្ថបទ",
+  "license": "LGPL-2.1+"
+ },
+ {
+  "family": "Khmer OS Battambang",
+  "role": "text",
+  "note": "Khmer OS Battambang — អត្ថបទ ពេញនិយម",
+  "license": "LGPL-2.1+"
+ },
+ {
+  "family": "Khmer OS Siemreap",
+  "role": "text",
+  "note": "Khmer OS Siemreap — អត្ថបទ ពេញនិយម",
+  "license": "LGPL-2.1+"
+ },
+ {
+  "family": "Khmer OS Content",
+  "role": "text",
+  "note": "Khmer OS Content — អត្ថបទ",
+  "license": "LGPL-2.1+"
+ },
+ {
+  "family": "Khmer OS Muol",
+  "role": "heading",
+  "note": "Khmer OS Muol — មូលក្រាស់ ប្រពៃណី",
+  "license": "LGPL-2.1+"
+ },
+ {
+  "family": "Khmer OS Muol Pali",
+  "role": "heading",
+  "note": "Khmer OS Muol Pali — មូលបាលី",
+  "license": "LGPL-2.1+"
+ },
+ {
+  "family": "Khmer OS Bokor",
+  "role": "heading",
+  "note": "Khmer OS Bokor — ស្ទីលបុរាណ",
+  "license": "LGPL-2.1+"
+ },
+ {
+  "family": "Khmer OS Fasthand",
+  "role": "heading",
+  "note": "Khmer OS Fasthand — សរសេរដៃ",
+  "license": "LGPL-2.1+"
+ },
+ {
+  "family": "Khmer OS Freehand",
+  "role": "heading",
+  "note": "Khmer OS Freehand — សរសេរដៃសេរី",
+  "license": "LGPL-2.1+"
+ },
+ {
+  "family": "Khmer OS Metal Chrieng",
+  "role": "heading",
+  "note": "Khmer OS Metal Chrieng — ទ្រេត ស្រស់",
+  "license": "LGPL-2.1+"
+ }
+]

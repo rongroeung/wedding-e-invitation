@@ -71,6 +71,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="font/woff2"
           crossOrigin="anonymous"
         />
+        {/* the Khmer typefaces a couple can choose (each downloaded only if used) */}
+        <link rel="stylesheet" href="/fonts/khmer/khmer-fonts.css" />
         {selfHostedFonts ? (
           <link rel="stylesheet" href="/fonts/fonts.css" />
         ) : (

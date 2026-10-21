@@ -1,6 +1,11 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import { useEffect, useLayoutEffect, useState } from "react";
+
+import type { CurtainSkin } from "@/lib/artwork";
+
+import { Drape } from "./Drape";
 
 const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
@@ -307,19 +312,56 @@ function Panel({
   open,
   rich,
   folds,
+  skin,
 }: {
   side: "left" | "right";
   open: boolean;
   rich: boolean;
   folds: FoldSet;
+  /** The couple's own cloth, or `null` for the drawn velvet. */
+  skin: CurtainSkin | null;
 }) {
   const uid = side;
   /* The leading edge is the one that faces the middle of the stage. */
   const leading = side === "left" ? "right" : "left";
 
-  return (
+  /*
+   * With a picture on it the drawn cloth stops being the cloth and becomes the
+   * *light on* the cloth: the folds are blended over the photograph rather than
+   * painted in front of it, in grey rather than in the velvet's own colours,
+   * so the couple's fabric keeps its colour and gains this curtain's shading.
+   * `soft-light` is the blend that does that without crushing either end —
+   * `overlay` at this strength turns the valleys black.
+   *
+   * With `curtainFolds` off there is no SVG at all. That loses the leading-edge
+   * glow and the cast shadow with it, which is the honest cost of the setting:
+   * those are lighting drawn for cloth we are no longer drawing.
+   */
+  const shaded = Boolean(skin) && skin!.folds;
+  if (skin && !shaded) {
+    return (
+      <div
+        className={`curtain ${PANEL_SIDE[side]} ${open ? "curtain-open" : ""}`}
+        aria-hidden="true"
+      >
+        <Skin skin={skin} rich={rich} />
+      </div>
+    );
+  }
+
+  const svg = (
     <svg
-      className={`curtain ${PANEL_SIDE[side]} ${open ? "curtain-open" : ""}`}
+      /*
+        * One class or the other, never both. `.curtain-face` is `inset: 0` on a
+        * wrapper that already has the panel's position; `.curtain` *is* that
+        * position. An element wearing the two of them takes `left: 0` from the
+        * first, which puts the right-hand panel on the left of the screen.
+        */
+      className={
+        skin
+          ? "curtain-face"
+          : `curtain ${PANEL_SIDE[side]} ${open ? "curtain-open" : ""}`
+      }
       viewBox={`0 0 ${W} ${H}`}
       preserveAspectRatio="none"
       aria-hidden="true"
@@ -528,6 +570,71 @@ function Panel({
       <rect x="0" y="0" width={W} height={H} fill={`url(#cast-${uid})`} />
     </svg>
   );
+
+  if (!skin) return svg;
+
+  return (
+    <div
+      className={`curtain curtain-skinned ${PANEL_SIDE[side]} ${open ? "curtain-open" : ""}`}
+      aria-hidden="true"
+      style={{ "--curtain-shade": skin.shade } as CSSProperties}
+    >
+      <Skin skin={skin} rich={rich} />
+      {svg}
+    </div>
+  );
+}
+
+/**
+ * The couple's own cloth, spanning the **whole stage** inside a panel that is
+ * only part of it.
+ *
+ * A picture sized to the panel would be two different crops of the same
+ * photograph butted together down the middle of the screen, which reads as a
+ * seam in the image rather than as a join between two curtains. Each panel is
+ * 54% of the stage, so the skin inside it is 100/54 of the panel — anchored to
+ * the panel's *outer* edge, which is the edge that stays put. Both panels then
+ * paint the same picture over the same stage, and the eight per cent where they
+ * overlap shows the same part of it twice.
+ *
+ * It is inside the panel, so it gathers with it: the horizontal squeeze that
+ * bunches the folds squeezes the photograph too, which is what cloth does.
+ */
+function Skin({ skin, rich }: { skin: CurtainSkin; rich: boolean }) {
+  /*
+   * A film is dropped on a phone, and this is the one place in the feature
+   * where that is not a nicety. These panels are transformed for 2.3 seconds
+   * while they part; a decoding video underneath a transforming element is the
+   * same main-thread cost that made the envelope stop answering taps, and it
+   * would land in exactly the same seconds. The poster is shown instead, and
+   * where there is no poster the picture is simply the first frame the browser
+   * paints of a film it never plays.
+   */
+  if (skin.kind === "video" && rich) {
+    return (
+      // eslint-disable-next-line jsx-a11y/media-has-caption
+      <video
+        className={`curtain-skin curtain-skin-${skin.fit}`}
+        src={skin.src}
+        poster={skin.poster || undefined}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        aria-hidden="true"
+      />
+    );
+  }
+
+  const src = skin.kind === "video" ? skin.poster || skin.src : skin.src;
+  return (
+    <span
+      className={`curtain-skin curtain-skin-${skin.fit}`}
+      style={{ backgroundImage: `url("${src}")` }}
+      aria-hidden="true"
+    />
+  );
 }
 
 /**
@@ -692,6 +799,7 @@ export function VelvetCurtains({
   open,
   struck,
   rich = true,
+  skin = null,
 }: {
   open: boolean;
   /** Finished opening: fade out, and be unmounted a moment later. */
@@ -709,16 +817,41 @@ export function VelvetCurtains({
    * the only one of the two that is still an invitation.
    */
   rich?: boolean;
+  /**
+   * The couple's own cloth, printed on the panels.
+   *
+   * `null` — the default — is the drawn velvet, unchanged. The panels still
+   * part and still gather either way: this replaces what the cloth *is*, never
+   * what it does.
+   */
+  skin?: CurtainSkin | null;
 }) {
   const folds = useFoldSet();
+
+  /*
+   * The drawn cloth is now `Drape`: pre-rendered fabric cut into folds that
+   * gather one after another. The SVG velvet below is kept for the one case
+   * that still needs it — the couple's own picture printed on the panels — so
+   * that setting behaves exactly as it did.
+   */
+  if (!skin) {
+    return (
+      <div
+        className={`curtains ${open ? "curtains-open" : ""} ${struck ? "curtains-struck" : ""}`}
+        aria-hidden="true"
+      >
+        <Drape open={open} />
+      </div>
+    );
+  }
 
   return (
     <div
       className={`curtains ${open ? "curtains-open" : ""} ${struck ? "curtains-struck" : ""}`}
       aria-hidden="true"
     >
-      <Panel side="left" open={open} rich={rich} folds={folds} />
-      <Panel side="right" open={open} rich={rich} folds={folds} />
+      <Panel side="left" open={open} rich={rich} folds={folds} skin={skin} />
+      <Panel side="right" open={open} rich={rich} folds={folds} skin={skin} />
       {/*
         * The dark seam where the two panels meet — the one part of a closed set
         * that no light reaches at all, and the first thing missing from a pair

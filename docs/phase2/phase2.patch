@@ -1,0 +1,2967 @@
+diff -ruN -x node_modules -x .next -x .data -x .git -x .env -x docs -x body -x '*.woff2' -x '*.webp' -x '*.png' -x tsconfig.tsbuildinfo -x next-env.d.ts a/drizzle/0024_flap_envelope.sql b/drizzle/0024_flap_envelope.sql
+--- a/drizzle/0024_flap_envelope.sql	1970-01-01 07:00:00.000000000 +0700
++++ b/drizzle/0024_flap_envelope.sql	2026-10-16 00:49:42.844607261 +0700
+@@ -0,0 +1,17 @@
++-- The flap envelope: a card that slides out, and a heading on the set.
++--
++-- The opening is now one handcrafted movement of about five and a half
++-- seconds — the seal is pressed and lifted away, the flap folds back, the
++-- card slides out and comes toward the camera, and the scene passes through a
++-- brief dark moment into the curtains. At the old 2.8s the flap and the card
++-- would be a blur. Moved only where the record is still on the value the last
++-- migration set; a couple who chose their own timing keeps it.
++ALTER TABLE "wedding" ALTER COLUMN "envelope_duration" SET DEFAULT 5500;
++--> statement-breakpoint
++UPDATE "wedding" SET "envelope_duration" = 5500 WHERE "envelope_duration" = 2800;
++--> statement-breakpoint
++-- The ceremonial heading set above the envelope, and the small script line
++-- beneath it. Both editable; empty hides the line.
++ALTER TABLE "wedding" ADD COLUMN IF NOT EXISTS "envelope_title" text NOT NULL DEFAULT 'សិរីសួស្តីអាពាហ៍ពិពាហ៍';
++--> statement-breakpoint
++ALTER TABLE "wedding" ADD COLUMN IF NOT EXISTS "envelope_subtitle" text NOT NULL DEFAULT 'The Wedding Invitation';
+diff -ruN -x node_modules -x .next -x .data -x .git -x .env -x docs -x body -x '*.woff2' -x '*.webp' -x '*.png' -x tsconfig.tsbuildinfo -x next-env.d.ts a/public/fonts/fonts.css b/public/fonts/fonts.css
+--- a/public/fonts/fonts.css	1970-01-01 07:00:00.000000000 +0700
++++ b/public/fonts/fonts.css	2026-10-16 00:43:58.065193786 +0700
+@@ -0,0 +1,38 @@
++/* Self-hosted body fonts (SIL OFL 1.1), from the @fontsource packages.
++ * The layout loads this file instead of Google Fonts whenever it exists, so
++ * guests on networks where fonts.googleapis.com is slow or blocked still see
++ * Khmer set in the intended faces. Display faces (Moul, Moulpali, Pinyon
++ * Script, Cormorant Garamond, Khmer OS Muol Light) are declared in globals.css. */
++
++@font-face{font-family:'Noto Sans Khmer';font-style:normal;font-weight:300;font-display:swap;src:url(/fonts/body/noto-sans-khmer-khmer-300-normal.woff2) format('woff2');unicode-range:U+1780-17FF, U+19E0-19FF, U+200C-200D, U+25CC;}
++@font-face{font-family:'Noto Sans Khmer';font-style:normal;font-weight:300;font-display:swap;src:url(/fonts/body/noto-sans-khmer-latin-300-normal.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
++@font-face{font-family:'Noto Sans Khmer';font-style:normal;font-weight:400;font-display:swap;src:url(/fonts/body/noto-sans-khmer-khmer-400-normal.woff2) format('woff2');unicode-range:U+1780-17FF, U+19E0-19FF, U+200C-200D, U+25CC;}
++@font-face{font-family:'Noto Sans Khmer';font-style:normal;font-weight:400;font-display:swap;src:url(/fonts/body/noto-sans-khmer-latin-400-normal.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
++@font-face{font-family:'Noto Sans Khmer';font-style:normal;font-weight:500;font-display:swap;src:url(/fonts/body/noto-sans-khmer-khmer-500-normal.woff2) format('woff2');unicode-range:U+1780-17FF, U+19E0-19FF, U+200C-200D, U+25CC;}
++@font-face{font-family:'Noto Sans Khmer';font-style:normal;font-weight:500;font-display:swap;src:url(/fonts/body/noto-sans-khmer-latin-500-normal.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
++@font-face{font-family:'Noto Sans Khmer';font-style:normal;font-weight:600;font-display:swap;src:url(/fonts/body/noto-sans-khmer-khmer-600-normal.woff2) format('woff2');unicode-range:U+1780-17FF, U+19E0-19FF, U+200C-200D, U+25CC;}
++@font-face{font-family:'Noto Sans Khmer';font-style:normal;font-weight:600;font-display:swap;src:url(/fonts/body/noto-sans-khmer-latin-600-normal.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
++@font-face{font-family:'Noto Sans Khmer';font-style:normal;font-weight:700;font-display:swap;src:url(/fonts/body/noto-sans-khmer-khmer-700-normal.woff2) format('woff2');unicode-range:U+1780-17FF, U+19E0-19FF, U+200C-200D, U+25CC;}
++@font-face{font-family:'Noto Sans Khmer';font-style:normal;font-weight:700;font-display:swap;src:url(/fonts/body/noto-sans-khmer-latin-700-normal.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
++@font-face{font-family:'Noto Serif Khmer';font-style:normal;font-weight:400;font-display:swap;src:url(/fonts/body/noto-serif-khmer-khmer-400-normal.woff2) format('woff2');unicode-range:U+1780-17FF, U+19E0-19FF, U+200C-200D, U+25CC;}
++@font-face{font-family:'Noto Serif Khmer';font-style:normal;font-weight:400;font-display:swap;src:url(/fonts/body/noto-serif-khmer-latin-400-normal.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
++@font-face{font-family:'Noto Serif Khmer';font-style:normal;font-weight:500;font-display:swap;src:url(/fonts/body/noto-serif-khmer-khmer-500-normal.woff2) format('woff2');unicode-range:U+1780-17FF, U+19E0-19FF, U+200C-200D, U+25CC;}
++@font-face{font-family:'Noto Serif Khmer';font-style:normal;font-weight:500;font-display:swap;src:url(/fonts/body/noto-serif-khmer-latin-500-normal.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
++@font-face{font-family:'Noto Serif Khmer';font-style:normal;font-weight:600;font-display:swap;src:url(/fonts/body/noto-serif-khmer-khmer-600-normal.woff2) format('woff2');unicode-range:U+1780-17FF, U+19E0-19FF, U+200C-200D, U+25CC;}
++@font-face{font-family:'Noto Serif Khmer';font-style:normal;font-weight:600;font-display:swap;src:url(/fonts/body/noto-serif-khmer-latin-600-normal.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
++@font-face{font-family:'Noto Serif Khmer';font-style:normal;font-weight:700;font-display:swap;src:url(/fonts/body/noto-serif-khmer-khmer-700-normal.woff2) format('woff2');unicode-range:U+1780-17FF, U+19E0-19FF, U+200C-200D, U+25CC;}
++@font-face{font-family:'Noto Serif Khmer';font-style:normal;font-weight:700;font-display:swap;src:url(/fonts/body/noto-serif-khmer-latin-700-normal.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
++@font-face{font-family:'Kantumruy Pro';font-style:normal;font-weight:300;font-display:swap;src:url(/fonts/body/kantumruy-pro-khmer-300-normal.woff2) format('woff2');unicode-range:U+1780-17FF, U+19E0-19FF, U+200C-200D, U+25CC;}
++@font-face{font-family:'Kantumruy Pro';font-style:normal;font-weight:300;font-display:swap;src:url(/fonts/body/kantumruy-pro-latin-300-normal.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
++@font-face{font-family:'Kantumruy Pro';font-style:normal;font-weight:400;font-display:swap;src:url(/fonts/body/kantumruy-pro-khmer-400-normal.woff2) format('woff2');unicode-range:U+1780-17FF, U+19E0-19FF, U+200C-200D, U+25CC;}
++@font-face{font-family:'Kantumruy Pro';font-style:normal;font-weight:400;font-display:swap;src:url(/fonts/body/kantumruy-pro-latin-400-normal.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
++@font-face{font-family:'Kantumruy Pro';font-style:normal;font-weight:500;font-display:swap;src:url(/fonts/body/kantumruy-pro-khmer-500-normal.woff2) format('woff2');unicode-range:U+1780-17FF, U+19E0-19FF, U+200C-200D, U+25CC;}
++@font-face{font-family:'Kantumruy Pro';font-style:normal;font-weight:500;font-display:swap;src:url(/fonts/body/kantumruy-pro-latin-500-normal.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
++@font-face{font-family:'Kantumruy Pro';font-style:normal;font-weight:600;font-display:swap;src:url(/fonts/body/kantumruy-pro-khmer-600-normal.woff2) format('woff2');unicode-range:U+1780-17FF, U+19E0-19FF, U+200C-200D, U+25CC;}
++@font-face{font-family:'Kantumruy Pro';font-style:normal;font-weight:600;font-display:swap;src:url(/fonts/body/kantumruy-pro-latin-600-normal.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
++@font-face{font-family:'Kantumruy Pro';font-style:normal;font-weight:700;font-display:swap;src:url(/fonts/body/kantumruy-pro-khmer-700-normal.woff2) format('woff2');unicode-range:U+1780-17FF, U+19E0-19FF, U+200C-200D, U+25CC;}
++@font-face{font-family:'Kantumruy Pro';font-style:normal;font-weight:700;font-display:swap;src:url(/fonts/body/kantumruy-pro-latin-700-normal.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
++@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:400;font-display:swap;src:url(/fonts/body/cormorant-garamond-latin-400-normal.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
++@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:500;font-display:swap;src:url(/fonts/body/cormorant-garamond-latin-500-normal.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
++@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:600;font-display:swap;src:url(/fonts/body/cormorant-garamond-latin-600-normal.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
++@font-face{font-family:'Cormorant Garamond';font-style:italic;font-weight:400;font-display:swap;src:url(/fonts/body/cormorant-garamond-latin-400-italic.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
+diff -ruN -x node_modules -x .next -x .data -x .git -x .env -x docs -x body -x '*.woff2' -x '*.webp' -x '*.png' -x tsconfig.tsbuildinfo -x next-env.d.ts a/public/kit/CREDITS.txt b/public/kit/CREDITS.txt
+--- a/public/kit/CREDITS.txt	1970-01-01 07:00:00.000000000 +0700
++++ b/public/kit/CREDITS.txt	2026-10-16 00:50:01.982625791 +0700
+@@ -0,0 +1,22 @@
++Khmer E-Invitation Starter Kit · by Someth Phay (somethphay.me)
++================================================================
++Free to use for your own wedding invitation. Please keep the credit.
++
++elements/  (original decorative elements, made for this design)
++  crest.svg      Fan-shaped crest: cover, seal, venue
++  corner.svg     Corner element (top-left; mirror it inside the SVG for other corners)
++  divider.svg    Section divider
++  wax-seal.svg   Lit gold wax seal with the crest pressed in
++  butterfly.svg  Butterfly used in the name logo
++  lotus.svg      Line lotus (loader / small accents)
++  All gold uses one gradient id "g-foil". Change its colours to match your card
++  (e.g. silver: #8a8f96 / #d9dde2 / #ffffff).
++
++textures/ (tileable 512x512, use as background-image, background-size ~320px)
++  paper-olive.webp   Envelope paper (olive). Recolour with a CSS filter or regenerate
++  paper-cream.webp   Card paper
++  paper-lining.webp  Envelope flap lining
++
++How to use with the prompt:
++  Attach this whole folder (or the zip) to Claude together with the prompt.
++  The prompt tells Claude to use these files instead of drawing its own.
+diff -ruN -x node_modules -x .next -x .data -x .git -x .env -x docs -x body -x '*.woff2' -x '*.webp' -x '*.png' -x tsconfig.tsbuildinfo -x next-env.d.ts a/public/kit/butterfly.svg b/public/kit/butterfly.svg
+--- a/public/kit/butterfly.svg	1970-01-01 07:00:00.000000000 +0700
++++ b/public/kit/butterfly.svg	2026-10-16 00:50:13.562127370 +0700
+@@ -0,0 +1,15 @@
++<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 80" aria-hidden="true"><defs><linearGradient id="g-foil" x1="0" y1="0" x2="1" y2=".35"><stop offset="0" stop-color="#8f7140"/><stop offset=".25" stop-color="#c9a96e"/><stop offset=".45" stop-color="#f5e8cc"/><stop offset=".62" stop-color="#c9a96e"/><stop offset=".85" stop-color="#8f7140"/><stop offset="1" stop-color="#c9a96e"/></linearGradient></defs><style>.kb-fill{fill:url(#g-foil)}.kb-line{fill:none;stroke:url(#g-foil);stroke-width:1.6;stroke-linecap:round}</style>
++  <g class="wing-l"><g transform="translate(100 0) scale(-1 1)">
++  <path d="M51 38 C58 14 82 1 94 10 C103 18 92 33 75 39 C66 42 57 41 51 40 Z" fill="url(#g-foil)" fill-opacity=".9"/>
++  <path d="M51 42 C62 44 80 50 81 62 C82 74 66 76 59 66 C54 59 51 51 51 42 Z" fill="url(#g-foil)" fill-opacity=".75"/>
++  <path d="M53 39 C64 30 76 20 90 13 M56 39 C68 36 80 33 92 24 M54 44 C62 52 70 58 78 64 M53 46 C57 56 61 64 66 70" fill="none" stroke="#5a4113" stroke-width=".8" stroke-opacity=".55"/>
++  <circle cx="86" cy="15" r="1.6" fill="#fff6d8" opacity=".8"/><circle cx="90" cy="22" r="1.1" fill="#fff6d8" opacity=".7"/></g></g>
++  <g class="wing-r">
++  <path d="M51 38 C58 14 82 1 94 10 C103 18 92 33 75 39 C66 42 57 41 51 40 Z" fill="url(#g-foil)" fill-opacity=".9"/>
++  <path d="M51 42 C62 44 80 50 81 62 C82 74 66 76 59 66 C54 59 51 51 51 42 Z" fill="url(#g-foil)" fill-opacity=".75"/>
++  <path d="M53 39 C64 30 76 20 90 13 M56 39 C68 36 80 33 92 24 M54 44 C62 52 70 58 78 64 M53 46 C57 56 61 64 66 70" fill="none" stroke="#5a4113" stroke-width=".8" stroke-opacity=".55"/>
++  <circle cx="86" cy="15" r="1.6" fill="#fff6d8" opacity=".8"/><circle cx="90" cy="22" r="1.1" fill="#fff6d8" opacity=".7"/></g>
++  <ellipse cx="50" cy="44" rx="2.4" ry="13" fill="url(#g-foil)"/>
++  <path d="M49 32 C46 22 42 16 37 12 M51 32 C54 22 58 16 63 12" fill="none" stroke="url(#g-foil)" stroke-width="1"/>
++  <circle cx="37" cy="12" r="1.4" fill="url(#g-foil)"/><circle cx="63" cy="12" r="1.4" fill="url(#g-foil)"/>
++</svg>
+diff -ruN -x node_modules -x .next -x .data -x .git -x .env -x docs -x body -x '*.woff2' -x '*.webp' -x '*.png' -x tsconfig.tsbuildinfo -x next-env.d.ts a/public/kit/corner.svg b/public/kit/corner.svg
+--- a/public/kit/corner.svg	1970-01-01 07:00:00.000000000 +0700
++++ b/public/kit/corner.svg	2026-10-16 00:50:13.562811841 +0700
+@@ -0,0 +1 @@
++<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" aria-hidden="true"><defs><linearGradient id="g-foil" x1="0" y1="0" x2="1" y2=".35"><stop offset="0" stop-color="#8f7140"/><stop offset=".25" stop-color="#c9a96e"/><stop offset=".45" stop-color="#f5e8cc"/><stop offset=".62" stop-color="#c9a96e"/><stop offset=".85" stop-color="#8f7140"/><stop offset="1" stop-color="#c9a96e"/></linearGradient></defs><style>.kb-fill{fill:url(#g-foil)}.kb-line{fill:none;stroke:url(#g-foil);stroke-width:1.6;stroke-linecap:round}</style><g transform=""><g class="kb-sway"><path class="kb-line" d="M6 6 H150 M6 6 V150"/><path class="kb-line" d="M14 14 H110 M14 14 V110"/><g transform="translate(22 22) rotate(135) scale(.9)"><path class="kb-fill " d="M0 0 C-10 -16 -14 -36 -6 -54 C0 -68 12 -77 21 -85 C27 -90 35 -87 34 -79 C33 -73 26 -73 26 -78 C21 -71 14 -64 15 -54 C16 -42 24 -38 23 -27 C22 -14 12 -6 0 0 Z"/><path class="kb-line" d="M0 -6 C-3 -20 -2 -36 4 -50"/></g><g transform="translate(40 16) rotate(100) scale(.55)"><path class="kb-fill " d="M0 0 C-10 -16 -14 -36 -6 -54 C0 -68 12 -77 21 -85 C27 -90 35 -87 34 -79 C33 -73 26 -73 26 -78 C21 -71 14 -64 15 -54 C16 -42 24 -38 23 -27 C22 -14 12 -6 0 0 Z"/><path class="kb-line" d="M0 -6 C-3 -20 -2 -36 4 -50"/></g><g transform="translate(16 40) rotate(170) scale(.55) scale(-1 1)"><path class="kb-fill " d="M0 0 C-10 -16 -14 -36 -6 -54 C0 -68 12 -77 21 -85 C27 -90 35 -87 34 -79 C33 -73 26 -73 26 -78 C21 -71 14 -64 15 -54 C16 -42 24 -38 23 -27 C22 -14 12 -6 0 0 Z"/><path class="kb-line" d="M0 -6 C-3 -20 -2 -36 4 -50"/></g><path class="kb-line kb-curl" d="M0 0 C8 -2 14 -9 13 -17 C12 -24 4 -27 -1 -23 C-5 -19 -3 -13 2 -13 C5 -13 6 -17 4 -18" transform="translate(62 24) scale(1.1)"/><path class="kb-line kb-curl" d="M0 0 C8 -2 14 -9 13 -17 C12 -24 4 -27 -1 -23 C-5 -19 -3 -13 2 -13 C5 -13 6 -17 4 -18" transform="translate(24 62) rotate(90) scale(1.1 -1.1)"/><g transform="translate(92 22) rotate(90) scale(.42)"><path class="kb-fill " d="M0 0 C-10 -16 -14 -36 -6 -54 C0 -68 12 -77 21 -85 C27 -90 35 -87 34 -79 C33 -73 26 -73 26 -78 C21 -71 14 -64 15 -54 C16 -42 24 -38 23 -27 C22 -14 12 -6 0 0 Z"/><path class="kb-line" d="M0 -6 C-3 -20 -2 -36 4 -50"/></g><g transform="translate(22 92) rotate(180) scale(.42) scale(-1 1)"><path class="kb-fill " d="M0 0 C-10 -16 -14 -36 -6 -54 C0 -68 12 -77 21 -85 C27 -90 35 -87 34 -79 C33 -73 26 -73 26 -78 C21 -71 14 -64 15 -54 C16 -42 24 -38 23 -27 C22 -14 12 -6 0 0 Z"/><path class="kb-line" d="M0 -6 C-3 -20 -2 -36 4 -50"/></g><circle class="kb-fill" cx="122" cy="14" r="2.4"/><circle class="kb-fill" cx="14" cy="122" r="2.4"/></g></g></svg>
+diff -ruN -x node_modules -x .next -x .data -x .git -x .env -x docs -x body -x '*.woff2' -x '*.webp' -x '*.png' -x tsconfig.tsbuildinfo -x next-env.d.ts a/public/kit/crest.svg b/public/kit/crest.svg
+--- a/public/kit/crest.svg	1970-01-01 07:00:00.000000000 +0700
++++ b/public/kit/crest.svg	2026-10-16 00:50:13.561614244 +0700
+@@ -0,0 +1 @@
++<svg xmlns="http://www.w3.org/2000/svg" viewBox="-110 -135 220 150" aria-hidden="true"><defs><linearGradient id="g-foil" x1="0" y1="0" x2="1" y2=".35"><stop offset="0" stop-color="#8f7140"/><stop offset=".25" stop-color="#c9a96e"/><stop offset=".45" stop-color="#f5e8cc"/><stop offset=".62" stop-color="#c9a96e"/><stop offset=".85" stop-color="#8f7140"/><stop offset="1" stop-color="#c9a96e"/></linearGradient></defs><style>.kb-fill{fill:url(#g-foil)}.kb-line{fill:none;stroke:url(#g-foil);stroke-width:1.6;stroke-linecap:round}</style><g transform="translate(0 -14) scale(1.25)"><path class="kb-fill " d="M0 0 C-10 -16 -14 -36 -6 -54 C0 -68 12 -77 21 -85 C27 -90 35 -87 34 -79 C33 -73 26 -73 26 -78 C21 -71 14 -64 15 -54 C16 -42 24 -38 23 -27 C22 -14 12 -6 0 0 Z"/><path class="kb-line" d="M0 -6 C-3 -20 -2 -36 4 -50"/></g><g transform="translate(-10 -12) rotate(-24) scale(1.0)"><path class="kb-fill " d="M0 0 C-10 -16 -14 -36 -6 -54 C0 -68 12 -77 21 -85 C27 -90 35 -87 34 -79 C33 -73 26 -73 26 -78 C21 -71 14 -64 15 -54 C16 -42 24 -38 23 -27 C22 -14 12 -6 0 0 Z"/><path class="kb-line" d="M0 -6 C-3 -20 -2 -36 4 -50"/></g><g transform="translate(10 -12) rotate(24) scale(1.0)"><path class="kb-fill" d="M0 0 C-10 -16 -14 -36 -6 -54 C0 -68 12 -77 21 -85 C27 -90 35 -87 34 -79 C33 -73 26 -73 26 -78 C21 -71 14 -64 15 -54 C16 -42 24 -38 23 -27 C22 -14 12 -6 0 0 Z" transform="scale(-1 1)"/><path class="kb-line" d="M0 -6 C-3 -20 -2 -36 4 -50" transform="scale(-1 1)"/></g><g transform="translate(-22 -8) rotate(-52) scale(.82)"><path class="kb-fill " d="M0 0 C-10 -16 -14 -36 -6 -54 C0 -68 12 -77 21 -85 C27 -90 35 -87 34 -79 C33 -73 26 -73 26 -78 C21 -71 14 -64 15 -54 C16 -42 24 -38 23 -27 C22 -14 12 -6 0 0 Z"/><path class="kb-line" d="M0 -6 C-3 -20 -2 -36 4 -50"/></g><g transform="translate(22 -8) rotate(52) scale(.82)"><path class="kb-fill" d="M0 0 C-10 -16 -14 -36 -6 -54 C0 -68 12 -77 21 -85 C27 -90 35 -87 34 -79 C33 -73 26 -73 26 -78 C21 -71 14 -64 15 -54 C16 -42 24 -38 23 -27 C22 -14 12 -6 0 0 Z" transform="scale(-1 1)"/><path class="kb-line" d="M0 -6 C-3 -20 -2 -36 4 -50" transform="scale(-1 1)"/></g><g transform="translate(-34 -2) rotate(-78) scale(.62)"><path class="kb-fill " d="M0 0 C-10 -16 -14 -36 -6 -54 C0 -68 12 -77 21 -85 C27 -90 35 -87 34 -79 C33 -73 26 -73 26 -78 C21 -71 14 -64 15 -54 C16 -42 24 -38 23 -27 C22 -14 12 -6 0 0 Z"/><path class="kb-line" d="M0 -6 C-3 -20 -2 -36 4 -50"/></g><g transform="translate(34 -2) rotate(78) scale(.62)"><path class="kb-fill" d="M0 0 C-10 -16 -14 -36 -6 -54 C0 -68 12 -77 21 -85 C27 -90 35 -87 34 -79 C33 -73 26 -73 26 -78 C21 -71 14 -64 15 -54 C16 -42 24 -38 23 -27 C22 -14 12 -6 0 0 Z" transform="scale(-1 1)"/><path class="kb-line" d="M0 -6 C-3 -20 -2 -36 4 -50" transform="scale(-1 1)"/></g><path class="kb-line kb-curl" d="M0 0 C8 -2 14 -9 13 -17 C12 -24 4 -27 -1 -23 C-5 -19 -3 -13 2 -13 C5 -13 6 -17 4 -18" transform="translate(-58 4) scale(1.3)"/><path class="kb-line kb-curl" d="M0 0 C8 -2 14 -9 13 -17 C12 -24 4 -27 -1 -23 C-5 -19 -3 -13 2 -13 C5 -13 6 -17 4 -18" transform="translate(58 4) scale(-1.3 1.3)"/><path class="kb-line" d="M-92 6 C-60 10 -30 -2 0 -2 C30 -2 60 10 92 6"/><path class="kb-fill" d="M-14 -2 C-10 -12 10 -12 14 -2 C8 0 -8 0 -14 -2 Z"/><circle class="kb-fill" cx="0" cy="-118" r="3"/></svg>
+diff -ruN -x node_modules -x .next -x .data -x .git -x .env -x docs -x body -x '*.woff2' -x '*.webp' -x '*.png' -x tsconfig.tsbuildinfo -x next-env.d.ts a/public/kit/divider.svg b/public/kit/divider.svg
+--- a/public/kit/divider.svg	1970-01-01 07:00:00.000000000 +0700
++++ b/public/kit/divider.svg	2026-10-16 00:50:13.561914388 +0700
+@@ -0,0 +1,6 @@
++<svg xmlns="http://www.w3.org/2000/svg" viewBox="-160 -40 320 50" aria-hidden="true"><defs><linearGradient id="g-foil" x1="0" y1="0" x2="1" y2=".35"><stop offset="0" stop-color="#8f7140"/><stop offset=".25" stop-color="#c9a96e"/><stop offset=".45" stop-color="#f5e8cc"/><stop offset=".62" stop-color="#c9a96e"/><stop offset=".85" stop-color="#8f7140"/><stop offset="1" stop-color="#c9a96e"/></linearGradient></defs><style>.kb-fill{fill:url(#g-foil)}.kb-line{fill:none;stroke:#d9b15a;stroke-width:1.6;stroke-linecap:round}</style>
++  <path class="kb-line" d="M-150 0 H-40 M40 0 H150"/>
++  <path class="kb-line kb-curl" d="M0 0 C8 -2 14 -9 13 -17 C12 -24 4 -27 -1 -23 C-5 -19 -3 -13 2 -13 C5 -13 6 -17 4 -18" transform="translate(-40 0) scale(-.9 .9)"/><path class="kb-line kb-curl" d="M0 0 C8 -2 14 -9 13 -17 C12 -24 4 -27 -1 -23 C-5 -19 -3 -13 2 -13 C5 -13 6 -17 4 -18" transform="translate(40 0) scale(.9)"/>
++  <g transform="translate(0 2) scale(.5)"><path class="kb-fill " d="M0 0 C-10 -16 -14 -36 -6 -54 C0 -68 12 -77 21 -85 C27 -90 35 -87 34 -79 C33 -73 26 -73 26 -78 C21 -71 14 -64 15 -54 C16 -42 24 -38 23 -27 C22 -14 12 -6 0 0 Z"/><path class="kb-line" d="M0 -6 C-3 -20 -2 -36 4 -50"/></g><g transform="translate(-6 2) rotate(-40) scale(.36)"><path class="kb-fill " d="M0 0 C-10 -16 -14 -36 -6 -54 C0 -68 12 -77 21 -85 C27 -90 35 -87 34 -79 C33 -73 26 -73 26 -78 C21 -71 14 -64 15 -54 C16 -42 24 -38 23 -27 C22 -14 12 -6 0 0 Z"/><path class="kb-line" d="M0 -6 C-3 -20 -2 -36 4 -50"/></g><g transform="translate(6 2) rotate(40) scale(.36)"><path class="kb-fill" d="M0 0 C-10 -16 -14 -36 -6 -54 C0 -68 12 -77 21 -85 C27 -90 35 -87 34 -79 C33 -73 26 -73 26 -78 C21 -71 14 -64 15 -54 C16 -42 24 -38 23 -27 C22 -14 12 -6 0 0 Z" transform="scale(-1 1)"/><path class="kb-line" d="M0 -6 C-3 -20 -2 -36 4 -50" transform="scale(-1 1)"/></g>
++  <circle class="kb-fill" cx="-154" cy="0" r="2.2"/><circle class="kb-fill" cx="154" cy="0" r="2.2"/>
++</svg>
+diff -ruN -x node_modules -x .next -x .data -x .git -x .env -x docs -x body -x '*.woff2' -x '*.webp' -x '*.png' -x tsconfig.tsbuildinfo -x next-env.d.ts a/public/kit/lotus.svg b/public/kit/lotus.svg
+--- a/public/kit/lotus.svg	1970-01-01 07:00:00.000000000 +0700
++++ b/public/kit/lotus.svg	2026-10-16 00:50:13.562446195 +0700
+@@ -0,0 +1,11 @@
++<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none" aria-hidden="true"><defs><linearGradient id="g-foil" x1="0" y1="0" x2="1" y2=".35"><stop offset="0" stop-color="#8f7140"/><stop offset=".25" stop-color="#c9a96e"/><stop offset=".45" stop-color="#f5e8cc"/><stop offset=".62" stop-color="#c9a96e"/><stop offset=".85" stop-color="#8f7140"/><stop offset="1" stop-color="#c9a96e"/></linearGradient></defs><style>.kb-fill{fill:url(#g-foil)}.kb-line{fill:none;stroke:url(#g-foil);stroke-width:1.6;stroke-linecap:round}</style>
++  <g stroke="url(#g-foil)" stroke-width="1.4" stroke-linejoin="round">
++    <path class="draw" d="M60 18 C73 38 73 70 60 90 C47 70 47 38 60 18 Z"/>
++    <path class="draw" d="M60 90 C40 82 26 62 28 38 C42 46 54 62 60 90 Z"/>
++    <path class="draw" d="M60 90 C80 82 94 62 92 38 C78 46 66 62 60 90 Z"/>
++    <path class="draw" d="M60 92 C34 94 14 80 8 62 C26 61 46 71 60 92 Z"/>
++    <path class="draw" d="M60 92 C86 94 106 80 112 62 C94 61 74 71 60 92 Z"/>
++    <path class="draw" d="M18 104 Q60 94 102 104"/>
++    <path class="draw" d="M34 112 Q60 106 86 112"/>
++  </g>
++</svg>
+diff -ruN -x node_modules -x .next -x .data -x .git -x .env -x docs -x body -x '*.woff2' -x '*.webp' -x '*.png' -x tsconfig.tsbuildinfo -x next-env.d.ts a/public/kit/wax-seal.svg b/public/kit/wax-seal.svg
+--- a/public/kit/wax-seal.svg	1970-01-01 07:00:00.000000000 +0700
++++ b/public/kit/wax-seal.svg	2026-10-16 00:50:30.524819010 +0700
+@@ -0,0 +1,28 @@
++<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140" aria-hidden="true"><defs><linearGradient id="g-foil" x1="0" y1="0" x2="1" y2=".35"><stop offset="0" stop-color="#8f7140"/><stop offset=".25" stop-color="#c9a96e"/><stop offset=".45" stop-color="#f5e8cc"/><stop offset=".62" stop-color="#c9a96e"/><stop offset=".85" stop-color="#8f7140"/><stop offset="1" stop-color="#c9a96e"/></linearGradient></defs><style>.kb-fill{fill:url(#g-foil)}.kb-line{fill:none;stroke:url(#g-foil);stroke-width:1.6;stroke-linecap:round}</style>
++  <defs>
++    <radialGradient id="wax" cx="38%" cy="32%" r="75%">
++      <stop offset="0" stop-color="#ecd9b0"/><stop offset=".45" stop-color="#bf9d62"/><stop offset="1" stop-color="#7a5c2e"/>
++    </radialGradient>
++    <filter id="wax-lit" x="-20%" y="-20%" width="140%" height="140%">
++      <feGaussianBlur in="SourceAlpha" stdDeviation="2.6" result="b"/>
++      <feSpecularLighting in="b" surfaceScale="5" specularConstant=".9" specularExponent="22" lighting-color="#fff6dc" result="s">
++        <fePointLight x="20" y="-10" z="90"/>
++      </feSpecularLighting>
++      <feComposite in="s" in2="SourceAlpha" operator="in" result="s2"/>
++      <feComposite in="SourceGraphic" in2="s2" operator="arithmetic" k1="0" k2="1" k3=".75" k4="0"/>
++    </filter>
++    <filter id="wax-press" x="-30%" y="-30%" width="160%" height="160%">
++      <feOffset dx="-1.2" dy="-1.2" in="SourceAlpha" result="hi"/><feFlood flood-color="#3d2c16" flood-opacity=".75"/><feComposite in2="hi" operator="in" result="dark"/>
++      <feOffset dx="1.2" dy="1.4" in="SourceAlpha" result="lo"/><feFlood flood-color="#fff3cf" flood-opacity=".7"/><feComposite in2="lo" operator="in" result="light"/>
++      <feMerge><feMergeNode in="light"/><feMergeNode in="dark"/><feMergeNode in="SourceGraphic"/></feMerge>
++    </filter>
++  </defs>
++  <path d="M127.5106 72 L127.8549 77.6982 L130.0486 83.9444 L131.3372 90.6065 L129.2111 96.526 L124.46 101.1095 L119.7242 105.2247 L115.9648 109.7223 L111.9183 113.9183 L106.7365 116.7635 L101.421 119.0249 L97.0863 122.6748 L93.1304 127.8416 L88.176 131.9184 L82.072 132.69 L75.8364 131.2582 L70 130.4861 L64.1746 131.1462 L58.2043 131.3012 L52.5384 129.5633 L47.1558 127.1509 L41.2849 125.7221 L34.9251 124.4933 L29.674 121.1373 L26.884 115.116 L25.5235 108.5009 L23.2246 103.2543 L19.3818 99.056 L15.7758 94.4604 L13.7215 89.0719 L12.1078 83.5155 L9.4518 77.9635 L6.8298 72 L6.9303 65.7882 L10.2861 60.1222 L14.2204 55.0795 L16.2193 49.7233 L16.984 43.6624 L18.9951 37.9196 L23.0089 33.4354 L27.5469 29.5469 L31.567 25.1693 L35.9241 21.0019 L41.6438 18.9492 L48.0891 19.1023 L53.8835 18.8709 L58.8847 16.1197 L64.099 12.0865 L70 9.8053 L76.0846 10.2216 L82.0265 11.5387 L88.0654 12.4464 L93.9585 14.1591 L98.732 18.2462 L102.2302 23.7641 L105.9609 28.1815 L111.2554 30.7446 L117.1178 33.3315 L121.2476 37.7575 L123.1074 43.6135 L124.5151 49.4191 L126.769 54.7793 L128.6781 60.3282 L128.6235 66.2261 L127.5106 72 Z" fill="#000" opacity=".35" transform="translate(2 5)" style="filter:blur(3px)"/>
++  <g filter="url(#wax-lit)">
++    <path d="M127.5106 70 L127.8549 75.6982 L130.0486 81.9444 L131.3372 88.6065 L129.2111 94.526 L124.46 99.1095 L119.7242 103.2247 L115.9648 107.7223 L111.9183 111.9183 L106.7365 114.7635 L101.421 117.0249 L97.0863 120.6748 L93.1304 125.8416 L88.176 129.9184 L82.072 130.69 L75.8364 129.2582 L70 128.4861 L64.1746 129.1462 L58.2043 129.3012 L52.5384 127.5633 L47.1558 125.1509 L41.2849 123.7221 L34.9251 122.4933 L29.674 119.1373 L26.884 113.116 L25.5235 106.5009 L23.2246 101.2543 L19.3818 97.056 L15.7758 92.4604 L13.7215 87.0719 L12.1078 81.5155 L9.4518 75.9635 L6.8298 70 L6.9303 63.7882 L10.2861 58.1222 L14.2204 53.0795 L16.2193 47.7233 L16.984 41.6624 L18.9951 35.9196 L23.0089 31.4354 L27.5469 27.5469 L31.567 23.1693 L35.9241 19.0019 L41.6438 16.9492 L48.0891 17.1023 L53.8835 16.8709 L58.8847 14.1197 L64.099 10.0865 L70 7.8053 L76.0846 8.2216 L82.0265 9.5387 L88.0654 10.4464 L93.9585 12.1591 L98.732 16.2462 L102.2302 21.7641 L105.9609 26.1815 L111.2554 28.7446 L117.1178 31.3315 L121.2476 35.7575 L123.1074 41.6135 L124.5151 47.4191 L126.769 52.7793 L128.6781 58.3282 L128.6235 64.2261 L127.5106 70 Z" fill="url(#wax)"/>
++    <circle cx="70" cy="70" r="44" fill="#a8875a"/>
++  </g>
++  <circle cx="70" cy="70" r="44" fill="none" stroke="#5f4625" stroke-opacity=".55" stroke-width="1.4"/>
++  <circle cx="70" cy="70" r="39" fill="none" stroke="#f1e2c2" stroke-opacity=".35" stroke-width=".8" stroke-dasharray="1.6 3"/>
++  <g filter="url(#wax-press)" transform="translate(70 92) scale(.36)" class="wax-crest"><g transform="translate(0 -14) scale(1.25)"><path class="kb-fill " d="M0 0 C-10 -16 -14 -36 -6 -54 C0 -68 12 -77 21 -85 C27 -90 35 -87 34 -79 C33 -73 26 -73 26 -78 C21 -71 14 -64 15 -54 C16 -42 24 -38 23 -27 C22 -14 12 -6 0 0 Z"/><path class="kb-line" d="M0 -6 C-3 -20 -2 -36 4 -50"/></g><g transform="translate(-10 -12) rotate(-24) scale(1.0)"><path class="kb-fill " d="M0 0 C-10 -16 -14 -36 -6 -54 C0 -68 12 -77 21 -85 C27 -90 35 -87 34 -79 C33 -73 26 -73 26 -78 C21 -71 14 -64 15 -54 C16 -42 24 -38 23 -27 C22 -14 12 -6 0 0 Z"/><path class="kb-line" d="M0 -6 C-3 -20 -2 -36 4 -50"/></g><g transform="translate(10 -12) rotate(24) scale(1.0)"><path class="kb-fill" d="M0 0 C-10 -16 -14 -36 -6 -54 C0 -68 12 -77 21 -85 C27 -90 35 -87 34 -79 C33 -73 26 -73 26 -78 C21 -71 14 -64 15 -54 C16 -42 24 -38 23 -27 C22 -14 12 -6 0 0 Z" transform="scale(-1 1)"/><path class="kb-line" d="M0 -6 C-3 -20 -2 -36 4 -50" transform="scale(-1 1)"/></g><g transform="translate(-22 -8) rotate(-52) scale(.82)"><path class="kb-fill " d="M0 0 C-10 -16 -14 -36 -6 -54 C0 -68 12 -77 21 -85 C27 -90 35 -87 34 -79 C33 -73 26 -73 26 -78 C21 -71 14 -64 15 -54 C16 -42 24 -38 23 -27 C22 -14 12 -6 0 0 Z"/><path class="kb-line" d="M0 -6 C-3 -20 -2 -36 4 -50"/></g><g transform="translate(22 -8) rotate(52) scale(.82)"><path class="kb-fill" d="M0 0 C-10 -16 -14 -36 -6 -54 C0 -68 12 -77 21 -85 C27 -90 35 -87 34 -79 C33 -73 26 -73 26 -78 C21 -71 14 -64 15 -54 C16 -42 24 -38 23 -27 C22 -14 12 -6 0 0 Z" transform="scale(-1 1)"/><path class="kb-line" d="M0 -6 C-3 -20 -2 -36 4 -50" transform="scale(-1 1)"/></g><g transform="translate(-34 -2) rotate(-78) scale(.62)"><path class="kb-fill " d="M0 0 C-10 -16 -14 -36 -6 -54 C0 -68 12 -77 21 -85 C27 -90 35 -87 34 -79 C33 -73 26 -73 26 -78 C21 -71 14 -64 15 -54 C16 -42 24 -38 23 -27 C22 -14 12 -6 0 0 Z"/><path class="kb-line" d="M0 -6 C-3 -20 -2 -36 4 -50"/></g><g transform="translate(34 -2) rotate(78) scale(.62)"><path class="kb-fill" d="M0 0 C-10 -16 -14 -36 -6 -54 C0 -68 12 -77 21 -85 C27 -90 35 -87 34 -79 C33 -73 26 -73 26 -78 C21 -71 14 -64 15 -54 C16 -42 24 -38 23 -27 C22 -14 12 -6 0 0 Z" transform="scale(-1 1)"/><path class="kb-line" d="M0 -6 C-3 -20 -2 -36 4 -50" transform="scale(-1 1)"/></g><path class="kb-line kb-curl" d="M0 0 C8 -2 14 -9 13 -17 C12 -24 4 -27 -1 -23 C-5 -19 -3 -13 2 -13 C5 -13 6 -17 4 -18" transform="translate(-58 4) scale(1.3)"/><path class="kb-line kb-curl" d="M0 0 C8 -2 14 -9 13 -17 C12 -24 4 -27 -1 -23 C-5 -19 -3 -13 2 -13 C5 -13 6 -17 4 -18" transform="translate(58 4) scale(-1.3 1.3)"/><path class="kb-line" d="M-92 6 C-60 10 -30 -2 0 -2 C30 -2 60 10 92 6"/><path class="kb-fill" d="M-14 -2 C-10 -12 10 -12 14 -2 C8 0 -8 0 -14 -2 Z"/><circle class="kb-fill" cx="0" cy="-118" r="3"/></g>
++</svg>
+diff -ruN -x node_modules -x .next -x .data -x .git -x .env -x docs -x body -x '*.woff2' -x '*.webp' -x '*.png' -x tsconfig.tsbuildinfo -x next-env.d.ts a/src/app/api/admin/wedding/route.ts b/src/app/api/admin/wedding/route.ts
+--- a/src/app/api/admin/wedding/route.ts	2026-09-13 00:20:36.000000000 +0700
++++ b/src/app/api/admin/wedding/route.ts	2026-10-16 00:49:47.592607543 +0700
+@@ -113,6 +113,8 @@
+   envelopeOpenLabel: z.string().max(60).optional(),
+   envelopeHint: z.string().max(120).optional(),
+   envelopeSkipLabel: z.string().max(40).optional(),
++  envelopeTitle: z.string().max(80).optional(),
++  envelopeSubtitle: z.string().max(80).optional(),
+ 
+   /*
+    * The pre-wedding film.
+diff -ruN -x node_modules -x .next -x .data -x .git -x .env -x docs -x body -x '*.woff2' -x '*.webp' -x '*.png' -x tsconfig.tsbuildinfo -x next-env.d.ts a/src/app/globals.css b/src/app/globals.css
+--- a/src/app/globals.css	2026-09-13 00:20:35.000000000 +0700
++++ b/src/app/globals.css	2026-10-16 01:10:34.616681670 +0700
+@@ -2636,3 +2636,588 @@
+   background-repeat: var(--page-bg-repeat, no-repeat);
+   background-position: var(--page-bg-position, center);
+ }
++
++/* ══ The flap envelope ═══════════════════════════════════════════════════════
++ *
++ * Unlayered on purpose: these follow, and override, the gatefold's sizing in
++ * `@layer components` above without editing it.
++ *
++ * The piece is landscape now — a real envelope, 1.42 wide for every 1 tall —
++ * and about 86% of a phone's width. Its width is still fitted to the height
++ * left between the furniture above and below it (`--env-chrome`), for the same
++ * reason the gatefold's was: type and touch targets do not shrink with the
++ * screen, so the envelope is what gives.
++ */
++.env-piece {
++  --env-w: clamp(220px, min(86vw, (100vh - var(--env-chrome, 330px)) * 1.42), 600px);
++  width: var(--env-w);
++  height: calc(var(--env-w) / 1.42);
++  font-size: calc(var(--env-w) / 26);
++}
++@supports (height: 100dvh) {
++  .env-piece {
++    --env-w: clamp(220px, min(86vw, (100dvh - var(--env-chrome, 330px)) * 1.42), 600px);
++  }
++}
++
++.fl {
++  position: absolute;
++  inset: 0;
++}
++
++/* Every layer of the envelope body lowers together, by `translate`, which
++   composes with each layer's own `transform` instead of replacing it. */
++.fl-layer {
++  position: absolute;
++  inset: 0;
++  width: 100%;
++  height: 100%;
++  overflow: visible;
++  translate: 0 0;
++  transition:
++    translate var(--fl-near-t, 1200ms) cubic-bezier(0.55, 0, 0.8, 0.25),
++    opacity var(--fl-near-t, 1200ms) ease-in;
++}
++.fl-layer.fl-lowered {
++  translate: 0 140%;
++  opacity: 0;
++}
++
++.fl-back   { z-index: 1; }
++.fl-card   { z-index: 3; }
++.fl-pocket { z-index: 4; }
++.fl-seal   { z-index: 6; }
++
++.fl-shadow {
++  position: absolute;
++  z-index: 0;
++  left: 5%;
++  right: 5%;
++  bottom: -9%;
++  height: 16%;
++  border-radius: 50%;
++  background: radial-gradient(closest-side, rgb(10 4 6 / 0.55), transparent);
++  filter: blur(6px);
++  transition: opacity var(--fl-near-t, 1200ms) ease-in;
++}
++.fl-shadow.fl-lowered { opacity: 0; }
++.env-lite .fl-shadow { filter: none; }
++
++/* Paper grain: the kit's cream stock multiplied into whatever colour the
++   envelope style asks for, so every style keeps the same tooth. */
++.fl-tex {
++  mix-blend-mode: multiply;
++  opacity: 0.9;
++}
++
++.fl-edge {
++  fill: none;
++  stroke: rgb(70 30 40 / 0.12);
++  stroke-width: 2;
++}
++.fl-edge-gold {
++  stroke: var(--env-gold);
++  stroke-width: 3;
++}
++.fl-rule {
++  fill: none;
++  stroke: var(--env-gold);
++  stroke-width: 2.4;
++  opacity: 0.85;
++}
++.fl-rule-pocket {
++  stroke-width: 2;
++  opacity: 0.7;
++}
++.fl-flap-cast { fill: rgb(70 30 40 / 0.14); }
++.fl-fold-cast { fill: rgb(70 30 40 / 0.12); }
++.fl-crease {
++  fill: none;
++  stroke: rgb(90 45 55 / 0.22);
++  stroke-width: 1.6;
++}
++.fl-crease-soft { stroke: rgb(90 45 55 / 0.12); }
++.fl-outline {
++  fill: none;
++  stroke: rgb(90 45 55 / 0.16);
++  stroke-width: 2;
++}
++
++/* ── The flap ────────────────────────────────────────────────────────────
++ * The one thing that turns in three dimensions. Its perspective is in its own
++ * transform, so nothing above it has to become a 3D context (and lose its
++ * compositor layers). Past upright it is re-stacked behind the card. */
++.fl-layer.fl-flap {
++  z-index: 5;
++  height: calc(100% * 442 / 704);
++  transform-origin: 50% 0;
++  transform: perspective(1600px) rotateX(0deg);
++  transform-style: preserve-3d;
++  transition:
++    transform var(--fl-flap-t, 1100ms) cubic-bezier(0.45, 0.05, 0.3, 1),
++    translate var(--fl-near-t, 1200ms) cubic-bezier(0.55, 0, 0.8, 0.25),
++    opacity var(--fl-near-t, 1200ms) ease-in;
++}
++.fl-layer.fl-flap-open { transform: perspective(1600px) rotateX(-180deg); }
++.fl-layer.fl-flap-back { z-index: 2; }
++
++.fl-face {
++  position: absolute;
++  inset: 0;
++  -webkit-backface-visibility: hidden;
++  backface-visibility: hidden;
++}
++.fl-face > svg {
++  display: block;
++  width: 100%;
++  height: 100%;
++  overflow: visible;
++}
++.fl-face-back { transform: rotateX(180deg); }
++
++/* The couple's names, pressed into the flap above the seal. */
++.fl-flap-mark {
++  position: absolute;
++  left: 50%;
++  top: 9%;
++  width: 40%;
++  transform: translateX(-50%);
++}
++
++/* ── The card ───────────────────────────────────────────────────────────── */
++.fl-card {
++  position: absolute;
++  left: 6%;
++  right: 6%;
++  top: 5%;
++  height: 88%;
++  transform: translate3d(0, 0, 0);
++  transform-origin: 50% 60%;
++  transition: transform var(--fl-card-t, 1100ms) cubic-bezier(0.3, 0.08, 0.2, 1);
++}
++.fl-card-inner {
++  display: flex;
++  flex-direction: column;
++  align-items: center;
++  justify-content: center;
++  width: 100%;
++  height: 100%;
++  padding: 5% 9%;
++  border-radius: 3px;
++  background: #fbf5ea url(/kit/paper-cream.webp) center / 14em;
++  box-shadow:
++    0 1px 1px rgb(60 30 30 / 0.12),
++    0 0.8em 1.6em -0.9em rgb(60 30 30 / 0.4);
++  outline: 1px solid rgb(201 169 110 / 0.7);
++  outline-offset: -0.55em;
++  text-align: center;
++}
++.fl-card-crest {
++  width: 22%;
++  height: auto;
++}
++.fl-card-title {
++  margin: 0.15em 0 0;
++  font-family: var(--f-heading), "Khmer OS Muol Light", serif;
++  font-size: 0.82em;
++  line-height: 2;
++  color: rgb(var(--c-primary-rgb));
++}
++.fl-card .fl-card-mono {
++  width: 42%;
++  height: auto;
++}
++.fl-card-lead {
++  margin: 0.1em 0 0;
++  font-size: 0.66em;
++  line-height: 1.9;
++  color: rgb(var(--gold-1-rgb));
++}
++/* Out of the pocket, up and a little to the side, the way a hand draws it. */
++.fl-card.fl-card-out { transform: translate3d(2%, -106%, 0) rotate(-2.2deg); }
++/* Clear of the envelope it comes forward, on top of everything, into the
++   camera. The re-stack is invisible because nothing overlaps it any more. */
++.fl-card.fl-card-near {
++  z-index: 7;
++  transform: translate3d(0, -34%, 0) rotate(0deg) scale(1.72);
++  transition: transform var(--fl-near-t, 1200ms) cubic-bezier(0.5, 0, 0.25, 1);
++}
++
++/* ── The seal: pressed, lifted with its shadow growing, and taken away ──── */
++.fl-seal {
++  position: absolute;
++  left: 50%;
++  top: 61%;
++  width: 19%;
++  aspect-ratio: 1;
++  transform: translate(-50%, -50%);
++}
++.fl-seal img {
++  display: block;
++  width: 100%;
++  height: 100%;
++  filter: drop-shadow(0 1px 1px rgb(40 20 10 / 0.35));
++}
++.fl-seal::before {
++  content: "";
++  position: absolute;
++  inset: 12% 8% -6%;
++  border-radius: 50%;
++  background: radial-gradient(closest-side, rgb(30 12 10 / 0.42), transparent);
++  z-index: -1;
++}
++.fl-seal .env-seal {
++  position: relative;
++  left: auto;
++  top: auto;
++  width: 100%;
++  margin: 0;
++}
++.fl-seal-off { animation: fl-seal-off var(--env-seal-t, 770ms) cubic-bezier(0.45, 0, 0.55, 1) forwards; }
++.fl-seal-off::before { animation: fl-seal-shadow var(--env-seal-t, 770ms) ease-in forwards; }
++@keyframes fl-seal-off {
++  0%   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
++  16%  { transform: translate(-50%, -50%) scale(0.93); opacity: 1; }
++  48%  { transform: translate(-50%, -66%) scale(1.12) rotate(-4deg); opacity: 1; }
++  100% { transform: translate(40%, -260%) scale(1.18) rotate(16deg); opacity: 0; }
++}
++@keyframes fl-seal-shadow {
++  0%, 16% { transform: translate(0, 0) scale(1); opacity: 1; }
++  48%     { transform: translate(6%, 22%) scale(1.25); opacity: 0.8; }
++  100%    { transform: translate(14%, 60%) scale(1.6); opacity: 0; }
++}
++
++/* ── The set: dusk, a heading, and light type ──────────────────────────── */
++.room-dusk {
++  position: absolute;
++  inset: 0;
++  background: radial-gradient(120% 92% at 50% 36%, #5c3644 0%, #2e1b23 52%, #150c10 100%);
++}
++.room-dusk-photo {
++  inset: -48px;
++  background:
++    linear-gradient(rgb(22 11 16 / 0.6), rgb(22 11 16 / 0.8)),
++    var(--room-photo) center / cover no-repeat;
++  filter: blur(14px) saturate(0.85);
++}
++.env-lite .room-dusk-photo { filter: blur(8px); }
++
++.env-heading {
++  margin-bottom: clamp(0.2rem, 1.2vh, 0.8rem);
++  padding-inline: 1rem;
++  text-align: center;
++  transition:
++    opacity 700ms ease-out,
++    transform 900ms cubic-bezier(0.4, 0, 0.5, 1);
++}
++.env-heading-gone {
++  opacity: 0;
++  transform: translate3d(0, -0.6rem, 0);
++}
++.env-heading-title {
++  margin: 0;
++  padding-top: 0.15em;
++  font-family: "Moul", var(--f-heading), serif;
++  font-weight: 400;
++  font-size: clamp(1.1rem, 5.6vw, 2rem);
++  line-height: 2.05;
++  color: #f1dfba;
++  text-shadow: 0 1px 0 rgb(0 0 0 / 0.35), 0 0 24px rgb(201 169 110 / 0.28);
++}
++.env-heading-sub {
++  margin: -0.35em 0 0;
++  font-family: "Pinyon Script", cursive;
++  font-size: clamp(1.1rem, 4.8vw, 1.7rem);
++  line-height: 1.5;
++  color: rgb(247 214 222 / 0.88);
++}
++.env-veil .env-address-lead { color: rgb(241 223 186 / 0.86); }
++.env-veil .env-address-name { color: #fbeff2; }
++.env-veil .env-hint { color: rgb(251 239 242 / 0.7); }
++.env-veil .env-skip { color: rgb(251 239 242 / 0.6); }
++.env-veil .env-skip:hover { color: rgb(251 239 242 / 0.95); }
++
++/* The dark beat: the card comes into it, the curtains come out of it. */
++.env-dusk {
++  position: absolute;
++  inset: 0;
++  z-index: 40;
++  background: #0c0608;
++  opacity: 0;
++  pointer-events: none;
++  transition-property: opacity;
++  transition-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
++}
++.env-dusk-on { opacity: 1; }
++
++@media (max-height: 620px) {
++  .env-veil { --env-chrome: 190px; }
++  .env-heading-title { font-size: 1rem; line-height: 1.85; }
++  .env-heading-sub { display: none; }
++}
++
++@media (prefers-reduced-motion: reduce) {
++  .fl-layer,
++  .fl-card,
++  .fl-layer.fl-flap { transition-duration: 1ms !important; }
++  .fl-seal-off,
++  .fl-seal-off::before { animation-duration: 1ms !important; }
++}
++
++/* ══ The couple-name mark ═════════════════════════════════════════════════ */
++.namelogo {
++  position: relative;
++  container-type: inline-size;
++  width: 100%;
++  aspect-ratio: 2 / 1;
++  color: var(--env-gold, rgb(var(--gold-frame-rgb)));
++}
++.namelogo-name {
++  position: absolute;
++  white-space: nowrap;
++  font-family: var(--nl-face, "Moulpali", "Moul", serif);
++  font-weight: 400;
++  font-size: 15cqw;
++  /* Khmer needs room above and below for vowels and subscripts. */
++  line-height: 1.9;
++  padding-block: 0.1em;
++  color: #b8935a;
++  text-shadow: 0 1px 0 rgb(255 255 255 / 0.35);
++}
++.namelogo-a { left: 3%; top: -6%; }
++.namelogo-b { right: 3%; bottom: -10%; }
++.namelogo-flourish {
++  position: absolute;
++  inset: 0;
++  width: 100%;
++  height: 100%;
++  overflow: visible;
++}
++.namelogo-line {
++  fill: none;
++  stroke: #c9a96e;
++  stroke-width: 1.6;
++  stroke-linecap: round;
++  stroke-dasharray: 1;
++  stroke-dashoffset: 0;
++}
++.namelogo-line-fine { stroke-width: 0.9; opacity: 0.7; }
++.namelogo-heart {
++  position: absolute;
++  left: 50%;
++  top: 56%;
++  width: 7%;
++  translate: -50% -50%;
++  fill: #c98a98;
++}
++.namelogo-fly {
++  position: absolute;
++  right: 6%;
++  top: 2%;
++  width: 13%;
++  height: auto;
++  rotate: 14deg;
++}
++
++/* wait: hidden until the reveal, but only when JavaScript can run it */
++.js .namelogo-wait .namelogo-name { clip-path: inset(-45% 100% -45% -12%); }
++.js .namelogo-wait .namelogo-line { stroke-dashoffset: 1; }
++.js .namelogo-wait .namelogo-heart { scale: 0; }
++.js .namelogo-wait .namelogo-fly { opacity: 0; }
++
++/* play: names left to right, the flourish draws, the heart, the butterfly */
++.namelogo-play .namelogo-name {
++  animation: nl-write 780ms cubic-bezier(0.4, 0, 0.2, 1) both;
++}
++.namelogo-play .namelogo-a { animation-delay: 150ms; }
++.namelogo-play .namelogo-b { animation-delay: 620ms; }
++.namelogo-play .namelogo-line {
++  animation: nl-draw 1000ms cubic-bezier(0.45, 0, 0.25, 1) 900ms both;
++}
++.namelogo-play .namelogo-line-fine { animation-delay: 1250ms; animation-duration: 700ms; }
++.namelogo-play .namelogo-heart {
++  animation: nl-heart 520ms cubic-bezier(0.34, 1.56, 0.64, 1) 1750ms both;
++}
++.namelogo-play .namelogo-fly {
++  animation: nl-fly 1300ms cubic-bezier(0.25, 0.7, 0.3, 1) 1950ms both;
++}
++/* The mask is bled far past the line box and taken off entirely at the end,
++   so no Khmer mark is ever left cut by it. */
++@keyframes nl-write {
++  0%   { clip-path: inset(-45% 100% -45% -12%); }
++  99%  { clip-path: inset(-45% -12% -45% -12%); }
++  100% { clip-path: none; }
++}
++@keyframes nl-draw {
++  from { stroke-dashoffset: 1; }
++  to   { stroke-dashoffset: 0; }
++}
++@keyframes nl-heart {
++  from { scale: 0; }
++  to   { scale: 1; }
++}
++@keyframes nl-fly {
++  0%   { opacity: 0; translate: 70% -90%; rotate: 40deg; }
++  55%  { opacity: 1; translate: -8% 6%; rotate: 6deg; }
++  78%  { translate: 4% -3%; rotate: 18deg; }
++  100% { opacity: 1; translate: 0 0; rotate: 14deg; }
++}
++@media (prefers-reduced-motion: reduce) {
++  .namelogo-play .namelogo-name,
++  .namelogo-play .namelogo-line,
++  .namelogo-play .namelogo-heart,
++  .namelogo-play .namelogo-fly { animation-duration: 1ms !important; animation-delay: 0ms !important; }
++}
++
++/* ══ The cover ═══════════════════════════════════════════════════════════════
++ *
++ * Sized against the cover's own box with container units, so the whole
++ * composition fits one screen on a 1280×800 desktop and still balances on a
++ * short phone held sideways — nothing here reads the viewport.
++ */
++.cover-shell {
++  container-type: size;
++  padding: 3cqh 7%;
++}
++.cv {
++  position: relative;
++  z-index: 20;
++  display: flex;
++  flex-direction: column;
++  align-items: center;
++  width: 100%;
++  max-width: 30rem;
++}
++.cv-crest {
++  width: clamp(48px, 11cqh, 104px);
++  height: auto;
++}
++.cv-title {
++  margin: 0.2cqh 0 0;
++  font-family: var(--f-heading), "Khmer OS Muol Light", serif;
++  font-weight: 400;
++  font-size: clamp(0.95rem, min(5.4cqw, 4.4cqh), 1.6rem);
++  line-height: 2.05;
++  color: rgb(var(--c-primary-rgb));
++}
++.cv-names {
++  width: min(80cqw, 40cqh, 360px);
++  margin: 0.4cqh 0 1.6cqh;
++}
++.cv-lead {
++  margin: 0;
++  font-size: clamp(0.74rem, 2.4cqh, 0.95rem);
++  line-height: 1.9;
++  color: rgb(var(--gold-1-rgb));
++}
++.cv-guest {
++  max-width: 94%;
++  margin: 0 0 1.4cqh;
++  font-family: var(--f-heading), "Khmer OS Muol Light", serif;
++  font-size: clamp(0.9rem, min(5cqw, 3.9cqh), 1.4rem);
++  line-height: 1.95;
++  color: rgb(var(--c-primary-rgb));
++}
++.cv-guest-latin {
++  font-family: "Cormorant Garamond", serif;
++  font-weight: 600;
++  letter-spacing: 0.06em;
++  text-transform: uppercase;
++}
++.cv-date {
++  display: grid;
++  grid-template-columns: repeat(4, auto);
++  margin: 0;
++  border-block: 1px solid rgb(var(--gold-frame-rgb) / 0.5);
++}
++.cv-date-cell {
++  padding: 0.3cqh clamp(0.55rem, 3cqw, 1.2rem);
++  text-align: center;
++}
++.cv-date-cell + .cv-date-cell { border-left: 1px solid rgb(var(--gold-frame-rgb) / 0.45); }
++.cv-date-label {
++  font-size: clamp(0.6rem, 1.8cqh, 0.76rem);
++  line-height: 1.8;
++  color: rgb(var(--gold-1-rgb));
++}
++.cv-date-value {
++  margin: 0;
++  font-family: var(--f-heading), "Khmer OS Muol Light", serif;
++  font-size: clamp(0.8rem, min(3.8cqw, 3.4cqh), 1.15rem);
++  line-height: 2;
++  color: rgb(var(--c-primary-rgb));
++}
++.cv-time,
++.cv-venue {
++  margin: 0;
++  font-size: clamp(0.7rem, 2.3cqh, 0.9rem);
++  line-height: 1.9;
++  color: rgb(var(--c-text-rgb) / 0.85);
++}
++.cv-time { margin-top: 1.2cqh; }
++.cv-open { margin-top: 2.6cqh; }
++
++/* With the couple's photograph behind it, the writing turns light. */
++.cover-photo {
++  position: absolute;
++  inset: 0;
++  z-index: 0;
++  background:
++    linear-gradient(180deg, rgb(20 10 14 / 0.62) 0%, rgb(20 10 14 / 0.4) 42%, rgb(20 10 14 / 0.74) 100%),
++    var(--cover-photo) center / cover no-repeat;
++}
++.cover-on-photo .cv-title,
++.cover-on-photo .cv-guest,
++.cover-on-photo .cv-date-value { color: #fbf1f3; text-shadow: 0 1px 8px rgb(0 0 0 / 0.45); }
++.cover-on-photo .cv-lead,
++.cover-on-photo .cv-date-label { color: #ecd9b0; }
++.cover-on-photo .cv-time,
++.cover-on-photo .cv-venue { color: rgb(251 241 243 / 0.9); }
++.cover-on-photo .namelogo-name { color: #ecd9b0; text-shadow: 0 1px 8px rgb(0 0 0 / 0.5); }
++
++/* A short screen: the crest goes before anything that carries information. */
++@container (max-height: 420px) {
++  .cv-crest { display: none; }
++}
++
++/*
++ * A short landscape screen — a phone held sideways.
++ *
++ * The frame's ornament is sized from the card's *width*, and on a 740×360
++ * phone that gave the head and foot bands more than half the height between
++ * them, leaving the cover too little room to show its own button. Capping the
++ * artwork's width caps its height with it, so the ornament stays in the
++ * corners at a size the screen can afford.
++ */
++@media (max-height: 520px) and (orientation: landscape) {
++  .frame-edge > :not(.frame-join) {
++    max-width: 13%;
++  }
++  .frame-edge-band > * {
++    max-width: 30%;
++  }
++}
++
++/* Very short covers lay out in two columns: the names on the left, and who it
++   is for, when, and the button on the right. */
++@container (max-height: 300px) {
++  .cv {
++    display: grid;
++    grid-template-columns: 1fr 1fr;
++    grid-auto-flow: dense;
++    column-gap: 5cqw;
++    align-items: center;
++    max-width: 46rem;
++  }
++  .cv > * { grid-column: 2; justify-self: center; }
++  .cv-title { grid-column: 1; grid-row: 1 / 3; align-self: end; }
++  .cv-names { grid-column: 1; grid-row: 3 / 7; width: min(42cqw, 70cqh, 320px); align-self: start; }
++  .cv-lead { font-size: 0.72rem; line-height: 1.7; }
++  .cv-guest { margin-bottom: 0.6rem; font-size: 0.92rem; line-height: 1.8; }
++  .cv-date-label { font-size: 0.58rem; line-height: 1.6; }
++  .cv-date-value { font-size: 0.8rem; line-height: 1.8; }
++  .cv-time, .cv-venue { display: none; }
++  .cv-open { margin-top: 0.7rem; min-height: 40px; padding-block: 0.4rem; }
++}
++/* On a dark photograph the dark button needs an edge to stand on. */
++.cover-on-photo .cv-open { box-shadow: 0 0 0 1px rgb(236 217 176 / 0.75), 0 8px 22px -10px rgb(0 0 0 / 0.6); }
+diff -ruN -x node_modules -x .next -x .data -x .git -x .env -x docs -x body -x '*.woff2' -x '*.webp' -x '*.png' -x tsconfig.tsbuildinfo -x next-env.d.ts a/src/components/admin/EnvelopeForm.tsx b/src/components/admin/EnvelopeForm.tsx
+--- a/src/components/admin/EnvelopeForm.tsx	2026-09-13 00:20:35.000000000 +0700
++++ b/src/components/admin/EnvelopeForm.tsx	2026-10-16 00:49:55.244607998 +0700
+@@ -35,6 +35,8 @@
+     envelopeOpenLabel: wedding.envelopeOpenLabel,
+     envelopeHint: wedding.envelopeHint,
+     envelopeSkipLabel: wedding.envelopeSkipLabel,
++    envelopeTitle: wedding.envelopeTitle,
++    envelopeSubtitle: wedding.envelopeSubtitle,
+ 
+     videoEnabled: wedding.videoEnabled,
+     videoUrl: wedding.videoUrl,
+@@ -314,7 +316,7 @@
+         <div className="space-y-5">
+           <Field
+             label={`រយៈពេលចលនា — ${(form.envelopeDuration / 1000).toFixed(1)} វិនាទី`}
+-            hint="ចន្លោះ ១,៦ ដល់ ១៤ វិនាទី · រូបភាពពេញលេញប្រហែល ៩ វិនាទី"
++            hint="ចន្លោះ ១,៦ ដល់ ១៤ វិនាទី · ណែនាំ ៥,៥ វិនាទី សម្រាប់ការបើកស្រោមសំបុត្រពេញលេញ"
+           >
+             <input
+               type="range"
+@@ -327,6 +329,23 @@
+             />
+           </Field>
+ 
++          <div className="grid gap-4 sm:grid-cols-2">
++            <Field label="ចំណងជើងលើស្រោមសំបុត្រ" hint="ទទេ = មិនបង្ហាញ">
++              <Input
++                value={form.envelopeTitle}
++                onChange={(e) => set("envelopeTitle", e.target.value)}
++                maxLength={80}
++              />
++            </Field>
++            <Field label="អក្សរតុបតែងខាងក្រោម" hint="ឧ. The Wedding Invitation · ទទេ = មិនបង្ហាញ">
++              <Input
++                value={form.envelopeSubtitle}
++                onChange={(e) => set("envelopeSubtitle", e.target.value)}
++                maxLength={80}
++              />
++            </Field>
++          </div>
++
+           <div className="grid gap-4 sm:grid-cols-3">
+             <Field label="អក្សរលើប៊ូតុងបើក">
+               <Input
+diff -ruN -x node_modules -x .next -x .data -x .git -x .env -x docs -x body -x '*.woff2' -x '*.webp' -x '*.png' -x tsconfig.tsbuildinfo -x next-env.d.ts a/src/components/admin/ThemeForm.tsx b/src/components/admin/ThemeForm.tsx
+--- a/src/components/admin/ThemeForm.tsx	2026-09-13 00:20:35.000000000 +0700
++++ b/src/components/admin/ThemeForm.tsx	2026-10-16 00:44:02.864587051 +0700
+@@ -33,6 +33,7 @@
+ 
+ const BODY_FONTS = [
+   "'Noto Sans Khmer'",
++  "'Kantumruy Pro'",
+   "'Noto Serif Khmer'",
+   "'Khmer OS Siemreap'",
+   "'Khmer OS Battambang'",
+diff -ruN -x node_modules -x .next -x .data -x .git -x .env -x docs -x body -x '*.woff2' -x '*.webp' -x '*.png' -x tsconfig.tsbuildinfo -x next-env.d.ts a/src/components/invitation/Cover.tsx b/src/components/invitation/Cover.tsx
+--- a/src/components/invitation/Cover.tsx	2026-09-13 00:20:35.000000000 +0700
++++ b/src/components/invitation/Cover.tsx	2026-10-16 00:54:38.560954500 +0700
+@@ -3,6 +3,7 @@
+ import type { Guest, Wedding } from "@/lib/db/schema";
+ import { CoverContent } from "./CoverContent";
+ import { LiveBackdrop } from "./LiveBackdrop";
++import { mediaSrc } from "@/lib/media";
+ 
+ /**
+  * The closed card. A monogram, the guest's name, and one button — nothing else,
+@@ -25,6 +26,12 @@
+   /** The velvet is parting: the monogram may draw itself in. */
+   reveal?: boolean;
+ }) {
++  /*
++   * The couple's cover photograph, when there is one, fills the cover under a
++   * controlled dark overlay and the writing turns light. Without one the cover
++   * is the card's own paper, exactly as before.
++   */
++  const photo = mediaSrc(wedding.coverPhotoId, wedding.coverPhotoUrl);
+   return (
+     <div
+       className={`absolute inset-0 z-30 transition-all duration-[900ms] ease-[cubic-bezier(.7,0,.25,1)] ${
+@@ -37,7 +44,18 @@
+         * reads lighter than the textured stock around it, which shows as a
+         * seam where the cover meets the frame.
+         */}
+-      <div className="paper relative flex h-full w-full flex-col items-center justify-center overflow-hidden px-8 py-10 text-center sm:px-10">
++      <div
++        className={`cover-shell paper relative flex h-full w-full flex-col items-center justify-center overflow-hidden text-center ${
++          photo ? "cover-on-photo" : ""
++        }`}
++      >
++        {photo && (
++          <span
++            className="cover-photo"
++            style={{ ["--cover-photo" as string]: `url("${photo.replace(/"/g, "%22")}")` }}
++            aria-hidden="true"
++          />
++        )}
+         <LiveBackdrop count={14} />
+ 
+         <CoverContent
+@@ -45,7 +63,7 @@
+           guest={guest}
+           reveal={reveal}
+           action={
+-            <button type="button" onClick={onOpen} className="btn-gold mt-12 min-w-[210px] khmer-wrap">
++            <button type="button" onClick={onOpen} className="btn-gold cv-open min-w-[200px] khmer-wrap">
+               {wedding.openButton}
+             </button>
+           }
+diff -ruN -x node_modules -x .next -x .data -x .git -x .env -x docs -x body -x '*.woff2' -x '*.webp' -x '*.png' -x tsconfig.tsbuildinfo -x next-env.d.ts a/src/components/invitation/CoverContent.tsx b/src/components/invitation/CoverContent.tsx
+--- a/src/components/invitation/CoverContent.tsx	2026-09-13 00:20:35.000000000 +0700
++++ b/src/components/invitation/CoverContent.tsx	2026-10-16 00:54:27.082060627 +0700
+@@ -1,5 +1,6 @@
+ import type { Guest, Wedding } from "@/lib/db/schema";
+-import { Monogram } from "@/components/ui/Monogram";
++import { NameLogo } from "@/components/ui/NameLogo";
++import { KHMER_MONTHS, KHMER_WEEKDAYS, toKhmerNumber, zonedParts } from "@/lib/khmer";
+ 
+ /**
+  * What the closed invitation says: the monogram, the occasion, and who it is
+@@ -19,64 +20,78 @@
+   };
+ }
+ 
++/**
++ * The date as four cells — ថ្ងៃ | ទី | ខែ | ឆ្នាំ — read off the wedding's own
++ * date in Cambodia's time zone, so the server's HTML and the guest's browser
++ * always agree on it.
++ */
++function DateGrid({ date }: { date: Date }) {
++  const { weekday, day, month, year } = zonedParts(date);
++  const cells = [
++    ["ថ្ងៃ", KHMER_WEEKDAYS[weekday].replace(/^ថ្ងៃ/, "")],
++    ["ទី", toKhmerNumber(day)],
++    ["ខែ", KHMER_MONTHS[month - 1]],
++    ["ឆ្នាំ", toKhmerNumber(year)],
++  ];
++  return (
++    <dl className="cv-date" aria-label="កាលបរិច្ឆេទ">
++      {cells.map(([label, value]) => (
++        <div key={label} className="cv-date-cell">
++          <dt className="cv-date-label">{label}</dt>
++          <dd className="cv-date-value khmer-wrap">{value}</dd>
++        </div>
++      ))}
++    </dl>
++  );
++}
++
+ export function CoverContent({
+   wedding,
+   guest,
+   action,
+-  compact = false,
+   reveal = false,
+ }: {
+   wedding: Wedding;
+   guest: Guest | null;
+-  /** The open button, when this is the live cover rather than a card in an envelope. */
++  /** The open button, when this is the live cover. */
+   action?: React.ReactNode;
+   /**
+-   * The cover is about to be seen: draw the monogram in.
++   * The cover is about to be seen: play the name mark's reveal.
+    *
+    * Passed down rather than decided here, because "seen" is a fact about the
+-   * *page* — the velvet starting to part — and this component has no way to
+-   * know it. Left off, the mark is simply already there, which is what a
+-   * preview or a print sheet wants.
++   * *page* — the velvet starting to part — and this component cannot know it.
+    */
+   reveal?: boolean;
+-  /** Inside the envelope the card is small; give it a little less air. */
+-  compact?: boolean;
+ }) {
+   const name = coverName(wedding, guest);
++  const date = new Date(wedding.weddingDate);
+ 
+   return (
+-    <div className="relative z-20 flex w-full flex-col items-center">
+-      <Monogram
+-        text={wedding.monogram}
++    <div className="cv">
++      {/* eslint-disable-next-line @next/next/no-img-element */}
++      <img className="cv-crest" src="/kit/crest.svg" alt="" aria-hidden="true" draggable={false} />
++
++      <h1 className="cv-title khmer-wrap">{wedding.title}</h1>
++
++      <NameLogo
+         groom={wedding.groomName}
+         bride={wedding.brideName}
+         font={wedding.monogramFont}
+-        play={reveal}
+-        className={
+-          compact
+-            ? "h-auto w-[62%] max-w-[210px] text-gold-frame"
+-            : "cover-monogram text-gold-frame"
+-        }
++        state={reveal ? "play" : "wait"}
++        className="cv-names"
+       />
+ 
+-      <p className={`text-sm text-gold-1 khmer-wrap ${compact ? "mt-[6%]" : "mt-10"}`}>
+-        {wedding.subtitle}
+-      </p>
+-
+-      <p
+-        className={`${compact ? "mt-[3%] text-base" : "mt-4 text-xl"} font-semibold text-heading ${
+-          /*
+-           * `break-words` on the Latin branch: a long single surname is wider
+-           * than the card inside the envelope, and without it the name simply
+-           * runs off the paper and is cut by the card's own overflow. Khmer
+-           * takes `khmer-wrap` instead, which breaks between clusters and never
+-           * inside one.
+-           */
+-          name.latin ? "uppercase tracking-[0.08em] break-words" : "khmer-wrap"
+-        }`}
+-      >
+-        {name.text}
+-      </p>
++      {wedding.subtitle && <p className="cv-lead khmer-wrap">{wedding.subtitle}</p>}
++      <p className={`cv-guest ${name.latin ? "cv-guest-latin" : "khmer-wrap"}`}>{name.text}</p>
++
++      {!Number.isNaN(date.getTime()) && <DateGrid date={date} />}
++
++      {(wedding.weddingTimeKhmer || wedding.buddhistYear) && (
++        <p className="cv-time khmer-wrap">
++          {[wedding.weddingTimeKhmer, wedding.buddhistYear].filter(Boolean).join(" · ")}
++        </p>
++      )}
++      {wedding.venueName && <p className="cv-venue khmer-wrap">{wedding.venueName}</p>}
+ 
+       {action}
+     </div>
+diff -ruN -x node_modules -x .next -x .data -x .git -x .env -x docs -x body -x '*.woff2' -x '*.webp' -x '*.png' -x tsconfig.tsbuildinfo -x next-env.d.ts a/src/components/invitation/envelope/CinemaRoom.tsx b/src/components/invitation/envelope/CinemaRoom.tsx
+--- a/src/components/invitation/envelope/CinemaRoom.tsx	2026-09-13 00:20:35.000000000 +0700
++++ b/src/components/invitation/envelope/CinemaRoom.tsx	2026-10-16 00:54:07.011455992 +0700
+@@ -53,7 +53,20 @@
+   }));
+ }
+ 
+-export function CinemaRoom({ lit, rich }: { lit: boolean; rich: boolean }) {
++export function CinemaRoom({
++  lit,
++  rich,
++  photo = "",
++}: {
++  lit: boolean;
++  rich: boolean;
++  /**
++   * The couple's cover photograph. Laid behind everything, blurred and taken
++   * down to dusk, so the envelope stands in front of their own picture rather
++   * than a generic room. Without one the room is dusk on its own.
++   */
++  photo?: string;
++}) {
+   /* Fewer of everything on a device that cannot spare the compositing. */
+   const bokeh = useMemo(() => scatter(rich ? 11 : 5, 9871), [rich]);
+   const dust = useMemo(() => scatter(rich ? 26 : 10, 4421), [rich]);
+@@ -63,6 +76,11 @@
+     <div className="room" aria-hidden="true">
+       {/* the air of the room, and the pool of light the envelope stands in */}
+       <span className="room-air" />
++      {/* Dusk: the room taken down so the blush envelope and the gold read. */}
++      <span
++        className={`room-dusk ${photo ? "room-dusk-photo" : ""}`}
++        style={photo ? { ["--room-photo" as string]: `url("${photo.replace(/"/g, "%22")}")` } : undefined}
++      />
+       <span className={`room-key ${lit ? "room-key-on" : ""}`} />
+       <span className="room-vignette" />
+ 
+diff -ruN -x node_modules -x .next -x .data -x .git -x .env -x docs -x body -x '*.woff2' -x '*.webp' -x '*.png' -x tsconfig.tsbuildinfo -x next-env.d.ts a/src/components/invitation/envelope/Envelope.tsx b/src/components/invitation/envelope/Envelope.tsx
+--- a/src/components/invitation/envelope/Envelope.tsx	2026-09-13 00:20:35.000000000 +0700
++++ b/src/components/invitation/envelope/Envelope.tsx	2026-10-16 00:58:50.948639842 +0700
+@@ -1,88 +1,339 @@
++import { useId } from "react";
+ import type { EnvelopeFace } from "@/lib/artwork";
+-
+-import { EnvelopeBack } from "./EnvelopeBack";
+-import { EnvelopeInnerLiner } from "./EnvelopeInnerLiner";
+-import { SlidingCover } from "./SlidingCover";
++import { NameLogo } from "@/components/ui/NameLogo";
++import { Monogram } from "@/components/ui/Monogram";
++import { WaxSeal } from "./WaxSeal";
+ 
+ /**
+- * The envelope: three layers standing at three distances from the camera
+- * inside one `preserve-3d` stage.
++ * The envelope: a real one, with a flap.
+  *
+- *   contact (-1)  →  body (0)  →  liner (1)  →  glow (2)  →  cover (3)  →  seal (4)
++ *   back (1) → flap once it is past upright (2) → card (3) → pocket (4) →
++ *   flap while closed (5) → seal (6)
+  *
+- * **There is no card in here any more.** There was, and it was wrong: the
+- * envelope opened, the invitation came forward, the camera closed on it, and
+- * the whole thing landed on the page's own card — a complete little reveal of
+- * its own, finished, before the curtains had done anything at all. Two reveals
+- * in a row is one too many, and the second one is the one that matters. The
+- * envelope's job is to open; the invitation belongs behind the velvet, which is
+- * the only place it is actually read.
++ * It replaces the gatefold — two panels sliding apart onto an empty lining —
++ * with the thing a guest actually knows: a wax seal holding a scalloped flap
++ * shut, the flap folding back on its hinge, and a card inside. The card is the
++ * point of the change. An envelope that opens onto nothing has nothing to hand
++ * the guest; this one hands them the invitation, which then comes toward the
++ * camera and carries the scene into the curtains.
+  *
+- * So the panels slide apart onto the lining and the warm light inside, and that
+- * light is what the curtain scene arrives over. Everything that used to serve
+- * the card — the flight pose, the measured morph onto `.card-stock`, the depth
+- * it needed to clear the front — has gone with it.
++ * **Depth is `z-index`, not `preserve-3d`**, exactly as before and for the same
++ * reason: inside a 3D context a transformed child cannot be composited on its
++ * own, so every frame re-rasterises its neighbours. Only the flap turns in
++ * three dimensions, and it carries its own `perspective()` in its transform so
++ * nothing above it has to become a 3D context. Its two faces are the one place
++ * `backface-visibility` is needed. Past 90° the flap is re-stacked *behind* the
++ * card (`flapBack`), which a single z-order cannot express and a real flap does.
+  *
+- * They are `z-index` and no longer `translateZ`, and that is not a tidy-up. A
+- * child of a `preserve-3d` element cannot be promoted to its own compositor
+- * layer, so every frame of the slide re-rasterised both panels — and a panel
+- * carries a full blind-emboss drawing, five instanced passes over the same
+- * geometry, at whatever size the envelope happens to be. Flattened, the slide
+- * is the compositor moving two textures it already has. Nothing here rotates
+- * any more, so there was never anything the third dimension was still buying.
++ * Every layer of the envelope body takes the same `translate` when it lowers,
++ * rather than living in one wrapper that moves: a wrapper would be a stacking
++ * context, and the card has to sit *between* the back and the pocket.
+  *
+- * The order still matters exactly as much: the glow has to sit in front of the
+- * lining and behind the cover, or it is either buried or laid over the paper
+- * like a sticker.
++ * All the paper is drawn in one coordinate space, 1000 × 704 — the envelope's
++ * own aspect — so the folds, the flap and the couple's own artwork (when they
++ * have uploaded one) meet exactly.
++ */
++
++const W = 1000;
++const H = 704;
++/** How far down the closed flap reaches: its tip, where the seal sits. */
++const FLAP = 430;
++
++/** A scalloped edge from `a` to `b`, the bumps bulging to the right of travel. */
++function scallops(a: [number, number], b: [number, number], count: number, depth: number) {
++  const [x0, y0] = a;
++  const [x1, y1] = b;
++  const dx = (x1 - x0) / count;
++  const dy = (y1 - y0) / count;
++  const len = Math.hypot(dx, dy);
++  // right-hand normal of the direction of travel
++  const nx = (dy / len) * depth;
++  const ny = (-dx / len) * depth;
++  let d = "";
++  for (let i = 0; i < count; i += 1) {
++    const sx = x0 + dx * i;
++    const sy = y0 + dy * i;
++    const cx = sx + dx / 2 + nx;
++    const cy = sy + dy / 2 + ny;
++    d += ` Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${(sx + dx).toFixed(1)} ${(sy + dy).toFixed(1)}`;
++  }
++  return d;
++}
++
++/* The flap: straight along the top hinge, scalloped down both sides to a
++   softened point. Traced clockwise, so "right of travel" is outside. */
++const FLAP_PATH =
++  `M 0 0 L ${W} 0` +
++  scallops([W, 0], [528, FLAP - 18], 10, -11) +
++  ` Q ${W / 2} ${FLAP + 8} 472 ${FLAP - 18}` +
++  scallops([472, FLAP - 18], [0, 0], 10, -11) +
++  " Z";
++
++/* The same outline drawn inside the edge, for the gold rule. */
++/*
++ * Built with `join`, not a template literal. SWC's minifier folded
++ * `${W - 40} 22` into `960` and dropped the ` 22` — a path that parses as
++ * "L 960 L 530 …" and that the browser throws away. The arithmetic is the
++ * same; the minifier simply has nothing here to fold.
+  */
++const FLAP_RULE = [
++  "M", 40, 22,
++  "L", W - 40, 22,
++  "L", 530, FLAP - 52,
++  "Q", W / 2, FLAP - 30, 470, FLAP - 52,
++  "Z",
++].join(" ");
++
++const LEFT_FOLD = `M 0 4 L 470 ${H / 2 - 6} Q 498 ${H / 2 + 12} 470 ${H / 2 + 30} L 0 ${H} Z`;
++const RIGHT_FOLD = `M ${W} 4 L 530 ${H / 2 - 6} Q 502 ${H / 2 + 12} 530 ${H / 2 + 30} L ${W} ${H} Z`;
++const BOTTOM_FOLD = `M 0 ${H} L 468 ${H * 0.47 + 14} Q ${W / 2} ${H * 0.47 - 6} 532 ${H * 0.47 + 14} L ${W} ${H} Z`;
++
++export type EnvelopePhase = {
++  /** The seal has been pressed, lifted and taken away. */
++  unsealed: boolean;
++  /** The flap is folding back on its hinge. */
++  flapOpen: boolean;
++  /** The flap is past upright and belongs behind the card. */
++  flapBack: boolean;
++  /** The card is sliding up out of the pocket. */
++  cardOut: boolean;
++  /** The envelope lowers away and the card comes toward the camera. */
++  lowered: boolean;
++};
++
+ export function Envelope({
+   envelope,
+   phase,
+   face,
++  groom,
++  bride,
++  monogramFont,
++  monogramText,
++  customSeal,
++  cardLines,
+ }: {
+   envelope: {
+     showSeal: boolean;
+     sealText: string;
+-    ornament: "corner" | "corner-rich";
+-  };
+-  phase: {
+-    /** The wax has given and the seal has lifted off the join. */
+-    unsealed: boolean;
+-    /** The two front panels are sliding apart. */
+-    doorsOpen: boolean;
+   };
++  phase: EnvelopePhase;
+   /** The couple's own picture on the paper, or `null` for the drawn stock. */
+   face: EnvelopeFace | null;
++  groom: string;
++  bride: string;
++  monogramFont?: string | null;
++  /** The couple's initials monogram, set in their chosen face, on the card. */
++  monogramText?: string;
++  /**
++   * The couple typed their own words for the seal. Then the drawn wax seal
++   * carries them, exactly as it always has; otherwise the pressed crest seal.
++   */
++  customSeal: boolean;
++  /** What is printed on the card: the address line and the occasion. */
++  cardLines: { lead: string; title: string };
+ }) {
++  const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
++  const ornament = face ? face.ornament : true;
++
++  const body = [
++    "fl-layer",
++    phase.lowered ? "fl-lowered" : "",
++  ].join(" ");
++
++  /** The couple's own artwork, laid into whichever piece of paper asks. */
++  const artwork = (clip: string) =>
++    face ? (
++      <g clipPath={`url(#${clip})`}>
++        <image
++          href={face.src}
++          x={0}
++          y={0}
++          width={W}
++          height={H}
++          preserveAspectRatio={face.preserveAspectRatio}
++        />
++        {face.scrim > 0 && <rect width={W} height={H} fill="var(--env-paper)" opacity={face.scrim} />}
++      </g>
++    ) : null;
++
+   return (
+-    <>
+-      <EnvelopeBack dim={false} />
++    <div className="fl" data-phase={phaseName(phase)}>
++      {/* The contact shadow on the table, so the envelope rests on something. */}
++      <span className={`fl-shadow ${phase.lowered ? "fl-lowered" : ""}`} aria-hidden="true" />
++
++      {/* ── 1 · the back of the envelope, and its lined inside ───────────── */}
++      <svg className={`${body} fl-back`} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" aria-hidden="true">
++        <defs>
++          <pattern id={`lin-${uid}`} patternUnits="userSpaceOnUse" width="320" height="320">
++            <image href="/kit/paper-lining.webp" width="320" height="320" />
++          </pattern>
++          <linearGradient id={`in-${uid}`} x1="0" y1="0" x2="0" y2="1">
++            <stop offset="0" stopColor="#000" stopOpacity="0.30" />
++            <stop offset="0.55" stopColor="#000" stopOpacity="0.06" />
++            <stop offset="1" stopColor="#000" stopOpacity="0.18" />
++          </linearGradient>
++        </defs>
++        <rect width={W} height={H} rx="10" fill="var(--env-paper-deep)" />
++        <rect x="8" y="8" width={W - 16} height={H - 16} rx="6" fill={`url(#lin-${uid})`} />
++        <rect x="8" y="8" width={W - 16} height={H - 16} rx="6" fill={`url(#in-${uid})`} />
++      </svg>
++
++      {/* ── 2/5 · the flap, two faces on one hinge ───────────────────────── */}
++      <div
++        className={`${body} fl-flap ${phase.flapOpen ? "fl-flap-open" : ""} ${phase.flapBack ? "fl-flap-back" : ""}`}
++        aria-hidden="true"
++      >
++        <div className="fl-face fl-face-front">
++          <svg viewBox={`0 0 ${W} ${FLAP + 12}`} preserveAspectRatio="none">
++            <defs>
++              <clipPath id={`fc-${uid}`}>
++                <path d={FLAP_PATH} />
++              </clipPath>
++              <pattern id={`pa-${uid}`} patternUnits="userSpaceOnUse" width="320" height="320">
++                <image href="/kit/paper-cream.webp" width="320" height="320" />
++              </pattern>
++              <linearGradient id={`fs-${uid}`} x1="0" y1="0" x2="0" y2="1">
++                <stop offset="0" stopColor="#fff" stopOpacity="0.16" />
++                <stop offset="0.7" stopColor="#fff" stopOpacity="0" />
++                <stop offset="1" stopColor="#000" stopOpacity="0.07" />
++              </linearGradient>
++            </defs>
++            {/* the flap's own shadow on the pocket beneath it */}
++            <path d={FLAP_PATH} className="fl-flap-cast" transform="translate(0 7)" />
++            <g clipPath={`url(#fc-${uid})`}>
++              <rect width={W} height={FLAP + 12} fill="var(--env-paper)" />
++              <rect width={W} height={FLAP + 12} fill={`url(#pa-${uid})`} className="fl-tex" />
++              <rect width={W} height={FLAP + 12} fill={`url(#fs-${uid})`} />
++            </g>
++            {artwork(`fc-${uid}`)}
++            {ornament && <path d={FLAP_RULE} className="fl-rule" />}
++            <path d={FLAP_PATH} className="fl-edge" />
++          </svg>
++          {ornament && (
++            <div className="fl-flap-mark">
++              <NameLogo groom={groom} bride={bride} font={monogramFont} state="still" />
++            </div>
++          )}
++        </div>
++
++        <div className="fl-face fl-face-back">
++          <svg viewBox={`0 0 ${W} ${FLAP + 12}`} preserveAspectRatio="none">
++            <defs>
++              <clipPath id={`bc-${uid}`}>
++                <path d={FLAP_PATH} />
++              </clipPath>
++              <pattern id={`pl-${uid}`} patternUnits="userSpaceOnUse" width="320" height="320">
++                <image href="/kit/paper-lining.webp" width="320" height="320" />
++              </pattern>
++            </defs>
++            <g clipPath={`url(#bc-${uid})`}>
++              <rect width={W} height={FLAP + 12} fill="#f3e8d6" />
++              <rect width={W} height={FLAP + 12} fill={`url(#pl-${uid})`} />
++            </g>
++            <path d={FLAP_PATH} className="fl-edge fl-edge-gold" />
++          </svg>
++        </div>
++      </div>
++
++      {/* ── 3 · the card ─────────────────────────────────────────────────── */}
++      <div
++        className={`fl-card ${phase.cardOut ? "fl-card-out" : ""} ${phase.lowered ? "fl-card-near" : ""}`}
++        aria-hidden="true"
++      >
++        <div className="fl-card-inner">
++          {/* eslint-disable-next-line @next/next/no-img-element */}
++          <img className="fl-card-crest" src="/kit/crest.svg" alt="" draggable={false} />
++          {cardLines.title && <p className="fl-card-title khmer-wrap">{cardLines.title}</p>}
++          {/* The initials monogram, set in the face the couple chose in the
++              dashboard. The flap carries their names; the card carries this. */}
++          <Monogram
++            text={monogramText ?? ""}
++            groom={groom}
++            bride={bride}
++            font={monogramFont ?? undefined}
++            play={false}
++            className="fl-card-mono text-gold-frame"
++          />
++          {cardLines.lead && <p className="fl-card-lead khmer-wrap">{cardLines.lead}</p>}
++        </div>
++      </div>
++
++      {/* ── 4 · the pocket: two side folds under the bottom fold ─────────── */}
++      <svg className={`${body} fl-pocket`} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" aria-hidden="true">
++        <defs>
++          <pattern id={`pp-${uid}`} patternUnits="userSpaceOnUse" width="320" height="320">
++            <image href="/kit/paper-cream.webp" width="320" height="320" />
++          </pattern>
++          <clipPath id={`pk-${uid}`}>
++            <path d={LEFT_FOLD} />
++            <path d={RIGHT_FOLD} />
++            <path d={BOTTOM_FOLD} />
++          </clipPath>
++          <linearGradient id={`ls-${uid}`} x1="0" y1="0" x2="1" y2="0">
++            <stop offset="0" stopColor="#fff" stopOpacity="0.10" />
++            <stop offset="1" stopColor="#000" stopOpacity="0.10" />
++          </linearGradient>
++          <linearGradient id={`rs-${uid}`} x1="1" y1="0" x2="0" y2="0">
++            <stop offset="0" stopColor="#000" stopOpacity="0.02" />
++            <stop offset="1" stopColor="#000" stopOpacity="0.13" />
++          </linearGradient>
++          <linearGradient id={`bs-${uid}`} x1="0" y1="1" x2="0" y2="0">
++            <stop offset="0" stopColor="#fff" stopOpacity="0.14" />
++            <stop offset="1" stopColor="#fff" stopOpacity="0" />
++          </linearGradient>
++        </defs>
+ 
+-      {/*
+-        * The lining, which is what the open panels actually disclose. It is the
+-        * inside of the envelope — a shade deeper than the outside, and darkest
+-        * at the middle where least light reaches.
+-        */}
+-      <EnvelopeInnerLiner dim={false} mouthOpen={phase.doorsOpen} />
+-
+-      {/*
+-        * The warm light coming out as the panels part.
+-        *
+-        * With the card gone this is the whole of what is revealed, so it does
+-        * more work than it used to — but not much more. It arrives with the
+-        * doors and never before: a glow already burning inside a sealed
+-        * envelope is a lamp under a sheet of paper.
+-        */}
+-      <span className={`env-glow ${phase.doorsOpen ? "env-glow-on" : ""}`} aria-hidden="true" />
+-
+-      <SlidingCover
+-        unsealed={phase.unsealed}
+-        open={phase.doorsOpen}
+-        gold={!phase.unsealed}
+-        seal={envelope.showSeal ? envelope.sealText : null}
+-        dense={envelope.ornament === "corner-rich"}
+-        face={face}
+-      />
+-    </>
++        {[
++          [LEFT_FOLD, `ls-${uid}`],
++          [RIGHT_FOLD, `rs-${uid}`],
++        ].map(([d, shade]) => (
++          <g key={shade}>
++            <path d={d} fill="var(--env-paper-shade)" />
++            <path d={d} fill={`url(#pp-${uid})`} className="fl-tex" />
++            <path d={d} fill={`url(#${shade})`} />
++          </g>
++        ))}
++
++        {/* The bottom fold lies over both sides, so it casts onto them. */}
++        <path d={BOTTOM_FOLD} className="fl-fold-cast" transform="translate(0 -6)" />
++        <path d={BOTTOM_FOLD} fill="var(--env-paper)" />
++        <path d={BOTTOM_FOLD} fill={`url(#pp-${uid})`} className="fl-tex" />
++        <path d={BOTTOM_FOLD} fill={`url(#bs-${uid})`} />
++
++        {artwork(`pk-${uid}`)}
++
++        {/* Fold creases: a dark line and a lit one beside it, so the edges
++            read as paper turned over rather than shapes drawn on top. */}
++        <path d={`M 0 ${H} L 468 ${H * 0.47 + 14} Q ${W / 2} ${H * 0.47 - 6} 532 ${H * 0.47 + 14} L ${W} ${H}`} className="fl-crease" />
++        <path d={`M 4 4 L 470 ${H / 2 - 6}`} className="fl-crease fl-crease-soft" />
++        <path d={`M ${W - 4} 4 L 530 ${H / 2 - 6}`} className="fl-crease fl-crease-soft" />
++        {ornament && (
++          <rect x="22" y="22" width={W - 44} height={H - 44} rx="4" className="fl-rule fl-rule-pocket" clipPath={`url(#pk-${uid})`} />
++        )}
++        <rect x="1" y="1" width={W - 2} height={H - 2} rx="10" className="fl-outline" />
++      </svg>
++
++      {/* ── 6 · the seal ─────────────────────────────────────────────────── */}
++      {envelope.showSeal && (
++        <div className={`fl-seal ${phase.unsealed ? "fl-seal-off" : ""}`} aria-hidden="true">
++          {customSeal ? (
++            <WaxSeal text={envelope.sealText} released={false} gold />
++          ) : (
++            /* eslint-disable-next-line @next/next/no-img-element */
++            <img src="/kit/wax-seal.svg" alt="" draggable={false} />
++          )}
++        </div>
++      )}
++    </div>
+   );
+ }
++
++/** For `?diag=1` and the tests: which beat the drawing thinks it is in. */
++function phaseName(p: EnvelopePhase) {
++  if (p.lowered) return "lowered";
++  if (p.cardOut) return "card";
++  if (p.flapBack) return "flap-back";
++  if (p.flapOpen) return "flap";
++  if (p.unsealed) return "unsealed";
++  return "closed";
++}
+diff -ruN -x node_modules -x .next -x .data -x .git -x .env -x docs -x body -x '*.woff2' -x '*.webp' -x '*.png' -x tsconfig.tsbuildinfo -x next-env.d.ts a/src/components/invitation/envelope/EnvelopeBack.tsx b/src/components/invitation/envelope/EnvelopeBack.tsx
+--- a/src/components/invitation/envelope/EnvelopeBack.tsx	2026-09-13 00:20:35.000000000 +0700
++++ b/src/components/invitation/envelope/EnvelopeBack.tsx	1970-01-01 07:00:00.000000000 +0700
+@@ -1,30 +0,0 @@
+-import { EnvelopeBotanical } from "./EnvelopeBotanical";
+-
+-/**
+- * The envelope's body — the sheet everything else is folded from.
+- *
+- * Two things live here that are easy to leave out and impossible to fake
+- * afterwards: a sliver of the paper's own thickness showing past the front
+- * panel, and the shadow the whole object casts on the surface below it.
+- *
+- * It sits at the back of the stack, so what actually shows of it is the two
+- * shoulders either side of the closed flap — the side flaps, folded in behind
+- * the top one. They are the same sheet as everything else, so they carry the
+- * same die; two bare corners on an envelope covered in relief read as a fault
+- * in the pressing rather than as restraint.
+- */
+-export function EnvelopeBack({ dim }: { dim: boolean }) {
+-  return (
+-    <div
+-      className="env-layer env-fade"
+-      style={{ transform: "translateZ(0px)", opacity: dim ? 0 : 1 }}
+-      aria-hidden="true"
+-    >
+-      <span className="env-contact" />
+-      <span className="env-edge" />
+-      <span className="env-body env-grain absolute inset-0">
+-        <EnvelopeBotanical face="back" />
+-      </span>
+-    </div>
+-  );
+-}
+diff -ruN -x node_modules -x .next -x .data -x .git -x .env -x docs -x body -x '*.woff2' -x '*.webp' -x '*.png' -x tsconfig.tsbuildinfo -x next-env.d.ts a/src/components/invitation/envelope/EnvelopeBotanical.tsx b/src/components/invitation/envelope/EnvelopeBotanical.tsx
+--- a/src/components/invitation/envelope/EnvelopeBotanical.tsx	2026-09-13 00:20:35.000000000 +0700
++++ b/src/components/invitation/envelope/EnvelopeBotanical.tsx	1970-01-01 07:00:00.000000000 +0700
+@@ -1,433 +0,0 @@
+-/**
+- * The botanical relief pressed into the envelope's paper.
+- *
+- * This is a **blind emboss**: no ink and no foil, only the paper pushed up out
+- * of its own plane. So there is no colour anywhere in here, and — the part that
+- * is easy to get wrong — there is no *fill* either. A raised area of paper is
+- * still the same paper. What you see of it is one lit edge where the surface
+- * turns towards the light and one shadowed edge where it turns away, and
+- * nothing at all in between.
+- *
+- * So every shape is struck three times, not twice:
+- *
+- *   1. the shade, offset down and right;
+- *   2. the light, offset up and left;
+- *   3. **the paper itself, at no offset** — covering the middle of both and
+- *      leaving only the two crescents standing.
+- *
+- * Take the third pass away and the flowers fill in solid white, which is what a
+- * sticker looks like rather than an emboss. The knockout is the whole effect.
+- *
+- * The third pass fills but does **not** stroke, and that asymmetry is doing a
+- * second job. Every line in the drawing — a vein, a petal's crease, a stem, the
+- * outline between one petal and the next — survives the knockout as a pair of
+- * hairlines a few units apart, light above and dark below, which is precisely
+- * what a scored fold in paper looks like. Knock out the strokes as well and the
+- * blooms collapse into featureless lumps, because a flower's petals are only
+- * told apart by the creases between them. `--emb-line` is how that is arranged:
+- * the two struck passes set it to their own colour and the knockout sets it to
+- * `none`.
+- *
+- * It is drawn, not tiled. A repeating tile announces itself the moment the
+- * viewer finds the seam, and on something this size the seam is always found;
+- * one arrangement composed to the face reads as a die cut for this envelope.
+- * All three faces share one coordinate space — the whole envelope, 1000 across
+- * and 1280 down — so a stem that runs off the flap continues on the pocket
+- * beneath it, exactly as it would on a sheet embossed before it was folded.
+- *
+- * Everything grows from three primitives — a petal, a leaf and a bud — placed,
+- * turned and scaled. One hand, many placements.
+- */
+-
+-/* ── the primitives, drawn at the origin, opening upward ─────────────── */
+-
+-/**
+- * One petal of an open bloom: broad in the shoulder, waisted at the base, and
+- * very slightly notched at the tip. The notch is two units deep and it is the
+- * difference between a flower and a daisy stamp.
+- */
+-const PETAL = [
+-  "M0 0",
+-  "C-9 -7 -16 -19 -15 -30",
+-  "C-14 -40 -8 -45 -3.5 -42",
+-  "C-1.5 -40.5 -0.5 -38.5 0 -36",
+-  "C0.5 -38.5 1.5 -40.5 3.5 -42",
+-  "C8 -45 14 -40 15 -30",
+-  "C16 -19 9 -7 0 0",
+-  "Z",
+-].join(" ");
+-
+-/** A leaf: an almond drawn out to a tip. */
+-const LEAF =
+-  "M0 0 C-14 -10 -21 -27 -18 -43 C-15 -55 -6 -62 0 -68 C6 -62 15 -55 18 -43 C21 -27 14 -10 0 0 Z";
+-
+-/** A closed bud, held in two sepals. */
+-const BUD = "M0 0 C-8 -6 -11 -17 -8 -27 C-6 -34 -2 -37 0 -40 C2 -37 6 -34 8 -27 C11 -17 8 -6 0 0 Z";
+-
+-/**
+- * A raised area, and a scored line. Both are written against two custom
+- * properties rather than fixed paints, which is what lets one copy of the
+- * drawing be struck five different ways — see `BotanicalArt`.
+- */
+-const raised = {
+-  fill: "var(--emb-fill)",
+-  stroke: "var(--emb-line)",
+-  strokeWidth: 1.1,
+-} as const;
+-
+-const scored = (w: number) =>
+-  ({ fill: "none", stroke: "var(--emb-line)", strokeWidth: w }) as const;
+-
+-/**
+- * An open bloom. Five petals, and behind them five more turned half a step so
+- * the gaps of the front row are filled — which is what stops five petals
+- * reading as a star. Each front petal carries a crease down its middle: on a
+- * real die that crease is a second, shallower depth, and without it a petal is
+- * a flat plate.
+- */
+-function Bloom({ transform, petals = 5 }: { transform: string; petals?: number }) {
+-  const step = 360 / petals;
+-  return (
+-    <g transform={transform}>
+-      {/* the back row, smaller and set between */}
+-      {Array.from({ length: petals }, (_, i) => (
+-        <path
+-          key={`b${i}`}
+-          d={PETAL}
+-          {...raised}
+-          transform={`rotate(${i * step + step / 2}) scale(0.78)`}
+-        />
+-      ))}
+-      {Array.from({ length: petals }, (_, i) => (
+-        <g key={`f${i}`} transform={`rotate(${i * step})`}>
+-          <path d={PETAL} {...raised} />
+-          <path d="M0 -9 C-1.5 -17 -1.5 -25 0 -33" {...scored(1.3)} />
+-        </g>
+-      ))}
+-      {/* the eye, and a ring of stamen heads around it */}
+-      <circle r={6.5} {...raised} />
+-      {Array.from({ length: 9 }, (_, i) => (
+-        <circle key={`s${i}`} r={2} cy={-11.5} fill="var(--emb-fill)" transform={`rotate(${i * 40})`} />
+-      ))}
+-    </g>
+-  );
+-}
+-
+-/** A leaf with its midrib and four pairs of veins. */
+-function Leaflet({ transform }: { transform: string }) {
+-  return (
+-    <g transform={transform}>
+-      <path d={LEAF} {...raised} />
+-      <path d="M0 -3 L0 -64" {...scored(1.7)} />
+-      {[-15, -28, -41, -52].map((y, i) => (
+-        <g key={i} {...scored(1.2)}>
+-          <path d={`M0 ${y} C-6 ${y - 4} -10 ${y - 9} -13 ${y - 15}`} />
+-          <path d={`M0 ${y} C6 ${y - 4} 10 ${y - 9} 13 ${y - 15}`} />
+-        </g>
+-      ))}
+-    </g>
+-  );
+-}
+-
+-/**
+- * A sprig: a stem with leaves set alternately along it and a bud at the tip.
+- * The stem is a real curve and each leaf is turned to the angle the curve has
+- * where it is attached, which is why the sprig reads as one growing thing
+- * rather than as leaves posted along a line.
+- */
+-function Sprig({ transform }: { transform: string }) {
+-  return (
+-    <g transform={transform}>
+-      <path
+-        d="M0 0 C7 -36 3 -72 -8 -106 C-17 -134 -21 -156 -19 -178"
+-        {...scored(2.4)}
+-      />
+-      <Leaflet transform="translate(3 -20) rotate(62) scale(0.58)" />
+-      <Leaflet transform="translate(2 -30) rotate(-58) scale(0.54)" />
+-      <Leaflet transform="translate(5 -50) rotate(66) scale(0.5)" />
+-      <Leaflet transform="translate(1 -62) rotate(-62) scale(0.46)" />
+-      <Leaflet transform="translate(-4 -82) rotate(68) scale(0.42)" />
+-      <Leaflet transform="translate(-10 -98) rotate(-60) scale(0.38)" />
+-      <Leaflet transform="translate(-15 -122) rotate(58) scale(0.34)" />
+-      <Leaflet transform="translate(-18 -142) rotate(-52) scale(0.3)" />
+-      <path d={BUD} {...raised} transform="translate(-19 -178) rotate(-6) scale(0.58)" />
+-    </g>
+-  );
+-}
+-
+-/** A short spray of buds on fine stems. */
+-function BudSpray({ transform }: { transform: string }) {
+-  return (
+-    <g transform={transform}>
+-      <path
+-        d="M0 0 C-2 -22 -4 -42 -2 -58 M0 -16 C-13 -24 -22 -35 -26 -48 M0 -28 C13 -37 21 -48 24 -60"
+-        {...scored(1.9)}
+-      />
+-      <path d={BUD} {...raised} transform="translate(-2 -58) scale(0.46)" />
+-      <path d={BUD} {...raised} transform="translate(-26 -48) rotate(-30) scale(0.4)" />
+-      <path d={BUD} {...raised} transform="translate(24 -60) rotate(26) scale(0.42)" />
+-      <Leaflet transform="translate(-4 -14) rotate(-74) scale(0.3)" />
+-      <Leaflet transform="translate(4 -22) rotate(78) scale(0.28)" />
+-    </g>
+-  );
+-}
+-
+-/**
+- * The two shoulders either side of the closed flap.
+- *
+- * These are the side flaps, folded in behind the top one. They are a small
+- * sliver of paper and it would be easy to leave them bare — which is exactly
+- * why they must not be: two undecorated corners on an envelope covered in
+- * relief read as a fault in the die rather than as restraint.
+- */
+-function BackArrangement() {
+-  return (
+-    <>
+-      <Bloom transform="translate(88 168) rotate(-20) scale(1.04)" />
+-      <Sprig transform="translate(206 296) rotate(-150) scale(0.74)" />
+-      <Leaflet transform="translate(34 288) rotate(34) scale(0.68)" />
+-      <BudSpray transform="translate(158 300) rotate(-18) scale(0.68)" />
+-      <Leaflet transform="translate(60 80) rotate(-52) scale(0.56)" />
+-
+-      <Bloom transform="translate(914 182) rotate(18) scale(1)" />
+-      <Sprig transform="translate(796 308) rotate(150) scale(0.72)" />
+-      <Leaflet transform="translate(968 296) rotate(-32) scale(0.66)" />
+-      <BudSpray transform="translate(846 306) rotate(16) scale(0.66)" />
+-      <Leaflet transform="translate(942 92) rotate(50) scale(0.54)" />
+-    </>
+-  );
+-}
+-
+-/**
+- * The arrangement on the pocket — the paper below the flap.
+- *
+- * Dense at the sides and across the foot and thinner through the middle, where
+- * the seal sits and the bottom flap's two creases cross. A die that crowds
+- * either of them makes all three harder to read; a die that leaves the sides
+- * bare makes the envelope look half finished.
+- */
+-function PocketArrangement({ dense }: { dense: boolean }) {
+-  return (
+-    <>
+-      {/* the left side, from the mouth down */}
+-      <Bloom transform="translate(118 470) rotate(-14) scale(1.34)" />
+-      <Sprig transform="translate(84 668) rotate(-10) scale(1.24)" />
+-      <Leaflet transform="translate(232 560) rotate(38) scale(1)" />
+-      <BudSpray transform="translate(252 428) rotate(16) scale(1.14)" />
+-      <Bloom transform="translate(64 800) rotate(26) scale(0.94)" petals={6} />
+-      <Leaflet transform="translate(196 728) rotate(-58) scale(0.8)" />
+-      <Sprig transform="translate(228 900) rotate(18) scale(0.9)" />
+-      <BudSpray transform="translate(126 906) rotate(-24) scale(0.84)" />
+-      <Leaflet transform="translate(38 620) rotate(64) scale(0.72)" />
+-
+-      {/* the right side */}
+-      <Bloom transform="translate(890 518) rotate(20) scale(1.22)" />
+-      <Sprig transform="translate(922 710) rotate(12) scale(1.26)" />
+-      <Leaflet transform="translate(766 600) rotate(-42) scale(0.94)" />
+-      <BudSpray transform="translate(748 456) rotate(-20) scale(1.06)" />
+-      <Bloom transform="translate(946 838) rotate(-22) scale(0.9)" petals={6} />
+-      <Leaflet transform="translate(812 754) rotate(56) scale(0.78)" />
+-      <Sprig transform="translate(778 928) rotate(-16) scale(0.88)" />
+-      <BudSpray transform="translate(884 934) rotate(22) scale(0.82)" />
+-      <Leaflet transform="translate(968 646) rotate(-62) scale(0.7)" />
+-
+-      {/* across the foot */}
+-      <Bloom transform="translate(196 1046) rotate(10) scale(1.16)" />
+-      <Sprig transform="translate(378 1180) rotate(-26) scale(1.08)" />
+-      <Bloom transform="translate(806 1094) rotate(-16) scale(1.2)" />
+-      <Sprig transform="translate(628 1198) rotate(24) scale(1.02)" />
+-      <Leaflet transform="translate(506 1142) rotate(6) scale(0.84)" />
+-      <BudSpray transform="translate(302 1222) rotate(-8) scale(0.9)" />
+-      <BudSpray transform="translate(704 1230) rotate(10) scale(0.86)" />
+-      <Leaflet transform="translate(96 1156) rotate(-34) scale(0.7)" />
+-      <Leaflet transform="translate(910 1176) rotate(32) scale(0.68)" />
+-      <Bloom transform="translate(500 1256) rotate(0) scale(0.8)" />
+-
+-      {dense && (
+-        <>
+-          {/* the quieter middle, filled in only for the richer styles */}
+-          <Leaflet transform="translate(330 660) rotate(48) scale(0.62)" />
+-          <Leaflet transform="translate(672 690) rotate(-46) scale(0.6)" />
+-          <BudSpray transform="translate(446 540) rotate(-6) scale(0.8)" />
+-          <BudSpray transform="translate(566 508) rotate(10) scale(0.74)" />
+-          <Leaflet transform="translate(292 1020) rotate(-24) scale(0.56)" />
+-          <Leaflet transform="translate(712 1042) rotate(22) scale(0.54)" />
+-          <Bloom transform="translate(390 812) rotate(16) scale(0.62)" petals={6} />
+-          <Bloom transform="translate(614 842) rotate(-14) scale(0.6)" petals={6} />
+-          <Leaflet transform="translate(500 940) rotate(4) scale(0.5)" />
+-        </>
+-      )}
+-    </>
+-  );
+-}
+-
+-/**
+- * The arrangement on the flap.
+- *
+- * The flap narrows to a point, so the die has to narrow with it: weight in the
+- * two shoulders and nothing in the last third. Anything placed down there is
+- * cut in half by the fold and left looking unfinished.
+- */
+-function FlapArrangement({ dense }: { dense: boolean }) {
+-  return (
+-    <>
+-      <Bloom transform="translate(188 132) rotate(-18) scale(1.26)" />
+-      <Sprig transform="translate(322 248) rotate(-124) scale(1.04)" />
+-      <Leaflet transform="translate(288 58) rotate(30) scale(0.86)" />
+-      <BudSpray transform="translate(108 254) rotate(-44) scale(0.96)" />
+-      <Bloom transform="translate(46 116) rotate(24) scale(0.78)" petals={6} />
+-      <Leaflet transform="translate(158 232) rotate(-70) scale(0.64)" />
+-      <BudSpray transform="translate(324 96) rotate(28) scale(0.66)" />
+-
+-      <Bloom transform="translate(818 146) rotate(16) scale(1.22)" />
+-      <Sprig transform="translate(686 260) rotate(124) scale(1)" />
+-      <Leaflet transform="translate(718 70) rotate(-28) scale(0.84)" />
+-      <BudSpray transform="translate(898 262) rotate(42) scale(0.92)" />
+-      <Bloom transform="translate(958 126) rotate(-22) scale(0.76)" petals={6} />
+-      <Leaflet transform="translate(848 240) rotate(68) scale(0.62)" />
+-      <BudSpray transform="translate(676 104) rotate(-26) scale(0.64)" />
+-
+-      {dense && (
+-        <>
+-          <Leaflet transform="translate(446 124) rotate(-58) scale(0.68)" />
+-          <Leaflet transform="translate(562 130) rotate(58) scale(0.66)" />
+-          <BudSpray transform="translate(504 54) rotate(0) scale(0.66)" />
+-          <Bloom transform="translate(418 266) rotate(22) scale(0.7)" petals={6} />
+-          <Bloom transform="translate(588 274) rotate(-20) scale(0.68)" petals={6} />
+-          <Leaflet transform="translate(504 196) rotate(2) scale(0.54)" />
+-        </>
+-      )}
+-    </>
+-  );
+-}
+-
+-const ARRANGEMENT = {
+-  pocket: PocketArrangement,
+-  flap: FlapArrangement,
+-  back: BackArrangement,
+-};
+-
+-export type BotanicalFace = keyof typeof ARRANGEMENT;
+-
+-/**
+- * The relief as bare geometry, for a caller that already has an SVG of its own.
+- *
+- * The offset between the three passes is in viewBox units rather than pixels,
+- * so the depth scales with the envelope — shallower on a phone, deeper on a
+- * desktop, which is what happens when you bring a real card closer to your eye.
+- */
+-export function BotanicalArt({
+-  face,
+-  dense = false,
+-  /**
+-   * What the paper is, for the knockout. It has to be an actual colour and not
+-   * `transparent`: the pass exists to cover the middle of the two struck copies
+-   * back up again.
+-   */
+-  paper = "var(--env-paper)",
+-  /**
+-   * Distinguishes two copies of the same die on one page.
+-   *
+-   * The gatefold draws the *same* arrangement into two separate SVGs, one per
+-   * panel, so both would otherwise define `emb-pocket` and both `<use>` would
+-   * resolve to whichever came first in the document — and a `<use>` pointing
+-   * into a different `<svg>` renders nothing at all. Ids are global; the copies
+-   * have to say which one they are.
+-   */
+-  copy = "",
+-}: {
+-  face: BotanicalFace;
+-  dense?: boolean;
+-  paper?: string;
+-  copy?: string;
+-}) {
+-  const Art = ARRANGEMENT[face];
+-  /*
+-   * Defined once and instanced five times.
+-   *
+-   * Five passes over an arrangement this dense is a few thousand nodes if the
+-   * geometry is repeated, which is a real cost on the mid-range phones these
+-   * are opened on. `<use>` is exactly the tool for it: one copy of the drawing
+-   * in `defs`, five references to it. `currentColor` and custom properties both
+-   * inherit from the referencing element into the instance, which is what makes
+-   * the five strikes differ at all.
+-   *
+-   * The id is derived from the face rather than from `useId` so this can stay a
+-   * server component. One envelope per page, and the three faces never collide.
+-   */
+-  const id = `emb-${face}${dense ? "-d" : ""}${copy ? `-${copy}` : ""}`;
+-  const d = 3.4;
+-  /* The creases are shallower than the areas they are scored into. */
+-  const c = d * 0.6;
+-
+-  const DARK = "rgb(58 40 26)";
+-
+-  /*
+-   * The order is the whole trick, and it is not the obvious one.
+-   *
+-   * Areas first — shade, light, then the paper knocking both of them back out
+-   * through the middle so only their two rims survive. Then the creases, *over*
+-   * the knockout, struck as their own light-and-dark pair. Score them before
+-   * the knockout instead and every line inside a shape is painted out by the
+-   * paper: petals lose the boundaries between them, leaves lose their veins,
+-   * and each bloom sets into one smooth lump. The creases have to come last.
+-   */
+-  const pass = (fill: string, line: string, dx: number, opacity: number) => (
+-    <use
+-      href={`#${id}`}
+-      style={{ ["--emb-fill" as string]: fill, ["--emb-line" as string]: line }}
+-      opacity={opacity}
+-      transform={`translate(${dx} ${dx})`}
+-    />
+-  );
+-
+-  return (
+-    <>
+-      <defs>
+-        <g id={id}>
+-          <Art dense={dense} />
+-        </g>
+-      </defs>
+-
+-      {/* the raised areas: shade, light, and the paper between them */}
+-      {pass(DARK, "none", d, 0.2)}
+-      {pass("#fff", "none", -d, 0.82)}
+-      {pass(paper, "none", 0, 0.92)}
+-
+-      {/* the creases scored into them */}
+-      {pass("none", DARK, c, 0.22)}
+-      {pass("none", "#fff", -c, 0.8)}
+-    </>
+-  );
+-}
+-
+-/** The same relief as a standalone sheet, for a face that is a plain box. */
+-export function EnvelopeBotanical({
+-  face,
+-  dense = false,
+-  paper,
+-}: {
+-  face: BotanicalFace;
+-  dense?: boolean;
+-  paper?: string;
+-}) {
+-  /*
+-   * Each face shows its own window onto the shared envelope space: the flap the
+-   * top 520 units, the pocket everything from 358 down. A face drawn in its own
+-   * private box cannot line up with its neighbours however carefully it is
+-   * placed.
+-   */
+-  const box = face === "pocket" ? "0 358 1000 922" : "0 0 1000 1280";
+-
+-  return (
+-    <svg
+-      className="env-botanical"
+-      viewBox={box}
+-      preserveAspectRatio="none"
+-      aria-hidden="true"
+-      focusable="false"
+-    >
+-      <BotanicalArt face={face} dense={dense} paper={paper} />
+-    </svg>
+-  );
+-}
+diff -ruN -x node_modules -x .next -x .data -x .git -x .env -x docs -x body -x '*.woff2' -x '*.webp' -x '*.png' -x tsconfig.tsbuildinfo -x next-env.d.ts a/src/components/invitation/envelope/EnvelopeHeading.tsx b/src/components/invitation/envelope/EnvelopeHeading.tsx
+--- a/src/components/invitation/envelope/EnvelopeHeading.tsx	1970-01-01 07:00:00.000000000 +0700
++++ b/src/components/invitation/envelope/EnvelopeHeading.tsx	2026-10-16 00:54:03.180622736 +0700
+@@ -0,0 +1,30 @@
++/**
++ * The ceremonial heading on the set, above the envelope:
++ * សិរីសួស្តីអាពាហ៍ពិពាហ៍ in Moul, and a small script line under it.
++ *
++ * Both come from the record (`envelopeTitle`, `envelopeSubtitle`) so a couple
++ * can reword or remove either; an empty value takes the line away. It leaves
++ * with the address as the seal gives, so nothing on the set competes with the
++ * flap for the guest's eye.
++ *
++ * Solid colour, not `background-clip: text`: a foil gradient clipped to text
++ * renders Khmer subscripts (coeng) transparent in more than one engine, and a
++ * heading with holes in it is worse than a heading without foil.
++ */
++export function EnvelopeHeading({
++  title,
++  subtitle,
++  gone,
++}: {
++  title: string;
++  subtitle: string;
++  gone: boolean;
++}) {
++  if (!title.trim() && !subtitle.trim()) return null;
++  return (
++    <div className={`env-heading ${gone ? "env-heading-gone" : ""}`} aria-hidden={gone}>
++      {title.trim() && <h1 className="env-heading-title khmer-wrap">{title}</h1>}
++      {subtitle.trim() && <p className="env-heading-sub">{subtitle}</p>}
++    </div>
++  );
++}
+diff -ruN -x node_modules -x .next -x .data -x .git -x .env -x docs -x body -x '*.woff2' -x '*.webp' -x '*.png' -x tsconfig.tsbuildinfo -x next-env.d.ts a/src/components/invitation/envelope/EnvelopeInnerLiner.tsx b/src/components/invitation/envelope/EnvelopeInnerLiner.tsx
+--- a/src/components/invitation/envelope/EnvelopeInnerLiner.tsx	2026-09-13 00:20:35.000000000 +0700
++++ b/src/components/invitation/envelope/EnvelopeInnerLiner.tsx	1970-01-01 07:00:00.000000000 +0700
+@@ -1,34 +0,0 @@
+-/**
+- * The lining — the paper you see inside the envelope once the flap is back.
+- *
+- * Lined envelopes are one of the quiet marks of expensive stationery, and the
+- * lining is never the same sheet as the outside: it is a shade deeper, and it
+- * carries a pattern the outside does not. Here that pattern is Khmer kbach in
+- * ivory-on-ivory — tonal, not gold — so it reads as a texture pressed into the
+- * paper rather than as printing, and it only really appears where the light
+- * rakes across it.
+- *
+- * It also does the work of hiding the card. Sitting between the invitation and
+- * the pocket, it means the card can wait completely out of sight and then rise
+- * — instead of being visible through the envelope's mouth from the start,
+- * which would give away the one surprise the envelope has to offer.
+- */
+-export function EnvelopeInnerLiner({ dim, mouthOpen }: { dim: boolean; mouthOpen: boolean }) {
+-  return (
+-    <div
+-      className="env-layer env-liner env-fade"
+-      /*
+-       * 8px, not the 18 it stood at when this envelope had a pocket. There the
+-       * lining had to be in *front* of the card so the card could wait unseen
+-       * and rise up behind it; in a gatefold the card lies on the lining, so
+-       * the lining is the backmost thing inside the envelope. Left at 18 it
+-       * painted over the card and over both front panels, and the whole
+-       * envelope came out as a flat pink rectangle.
+-       */
+-      style={{ transform: "translateZ(8px)", opacity: dim ? 0 : 1 }}
+-      aria-hidden="true"
+-    >
+-      <span className={`env-mouth ${mouthOpen ? "env-mouth-open" : ""}`} />
+-    </div>
+-  );
+-}
+diff -ruN -x node_modules -x .next -x .data -x .git -x .env -x docs -x body -x '*.woff2' -x '*.webp' -x '*.png' -x tsconfig.tsbuildinfo -x next-env.d.ts a/src/components/invitation/envelope/GiltFrame.tsx b/src/components/invitation/envelope/GiltFrame.tsx
+--- a/src/components/invitation/envelope/GiltFrame.tsx	2026-09-13 00:20:35.000000000 +0700
++++ b/src/components/invitation/envelope/GiltFrame.tsx	1970-01-01 07:00:00.000000000 +0700
+@@ -1,194 +0,0 @@
+-/**
+- * The champagne-foil frame stamped across the front of the envelope.
+- *
+- * It is drawn in the *envelope's* coordinate space — the full 1000 × 1280 sheet
+- * — by both panels, and each panel's `viewBox` windows it down to its own half.
+- * That is the whole trick, and it is what an earlier version got wrong by
+- * composing two open C-shaped paths that met at the join: the halves have to
+- * agree to a fraction of a unit or the top and bottom rules step where they
+- * cross the middle, and they cannot be made to agree once anything but a
+- * straight line is involved. Draw one frame twice and let the window do the
+- * cutting, and there is nothing left to line up.
+- *
+- * Four things make foil read as foil rather than as a yellow line:
+- *
+- * **It is a ramp, never a flat colour.** Gold is a mirror; a flat fill is the
+- * one thing it cannot be. Every stroke here takes the same diagonal gradient,
+- * so the rules brighten and darken together as if one light were crossing them.
+- *
+- * **It is pressed into the paper.** A dark copy of each rule sits a unit down
+- * and to the right, under the foil itself — the shadow in the channel the die
+- * left. Without it the frame sits *on* the paper like ink; with it the paper
+- * has a groove and the foil is lying in it.
+- *
+- * **The corners are not corners.** A plain rounded rectangle is a box, and a
+- * box around a wedding invitation is a certificate. Real stationery breaks the
+- * corner with something — a bracket, a leaf, a bud — and that one ornament is
+- * most of the difference between "bordered" and "engraved".
+- *
+- * **The weights are uneven.** A heavy outer rule, a hairline inside it, and a
+- * row of dots between the two. Three rules of the same weight read as a grid;
+- * three of different weights read as a frame with a hierarchy.
+- */
+-
+-/** The outer rule: the heavy one, and the one the eye measures the piece by. */
+-const OUTER = { x: 62, y: 62, w: 876, h: 1156, r: 26 };
+-/** The hairline inside it. */
+-const INNER = { x: 104, y: 104, w: 792, h: 1072, r: 16 };
+-/** The dotted rule that runs between them. */
+-const BEADS = { x: 83, y: 83, w: 834, h: 1114, r: 21 };
+-
+-function rect({ x, y, w, h, r }: { x: number; y: number; w: number; h: number; r: number }) {
+-  return `M${x + r} ${y} H${x + w - r} A${r} ${r} 0 0 1 ${x + w} ${y + r} V${y + h - r} A${r} ${r} 0 0 1 ${x + w - r} ${y + h} H${x + r} A${r} ${r} 0 0 1 ${x} ${y + h - r} V${y + r} A${r} ${r} 0 0 1 ${x + r} ${y} Z`;
+-}
+-
+-/**
+- * The corner ornament, drawn once in a local box with its origin at the corner
+- * of the inner rule and its arms running along the two rules that meet there.
+- *
+- * A bracket sweeping between the rules, three leaves riding on it, and a bud at
+- * the tip of each arm. It is placed at the four corners by reflection, so the
+- * same drawing serves all four and every one of them turns the right way.
+- */
+-const CORNER_ARC = "M2 92 C2 42 42 2 92 2";
+-const CORNER_ARC_2 = "M20 92 C20 52 52 20 92 20";
+-
+-/** The teardrop finishing each arm of the bracket. */
+-const CORNER_TIP = "M2 92 C10 96 14 104 12 112 C4 110 0 102 2 92 Z";
+-
+-/*
+- * A reflection across the line y = x — the diagonal this corner is symmetrical
+- * about. Everything drawn on one arm of the bracket is drawn again through it,
+- * so the ornament reads as one piece of engraving rather than as a branch that
+- * happens to have been laid in a corner. A rotation cannot do this: turning an
+- * arm through 90 degrees puts its ornament on the outside of the curve.
+- */
+-const FLIP = "matrix(0 1 1 0 0 0)";
+-
+-/**
+- * Beads riding on the bracket, graduating from the arms into the middle.
+- *
+- * These replaced a spray of leaves, and the reason is worth keeping. The leaves
+- * were drawn along one arm and mirrored onto the other, which is correct for
+- * everything else here — but a leaf has length, and two mirrored sprays met on
+- * the diagonal and overlapped into a blot. Beads have no length. They sit on
+- * the curve, graduate cleanly into the middle, and survive being looked at on a
+- * phone, where a leaf at this scale is three pixels of nothing.
+- *
+- * The positions are points on the bracket's own cubic at t = 0.09, 0.28 and
+- * 0.5, so they sit *on* the line rather than near it — the eye is unforgiving
+- * about a bead that has come off its string.
+- */
+-const BEAD_SPRAY: [number, number, number][] = [
+-  [2.9, 78.7, 2.4],
+-  [10.8, 53.0, 3.5],
+-  [28.2, 28.2, 5.0],
+-];
+-
+-function Corner({ stroke, fill }: { stroke: string; fill: string }) {
+-  return (
+-    <>
+-      <path d={CORNER_ARC} stroke={stroke} strokeWidth={2.6} fill="none" />
+-      <path d={CORNER_ARC_2} stroke={stroke} strokeWidth={1.2} fill="none" opacity={0.8} />
+-      <path d={CORNER_TIP} fill={fill} opacity={0.85} />
+-      <path d={CORNER_TIP} fill={fill} opacity={0.85} transform={FLIP} />
+-      {BEAD_SPRAY.map(([cx, cy, r], i) => (
+-        <g key={i}>
+-          <circle cx={cx} cy={cy} r={r} fill={fill} />
+-          {/*
+-            * The middle bead is its own reflection; drawing it a second time
+-            * would only double its opacity against everything else.
+-            */}
+-          {cx !== cy && <circle cx={cy} cy={cx} r={r} fill={fill} />}
+-        </g>
+-      ))}
+-    </>
+-  );
+-}
+-
+-/**
+- * Where each corner ornament sits and which way it faces.
+- *
+- * The origin is the inner rule's corner; the arms run outward along it. Mirror
+- * rather than rotate: a rotated ornament puts its leaves on the wrong side of
+- * the arc on two of the four corners, which is the kind of mistake that is
+- * invisible until it is pointed out and then impossible to stop seeing.
+- */
+-const CORNERS = [
+-  `translate(${INNER.x} ${INNER.y})`,
+-  `translate(${INNER.x + INNER.w} ${INNER.y}) scale(-1 1)`,
+-  `translate(${INNER.x} ${INNER.y + INNER.h}) scale(1 -1)`,
+-  `translate(${INNER.x + INNER.w} ${INNER.y + INNER.h}) scale(-1 -1)`,
+-];
+-
+-export function GiltFrame({ foil }: { /** The id of the champagne gradient in this panel's own defs. */ foil: string }) {
+-  const gold = `url(#${foil})`;
+-
+-  return (
+-    <>
+-      {/*
+-        * The channel the die pressed, struck first and offset down-right so the
+-        * foil laid over it leaves a dark edge on the side away from the light.
+-        * One group at low opacity rather than a shadow per rule: they are all
+-        * in the same groove.
+-        */}
+-      <g
+-        transform="translate(1.6 1.9)"
+-        stroke="rgb(90 58 66 / 0.3)"
+-        fill="rgb(90 58 66 / 0.26)"
+-        opacity={0.8}
+-      >
+-        <path d={rect(OUTER)} strokeWidth={3.6} fill="none" />
+-        <path d={rect(INNER)} strokeWidth={1.4} fill="none" />
+-        {CORNERS.map((t, i) => (
+-          <g key={i} transform={t}>
+-            <Corner stroke="rgb(90 58 66 / 0.3)" fill="rgb(90 58 66 / 0.26)" />
+-          </g>
+-        ))}
+-      </g>
+-
+-      {/* the foil itself */}
+-      <path d={rect(OUTER)} stroke={gold} strokeWidth={3.4} fill="none" />
+-      <path d={rect(INNER)} stroke={gold} strokeWidth={1.6} fill="none" opacity={0.88} />
+-
+-      {/*
+-        * The dotted rule between the two. `1.6 11` rather than a solid line:
+-        * a third continuous rule at this spacing reads as a printing error,
+-        * where a row of dots reads as an engraved bead — and it is the detail
+-        * that survives being seen at phone size, because dots stay dots.
+-        */}
+-      <path
+-        d={rect(BEADS)}
+-        stroke={gold}
+-        strokeWidth={2}
+-        strokeLinecap="round"
+-        strokeDasharray="1.6 11"
+-        fill="none"
+-        opacity={0.62}
+-      />
+-
+-      {CORNERS.map((t, i) => (
+-        <g key={i} transform={t}>
+-          <Corner stroke={gold} fill={gold} />
+-        </g>
+-      ))}
+-
+-      {/*
+-        * A highlight following the top and left of the outer rule only.
+-        *
+-        * Foil pressed into paper catches the light on the two edges that face
+-        * it and goes dark on the other two. Ringing the whole frame with the
+-        * same highlight is what makes gilding look like a yellow outline; the
+-        * asymmetry is the entire effect, and it is why this is drawn as an open
+-        * path rather than as another rectangle.
+-        */}
+-      <path
+-        d={`M${OUTER.x} ${OUTER.y + OUTER.h - OUTER.r} V${OUTER.y + OUTER.r} A${OUTER.r} ${OUTER.r} 0 0 1 ${OUTER.x + OUTER.r} ${OUTER.y} H${OUTER.x + OUTER.w - OUTER.r}`}
+-        stroke="rgb(255 253 246 / 0.5)"
+-        strokeWidth={0.9}
+-        fill="none"
+-        transform="translate(-1 -1.1)"
+-      />
+-    </>
+-  );
+-}
+diff -ruN -x node_modules -x .next -x .data -x .git -x .env -x docs -x body -x '*.woff2' -x '*.webp' -x '*.png' -x tsconfig.tsbuildinfo -x next-env.d.ts a/src/components/invitation/envelope/InvitationOpening.tsx b/src/components/invitation/envelope/InvitationOpening.tsx
+--- a/src/components/invitation/envelope/InvitationOpening.tsx	2026-09-13 00:20:35.000000000 +0700
++++ b/src/components/invitation/envelope/InvitationOpening.tsx	2026-10-16 00:55:29.601560613 +0700
+@@ -9,6 +9,8 @@
+ 
+ import { Envelope } from "./Envelope";
+ import { EnvelopeAddress } from "./EnvelopeAddress";
++import { EnvelopeHeading } from "./EnvelopeHeading";
++import { mediaSrc } from "@/lib/media";
+ import { OpenButton } from "./OpenButton";
+ import { OpenEnvelopeLink } from "./OpenEnvelopeLink";
+ import { OpeningTransition } from "./OpeningTransition";
+@@ -25,9 +27,9 @@
+ const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
+ 
+ /** Steps of the opening, in order. Each one only ever moves forward. */
+-type Step = "closed" | "unsealed" | "doors" | "fill" | "done";
++type Step = "closed" | "unsealed" | "flap" | "flapBack" | "card" | "lower" | "fill" | "done";
+ 
+-const ORDER: Step[] = ["closed", "unsealed", "doors", "fill", "done"];
++const ORDER: Step[] = ["closed", "unsealed", "flap", "flapBack", "card", "lower", "fill", "done"];
+ const at = (step: Step) => ORDER.indexOf(step);
+ 
+ /** Where each step begins, as a fraction of the configured total. */
+@@ -41,41 +43,34 @@
+  * shut, it gives, and only then do they swing. Cue the two together and the
+  * seal was never doing anything.
+  */
++/*
++ * The flap envelope's beats, as fractions of the run (5.5s by default):
++ *
++ *   0.00  unsealed  the seal is pressed, then lifts away with its shadow
++ *   0.10  flap      the flap folds back on its hinge
++ *   0.20  flapBack  …and once it is past upright it belongs behind the card
++ *   0.30  card      the card slides up and out, at a slight angle
++ *   0.50  lower     the envelope lowers away; the card comes toward the camera
++ *   0.74  fill      a brief dark beat, then the veil lifts onto the curtains
++ *   0.98  done      the overlay is unmounted
++ *
++ * `flapBack` is half the flap's own travel after `flap` (the flap turns over
++ * 0.20 of the run), which is the moment it passes 90° — the instant a real
++ * flap goes from in front of the card to behind it. The dark beat is set in
++ * the stylesheet to be complete just before `fill`, so the veil lifts from
++ * darkness rather than from a half-faded card.
++ *
++ * Everything only moves forward, and every timer is on `timers`, so a skip, a
++ * backgrounded tab or an unmount mid-run lands on the same final state.
++ */
+ const CUE: Record<Exclude<Step, "closed">, number> = {
+-  unsealed: 0.05,
+-  doors: 0.16,
+-  /*
+-   * When the hand-over to the velvet begins.
+-   *
+-   * This is the fourth attempt at these numbers, and the failure that produced
+-   * this one is worth writing down because nothing about it showed up in a
+-   * still frame. The dissolve is eased `ease` — front-loaded, two thirds gone
+-   * in the first third of its run — and the panels were eased with a very soft
+-   * foot, barely moving for their first half-second. Cued a fraction apart,
+-   * the two curves ran in opposite directions: the veil was most of the way
+-   * gone before the panels had visibly started, so the one gesture the whole
+-   * scene exists for was played almost entirely inside a fade. Each animation
+-   * measured correct on its own. Only the pair was wrong.
+-   *
+-   * So the panels now start early and move immediately, and the dissolve waits
+-   * until they are about two thirds open — far enough that the sliding is the
+-   * thing being watched, not so far that the envelope is ever seen to come to
+-   * rest around an empty lined box, which is the one frame in the sequence
+-   * with nothing in it.
+-   *
+-   * The panels are also given longer than the dissolve, on purpose: they are
+-   * still travelling when the last of the envelope goes, so they are never
+-   * seen to stop. An envelope that comes to rest has nothing left to show —
+-   * the invitation is not inside it any more — and the frame it rests into is
+-   * an empty lined box. Overlapping the two is not a way of hiding that frame;
+-   * it is a way of never reaching it.
+-   *
+-   * The gap between `fill` and `done` is the dissolve (0.45 of the run, set
+-   * below). A transition longer than the beat it lives in is still moving when
+-   * its element is removed.
+-   */
+-  fill: 0.42,
+-  done: 0.9,
++  unsealed: 0,
++  flap: 0.1,
++  flapBack: 0.2,
++  card: 0.3,
++  lower: 0.5,
++  fill: 0.74,
++  done: 0.98,
+ };
+ 
+ export const envelopeSeenKey = (code: string) => `wedding:envelope:${code || "home"}`;
+@@ -160,6 +155,8 @@
+    * come to disagree about which one it is.
+    */
+   const face = envelopeFace(wedding);
++  /* The couple's cover photograph, blurred and darkened behind the envelope. */
++  const photo = mediaSrc(wedding.coverPhotoId, wedding.coverPhotoUrl);
+   const timers = useRef<number[]>([]);
+   const opened = useRef(false);
+   const checked = useRef(false);
+@@ -512,7 +509,11 @@
+       ]
+         .filter(Boolean)
+         .join(" ")
+-    : "translate3d(0, 2%, 0) scale(0.8) rotateX(2deg)";
++    : index >= at("lower")
++      ? "translate3d(0, 6%, 0) scale(0.92)"
++      : index >= at("card")
++        ? /* room above for the card as it comes out */ "translate3d(0, 24%, 0) scale(0.82)"
++        : "translate3d(0, 0, 0) scale(1)";
+ 
+   return (
+     /*
+@@ -522,8 +523,8 @@
+      * own dissolve and simply vanished. A fade has to be over before the thing
+      * fading is taken away.
+      */
+-    <OpeningTransition gone={step === "fill"} duration={Math.round(D * 0.45)}>
+-      <CinemaRoom lit={index >= at("doors")} rich={rich} />
++    <OpeningTransition gone={step === "fill"} duration={Math.round(D * 0.22)}>
++      <CinemaRoom lit={index >= at("flap")} rich={rich} photo={photo} />
+ 
+       <div
+         className="env-stage flex h-full w-full items-center justify-center px-4"
+@@ -560,6 +561,11 @@
+             through to the target behind it; only the controls inside it take
+             pointer events back. */}
+         <div className="env-column pointer-events-none relative z-[1] flex w-full flex-col items-center">
++          <EnvelopeHeading
++            title={wedding.envelopeTitle}
++            subtitle={wedding.envelopeSubtitle}
++            gone={index >= at("unsealed")}
++          />
+           <EnvelopeAddress wedding={wedding} guest={guest} gone={index >= at("unsealed")} />
+ 
+           <div
+@@ -582,7 +588,10 @@
+               ["--env-gold-deep" as string]: envelope.goldDeep,
+               ["--env-seal" as string]: envelope.seal,
+               ["--env-seal-ink" as string]: envelope.sealInk,
+-              ["--env-seal-t" as string]: `${Math.round(D * 0.16)}ms`,
++              ["--env-seal-t" as string]: `${Math.round(D * 0.14)}ms`,
++              ["--fl-flap-t" as string]: `${Math.round(D * 0.2)}ms`,
++              ["--fl-card-t" as string]: `${Math.round(D * 0.2)}ms`,
++              ["--fl-near-t" as string]: `${Math.round(D * 0.22)}ms`,
+               /*
+                * The panels take most of the run: heavy paper on two hinges, and
+                * the only thing in the shot that moves. They are still moving
+@@ -616,9 +625,18 @@
+             <Envelope
+               envelope={envelope}
+               face={face}
++              groom={wedding.groomName}
++              bride={wedding.brideName}
++              monogramFont={wedding.monogramFont}
++              monogramText={wedding.monogram}
++              customSeal={wedding.envelopeSealText.trim() !== ""}
++              cardLines={{ lead: wedding.subtitle, title: wedding.title }}
+               phase={{
+                 unsealed: index >= at("unsealed"),
+-                doorsOpen: index >= at("doors"),
++                flapOpen: index >= at("flap"),
++                flapBack: index >= at("flapBack"),
++                cardOut: index >= at("card"),
++                lowered: index >= at("lower"),
+               }}
+             />
+ 
+@@ -635,6 +653,17 @@
+         </div>
+       </div>
+ 
++      {/* The dark beat between the card reaching the camera and the curtains:
++          above the whole set, so the card goes into it rather than past it. */}
++      <span
++        className={`env-dusk ${index >= at("lower") ? "env-dusk-on" : ""}`}
++        style={{
++          transitionDuration: `${Math.round(D * 0.16)}ms`,
++          transitionDelay: index >= at("lower") ? `${Math.round(D * 0.07)}ms` : "0ms",
++        }}
++        aria-hidden="true"
++      />
++
+       {envelope.skip && (
+         <SkipButton label={wedding.envelopeSkipLabel} onSkip={jump} hidden={!closed} />
+       )}
+diff -ruN -x node_modules -x .next -x .data -x .git -x .env -x docs -x body -x '*.woff2' -x '*.webp' -x '*.png' -x tsconfig.tsbuildinfo -x next-env.d.ts a/src/components/invitation/envelope/SlidingCover.tsx b/src/components/invitation/envelope/SlidingCover.tsx
+--- a/src/components/invitation/envelope/SlidingCover.tsx	2026-09-13 00:20:35.000000000 +0700
++++ b/src/components/invitation/envelope/SlidingCover.tsx	1970-01-01 07:00:00.000000000 +0700
+@@ -1,258 +0,0 @@
+-"use client";
+-
+-import { useId } from "react";
+-
+-import type { EnvelopeFace } from "@/lib/artwork";
+-import { BotanicalArt } from "./EnvelopeBotanical";
+-import { GiltFrame } from "./GiltFrame";
+-import { WaxSeal } from "./WaxSeal";
+-
+-/**
+- * The front of the envelope, in two panels that **slide** apart.
+- *
+- * This replaces a gatefold whose panels swung outward on hinges at their outer
+- * edges. The two mechanisms look similar in a still frame and are nothing alike
+- * in motion, and the difference is worth writing down because it decides most
+- * of what is in this file.
+- *
+- * A hinge is a rotation, so it needs a third dimension: each panel turns about
+- * a vertical axis, presents its edge to the camera on the way round, and ends
+- * up showing its *back*. That meant two faces per panel sorted by
+- * `backface-visibility`, a lining drawn for a surface only visible for the last
+- * third of the movement, and a careful depth order to keep the turning paper
+- * from cutting through everything near it.
+- *
+- * A slide is a translation. The panels stay square to the camera for the whole
+- * movement and never show anything but their printed front, so the second face,
+- * the lining behind it, the backface sorting and the whole reason for the
+- * rotation's depth budget are simply not needed. What is left is two pieces of
+- * paper drawn aside — which is also the plainer, quieter gesture, and reads at
+- * a glance on a phone in a way a rotation at this size never quite does.
+- *
+- * Each panel travels 88% of its own width. Not 100%: a sliver of each staying
+- * within the envelope's own footprint keeps them reading as *this* envelope's
+- * front rather than as two rectangles that have left. And the arithmetic has to
+- * hold at the narrowest viewport — the pair spans 1.88 × the envelope's width
+- * at full travel, which at the camera's 0.8 is 1.5 × the envelope, and the
+- * envelope is 62vw. That is the number that keeps them on a 360px phone.
+- *
+- * They also lift a little as they go, from 32px of depth to 44, with the shadow
+- * under them growing to match. Paper drawn aside is picked up slightly before
+- * it moves; panels that slide at a fixed depth read as two flat shapes on one
+- * plane sliding past each other, which is a UI transition rather than an object.
+- */
+-
+-/*
+- * The side classes are written out in full, deliberately.
+- *
+- * Tailwind scans the source as *text* for class names and drops anything in
+- * `@layer components` it cannot find, so a class assembled at runtime —
+- * `slide-${side}` — never appears in any file and its rule is purged from the
+- * stylesheet. Nothing errors; the panels simply lose their position, both stack
+- * up on the left, and the envelope renders as a flat rectangle.
+- */
+-const PANEL_SIDE = { left: "slide-left", right: "slide-right" } as const;
+-
+-export function SlidingCover({
+-  unsealed,
+-  open,
+-  seal,
+-  gold,
+-  dense,
+-  face,
+-}: {
+-  /** The seal has released. */
+-  unsealed: boolean;
+-  /** The two panels are drawing apart. */
+-  open: boolean;
+-  /** The seal's inscription — the couple's initials, from the record. */
+-  seal: string | null;
+-  /** True while the foil and the wax should catch the light. */
+-  gold: boolean;
+-  /** The richer styles press a fuller die into the paper. */
+-  dense: boolean;
+-  /**
+-   * The couple's own picture, printed on the paper.
+-   *
+-   * It is drawn into the envelope's own coordinate space rather than into each
+-   * panel's, which is the same trick the gilt frame and the emboss already use
+-   * and is the only way one picture can run across both panels and meet exactly
+-   * at the join. Compose it as two halves and they will not meet — not at any
+-   * viewport, and worse at some than at others.
+-   *
+-   * `null` when nothing is uploaded, and then nothing about this file changes.
+-   */
+-  face: EnvelopeFace | null;
+-}) {
+-  const uid = useId().replace(/:/g, "");
+-
+-  return (
+-    <>
+-      <Panel side="left" uid={uid} open={open} dense={dense} face={face} />
+-      <Panel side="right" uid={uid} open={open} dense={dense} face={face} />
+-
+-      {/*
+-        * The seal sits over the join, which means it belongs to neither panel —
+-        * it is the thing holding the two of them shut. So it lives out here and
+-        * releases on its own: it lifts, turns a little and goes, and only then
+-        * do the panels start to move. A seal that opens *with* the cover was
+-        * never holding it closed.
+-        */}
+-      {seal && (
+-        <div className={`slide-seal ${open ? "slide-seal-gone" : ""}`}>
+-          <WaxSeal text={seal} released={unsealed} gold={gold} />
+-        </div>
+-      )}
+-    </>
+-  );
+-}
+-
+-function Panel({
+-  side,
+-  uid,
+-  open,
+-  dense,
+-  face,
+-}: {
+-  side: "left" | "right";
+-  uid: string;
+-  open: boolean;
+-  dense: boolean;
+-  face: EnvelopeFace | null;
+-}) {
+-  const left = side === "left";
+-  const id = `${side}-${uid}`;
+-
+-  /*
+-   * Each panel is a window onto the envelope's own coordinate space rather than
+-   * a drawing of its own — the left half of it, or the right half. That is what
+-   * lets one embossed die run across both panels and meet exactly at the join
+-   * while they are closed, the way a real sheet embossed before it was folded
+-   * would. Two separately composed halves cannot be made to meet.
+-   */
+-  const box = left ? "0 0 500 1280" : "500 0 500 1280";
+-
+-  return (
+-    <div
+-      /*
+-       * No `env-fade` here, deliberately. It carries `transition: opacity …`,
+-       * and `transition` is a shorthand: sharing a specificity with
+-       * `.slide-panel` and losing the cascade by position, it replaced the
+-       * panel's whole transition list rather than adding to it. The panels
+-       * kept their final transform and lost the 1.68s that gets them there —
+-       * they simply teleported apart, in one frame, with nothing reporting a
+-       * problem. Nothing dims the cover any more in any case; the class was a
+-       * leftover from when the panels faded behind the card.
+-       */
+-      className={`slide-panel ${PANEL_SIDE[side]} ${open ? "slide-open" : ""}`}
+-      aria-hidden="true"
+-    >
+-      <svg className="slide-face" viewBox={box} preserveAspectRatio="none" fill="none">
+-        <defs>
+-          {/*
+-            * The sheet. Lit from the upper left, so the two panels are *not*
+-            * mirror images of one another: the left one catches the light on
+-            * its inner edge and the right one on its outer. Mirroring the
+-            * gradient is the fastest way to make a symmetrical object look
+-            * like a symmetrical drawing.
+-            */}
+-          <linearGradient id={`p-${id}`} x1="0.05" y1="0" x2="0.95" y2="1">
+-            <stop offset="0" stopColor="var(--env-paper)" />
+-            <stop offset="0.55" stopColor="var(--env-paper)" />
+-            <stop offset="1" stopColor="var(--env-paper-shade)" />
+-          </linearGradient>
+-
+-          {/*
+-            * Champagne foil: a ramp, never a flat line. Gold is a mirror, and
+-            * what it reflects is a room — so it needs more than one bright
+-            * band across a sheet this tall. Two highlights and three darks,
+-            * with the darks kept narrow: a wide dark stop turns the top-left
+-            * of the frame the colour of weak tea, which is what a single
+-            * five-stop ramp did here at the old, smaller size and could not
+-            * get away with once the envelope grew.
+-            */}
+-          <linearGradient id={`f-${id}`} x1="0" y1="0" x2="0.85" y2="1">
+-            <stop offset="0" stopColor="var(--env-gold-deep)" />
+-            <stop offset="0.14" stopColor="var(--env-gold)" />
+-            <stop offset="0.3" stopColor="var(--env-gold-light)" />
+-            <stop offset="0.42" stopColor="var(--env-gold)" />
+-            <stop offset="0.54" stopColor="var(--env-gold-deep)" />
+-            <stop offset="0.68" stopColor="var(--env-gold)" />
+-            <stop offset="0.8" stopColor="var(--env-gold-light)" />
+-            <stop offset="0.9" stopColor="var(--env-gold)" />
+-            <stop offset="1" stopColor="var(--env-gold-deep)" />
+-          </linearGradient>
+-        </defs>
+-
+-        <rect x={left ? 0 : 500} y="0" width="500" height="1280" fill={`url(#p-${id})`} />
+-
+-        {/*
+-          * The couple's own picture, over the paper and under everything else.
+-          *
+-          * Drawn at the *whole* envelope — 0 to 1000 — in both panels, and each
+-          * panel's `viewBox` cuts it to its own half. That is what makes the
+-          * two halves meet: they are not two crops that have to agree, they are
+-          * one drawing seen through two windows.
+-          *
+-          * `preserveAspectRatio` carries the couple's fit, so "cover" crops the
+-          * picture to fill the paper and "contain" shows all of it with the
+-          * paper's own gradient still visible around it. The paper rect above
+-          * is deliberately still drawn either way: with "contain" it is the
+-          * mount the photograph sits on, and with "cover" it is what shows for
+-          * the moment before the picture has loaded.
+-          */}
+-        {face && (
+-          <>
+-            <image
+-              href={face.src}
+-              x="0"
+-              y="0"
+-              width="1000"
+-              height="1280"
+-              preserveAspectRatio={face.preserveAspectRatio}
+-            />
+-            {/*
+-              * A wash of the paper's own colour over the photograph.
+-              *
+-              * Gold on a busy picture is unreadable, and the couple cannot be
+-              * asked to solve that by editing the photograph. This is the dial
+-              * that takes it back towards the paper without them having to.
+-              */}
+-            {face.scrim > 0 && (
+-              <rect
+-                x={left ? 0 : 500}
+-                y="0"
+-                width="500"
+-                height="1280"
+-                fill="var(--env-paper)"
+-                opacity={face.scrim}
+-              />
+-            )}
+-          </>
+-        )}
+-
+-        {/* the embossed florals, cut off by this panel's own edges */}
+-        {(!face || face.ornament) && <BotanicalArt face="pocket" dense={dense} copy={side} />}
+-
+-        {/*
+-          * The gilt frame, drawn whole in the envelope's own coordinates and
+-          * cut to this panel by the `viewBox` above. See `GiltFrame`: composing
+-          * it as two halves that meet at the join is what it replaces.
+-          */}
+-        {(!face || face.ornament) && <GiltFrame foil={`f-${id}`} />}
+-
+-        {/*
+-          * The gilded cut edge along the join. On a sliding cover this is the
+-          * edge that actually travels, so it is the one the eye follows the
+-          * whole way — and it is why the join is gilded at all.
+-          */}
+-        <path
+-          d="M500 0 V1280"
+-          stroke={`url(#f-${id})`}
+-          strokeWidth={2.6}
+-          transform={`translate(${left ? -1.3 : 1.3} 0)`}
+-        />
+-      </svg>
+-    </div>
+-  );
+-}
+diff -ruN -x node_modules -x .next -x .data -x .git -x .env -x docs -x body -x '*.woff2' -x '*.webp' -x '*.png' -x tsconfig.tsbuildinfo -x next-env.d.ts a/src/components/ui/CardFrame.tsx b/src/components/ui/CardFrame.tsx
+--- a/src/components/ui/CardFrame.tsx	2026-09-13 00:20:35.000000000 +0700
++++ b/src/components/ui/CardFrame.tsx	2026-10-16 01:03:57.839867009 +0700
+@@ -51,7 +51,7 @@
+     if (!frame.cornerSrc) return null;
+     return (
+       <div
+-        className="pointer-events-none relative flex w-full shrink-0 justify-between"
++        className="frame-edge pointer-events-none relative flex w-full shrink-0 justify-between"
+         aria-hidden="true"
+       >
+         {join}
+@@ -78,7 +78,7 @@
+   if (!frame.art) {
+     return (
+       <div
+-        className="pointer-events-none flex w-full shrink-0 justify-center text-gold-frame"
++        className="frame-edge frame-edge-band pointer-events-none flex w-full shrink-0 justify-center text-gold-frame"
+         aria-hidden="true"
+       >
+         <OrnamentBand motif={frame.motif} flip={bottom} style={{ width: `${frame.scale}%` }} />
+@@ -105,7 +105,7 @@
+ 
+   return (
+     <div
+-      className="pointer-events-none relative flex w-full shrink-0 justify-between text-gold-frame"
++      className="frame-edge pointer-events-none relative flex w-full shrink-0 justify-between text-gold-frame"
+       aria-hidden="true"
+     >
+       {join}
+diff -ruN -x node_modules -x .next -x .data -x .git -x .env -x docs -x body -x '*.woff2' -x '*.webp' -x '*.png' -x tsconfig.tsbuildinfo -x next-env.d.ts a/src/components/ui/NameLogo.tsx b/src/components/ui/NameLogo.tsx
+--- a/src/components/ui/NameLogo.tsx	1970-01-01 07:00:00.000000000 +0700
++++ b/src/components/ui/NameLogo.tsx	2026-10-16 00:52:26.930098811 +0700
+@@ -0,0 +1,101 @@
++import { monogramFont, monogramStack } from "@/lib/monogram-fonts";
++
++/**
++ * The couple's names as one mark: the groom's short name high on the left, the
++ * bride's low on the right, a fine gold flourish running between them, a small
++ * heart where it crosses the middle, and a butterfly settled at the top.
++ *
++ * It is the invitation's identity and it is drawn the same way everywhere it
++ * appears — on the envelope's flap, on the card inside, and on the cover — so a
++ * guest sees one mark travel through the whole opening rather than three
++ * related ones.
++ *
++ * **The names are HTML, never SVG `<text>`.** Khmer is shaped by the browser's
++ * text engine: subscript consonants (coeng), vowels above and below the base,
++ * and the way they stack. SVG text goes through a different path in WebKit and
++ * is where that shaping is least dependable — and it gives a script mark no
++ * room above and below for those marks. The ornament is SVG because it is a
++ * drawing; the names are type because they are type.
++ *
++ * Nothing here sets `letter-spacing`, and the reveal masks are bled well past
++ * the line box at top and bottom, so no vowel sign or subscript is ever cut —
++ * and the mask is removed outright once the reveal is over.
++ *
++ * The face is the couple's monogram face when that face is Khmer (the dashboard
++ * picker already governs it), and Moulpali otherwise: a Latin script face has
++ * no Khmer glyphs and would fall back to whatever the phone has.
++ */
++
++/** "សុខ វិសាល" → "វិសាល". Khmer names are written family name first, so the
++ *  given name — the one a guest calls them by — is the last word. */
++export function shortName(name: string): string {
++  const parts = name.trim().split(/\s+/).filter(Boolean);
++  return parts[parts.length - 1] ?? "";
++}
++
++export type NameLogoState = "still" | "wait" | "play";
++
++export function NameLogo({
++  groom,
++  bride,
++  font,
++  state = "still",
++  className = "",
++}: {
++  groom: string;
++  bride: string;
++  /** The couple's monogram font id; used when it is a Khmer face. */
++  font?: string | null;
++  /**
++   * `still` — drawn, no animation (the envelope, previews, reduced motion).
++   * `wait`  — hidden, about to play (the cover behind closed curtains).
++   * `play`  — the reveal: names left to right, the flourish draws, the heart,
++   *           then the butterfly settles.
++   */
++  state?: NameLogoState;
++  className?: string;
++}) {
++  const face = monogramFont(font);
++  const family = face.script === "khmer" ? monogramStack(face) : "'Moulpali', 'Moul', serif";
++  const a = shortName(groom);
++  const b = shortName(bride);
++
++  return (
++    <div
++      className={`namelogo namelogo-${state} ${className}`}
++      role="img"
++      aria-label={`${a} និង ${b}`}
++      style={{ ["--nl-face" as string]: family }}
++    >
++      <svg className="namelogo-flourish" viewBox="0 0 300 150" aria-hidden="true" preserveAspectRatio="none">
++        {/* One continuous line: out from under the groom's name, a loop
++            through the middle where the heart sits, and into the bride's. */}
++        <path
++          className="namelogo-line"
++          pathLength={1}
++          d="M34 72 C 70 70, 104 62, 128 72 C 146 80, 150 98, 138 104 C 126 110, 116 96, 128 86 C 146 70, 176 80, 196 84 C 220 89, 246 92, 268 90"
++        />
++        <path
++          className="namelogo-line namelogo-line-fine"
++          pathLength={1}
++          d="M52 80 C 82 80, 102 74, 120 78"
++        />
++        <path
++          className="namelogo-line namelogo-line-fine"
++          pathLength={1}
++          d="M184 92 C 206 96, 228 98, 252 96"
++        />
++      </svg>
++
++      <span className="namelogo-name namelogo-a khmer-wrap">{a}</span>
++      <span className="namelogo-name namelogo-b khmer-wrap">{b}</span>
++
++      <svg className="namelogo-heart" viewBox="0 0 24 22" aria-hidden="true">
++        <path d="M12 20.6C6.2 16.2 2 12.6 2 8.1 2 5 4.4 2.6 7.3 2.6c1.9 0 3.6 1 4.7 2.6 1.1-1.6 2.8-2.6 4.7-2.6C19.6 2.6 22 5 22 8.1c0 4.5-4.2 8.1-10 12.5z" />
++      </svg>
++
++      {/* eslint-disable-next-line @next/next/no-img-element */}
++      <img className="namelogo-fly" src="/kit/butterfly.svg" alt="" aria-hidden="true" draggable={false} />
++    </div>
++  );
++}
+diff -ruN -x node_modules -x .next -x .data -x .git -x .env -x docs -x body -x '*.woff2' -x '*.webp' -x '*.png' -x tsconfig.tsbuildinfo -x next-env.d.ts a/src/lib/db/schema.ts b/src/lib/db/schema.ts
+--- a/src/lib/db/schema.ts	2026-09-13 00:20:36.000000000 +0700
++++ b/src/lib/db/schema.ts	2026-10-16 00:49:46.280607465 +0700
+@@ -190,7 +190,7 @@
+   envelopeSealText: text("envelope_seal_text").notNull().default(""),
+   envelopeAnimate: boolean("envelope_animate").notNull().default(true),
+   /** Length of the opening sequence, in milliseconds. */
+-  envelopeDuration: integer("envelope_duration").notNull().default(2800),
++  envelopeDuration: integer("envelope_duration").notNull().default(5500),
+   envelopeMusic: boolean("envelope_music").notNull().default(true),
+   envelopeSkip: boolean("envelope_skip").notNull().default(true),
+   /** Off: opened once, the envelope stays open for the rest of the visit. */
+@@ -200,6 +200,10 @@
+   envelopeOpenLabel: text("envelope_open_label").notNull().default("បើកសំបុត្រអញ្ជើញ"),
+   envelopeHint: text("envelope_hint").notNull().default("សូមចុចដើម្បីបើកសំបុត្រអញ្ជើញ"),
+   envelopeSkipLabel: text("envelope_skip_label").notNull().default("រំលង"),
++  /* The heading on the set above the envelope, and the script line under it.
++     Empty hides either one. */
++  envelopeTitle: text("envelope_title").notNull().default("សិរីសួស្តីអាពាហ៍ពិពាហ៍"),
++  envelopeSubtitle: text("envelope_subtitle").notNull().default("The Wedding Invitation"),
+ 
+   /* ── The pre-wedding film, played between the envelope and the curtains ──
+      One beat, in the one place it belongs: the envelope has just been opened
+diff -ruN -x node_modules -x .next -x .data -x .git -x .env -x docs -x body -x '*.woff2' -x '*.webp' -x '*.png' -x tsconfig.tsbuildinfo -x next-env.d.ts a/tests/opening.mjs b/tests/opening.mjs
+--- a/tests/opening.mjs	1970-01-01 07:00:00.000000000 +0700
++++ b/tests/opening.mjs	2026-10-16 01:07:17.528701958 +0700
+@@ -0,0 +1,158 @@
++/**
++ * The opening, checked in a real browser against a running server.
++ *
++ *   npm run build && PORT=3100 npm start      # in one terminal
++ *   npx playwright@1.49.1 install chromium    # once, if you have no browser
++ *   node tests/opening.mjs                    # BASE=http://localhost:3100
++ *
++ * Every assertion is about what a guest can see or touch, not about what is
++ * in the DOM: an element that exists behind a curtain is not one a guest can
++ * use (see the build notes on `deadjs`).
++ */
++import { chromium } from "playwright";
++
++const BASE = process.env.BASE ?? "http://localhost:3100";
++const GUEST = process.env.GUEST ?? "/invite/K7Q4MXA2";
++const exe = process.env.CHROMIUM;
++const browser = await chromium.launch(exe ? { executablePath: exe } : {});
++const results = [];
++const check = (name, ok, detail = "") => {
++  results.push({ name, ok, detail });
++  console.log(`${ok ? "PASS" : "FAIL"}  ${name}${detail ? "  — " + detail : ""}`);
++};
++
++async function page(opts = {}) {
++  const ctx = await browser.newContext({
++    viewport: { width: 390, height: 844 },
++    hasTouch: true,
++    isMobile: true,
++    ...opts,
++  });
++  const p = await ctx.newPage();
++  p.errors = [];
++  p.on("pageerror", (e) => p.errors.push(e.message));
++  p.on("console", (m) => m.type() === "error" && p.errors.push(m.text()));
++  return p;
++}
++
++/* Watch the beats from inside the page, so timing is the page's, not ours. */
++const recordSteps = () => {
++  window.__steps = [];
++  const o = document.querySelector("[data-opening]");
++  if (!o) return;
++  new MutationObserver(() => {
++    const s = o.getAttribute("data-step");
++    if (s && window.__steps[window.__steps.length - 1] !== s) window.__steps.push(s);
++  }).observe(o, { attributes: true, attributeFilter: ["data-step"] });
++};
++
++const coverButtonReachable = (p) =>
++  p.evaluate(() => {
++    const b = [...document.querySelectorAll("button")].find((x) => x.textContent.trim() === "បើកលិខិត");
++    if (!b) return "no button";
++    const r = b.getBoundingClientRect();
++    const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
++    return hit && (hit === b || b.contains(hit)) ? "ok" : `covered by ${hit?.className || hit?.tagName}`;
++  });
++
++// 1 — a finger opens it, every beat runs once and in order, and the guest lands on a usable cover
++{
++  const p = await page();
++  await p.goto(BASE + GUEST, { waitUntil: "networkidle" });
++  await p.evaluate(recordSteps);
++  await p.waitForTimeout(1200);
++  await p.touchscreen.tap(195, 420);
++  await p.touchscreen.tap(195, 420); // a second, impatient tap
++  await p.waitForFunction(() => !document.querySelector("[data-opening]"), null, { timeout: 12000 });
++  const steps = await p.evaluate(() => window.__steps);
++  // `done` unmounts the overlay, so the last beat that can be observed is `fill`.
++  const want = ["unsealed", "flap", "flapBack", "card", "lower", "fill"];
++  check("finger tap opens the envelope", true);
++  check("beats run once, in order", JSON.stringify(steps) === JSON.stringify(want), steps.join(" → "));
++  await p.waitForTimeout(3800); // curtains part and are struck
++  check("cover button reachable after opening", (await coverButtonReachable(p)) === "ok", await coverButtonReachable(p));
++  const clips = await p.evaluate(() =>
++    [...document.querySelectorAll(".cv .namelogo-name")].map((e) => getComputedStyle(e).clipPath));
++  await p.waitForTimeout(3500); // the name mark's reveal
++  const after = await p.evaluate(() =>
++    [...document.querySelectorAll(".cv .namelogo-name")].map((e) => getComputedStyle(e).clipPath));
++  check("name mark's mask is removed after the reveal", after.every((c) => c === "none"), `${clips} → ${after}`);
++  const scroll = await p.evaluate(() => document.documentElement.scrollWidth > innerWidth);
++  check("no horizontal scroll", !scroll);
++  const btn = await p.$("text=បើកលិខិត");
++  await btn.tap();
++  await p.waitForTimeout(1300);
++  const mainVisible = await p.evaluate(() => getComputedStyle(document.querySelector("main")).opacity);
++  check("cover's own button still opens the invitation", mainVisible === "1", `main opacity ${mainVisible}`);
++  check("no console errors", p.errors.length === 0, p.errors.join(" | "));
++  await p.context().close();
++}
++
++// 2 — the music starts from the opening tap, when the couple has music on
++// (left to MusicPlayer's own behaviour; asserted only that nothing throws)
++
++// 3 — skip with JavaScript: no navigation, straight to a usable cover
++{
++  const p = await page();
++  await p.goto(BASE + GUEST, { waitUntil: "networkidle" });
++  const url = p.url();
++  await p.waitForTimeout(800);
++  await p.tap(".env-skip");
++  await p.waitForFunction(() => !document.querySelector("[data-opening]"), null, { timeout: 6000 });
++  check("skip does not navigate", p.url() === url, p.url());
++  await p.waitForTimeout(3600);
++  check("skip lands on a usable cover", (await coverButtonReachable(p)) === "ok");
++  await p.context().close();
++}
++
++// 4 — no JavaScript: the envelope is visible, and its tap target is a link that lands on the cover
++{
++  const p = await page({ javaScriptEnabled: false });
++  await p.goto(BASE + GUEST, { waitUntil: "load" });
++  const boxes = await p.evaluate(() =>
++    [".env-piece", ".fl-flap", ".fl-pocket", ".env-heading-title", ".env-anywhere"].map((s) => {
++      const e = document.querySelector(s);
++      if (!e) return `${s}:missing`;
++      const r = e.getBoundingClientRect();
++      return r.width > 0 && r.height > 0 ? "ok" : `${s}:empty`;
++    }));
++  check("no-JS: envelope, flap, pocket, heading and link have size", boxes.every((b) => b === "ok"), boxes.join(","));
++  await Promise.all([p.waitForURL(/envelope=open/), p.tap(".env-anywhere")]);
++  await p.waitForLoadState("load");
++  const overlay = await p.$("[data-opening]");
++  check("no-JS: tapping lands on the invitation", !overlay && p.url().includes("envelope=open"), p.url());
++  await p.context().close();
++}
++
++// 5 — reduced motion jumps straight through
++{
++  const p = await page({ reducedMotion: "reduce" });
++  await p.goto(BASE + GUEST, { waitUntil: "networkidle" });
++  await p.waitForTimeout(600);
++  const t0 = Date.now();
++  await p.touchscreen.tap(195, 420);
++  await p.waitForFunction(() => !document.querySelector("[data-opening]"), null, { timeout: 4000 });
++  check("reduced motion: opening takes under 1.5s", Date.now() - t0 < 1500, `${Date.now() - t0}ms`);
++  await p.context().close();
++}
++
++// 6 — a backgrounded tab mid-opening still finishes
++{
++  const p = await page();
++  await p.goto(BASE + GUEST, { waitUntil: "networkidle" });
++  await p.waitForTimeout(600);
++  await p.touchscreen.tap(195, 420);
++  await p.waitForTimeout(900);
++  const other = await p.context().newPage();
++  await other.goto("about:blank");
++  await other.waitForTimeout(6500);
++  await p.bringToFront();
++  await p.waitForTimeout(800);
++  check("backgrounded mid-opening: overlay gone on return", !(await p.$("[data-opening]")));
++  await p.context().close();
++}
++
++await browser.close();
++const failed = results.filter((r) => !r.ok);
++console.log(`\n${results.length - failed.length}/${results.length} passed`);
++process.exit(failed.length ? 1 : 0);

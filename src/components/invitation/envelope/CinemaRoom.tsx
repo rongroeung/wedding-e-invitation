@@ -2,6 +2,10 @@
 
 import { useMemo } from "react";
 
+import type { Wedding } from "@/lib/db/schema";
+
+import { RoomFx } from "./RoomFx";
+
 /**
  * The room the envelope is opened in.
  *
@@ -53,18 +57,49 @@ function scatter(count: number, seed: number) {
   }));
 }
 
-export function CinemaRoom({ lit, rich }: { lit: boolean; rich: boolean }) {
+export function CinemaRoom({
+  lit,
+  rich,
+  photo = "",
+  wedding,
+  synced = false,
+}: {
+  lit: boolean;
+  rich: boolean;
+  /** For the live layer: the couple's default animation. */
+  wedding?: Wedding;
+  /** The room in a deep shade of the chosen paper rather than burgundy. */
+  synced?: boolean;
+  /**
+   * The couple's cover photograph. Laid behind everything, blurred and taken
+   * down to dusk, so the envelope stands in front of their own picture rather
+   * than a generic room. Without one the room is dusk on its own.
+   */
+  photo?: string;
+}) {
   /* Fewer of everything on a device that cannot spare the compositing. */
-  const bokeh = useMemo(() => scatter(rich ? 11 : 5, 9871), [rich]);
-  const dust = useMemo(() => scatter(rich ? 26 : 10, 4421), [rich]);
-  const sparks = useMemo(() => scatter(rich ? 7 : 3, 7717), [rich]);
+  /*
+   * Fewer than there were. Twenty-six motes of dust and seven sparkles read as
+   * an effect laid over the room; a handful of soft out-of-focus lights and a
+   * few motes read as air. The envelope is the subject.
+   */
+  const bokeh = useMemo(() => scatter(rich ? 7 : 4, 9871), [rich]);
+  const dust = useMemo(() => scatter(rich ? 8 : 4, 4421), [rich]);
+  const sparks = useMemo(() => scatter(rich ? 2 : 1, 7717), [rich]);
 
   return (
-    <div className="room" aria-hidden="true">
+    <div className={`room ${synced ? "room-synced" : ""}`} aria-hidden="true">
       {/* the air of the room, and the pool of light the envelope stands in */}
       <span className="room-air" />
+      {/* Dusk: the room taken down so the blush envelope and the gold read. */}
+      <span
+        className={`room-dusk ${photo ? "room-dusk-photo" : ""}`}
+        style={photo ? { ["--room-photo" as string]: `url("${photo.replace(/"/g, "%22")}")` } : undefined}
+      />
       <span className={`room-key ${lit ? "room-key-on" : ""}`} />
+      <span className="room-grain" />
       <span className="room-vignette" />
+      {wedding && <RoomFx wedding={wedding} rich={rich} />}
 
       {bokeh.map((p, i) => (
         <span
@@ -91,7 +126,7 @@ export function CinemaRoom({ lit, rich }: { lit: boolean; rich: boolean }) {
             left: `${(p.x * 100).toFixed(2)}%`,
             top: `${(p.y * 100).toFixed(2)}%`,
             width: `${(1 + p.scale * 1.6).toFixed(2)}px`,
-            opacity: 0.16 + p.span * 0.4,
+            opacity: 0.08 + p.span * 0.2,
             animationDuration: `${(13 + p.delay * 12).toFixed(1)}s`,
             animationDelay: `${(-p.span * 20).toFixed(1)}s`,
           }}

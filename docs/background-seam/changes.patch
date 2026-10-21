@@ -1,0 +1,103 @@
+--- a/src/app/globals.css
++++ b/src/app/globals.css
+@@ -437,13 +437,17 @@
+   .paper {
+     background-color: var(--c-bg);
+     /*
+-     * Fibre only — no vignette or gradient. Anything positional makes the
+-     * frame's strip read as a different tone from the scrolling content, and
+-     * the two must be ស្មើសាច់: one continuous sheet of paper.
++     * One seamless relief tile (`/kit/paper-card.webp`: fine grain and sparse,
++     * faint fibres, mean exactly mid-grey) laid over the colour with `overlay`.
++     * Overlay of mid-grey is the identity, so the tile adds tooth without
++     * shifting the paper's tone. The old turbulence was blended with
++     * `multiply`, which can only darken — and it darkened whichever region
++     * carried it into a visibly greyer rectangle than the regions that did not.
+      */
+-    background-image:
+-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23f)' opacity='0.22'/%3E%3C/svg%3E");
+-    background-blend-mode: multiply;
++    background-image: url(/kit/paper-card.webp);
++    background-size: 512px 512px;
++    background-repeat: repeat;
++    background-blend-mode: overlay;
+   }
+ 
+   /* The muted surface the card sits on, seen only on tablet and desktop */
+@@ -581,6 +585,30 @@
+   }
+ 
+   /*
++   * The sheet's paper, painted once for the whole card.
++   *
++   * The card is one piece of stationery, so its grain is one layer covering it
++   * from the top edge to the bottom — under the frame's ornament strips, the
++   * cover and the scrolling invitation alike. It is a pseudo-element rather
++   * than a background so that it composes with the couple's own uploaded paper
++   * (`--card-bg`, above) instead of replacing it, which is what the `.paper`
++   * class on this same element was silently losing: `background-image` above
++   * overrides `.paper`'s, so the frame strips were flat colour while the cover
++   * painted its own textured, darker paper between them.
++   *
++   * It does not scroll: the writing moves, the sheet stays put.
++   */
++  .card-stock::before {
++    content: "";
++    position: absolute;
++    inset: 0;
++    z-index: 0;
++    pointer-events: none;
++    background: url(/kit/paper-card.webp) 0 0 / 512px 512px repeat;
++    mix-blend-mode: overlay;
++  }
++
++  /*
+    * Metallic gold text — reads like foil stamping on a wedding card.
+    *
+    * Two things matter here. The ramp stays in the darker half of the gold
+@@ -680,7 +708,13 @@
+     left: 50%;
+     border-radius: 9999px;
+     transform: translateX(-50%);
+-    background: radial-gradient(circle, rgba(var(--gold-3-rgb) / 0.4), transparent 68%);
++    /*
++     * `closest-side`: the glow fades to nothing inside its own box. A circle
++     * sized to the far corner ran past the top and bottom of a wide, short box
++     * (a phone held sideways) and was cut off there in a hard line across the
++     * paper. On tall screens the two are within a few pixels of each other.
++     */
++    background: radial-gradient(closest-side, rgba(var(--gold-3-rgb) / 0.4), transparent);
+     filter: blur(22px);
+     animation: breathe 7.5s ease-in-out infinite;
+     will-change: opacity, transform;
+--- a/src/components/invitation/Cover.tsx
++++ b/src/components/invitation/Cover.tsx
+@@ -45,7 +45,7 @@
+          * own `.paper`, which made the cover a second, differently toned piece
+          * of paper laid between the frame's head and foot.
+          */
+-        className={`cover-shell paper relative flex h-full w-full flex-col items-center justify-center overflow-hidden text-center ${
++        className={`cover-shell relative flex h-full w-full flex-col items-center justify-center overflow-hidden text-center ${
+           photo ? "cover-on-photo" : ""
+         }`}
+       >
+@@ -58,7 +58,7 @@
+         )}
+         {/* No sheen: it is clipped to this box, so each pass lit a band with
+             hard top and bottom edges across the sheet. */}
+-        <LiveBackdrop count={14} />
++        <LiveBackdrop count={14} sheen={false} />
+ 
+         <CoverContent
+           wedding={wedding}
+--- a/src/components/invitation/Blessing.tsx
++++ b/src/components/invitation/Blessing.tsx
+@@ -6,7 +6,7 @@
+   return (
+     <section id="blessing" className="relative overflow-hidden">
+       {/* fades out at both ends, so the section never ends on an edge */}
+-      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-beige/45" />
++      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-beige/35 to-transparent" />
+       <PatternBackground pattern={wedding.pattern} />
+ 
+       <div className="section-pad relative mx-auto max-w-2xl text-center">

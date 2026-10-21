@@ -1,4 +1,8 @@
 import { eq } from "drizzle-orm";
+import { FX_LEVEL_KEYS, FX_MODE_KEYS, PAPER_THEME_KEYS } from "@/lib/appearance";
+import { BACKDROP_PRESET_KEYS } from "@/lib/backgrounds";
+import { DESIGN_KIT_KEYS } from "@/lib/designKit";
+import { FRAME_MOTIFS } from "@/lib/frame";
 import { z } from "zod";
 import { fail, getSession, ok, readJson, requireAdmin } from "@/lib/api";
 import { getDb } from "@/lib/db";
@@ -82,9 +86,10 @@ const schema = z.object({
   fontBody: z.string().max(80).optional(),
   pattern: z.enum(["lotus", "angkor", "floral", "none"]).optional(),
   frameSource: z.enum(["builtin", "custom"]).optional(),
-  frameMotif: z
-    .enum(["kbach", "royal", "royal-light", "lotus", "flame", "angkor", "wheel"])
-    .optional(),
+  // One list, shared with the frame resolver and the dashboard, so a frame the
+  // dashboard offers can never be one the server refuses.
+  frameMotif: z.enum(FRAME_MOTIFS).optional(),
+  designKit: z.enum(DESIGN_KIT_KEYS).optional(),
   frameLayout: z.enum(["band", "corner"]).optional(),
   frameTopMediaId: z.string().max(80).nullable().optional(),
   frameTopUrl: z.string().max(600).optional(),
@@ -110,9 +115,12 @@ const schema = z.object({
   envelopeMusic: z.boolean().optional(),
   envelopeSkip: z.boolean().optional(),
   envelopeEveryVisit: z.boolean().optional(),
+  envelopeMatchPaper: z.boolean().optional(),
   envelopeOpenLabel: z.string().max(60).optional(),
   envelopeHint: z.string().max(120).optional(),
   envelopeSkipLabel: z.string().max(40).optional(),
+  envelopeTitle: z.string().max(80).optional(),
+  envelopeSubtitle: z.string().max(80).optional(),
 
   /*
    * The pre-wedding film.
@@ -133,6 +141,43 @@ const schema = z.object({
   videoMediaId: z.string().max(64).nullable().optional(),
   videoPosterId: z.string().max(64).nullable().optional(),
   videoSkipLabel: z.string().max(40).optional(),
+
+  /*
+   * The couple's own artwork.
+   *
+   * `fit` and `kind` are enums rather than free strings because they are
+   * written straight into CSS and into an SVG's `preserveAspectRatio`, and a
+   * value that is not one of these is not a styling mistake — it is an
+   * attribute the browser cannot parse, on a surface that then does not paint
+   * at all.
+   */
+  envelopeFaceMediaId: z.string().max(64).nullable().optional(),
+  envelopeFaceFit: z.enum(["cover", "contain", "stretch"]).optional(),
+  envelopeFaceScrim: z.number().int().min(0).max(100).optional(),
+  envelopeFaceOrnament: z.boolean().optional(),
+
+  curtainMediaId: z.string().max(64).nullable().optional(),
+  curtainMediaKind: z.enum(["image", "video"]).optional(),
+  curtainPosterId: z.string().max(64).nullable().optional(),
+  curtainFit: z.enum(["cover", "contain", "tile"]).optional(),
+  curtainFolds: z.boolean().optional(),
+  curtainEnabled: z.boolean().optional(),
+  curtainShade: z.number().int().min(0).max(100).optional(),
+
+  pageBgMediaId: z.string().max(64).nullable().optional(),
+  pageBgFit: z.enum(["cover", "contain", "tile"]).optional(),
+  pageBgScrim: z.number().int().min(0).max(100).optional(),
+  pageBgPreset: z.enum(["", ...BACKDROP_PRESET_KEYS]).optional(),
+
+  cardBgMediaId: z.string().max(64).nullable().optional(),
+  cardBgFit: z.enum(["cover", "contain", "tile"]).optional(),
+  cardBgScrim: z.number().int().min(0).max(100).optional(),
+  cardBgPreset: z.enum(["", ...BACKDROP_PRESET_KEYS]).optional(),
+  envelopeFlapMark: z.enum(["namelogo", "monogram"]).optional(),
+  appearancePaper: z.enum(PAPER_THEME_KEYS).optional(),
+  appearanceFx: z.enum(FX_MODE_KEYS).optional(),
+  appearanceLevel: z.enum(FX_LEVEL_KEYS).optional(),
+  appearanceGuestPanel: z.boolean().optional(),
 
   frameEmboss: z.boolean().optional(),
   frameDepth: z.number().int().min(0).max(100).optional(),

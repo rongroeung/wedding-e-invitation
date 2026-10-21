@@ -5,8 +5,12 @@ import type { Guest, Wedding } from "@/lib/db/schema";
 import type { EnvelopeConfig } from "@/lib/envelope";
 import type { FrameConfig } from "@/lib/frame";
 import { CinemaRoom } from "./CinemaRoom";
+import { envelopeFace } from "@/lib/artwork";
+
 import { Envelope } from "./Envelope";
 import { EnvelopeAddress } from "./EnvelopeAddress";
+import { EnvelopeHeading } from "./EnvelopeHeading";
+import { mediaSrc } from "@/lib/media";
 import { OpenButton } from "./OpenButton";
 import { OpenEnvelopeLink } from "./OpenEnvelopeLink";
 import { OpeningTransition } from "./OpeningTransition";
@@ -23,9 +27,9 @@ import { usePointerTilt, useRichDevice } from "./usePointerTilt";
 const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 /** Steps of the opening, in order. Each one only ever moves forward. */
-type Step = "closed" | "unsealed" | "doors" | "fill" | "done";
+type Step = "closed" | "press" | "lift" | "flap" | "card" | "lower" | "fill" | "done";
 
-const ORDER: Step[] = ["closed", "unsealed", "doors", "fill", "done"];
+const ORDER: Step[] = ["closed", "press", "lift", "flap", "card", "lower", "fill", "done"];
 const at = (step: Step) => ORDER.indexOf(step);
 
 /** Where each step begins, as a fraction of the configured total. */
@@ -39,41 +43,38 @@ const at = (step: Step) => ORDER.indexOf(step);
  * shut, it gives, and only then do they swing. Cue the two together and the
  * seal was never doing anything.
  */
+/*
+ * The opening as one physical action, in fractions of the run (6.2 s default):
+ *
+ *   0.00  —      anticipation: the guest has tapped; nothing moves yet
+ *   0.07  press  the seal is pressed very slightly against the paper
+ *   0.12  lift   …released, lifted with its shadow separating, and carried
+ *                away by hand (the lift runs 0.15 of the run)
+ *   0.27  flap   the flap lifts at its point and turns back on its hinge
+ *                (0.225 of the run); its lining comes round with it
+ *   0.50  card   the card is drawn up out of the pocket at a slight angle,
+ *                and the envelope gives a little downward (0.26)
+ *   0.76  lower  the envelope drops out of the shot; the card comes toward
+ *                the camera; the room goes dark (0.21)
+ *   0.91  fill   the veil lifts out of the dark onto the curtains
+ *   0.995 done   the overlay is unmounted
+ *
+ * Each beat starts a moment before the last one has fully settled, so the
+ * movement overlaps the way a hand does — but the seal is always gone before
+ * the flap moves, and the flap is past upright before the card starts out,
+ * because the physical action needs them to be.
+ *
+ * Everything only moves forward and every timer is on `timers`, so a skip, a
+ * backgrounded tab or an unmount mid-run lands on the same final state.
+ */
 const CUE: Record<Exclude<Step, "closed">, number> = {
-  unsealed: 0.05,
-  doors: 0.16,
-  /*
-   * When the hand-over to the velvet begins.
-   *
-   * This is the fourth attempt at these numbers, and the failure that produced
-   * this one is worth writing down because nothing about it showed up in a
-   * still frame. The dissolve is eased `ease` — front-loaded, two thirds gone
-   * in the first third of its run — and the panels were eased with a very soft
-   * foot, barely moving for their first half-second. Cued a fraction apart,
-   * the two curves ran in opposite directions: the veil was most of the way
-   * gone before the panels had visibly started, so the one gesture the whole
-   * scene exists for was played almost entirely inside a fade. Each animation
-   * measured correct on its own. Only the pair was wrong.
-   *
-   * So the panels now start early and move immediately, and the dissolve waits
-   * until they are about two thirds open — far enough that the sliding is the
-   * thing being watched, not so far that the envelope is ever seen to come to
-   * rest around an empty lined box, which is the one frame in the sequence
-   * with nothing in it.
-   *
-   * The panels are also given longer than the dissolve, on purpose: they are
-   * still travelling when the last of the envelope goes, so they are never
-   * seen to stop. An envelope that comes to rest has nothing left to show —
-   * the invitation is not inside it any more — and the frame it rests into is
-   * an empty lined box. Overlapping the two is not a way of hiding that frame;
-   * it is a way of never reaching it.
-   *
-   * The gap between `fill` and `done` is the dissolve (0.45 of the run, set
-   * below). A transition longer than the beat it lives in is still moving when
-   * its element is removed.
-   */
-  fill: 0.42,
-  done: 0.9,
+  press: 0.07,
+  lift: 0.12,
+  flap: 0.27,
+  card: 0.5,
+  lower: 0.76,
+  fill: 0.91,
+  done: 0.995,
 };
 
 export const envelopeSeenKey = (code: string) => `wedding:envelope:${code || "home"}`;
@@ -152,6 +153,27 @@ export function InvitationOpening({
   const [pushed, setPushed] = useState(false);
   const [step, setStep] = useState<Step>("closed");
   const rich = useRichDevice();
+  /*
+   * Resolved once per render rather than per panel: both panels draw the same
+   * picture, and resolving it twice is how the two halves would eventually
+   * come to disagree about which one it is.
+   */
+  const face = envelopeFace(wedding);
+  const match = wedding.envelopeMatchPaper;
+  const syncOr = (name: string, value: string) => (match ? `var(--sync-env-${name}, ${value})` : value);
+  const envColours = {
+    ["--env-paper" as string]: syncOr("paper", envelope.paper),
+    ["--env-paper-shade" as string]: syncOr("paper-shade", envelope.paperShade),
+    ["--env-paper-deep" as string]: syncOr("paper-deep", envelope.paperDeep),
+    ["--env-ink" as string]: syncOr("ink", envelope.ink),
+    ["--env-gold" as string]: syncOr("gold", envelope.gold),
+    ["--env-gold-light" as string]: syncOr("gold-light", envelope.goldLight),
+    ["--env-gold-deep" as string]: syncOr("gold-deep", envelope.goldDeep),
+    ["--env-seal" as string]: syncOr("seal", envelope.seal),
+    ["--env-seal-ink" as string]: syncOr("seal-ink", envelope.sealInk),
+  };
+  /* The couple's cover photograph, blurred and darkened behind the envelope. */
+  const photo = mediaSrc(wedding.coverPhotoId, wedding.coverPhotoUrl);
   const timers = useRef<number[]>([]);
   const opened = useRef(false);
   const checked = useRef(false);
@@ -292,9 +314,7 @@ export function InvitationOpening({
       return;
     }
 
-    setStep("unsealed");
     (Object.keys(CUE) as Exclude<Step, "closed">[]).forEach((next) => {
-      if (next === "unsealed") return;
       timers.current.push(
         window.setTimeout(() => {
           /*
@@ -504,7 +524,16 @@ export function InvitationOpening({
       ]
         .filter(Boolean)
         .join(" ")
-    : "translate3d(0, 2%, 0) scale(0.8) rotateX(2deg)";
+    : /* the framing per beat is in CSS variables, so a short landscape
+         screen can take a wider shot (see `.env-veil` in globals.css) */
+      index >= at("lower")
+      ? "translate3d(0, var(--pe-cam-low-y, 10%), 0) scale(var(--pe-cam-low-s, 0.9))"
+      : index >= at("card")
+        ? /* room above for the card as it comes out */
+          "translate3d(0, var(--pe-cam-card-y, 20%), 0) scale(var(--pe-cam-card-s, 0.86))"
+        : index >= at("flap")
+          ? /* a touch of room for the open flap */ "translate3d(0, 8%, 0) scale(0.96)"
+          : "translate3d(0, 0, 0) scale(1)";
 
   return (
     /*
@@ -514,8 +543,8 @@ export function InvitationOpening({
      * own dissolve and simply vanished. A fade has to be over before the thing
      * fading is taken away.
      */
-    <OpeningTransition gone={step === "fill"} duration={Math.round(D * 0.45)}>
-      <CinemaRoom lit={index >= at("doors")} rich={rich} />
+    <OpeningTransition gone={step === "fill"} duration={Math.round(D * 0.08)}>
+      <CinemaRoom lit={index >= at("lift")} rich={rich} photo={photo} wedding={wedding} synced={match} />
 
       <div
         className="env-stage flex h-full w-full items-center justify-center px-4"
@@ -552,7 +581,12 @@ export function InvitationOpening({
             through to the target behind it; only the controls inside it take
             pointer events back. */}
         <div className="env-column pointer-events-none relative z-[1] flex w-full flex-col items-center">
-          <EnvelopeAddress wedding={wedding} guest={guest} gone={index >= at("unsealed")} />
+          <EnvelopeHeading
+            title={wedding.envelopeTitle}
+            subtitle={wedding.envelopeSubtitle}
+            gone={!closed}
+          />
+          <EnvelopeAddress wedding={wedding} guest={guest} gone={!closed} />
 
           <div
             /* While it is closed the drawing takes no pointer events at all,
@@ -565,29 +599,17 @@ export function InvitationOpening({
               /* How wide the piece is — and why that number is what it is —
                  lives in `.env-piece` in the stylesheet, because it needs a
                  `@supports` guard that an inline style cannot carry. */
-              ["--env-paper" as string]: envelope.paper,
-              ["--env-paper-shade" as string]: envelope.paperShade,
-              ["--env-paper-deep" as string]: envelope.paperDeep,
-              ["--env-ink" as string]: envelope.ink,
-              ["--env-gold" as string]: envelope.gold,
-              ["--env-gold-light" as string]: envelope.goldLight,
-              ["--env-gold-deep" as string]: envelope.goldDeep,
-              ["--env-seal" as string]: envelope.seal,
-              ["--env-seal-ink" as string]: envelope.sealInk,
-              ["--env-seal-t" as string]: `${Math.round(D * 0.16)}ms`,
-              /*
-               * The panels take most of the run: heavy paper on two hinges, and
-               * the only thing in the shot that moves. They are still moving
-               * long after the dissolve has begun, and are never seen to stop.
-               */
-              ["--env-door" as string]: `${Math.round(D * 0.62)}ms`,
-              /*
-               * One speed for everything the envelope's own layers do. There
-               * used to be two — a slower one for the card rising and a quicker
-               * one for its approach — and with the card gone there is nothing
-               * left that needs to be told apart.
-               */
-              ["--env-move" as string]: `${Math.round(D * 0.26)}ms`,
+              /* With "match the paper" on, every colour is the chosen paper's
+                 (set on <html> by the paper theme), falling back to the
+                 envelope style for the couple's own picture-paper. */
+              ...envColours,
+              ["--pe-lift-t" as string]: `${Math.round(D * 0.15)}ms`,
+              ["--pe-press-t" as string]: `${Math.round(D * 0.05)}ms`,
+              ["--pe-flap-t" as string]: `${Math.round(D * 0.225)}ms`,
+              ["--pe-card-t" as string]: `${Math.round(D * 0.26)}ms`,
+              ["--pe-near-t" as string]: `${Math.round(D * 0.21)}ms`,
+              /* The camera follows the action in one slow, eased move per beat. */
+              ["--env-move" as string]: `${Math.round(D * 0.2)}ms`,
               transform: camera,
               /*
                * Three different speeds on the same property, and they have to
@@ -607,9 +629,20 @@ export function InvitationOpening({
           >
             <Envelope
               envelope={envelope}
+              face={face}
+              groom={wedding.groomName}
+              bride={wedding.brideName}
+              monogramFont={wedding.monogramFont}
+              monogramText={wedding.monogram}
+              flapMark={wedding.envelopeFlapMark === "monogram" ? "monogram" : "namelogo"}
+              sealText={wedding.envelopeSealText}
+              cardLines={{ lead: wedding.subtitle, title: wedding.title }}
               phase={{
-                unsealed: index >= at("unsealed"),
-                doorsOpen: index >= at("doors"),
+                pressed: index >= at("press"),
+                lifted: index >= at("lift"),
+                flapOpen: index >= at("flap"),
+                cardOut: index >= at("card"),
+                lowered: index >= at("lower"),
               }}
             />
 
@@ -625,6 +658,19 @@ export function InvitationOpening({
           </div>
         </div>
       </div>
+
+      {/* The dark beat between the card reaching the camera and the curtains:
+          above the whole set, so the card goes into it rather than past it. */}
+      <span
+        className={`env-dusk ${index >= at("lower") ? "env-dusk-on" : ""}`}
+        style={{
+          /* dark by 0.90 of the run, just before the veil starts to lift at
+             0.91 — the veil must lift out of darkness, never out of a fade */
+          transitionDuration: `${Math.round(D * 0.09)}ms`,
+          transitionDelay: index >= at("lower") ? `${Math.round(D * 0.05)}ms` : "0ms",
+        }}
+        aria-hidden="true"
+      />
 
       {envelope.skip && (
         <SkipButton label={wedding.envelopeSkipLabel} onSkip={jump} hidden={!closed} />

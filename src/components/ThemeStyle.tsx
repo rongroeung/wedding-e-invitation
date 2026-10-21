@@ -1,3 +1,7 @@
+import { backdropVars, cardBackdrop, pageBackdrop } from "@/lib/artwork";
+import { designKitCss } from "@/lib/designKit";
+import { appearanceBootScript, appearanceDefaults } from "@/lib/appearance";
+import { paperThemeCss } from "@/lib/paperThemes";
 import type { Wedding } from "@/lib/db/schema";
 
 /**
@@ -92,7 +96,42 @@ export function ThemeStyle({ wedding }: { wedding: Wedding }) {
    * Thirty-three steps: fine enough that no two adjacent gradient stops land
    * on the same tone and flatten a section of the curve.
    */
+  /*
+   * The couple's own pictures behind the invitation: one for the room the card
+   * stands in, one for the card's own paper.
+   *
+   * Both are published as custom properties rather than written onto an element
+   * here, because both surfaces already exist and already have a colour — the
+   * page is `body`, the paper is `.card-stock` — and the honest change is to
+   * give those rules a picture to paint over their colour, not to lay a new
+   * element over the top of them.
+   */
+  const page = pageBackdrop(wedding);
+  const card = cardBackdrop(wedding);
+
   const tones = velvetScale(velvet, 33);
+  /*
+   * The same thirty-three steps with the hue taken out.
+   *
+   * When a couple prints their own cloth on the curtains, the drawn folds stop
+   * being the cloth and become the *light on* it: the panel's SVG is blended
+   * over their picture in `overlay` rather than painted in front of it. A blend
+   * carries colour as well as value, so the velvet's own pink ramp would print
+   * pink onto a blue silk. Grey blends as value alone.
+   *
+   * It is emitted as a scoped override of the very same custom properties, so
+   * the curtain needs no second code path — it goes on asking for `--vel-t12`
+   * and gets a grey instead of a rose.
+   *
+   * 0.12 to 0.97 rather than 0 to 1: those are the two extremes of the blend,
+   * and a fold that reaches either stops being shading and becomes a hole or a
+   * blowout in the couple's photograph.
+   */
+  const greys = Array.from({ length: 33 }, (_, i) => {
+    const level = Math.round((0.12 + (i / 32) * 0.85) * 255);
+    const hex = level.toString(16).padStart(2, "0");
+    return `#${hex}${hex}${hex}`;
+  });
   /*
    * The room the envelope opens in, and the set behind the curtains.
    *
@@ -150,13 +189,60 @@ export function ThemeStyle({ wedding }: { wedding: Wedding }) {
     --vel-deep-rgb:${channels(velvet.deep)};
     --vel-lit-rgb:${channels(velvet.lit)};
     --vel-glint-rgb:${channels(velvet.glint)};
+    --curtain-cloth:${velvet.mid};
     --room-far:${room.far};
     --room-near:${room.near};
     --room-far-rgb:${channels(room.far)};
     --f-heading:${sanitizeFont(wedding.fontHeading, "'Khmer OS Muol Light'")};
     --f-body:${sanitizeFont(wedding.fontBody, "'Noto Sans Khmer'")};
+    ${backdropVars("page", page, channels(background))}
+    ${backdropVars("card", card, channels(background))}
+  }
+  /* The same fold shading in grey, for a curtain wearing the couple's own
+     cloth. See the note beside "greys" above. */
+  .curtain-skinned{${greys.map((g, i) => `--vel-t${i}:${g};`).join("")}}
+  ${designKitCss(wedding.designKit)}
+  ${
+    /*
+     * A page picture lives on a fixed sheet behind everything (\`.page-backdrop\`),
+     * but the stage around the card is painted in solid colour on top of it —
+     * the stage, its centre runway, the set and the side panels — so the
+     * picture was never seen. With one chosen, those surfaces let it through:
+     * the runway and the set clear, the side panels a translucent wash of their
+     * own colour so their text stays readable. The drawn set (arch, columns,
+     * candles, bokeh) is the default backdrop and is put away: the couple's
+     * picture *is* the backdrop now, and the two laid over each other read as
+     * neither.
+     */
+    page
+      ? `.stage,.zone-centre,.stage-set{background:transparent!important}.stage-far,.stage-mid,.stage-near,.stage-set::after{display:none!important}.zone-side{background-color:rgb(var(--c-zone-rgb) / 0.62)!important;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}`
+      : ""
   }`;
-  return <style dangerouslySetInnerHTML={{ __html: css }} />;
+  return (
+    <>
+      <style dangerouslySetInnerHTML={{ __html: css }} />
+      {/* the thirty papers' colours, patterns and envelope/room shades */}
+      <style dangerouslySetInnerHTML={{ __html: paperThemeCss() }} />
+      {/*
+        * The paper theme and the live layer, applied before the first paint:
+        * the guest's own saved choice if they made one, otherwise the
+        * couple's defaults. See `lib/appearance`.
+        */}
+      <script dangerouslySetInnerHTML={{ __html: appearanceBootScript(appearanceDefaults(wedding)) }} />
+      {/*
+        * The room, as a fixed sheet behind everything.
+        *
+        * Not `background-attachment: fixed` on `body`, which is the obvious
+        * way to stop a photograph scrolling away down a long invitation and is
+        * the one mobile Safari has never handled: it either ignores it or
+        * repaints the whole image on every scroll frame. A fixed element with
+        * the picture on it is the same effect, composited, and it costs one
+        * div on the invitations that use it and nothing at all on the ones
+        * that do not.
+        */}
+      {page && <div className="page-backdrop" aria-hidden="true" />}
+    </>
+  );
 }
 
 /** Builds the metallic ramp around the chosen gold. */

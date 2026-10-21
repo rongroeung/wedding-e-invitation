@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { GoldDivider } from "@/components/ui/Ornaments";
+import { FlourishDivider } from "@/components/ui/Ornaments";
 
 /** Telegram / Facebook / Messenger / copy-link sharing. */
 export function ShareBar({ title }: { title: string }) {
@@ -49,7 +49,7 @@ export function ShareBar({ title }: { title: string }) {
         <p className="reveal text-sm text-gold-deep">
           ចែករំលែកសំបុត្រអញ្ជើញនេះ
         </p>
-        <GoldDivider className="my-5" width="max-w-[140px]" icon="none" />
+        <FlourishDivider role="share" width={120} className="my-5" />
         <div className="reveal flex flex-wrap items-center justify-center gap-3">
           {buttons.map((button) => (
             <button

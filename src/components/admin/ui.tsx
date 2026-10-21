@@ -330,3 +330,105 @@ export function MediaUpload({
     </div>
   );
 }
+
+/**
+ * One uploaded surface: the picture, how it is fitted, and how much of the
+ * surface's own colour is washed back over it.
+ *
+ * Four surfaces take an upload now — the envelope's paper, the curtain panels,
+ * the page and the card's own stock — and they take it in the same three parts
+ * every time. Writing that out four times is how the envelope ends up offering
+ * "tile" and the card does not, for no reason anybody can remember.
+ */
+export function ArtworkField({
+  label,
+  hint,
+  kind = "image",
+  mediaId,
+  onMedia,
+  fit,
+  fits = ["cover", "contain", "tile"],
+  onFit,
+  strengthLabel,
+  strengthHint,
+  strength,
+  onStrength,
+  children,
+  preset = false,
+}: {
+  label: string;
+  hint?: string;
+  kind?: "image" | "video";
+  mediaId: string | null;
+  onMedia: (id: string | null) => void;
+  fit: string;
+  /** Not every surface can tile: an SVG has no repeating paint. */
+  fits?: readonly ("cover" | "contain" | "tile" | "stretch")[];
+  onFit: (fit: string) => void;
+  strengthLabel: (value: number) => string;
+  strengthHint?: string;
+  strength: number;
+  onStrength: (value: number) => void;
+  /** Anything this particular surface needs and the others do not. */
+  children?: React.ReactNode;
+  /**
+   * A built-in design is on this surface instead of an upload: the strength
+   * still applies, but the design brings its own way of being laid.
+   */
+  preset?: boolean;
+}) {
+  return (
+    <div className="space-y-4">
+      <MediaUpload
+        label={label}
+        kind={kind}
+        currentSrc={mediaId ? `/api/media/${mediaId}` : undefined}
+        onUploaded={(id) => onMedia(id)}
+        onClear={() => onMedia(null)}
+      />
+      {hint && <p className="text-xs leading-relaxed text-slate-500">{hint}</p>}
+
+      {/*
+        * The rest is hidden until there is a picture to apply it to. A fit
+        * control over an empty surface is a control that does nothing, and a
+        * dashboard full of those is how a couple stops believing any of them.
+        */}
+      {(mediaId || preset) && (
+        <div className="space-y-4 rounded-lg border border-slate-200 bg-slate-50/60 p-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            {mediaId && (
+              <Field label="របៀបដាក់រូប">
+                <Select value={fit} onChange={(e) => onFit(e.target.value)}>
+                  {fits.map((option) => (
+                    <option key={option} value={option}>
+                      {FIT_LABELS[option]}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+            )}
+            <Field label={strengthLabel(strength)} hint={strengthHint}>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={5}
+                value={strength}
+                onChange={(e) => onStrength(Number(e.target.value))}
+                className="w-full accent-amber-600"
+              />
+            </Field>
+          </div>
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
+
+const FIT_LABELS: Record<string, string> = {
+  cover: "គ្របពេញ (កាត់គែម)",
+  contain: "ឃើញទាំងមូល (នៅសល់ទំនេរ)",
+  tile: "ដាក់ត្រួតគ្នា (Tile)",
+  stretch: "ទាញឱ្យពេញ (អាចខូចរាង)",
+};
