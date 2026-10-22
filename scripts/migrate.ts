@@ -16,12 +16,8 @@ async function main() {
 async function connect(): Promise<SqlRunner> {
   if (process.env.DATABASE_URL) {
     const { Client } = await import("pg");
-    const client = new Client({
-      connectionString: process.env.DATABASE_URL,
-      ssl: /sslmode=require|neon\.tech|supabase|vercel-storage/.test(process.env.DATABASE_URL)
-        ? { rejectUnauthorized: false }
-        : undefined,
-    });
+    const { pgConnection } = await import("../src/lib/db/pgConfig");
+    const client = new Client(pgConnection(process.env.DATABASE_URL));
     await client.connect();
     console.log("→ PostgreSQL");
     return {

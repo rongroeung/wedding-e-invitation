@@ -22,13 +22,8 @@ async function createDb(): Promise<DrizzleDb> {
   if (process.env.DATABASE_URL) {
     const { drizzle } = await import("drizzle-orm/node-postgres");
     const { Pool } = await import("pg");
-    const pool = new Pool({
-      connectionString: process.env.DATABASE_URL,
-      max: 5,
-      ssl: /sslmode=require|neon\.tech|supabase|vercel-storage/.test(process.env.DATABASE_URL)
-        ? { rejectUnauthorized: false }
-        : undefined,
-    });
+    const { pgConnection } = await import("./pgConfig");
+    const pool = new Pool({ ...pgConnection(process.env.DATABASE_URL), max: 5 });
     const db = drizzle(pool, { schema }) as unknown as DrizzleDb;
     await ensureSchema(db, true);
     return db;
