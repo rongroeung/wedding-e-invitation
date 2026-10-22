@@ -9,6 +9,19 @@ const nextConfig: NextConfig = {
     remotePatterns: [{ protocol: "https", hostname: "**" }],
   },
   serverExternalPackages: ["@electric-sql/pglite", "pg", "bcryptjs"],
+  /*
+   * The database brings itself up to date on first use (lib/db/index.ts,
+   * ensureSchema) by reading the SQL files in ./drizzle at run time. Nothing
+   * imports them, so the build's file tracing cannot see them and a
+   * serverless deploy (Vercel) ships every function without them — the
+   * migrator then finds no folder and applies nothing, and the first query
+   * for a newer column fails. Ship them with every route.
+   */
+  outputFileTracingIncludes: {
+    // the home page has to be named on its own: "/**/*" needs a segment
+    "/": ["./drizzle/*.sql"],
+    "/**/*": ["./drizzle/*.sql"],
+  },
   async headers() {
     return [
       {

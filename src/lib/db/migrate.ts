@@ -19,7 +19,12 @@ const LEDGER = "__wedding_migrations";
 
 export async function applyMigrations(runner: SqlRunner, log: (message: string) => void = () => {}) {
   const dir = path.join(process.cwd(), "drizzle");
-  if (!existsSync(dir)) return;
+  if (!existsSync(dir)) {
+    // Never silently: a deploy without its migrations runs new code against
+    // an old schema (next.config.ts, outputFileTracingIncludes).
+    console.error(`[db] migrations folder not found at ${dir}; the schema was not checked or updated`);
+    return;
+  }
 
   await runner.exec(
     `CREATE TABLE IF NOT EXISTS "${LEDGER}" (
