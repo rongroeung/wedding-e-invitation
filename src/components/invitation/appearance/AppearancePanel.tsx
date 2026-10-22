@@ -66,6 +66,10 @@ export function AppearancePanel({
   }, [open]);
 
   const papers = PAPER_THEME_KEYS.filter((k) => k !== "couple" || coupleSwatch);
+  const [tab, setTab] = useState<string | null>(null);
+  const groupOfCurrent = PAPER_THEMES[current.paper]?.group;
+  const shownGroup =
+    tab ?? (PAPER_GROUPS.some((g) => g.key === groupOfCurrent) ? (groupOfCurrent as string) : PAPER_GROUPS[0].key);
 
   return (
     <>
@@ -121,14 +125,48 @@ export function AppearancePanel({
               <legend className="ap-legend">
                 ក្រដាស <span>· Paper</span>
               </legend>
-              {PAPER_GROUPS.map((g) => (
-                <div key={g.key} className="ap-swatch-group">
-                  <p className="ap-swatch-group-title">
-                    {g.km} <span>· {g.en}</span>
-                  </p>
+              {/*
+                * Thirty papers in three collections: one collection at a
+                * time, chosen with these tabs, so the panel never becomes a
+                * long scroll of thumbnails. It opens on the collection of the
+                * paper in use.
+                */}
+              <div
+                className="ap-tabs"
+                role="tablist"
+                aria-label="Collections"
+                onKeyDown={(e) => {
+                  // arrow keys move between the collections, as tabs do
+                  if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+                  e.preventDefault();
+                  const i = PAPER_GROUPS.findIndex((g) => g.key === shownGroup);
+                  const n = PAPER_GROUPS.length;
+                  const next = PAPER_GROUPS[(i + (e.key === "ArrowRight" ? 1 : n - 1)) % n].key;
+                  setTab(next);
+                  e.currentTarget.querySelector<HTMLButtonElement>(`[data-group="${next}"]`)?.focus();
+                }}
+              >
+                {PAPER_GROUPS.map((g) => (
+                  <button
+                    key={g.key}
+                    type="button"
+                    role="tab"
+                    data-group={g.key}
+                    aria-selected={shownGroup === g.key}
+                    tabIndex={shownGroup === g.key ? 0 : -1}
+                    className="ap-tab"
+                    onClick={() => setTab(g.key)}
+                  >
+                    {g.km}
+                    <small>{g.en}</small>
+                  </button>
+                ))}
+              </div>
+              {PAPER_GROUPS.filter((g) => g.key === shownGroup).map((g) => (
+                <div key={g.key} className="ap-swatch-group" role="tabpanel">
                   <div className="ap-swatches">
                     {papers
-                      .filter((key) => PAPER_THEMES[key].group === g.key || (g.key === "stationery" && key === "couple"))
+                      .filter((key) => PAPER_THEMES[key].group === g.key || (g.key === "floral" && key === "couple"))
                       .map((key) => (
                         <label key={key} className="ap-swatch">
                           <input

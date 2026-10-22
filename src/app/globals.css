@@ -4142,12 +4142,29 @@ html[data-fx] .cv-crest::after { animation-delay: 3s; }
 .ap-legend span { font-weight: 400; }
 
 .ap-swatches { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
+/* the three collections, one shown at a time */
+.ap-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.3rem; margin: 0.2rem 0 0.7rem; }
+.ap-tab {
+  padding: 0.35rem 0.3rem;
+  border: 1px solid rgb(168 131 63 / 0.35);
+  border-radius: 0.6rem;
+  background: rgb(255 255 255 / 0.5);
+  font-size: 0.68rem;
+  line-height: 1.5;
+  text-align: center;
+  color: inherit;
+}
+.ap-tab small { display: block; font-size: 0.6rem; opacity: 0.7; }
+.ap-tab[aria-selected="true"] { border-color: #a8833f; background: #f4ead6; box-shadow: inset 0 0 0 1px #b8955c; }
+.ap-tab:focus-visible { outline: 2px solid #8a6a3a; outline-offset: 2px; }
 .ap-swatch { position: relative; display: block; cursor: pointer; }
 .ap-swatch input, .ap-option input, .ap-segment input { position: absolute; opacity: 0; width: 1px; height: 1px; }
 .ap-swatch-paper {
   position: relative;
   display: block;
-  height: 3.4rem;
+  /* a small picture of the whole sheet, so a design's head, foot and corners
+     can all be judged */
+  aspect-ratio: 3 / 4;
   overflow: hidden;
   border-radius: 0.6rem;
   border: 1px solid rgb(184 149 92 / 0.3);
@@ -4470,8 +4487,8 @@ html[data-paper-dark] .frame-edge.has-bt {
   pointer-events: none;
   --o: calc(var(--corner-w, 100px) * var(--bt-ro, 0.055));
   --i: calc(var(--corner-w, 100px) * var(--bt-ri, 0.09));
-  --wo: max(1px, calc(var(--corner-w, 100px) * 0.0075));
-  --wi: max(0.6px, calc(var(--corner-w, 100px) * 0.0045));
+  --wo: calc(max(1px, calc(var(--corner-w, 100px) * 0.0075)) * var(--bt-wo-k, 1));
+  --wi: calc(max(0.6px, calc(var(--corner-w, 100px) * 0.0045)) * var(--bt-wi-k, 1));
   --cw: var(--corner-w, 100px);
   --mw: calc(var(--corner-w, 100px) * 0.62);
   --run-v: calc(100% - 2 * var(--bt-ch));
@@ -4511,4 +4528,116 @@ html[data-paper-dark] .frame-edge.has-bt {
   top: calc(100% - (var(--o) + var(--i)) / 2);
   -webkit-mask: url(/art/stationery/mid-bottom.svg) center / 100% 100% no-repeat;
   mask: url(/art/stationery/mid-bottom.svg) center / 100% 100% no-repeat;
+}
+
+
+/* ══ The composed papers: bands, pattern, relief, recess ═════════════════════
+ *
+ * Each turns on only where a design asks for it (paperThemes.ts sets the
+ * --*-on switches and the art). The painted shape is always a child
+ * (::before), so a relief's lighting — a filter on the parent — follows the
+ * masked outline instead of being masked away with it.
+ */
+.ps-recess,
+.ps-pattern,
+.ps-emboss,
+.pb { display: none; }
+
+/* a recessed channel inside the rules: a shallow groove, lit from above left */
+.ps-recess {
+  display: var(--rc-on, none);
+  inset: calc(var(--bt-in) + var(--corner-w, 100px) * 0.07) !important;
+  border: calc(var(--corner-w, 100px) * 0.045) solid rgb(80 56 28 / 0.035);
+  box-shadow:
+    inset 1px 1px 0 rgb(255 255 255 / 0.75),
+    inset -1px -1px 0 rgb(80 56 28 / 0.14),
+    1px 1px 0 rgb(255 255 255 / 0.75),
+    -1px -1px 0 rgb(80 56 28 / 0.14);
+}
+html[data-paper-dark] .ps-recess {
+  border-color: rgb(0 0 0 / 0.12);
+  box-shadow:
+    inset 1px 1px 0 rgb(255 236 200 / 0.12),
+    inset -1px -1px 0 rgb(0 0 0 / 0.3),
+    1px 1px 0 rgb(255 236 200 / 0.12),
+    -1px -1px 0 rgb(0 0 0 / 0.3);
+}
+
+/* a fine all-over pattern that steps back where the words are */
+.ps-pattern {
+  display: var(--pt-on, none);
+  filter: var(--pt-f, none);
+}
+.ps-pattern::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--pt-paint);
+  opacity: var(--pt-a, 0.3);
+  -webkit-mask:
+    var(--pt-m) center / var(--pt-size) repeat,
+    radial-gradient(70% 62% at 50% 50%, rgb(0 0 0 / var(--pt-quiet)) 30%, #000 92%);
+  -webkit-mask-composite: source-in;
+  mask:
+    var(--pt-m) center / var(--pt-size) repeat,
+    radial-gradient(70% 62% at 50% 50%, rgb(0 0 0 / var(--pt-quiet)) 30%, #000 92%);
+  mask-composite: intersect;
+}
+
+/* carved relief: the shapes in a stone tone, lit from above left */
+.ps-emboss {
+  display: var(--pc-relief-on, none);
+  filter: var(--pc-lit);
+}
+.ps-emboss::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--pc-stone);
+  -webkit-mask: var(--pc-relief);
+  mask: var(--pc-relief);
+}
+
+/* bands of repeating ornament along the edges, between the corners; the
+   tile is fitted a whole number of times ("round"), so a band never ends on
+   half an ornament */
+.pb-t, .pb-b {
+  left: calc(var(--corner-w, 100px) * var(--pb-end, 0.92)) !important;
+  right: calc(var(--corner-w, 100px) * var(--pb-end, 0.92)) !important;
+}
+.pb-l, .pb-r {
+  top: calc(var(--bt-ch) * max(var(--pb-end, 0.92), 0.6)) !important;
+  bottom: calc(var(--bt-ch) * max(var(--pb-end, 0.92), 0.6)) !important;
+}
+.pb-t { display: var(--pb-t-on, none); filter: var(--pb-t-f); --m: var(--pb-t-m); --paint: var(--pb-t-paint);
+  top: calc(var(--bt-in) + var(--corner-w, 100px) * var(--pb-t-gap, 0.04)) !important; bottom: auto !important;
+  height: calc(var(--corner-w, 100px) * var(--pb-t-k, 0.3)); }
+.pb-b { display: var(--pb-b-on, none); filter: var(--pb-b-f); --m: var(--pb-b-m); --paint: var(--pb-b-paint);
+  bottom: calc(var(--bt-in) + var(--corner-w, 100px) * var(--pb-b-gap, 0.04)) !important; top: auto !important;
+  height: calc(var(--corner-w, 100px) * var(--pb-b-k, 0.3)); }
+.pb-l { display: var(--pb-l-on, none); filter: var(--pb-l-f); --m: var(--pb-l-m); --paint: var(--pb-l-paint);
+  left: calc(var(--bt-in) + var(--corner-w, 100px) * var(--pb-l-gap, 0.04)) !important; right: auto !important;
+  width: calc(var(--corner-w, 100px) * var(--pb-l-k, 0.2)); }
+.pb-r { display: var(--pb-r-on, none); filter: var(--pb-r-f); --m: var(--pb-r-m); --paint: var(--pb-r-paint);
+  right: calc(var(--bt-in) + var(--corner-w, 100px) * var(--pb-r-gap, 0.04)) !important; left: auto !important;
+  width: calc(var(--corner-w, 100px) * var(--pb-r-k, 0.2)); }
+.pb::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--paint);
+}
+.pb-t::before, .pb-b::before {
+  -webkit-mask: var(--m) left center / auto 100% round no-repeat;
+  mask: var(--m) left center / auto 100% round no-repeat;
+}
+.pb-l::before, .pb-r::before {
+  -webkit-mask: var(--m) center top / 100% auto no-repeat round;
+  mask: var(--m) center top / 100% auto no-repeat round;
+}
+/* the right band runs from the foot up, so its repeats meet the left band's
+   at opposite ends and the frame reads as balanced */
+.pb-r::before {
+  -webkit-mask-position: center bottom;
+  mask-position: center bottom;
 }

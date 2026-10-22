@@ -337,7 +337,7 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
                         aria-pressed={chosen}
                       >
                         <span
-                          className="block h-16 bg-cover bg-center"
+                          className="block aspect-[3/4] bg-cover bg-center"
                           style={{
                             backgroundImage:
                               key === "couple"

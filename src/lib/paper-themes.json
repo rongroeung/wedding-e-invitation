@@ -1,8 +1,10 @@
 [
  {
-  "key": "classic-ivory",
-  "km": "ភ្លុកបុរាណ ក្បាច់វល្លិ",
-  "en": "Ivory Ornamental Elegance",
+  "key": "khmer-classical-flourish",
+  "km": "ក្បាច់វល្លិខ្មែរបុរាណ",
+  "en": "Khmer Classical Flourish",
+  "group": "khmer",
+  "pattern": "none",
   "dark": false,
   "base": "#f8f2e7",
   "shade": "#e9ddc8",
@@ -13,142 +15,1458 @@
    "#e6d2a6",
    "#a5834f"
   ],
+  "ink": "#4a3527",
+  "line": "#6e5341",
   "petal": "#e2b9ae",
   "heart": "#e3c487",
   "leaf": "#a8b39a",
-  "foil": 0.92,
-  "bloom": 0.42,
+  "size": 460,
+  "foil": 0.95,
+  "bloom": 0.4,
+  "relief": 0,
   "fibre": 0.42,
-  "ink": "#4a3527",
-  "line": "#6e5341",
-  "lineAlpha": 0.74,
+  "centre": 0,
+  "kline": 0,
+  "lineAlpha": 0.92,
   "compose": {
    "art": [
     {
-     "comp": "camellia-spray",
+     "src": "collection/naga-crest",
+     "corner": "tc",
+     "size": "crest"
+    },
+    {
+     "src": "collection/kbach-medallion",
+     "corner": "bc",
+     "size": "min(30%, 18dvh, 210px)"
+    }
+   ],
+   "corner": "stationery/corner-acanthus",
+   "rule": "double",
+   "lineMetal": true
+  }
+ },
+ {
+  "key": "intricate-scrollwork",
+  "km": "ក្បាច់វល្លិល្អិតល្អន់",
+  "en": "Intricate Khmer Scrollwork",
+  "group": "khmer",
+  "pattern": "none",
+  "dark": false,
+  "base": "#f5ecdc",
+  "shade": "#e5d6bc",
+  "light": "rgb(255 250 238 / 0.9)",
+  "metal": [
+   "#86643a",
+   "#bb9760",
+   "#e5cf9c",
+   "#9e7b47"
+  ],
+  "ink": "#47311f",
+  "line": "#765536",
+  "petal": "#e2b9ae",
+  "heart": "#e3c487",
+  "leaf": "#a8b39a",
+  "size": 460,
+  "foil": 0.95,
+  "bloom": 0.4,
+  "relief": 0,
+  "fibre": 0.42,
+  "centre": 0,
+  "kline": 0,
+  "lineAlpha": 0.92,
+  "compose": {
+   "art": [],
+   "corner": "stationery/corner-loop",
+   "rule": "double",
+   "lineMetal": true,
+   "bands": {
+    "t": {
+     "src": "collection/band-scroll",
+     "k": 0.36,
+     "plate": "foil"
+    },
+    "b": {
+     "src": "collection/band-scroll",
+     "k": 0.36,
+     "plate": "foil"
+    }
+   }
+  }
+ },
+ {
+  "key": "royal-ornament",
+  "km": "ក្បាច់រាជស៊ីមេទ្រី",
+  "en": "Symmetrical Royal Ornament",
+  "group": "khmer",
+  "pattern": "none",
+  "dark": false,
+  "base": "#f5ecdc",
+  "shade": "#e5d6bc",
+  "light": "rgb(255 250 238 / 0.9)",
+  "metal": [
+   "#86643a",
+   "#bb9760",
+   "#e5cf9c",
+   "#9e7b47"
+  ],
+  "ink": "#47311f",
+  "line": "#765536",
+  "petal": "#e2b9ae",
+  "heart": "#e3c487",
+  "leaf": "#a8b39a",
+  "size": 460,
+  "foil": 0.95,
+  "bloom": 0.4,
+  "relief": 0,
+  "fibre": 0.42,
+  "centre": 0,
+  "kline": 0,
+  "lineAlpha": 0.92,
+  "compose": {
+   "art": [
+    {
+     "src": "collection/kbach-crest",
+     "corner": "tc",
+     "size": "crest"
+    },
+    {
+     "src": "collection/kbach-medallion",
+     "corner": "bc",
+     "size": "min(30%, 18dvh, 210px)"
+    }
+   ],
+   "corner": "collection/corner-phka",
+   "rule": "double",
+   "lineMetal": true
+  }
+ },
+ {
+  "key": "classic-ivory",
+  "km": "ក្បាច់វល្លិ និងមែកផ្កា",
+  "en": "Flowing Botanical Ornament",
+  "group": "khmer",
+  "pattern": "none",
+  "dark": false,
+  "base": "#f8f2e7",
+  "shade": "#e9ddc8",
+  "light": "rgb(255 253 246 / 0.9)",
+  "metal": [
+   "#8a693d",
+   "#bf9d66",
+   "#e6d2a6",
+   "#a5834f"
+  ],
+  "ink": "#4a3527",
+  "line": "#6e5341",
+  "petal": "#e2b9ae",
+  "heart": "#e3c487",
+  "leaf": "#a8b39a",
+  "size": 460,
+  "foil": 0.92,
+  "bloom": 0.42,
+  "relief": 0,
+  "fibre": 0.42,
+  "centre": 0,
+  "kline": 0,
+  "lineAlpha": 0.76,
+  "compose": {
+   "art": [
+    {
+     "src": "collection/camellia-spray",
      "corner": "bl",
      "size": "a"
     },
     {
-     "comp": "branch-hang",
+     "src": "collection/branch-hang",
      "corner": "tr",
      "size": "b"
     }
    ],
-   "lineMetal": false,
-   "corner": "acanthus"
-  },
+   "corner": "stationery/corner-acanthus",
+   "rule": "double",
+   "lineMetal": false
+  }
+ },
+ {
+  "key": "fine-line-heritage",
+  "km": "លំនាំបន្ទាត់ស្ដើងបេតិកភណ្ឌ",
+  "en": "Fine-Line Heritage Pattern",
+  "group": "khmer",
+  "pattern": "none",
+  "dark": false,
+  "base": "#f8f2e7",
+  "shade": "#e9ddc8",
+  "light": "rgb(255 253 246 / 0.9)",
+  "metal": [
+   "#8a693d",
+   "#bf9d66",
+   "#e6d2a6",
+   "#a5834f"
+  ],
+  "ink": "#4a3527",
+  "line": "#6e5341",
+  "petal": "#e2b9ae",
+  "heart": "#e3c487",
+  "leaf": "#a8b39a",
   "size": 460,
+  "foil": 0.9,
+  "bloom": 0.4,
   "relief": 0,
+  "fibre": 0.42,
   "centre": 0,
   "kline": 0,
-  "pattern": "none",
-  "group": "stationery"
+  "lineAlpha": 0.92,
+  "compose": {
+   "art": [],
+   "corner": "collection/corner-single-phka",
+   "rule": "single",
+   "lineMetal": true,
+   "pattern": {
+    "src": "collection/tile-diaper",
+    "size": "clamp(52px, 9vmin, 84px)",
+    "plate": "foil",
+    "alpha": 0.42,
+    "quiet": 0.06
+   }
+  }
  },
  {
   "key": "vintage-gold",
-  "km": "ក្បាច់វល្លិមាសបុរាណ",
-  "en": "Vintage Gold Flourish",
+  "km": "ជ្រុងក្បាច់ដ៏វិចិត្រ",
+  "en": "Ornamental Corner Masterpiece",
+  "group": "khmer",
+  "pattern": "none",
   "dark": false,
-  "base": "#f7efe1",
-  "shade": "#e6d6bb",
-  "light": "rgb(255 251 240 / 0.9)",
+  "base": "#f5ecdc",
+  "shade": "#e5d6bc",
+  "light": "rgb(255 250 238 / 0.9)",
   "metal": [
    "#86643a",
-   "#bd9a60",
-   "#e8d29f",
-   "#a17d47"
+   "#bb9760",
+   "#e5cf9c",
+   "#9e7b47"
   ],
-  "petal": "#dcb5a2",
-  "heart": "#dcbd7c",
-  "leaf": "#b3ad8c",
-  "foil": 0.95,
-  "bloom": 0.22,
-  "fibre": 0.42,
   "ink": "#47311f",
-  "line": "#7d5d38",
-  "lineAlpha": 0.9,
+  "line": "#765536",
+  "petal": "#e2b9ae",
+  "heart": "#e3c487",
+  "leaf": "#a8b39a",
+  "size": 460,
+  "foil": 0.95,
+  "bloom": 0.3,
+  "relief": 0,
+  "fibre": 0.42,
+  "centre": 0,
+  "kline": 0,
+  "lineAlpha": 0.92,
+  "compose": {
+   "art": [],
+   "corner": "stationery/corner-acanthus",
+   "cornerW": "min(30%, 16dvh, 210px)",
+   "rule": "double",
+   "mid": true,
+   "lineMetal": true
+  }
+ },
+ {
+  "key": "continuous-border",
+  "km": "ស៊ុមក្បាច់បន្តជាប់",
+  "en": "Continuous Ornamental Border",
+  "group": "khmer",
+  "pattern": "none",
+  "dark": false,
+  "base": "#f8f2e7",
+  "shade": "#e9ddc8",
+  "light": "rgb(255 253 246 / 0.9)",
+  "metal": [
+   "#8a693d",
+   "#bf9d66",
+   "#e6d2a6",
+   "#a5834f"
+  ],
+  "ink": "#4a3527",
+  "line": "#6e5341",
+  "petal": "#e2b9ae",
+  "heart": "#e3c487",
+  "leaf": "#a8b39a",
+  "size": 460,
+  "foil": 0.95,
+  "bloom": 0.4,
+  "relief": 0,
+  "fibre": 0.42,
+  "centre": 0,
+  "kline": 0,
+  "lineAlpha": 0.92,
+  "compose": {
+   "art": [],
+   "corner": "collection/corner-phka",
+   "rule": "double",
+   "lineMetal": true,
+   "bands": {
+    "t": {
+     "src": "collection/band-scroll",
+     "k": 0.3,
+     "plate": "foil"
+    },
+    "b": {
+     "src": "collection/band-scroll",
+     "k": 0.3,
+     "plate": "foil"
+    },
+    "l": {
+     "src": "collection/band-scroll-v",
+     "k": 0.3,
+     "plate": "foil"
+    },
+    "r": {
+     "src": "collection/band-scroll-v",
+     "k": 0.3,
+     "plate": "foil"
+    }
+   }
+  }
+ },
+ {
+  "key": "engraved-antique",
+  "km": "ក្បាច់ឆ្លាក់បុរាណ",
+  "en": "Engraved Antique Ornament",
+  "group": "khmer",
+  "pattern": "none",
+  "dark": false,
+  "base": "#f8f2e7",
+  "shade": "#e9ddc8",
+  "light": "rgb(255 253 246 / 0.9)",
+  "metal": [
+   "#8a693d",
+   "#bf9d66",
+   "#e6d2a6",
+   "#a5834f"
+  ],
+  "ink": "#4a3527",
+  "line": "#6e5341",
+  "petal": "#e2b9ae",
+  "heart": "#e3c487",
+  "leaf": "#a8b39a",
+  "size": 460,
+  "foil": 0.9,
+  "bloom": 0.4,
+  "relief": 0,
+  "fibre": 0.42,
+  "centre": 0,
+  "kline": 0,
+  "lineAlpha": 0.76,
   "compose": {
    "art": [
     {
-     "comp": "camellia-single",
-     "corner": "bl",
-     "size": "c",
-     "beside": true
+     "src": "collection/engraved-corner",
+     "corner": "tl",
+     "size": "min(34%, 21dvh, 230px)"
     },
     {
-     "comp": "camellia-single",
+     "src": "collection/engraved-corner",
+     "corner": "tr",
+     "size": "min(34%, 21dvh, 230px)"
+    },
+    {
+     "src": "collection/engraved-corner",
+     "corner": "bl",
+     "size": "min(34%, 21dvh, 230px)"
+    },
+    {
+     "src": "collection/engraved-corner",
      "corner": "br",
-     "size": "c",
-     "beside": true
+     "size": "min(34%, 21dvh, 230px)"
+    },
+    {
+     "src": "collection/engraved-crest",
+     "corner": "tc",
+     "size": "crest"
     }
    ],
-   "lineMetal": true,
-   "corner": "acanthus-grand",
-   "mid": true
-  },
+   "corner": "collection/corner-plain-single",
+   "rule": "single",
+   "lineMetal": false
+  }
+ },
+ {
+  "key": "contemporary-khmer",
+  "km": "បេតិកភណ្ឌខ្មែរសម័យថ្មី",
+  "en": "Contemporary Khmer Heritage",
+  "group": "khmer",
+  "pattern": "none",
+  "dark": false,
+  "base": "#f8f2e7",
+  "shade": "#e9ddc8",
+  "light": "rgb(255 253 246 / 0.9)",
+  "metal": [
+   "#8a693d",
+   "#bf9d66",
+   "#e6d2a6",
+   "#a5834f"
+  ],
+  "ink": "#4a3527",
+  "line": "#6e5341",
+  "petal": "#e2b9ae",
+  "heart": "#e3c487",
+  "leaf": "#a8b39a",
   "size": 460,
+  "foil": 0.95,
+  "bloom": 0.4,
   "relief": 0,
+  "fibre": 0.42,
   "centre": 0,
   "kline": 0,
+  "lineAlpha": 0.92,
+  "compose": {
+   "art": [
+    {
+     "src": "collection/naga-crest",
+     "corner": "tc",
+     "size": "min(34%, 20dvh, 230px)"
+    },
+    {
+     "src": "collection/mark-phka",
+     "corner": "bc",
+     "size": "mark"
+    }
+   ],
+   "corner": "collection/corner-single-phka",
+   "rule": "single",
+   "lineMetal": true
+  }
+ },
+ {
+  "key": "grand-ceremonial",
+  "km": "ក្បាច់ពិធីដ៏អធិកអធម",
+  "en": "Grand Ceremonial Ornament",
+  "group": "khmer",
   "pattern": "none",
-  "group": "stationery"
+  "dark": false,
+  "base": "#f5ecdc",
+  "shade": "#e5d6bc",
+  "light": "rgb(255 250 238 / 0.9)",
+  "metal": [
+   "#86643a",
+   "#bb9760",
+   "#e5cf9c",
+   "#9e7b47"
+  ],
+  "ink": "#47311f",
+  "line": "#765536",
+  "petal": "#e2b9ae",
+  "heart": "#e3c487",
+  "leaf": "#a8b39a",
+  "size": 460,
+  "foil": 0.95,
+  "bloom": 0.4,
+  "relief": 0,
+  "fibre": 0.42,
+  "centre": 0,
+  "kline": 0,
+  "lineAlpha": 0.92,
+  "compose": {
+   "art": [
+    {
+     "src": "collection/kbach-crest",
+     "corner": "tc",
+     "size": "crest"
+    }
+   ],
+   "corner": "stationery/corner-acanthus",
+   "cornerW": "min(30%, 16dvh, 210px)",
+   "rule": "double",
+   "lineMetal": true,
+   "bands": {
+    "b": {
+     "src": "collection/band-garland",
+     "k": 0.46,
+     "plate": "foil",
+     "gap": 0.02
+    }
+   }
+  }
+ },
+ {
+  "key": "sandstone-relief",
+  "km": "ចម្លាក់ថ្មភក់",
+  "en": "Sandstone Relief",
+  "group": "relief",
+  "pattern": "none",
+  "dark": false,
+  "base": "#f1e7d6",
+  "shade": "#dfd0b6",
+  "light": "rgb(255 249 236 / 0.85)",
+  "metal": [
+   "#86653c",
+   "#b99862",
+   "#e2cc9a",
+   "#9c7b49"
+  ],
+  "ink": "#45311f",
+  "line": "#7a6450",
+  "petal": "#e2b9ae",
+  "heart": "#e3c487",
+  "leaf": "#a8b39a",
+  "size": 460,
+  "foil": 0.9,
+  "bloom": 0.3,
+  "relief": 0,
+  "fibre": 0.42,
+  "centre": 0,
+  "kline": 0,
+  "lineAlpha": 0.76,
+  "compose": {
+   "art": [],
+   "corner": "collection/corner-plain-single",
+   "rule": "single",
+   "lineMetal": false,
+   "pattern": {
+    "src": "collection/tile-diaper",
+    "size": "clamp(60px, 11vmin, 96px)",
+    "plate": "relief",
+    "alpha": 1,
+    "quiet": 0.0
+   }
+  }
+ },
+ {
+  "key": "architectural-border",
+  "km": "ស៊ុមចម្លាក់ស្ថាបត្យកម្ម",
+  "en": "Architectural Carved Border",
+  "group": "relief",
+  "pattern": "none",
+  "dark": false,
+  "base": "#f1e7d6",
+  "shade": "#dfd0b6",
+  "light": "rgb(255 249 236 / 0.85)",
+  "metal": [
+   "#86653c",
+   "#b99862",
+   "#e2cc9a",
+   "#9c7b49"
+  ],
+  "ink": "#45311f",
+  "line": "#7a6450",
+  "petal": "#e2b9ae",
+  "heart": "#e3c487",
+  "leaf": "#a8b39a",
+  "size": 460,
+  "foil": 0.9,
+  "bloom": 0.3,
+  "relief": 0,
+  "fibre": 0.42,
+  "centre": 0,
+  "kline": 0,
+  "lineAlpha": 0.76,
+  "compose": {
+   "art": [],
+   "corner": "collection/corner-plain-double",
+   "rule": "double",
+   "lineMetal": false,
+   "depth": "deep",
+   "bands": {
+    "t": {
+     "src": "collection/band-balusters",
+     "k": 0.5,
+     "plate": "relief",
+     "gap": 0.03
+    },
+    "b": {
+     "src": "collection/band-balusters",
+     "k": 0.5,
+     "plate": "relief",
+     "gap": 0.03
+    },
+    "l": {
+     "src": "collection/band-colonnette-v",
+     "k": 0.2,
+     "plate": "relief"
+    },
+    "r": {
+     "src": "collection/band-colonnette-v",
+     "k": 0.2,
+     "plate": "relief"
+    }
+   }
+  }
+ },
+ {
+  "key": "layered-stone",
+  "km": "ក្បាច់ថ្មស្រទាប់",
+  "en": "Layered Stone Ornament",
+  "group": "relief",
+  "pattern": "none",
+  "dark": false,
+  "base": "#f1e7d6",
+  "shade": "#dfd0b6",
+  "light": "rgb(255 249 236 / 0.85)",
+  "metal": [
+   "#86653c",
+   "#b99862",
+   "#e2cc9a",
+   "#9c7b49"
+  ],
+  "ink": "#45311f",
+  "line": "#7a6450",
+  "petal": "#e2b9ae",
+  "heart": "#e3c487",
+  "leaf": "#a8b39a",
+  "size": 460,
+  "foil": 0.9,
+  "bloom": 0.3,
+  "relief": 0,
+  "fibre": 0.42,
+  "centre": 0,
+  "kline": 0,
+  "lineAlpha": 0.76,
+  "compose": {
+   "art": [
+    {
+     "src": "collection/kbach-crest",
+     "corner": "tc",
+     "size": "crest",
+     "plate": "relief"
+    },
+    {
+     "src": "collection/kbach-medallion",
+     "corner": "bc",
+     "size": "min(30%, 18dvh, 210px)",
+     "plate": "relief"
+    }
+   ],
+   "corner": "collection/corner-plain-double",
+   "rule": "double",
+   "lineMetal": false,
+   "depth": "deep",
+   "bands": {
+    "l": {
+     "src": "collection/band-scroll-v",
+     "k": 0.3,
+     "plate": "blind"
+    },
+    "r": {
+     "src": "collection/band-scroll-v",
+     "k": 0.3,
+     "plate": "blind"
+    }
+   }
+  }
+ },
+ {
+  "key": "floral-stone",
+  "km": "ចម្លាក់ផ្កាលើថ្ម",
+  "en": "Floral Stone Carving",
+  "group": "relief",
+  "pattern": "none",
+  "dark": false,
+  "base": "#f1e7d6",
+  "shade": "#dfd0b6",
+  "light": "rgb(255 249 236 / 0.85)",
+  "metal": [
+   "#86653c",
+   "#b99862",
+   "#e2cc9a",
+   "#9c7b49"
+  ],
+  "ink": "#45311f",
+  "line": "#7a6450",
+  "petal": "#e2b9ae",
+  "heart": "#e3c487",
+  "leaf": "#a8b39a",
+  "size": 460,
+  "foil": 0.9,
+  "bloom": 0.3,
+  "relief": 0,
+  "fibre": 0.42,
+  "centre": 0,
+  "kline": 0,
+  "lineAlpha": 0.76,
+  "compose": {
+   "art": [
+    {
+     "src": "collection/camellia-spray",
+     "corner": "bl",
+     "size": "a",
+     "plate": "relief"
+    },
+    {
+     "src": "collection/branch-hang",
+     "corner": "tr",
+     "size": "b",
+     "plate": "relief"
+    }
+   ],
+   "corner": "collection/corner-plain-single",
+   "rule": "single",
+   "lineMetal": false
+  }
+ },
+ {
+  "key": "architectural-panels",
+  "km": "ផ្ទាំងចម្លាក់ស្ថាបត្យកម្ម",
+  "en": "Classical Architectural Panels",
+  "group": "relief",
+  "pattern": "none",
+  "dark": false,
+  "base": "#ece0c9",
+  "shade": "#d8c6a6",
+  "light": "rgb(255 247 230 / 0.8)",
+  "metal": [
+   "#86653c",
+   "#bd9b62",
+   "#e8d29f",
+   "#a07d47"
+  ],
+  "ink": "#43301f",
+  "line": "#75604a",
+  "petal": "#e2b9ae",
+  "heart": "#e3c487",
+  "leaf": "#a8b39a",
+  "size": 460,
+  "foil": 0.9,
+  "bloom": 0.3,
+  "relief": 0,
+  "fibre": 0.42,
+  "centre": 0,
+  "kline": 0,
+  "lineAlpha": 0.76,
+  "compose": {
+   "art": [],
+   "corner": "collection/corner-plain-double",
+   "rule": "double",
+   "lineMetal": false,
+   "bands": {
+    "t": {
+     "src": "collection/band-lozenge",
+     "k": 0.55,
+     "plate": "relief",
+     "gap": 0.03
+    },
+    "b": {
+     "src": "collection/band-lozenge",
+     "k": 0.55,
+     "plate": "relief",
+     "gap": 0.03
+    }
+   }
+  }
+ },
+ {
+  "key": "sculpted-scrollwork",
+  "km": "ក្បាច់វល្លិចម្លាក់",
+  "en": "Sculpted Scrollwork",
+  "group": "relief",
+  "pattern": "none",
+  "dark": false,
+  "base": "#f1e7d6",
+  "shade": "#dfd0b6",
+  "light": "rgb(255 249 236 / 0.85)",
+  "metal": [
+   "#86653c",
+   "#b99862",
+   "#e2cc9a",
+   "#9c7b49"
+  ],
+  "ink": "#45311f",
+  "line": "#7a6450",
+  "petal": "#e2b9ae",
+  "heart": "#e3c487",
+  "leaf": "#a8b39a",
+  "size": 460,
+  "foil": 0.9,
+  "bloom": 0.3,
+  "relief": 0,
+  "fibre": 0.42,
+  "centre": 0,
+  "kline": 0,
+  "lineAlpha": 0.76,
+  "compose": {
+   "art": [
+    {
+     "src": "collection/pack-scroll-bow",
+     "corner": "tc",
+     "size": "crest",
+     "plate": "relief"
+    },
+    {
+     "src": "collection/pack-scroll-bow",
+     "corner": "bc",
+     "size": "crest",
+     "plate": "relief"
+    },
+    {
+     "src": "collection/pack-acanthus",
+     "corner": "tl",
+     "size": "min(26%, 17dvh, 180px)",
+     "plate": "relief"
+    },
+    {
+     "src": "collection/pack-acanthus",
+     "corner": "tr",
+     "size": "min(26%, 17dvh, 180px)",
+     "plate": "relief"
+    },
+    {
+     "src": "collection/pack-acanthus",
+     "corner": "bl",
+     "size": "min(26%, 17dvh, 180px)",
+     "plate": "relief"
+    },
+    {
+     "src": "collection/pack-acanthus",
+     "corner": "br",
+     "size": "min(26%, 17dvh, 180px)",
+     "plate": "relief"
+    }
+   ],
+   "corner": "collection/corner-plain-double",
+   "rule": "double",
+   "lineMetal": false,
+   "depth": "deep"
+  }
+ },
+ {
+  "key": "recessed-frame",
+  "km": "ស៊ុមចម្លាក់ផត",
+  "en": "Recessed Relief Frame",
+  "group": "relief",
+  "pattern": "none",
+  "dark": false,
+  "base": "#f8f2e7",
+  "shade": "#e9ddc8",
+  "light": "rgb(255 253 246 / 0.9)",
+  "metal": [
+   "#8a693d",
+   "#bf9d66",
+   "#e6d2a6",
+   "#a5834f"
+  ],
+  "ink": "#4a3527",
+  "line": "#6e5341",
+  "petal": "#e2b9ae",
+  "heart": "#e3c487",
+  "leaf": "#a8b39a",
+  "size": 460,
+  "foil": 0.9,
+  "bloom": 0.3,
+  "relief": 0,
+  "fibre": 0.42,
+  "centre": 0,
+  "kline": 0,
+  "lineAlpha": 0.76,
+  "compose": {
+   "art": [
+    {
+     "src": "collection/mark-phka",
+     "corner": "tl",
+     "size": "mark",
+     "plate": "relief"
+    },
+    {
+     "src": "collection/mark-phka",
+     "corner": "tr",
+     "size": "mark",
+     "plate": "relief"
+    },
+    {
+     "src": "collection/mark-phka",
+     "corner": "bl",
+     "size": "mark",
+     "plate": "relief"
+    },
+    {
+     "src": "collection/mark-phka",
+     "corner": "br",
+     "size": "mark",
+     "plate": "relief"
+    }
+   ],
+   "recess": true,
+   "corner": "collection/corner-plain-single",
+   "rule": "single",
+   "lineMetal": false
+  }
+ },
+ {
+  "key": "heritage-engraving",
+  "km": "ចម្លាក់បេតិកភណ្ឌ",
+  "en": "Heritage Engraving",
+  "group": "relief",
+  "pattern": "none",
+  "dark": false,
+  "base": "#f8f2e7",
+  "shade": "#e9ddc8",
+  "light": "rgb(255 253 246 / 0.9)",
+  "metal": [
+   "#8a693d",
+   "#bf9d66",
+   "#e6d2a6",
+   "#a5834f"
+  ],
+  "ink": "#4a3527",
+  "line": "#6e5341",
+  "petal": "#e2b9ae",
+  "heart": "#e3c487",
+  "leaf": "#a8b39a",
+  "size": 460,
+  "foil": 0.9,
+  "bloom": 0.3,
+  "relief": 0,
+  "fibre": 0.42,
+  "centre": 0,
+  "kline": 0,
+  "lineAlpha": 0.76,
+  "compose": {
+   "art": [],
+   "corner": "collection/corner-single-phka",
+   "rule": "single",
+   "lineMetal": false,
+   "bands": {
+    "t": {
+     "src": "collection/band-garland",
+     "k": 0.44,
+     "plate": "line",
+     "gap": 0.02
+    },
+    "b": {
+     "src": "collection/band-garland",
+     "k": 0.44,
+     "plate": "line",
+     "gap": 0.02
+    }
+   }
+  }
+ },
+ {
+  "key": "stone-and-gold",
+  "km": "ថ្ម និងមាស",
+  "en": "Stone-and-Gold Elegance",
+  "group": "relief",
+  "pattern": "none",
+  "dark": false,
+  "base": "#ece0c9",
+  "shade": "#d8c6a6",
+  "light": "rgb(255 247 230 / 0.8)",
+  "metal": [
+   "#86653c",
+   "#bd9b62",
+   "#e8d29f",
+   "#a07d47"
+  ],
+  "ink": "#43301f",
+  "line": "#75604a",
+  "petal": "#e2b9ae",
+  "heart": "#e3c487",
+  "leaf": "#a8b39a",
+  "size": 460,
+  "foil": 0.95,
+  "bloom": 0.3,
+  "relief": 0,
+  "fibre": 0.42,
+  "centre": 0,
+  "kline": 0,
+  "lineAlpha": 0.92,
+  "compose": {
+   "art": [
+    {
+     "src": "collection/kbach-medallion",
+     "corner": "tc",
+     "size": "min(32%, 18dvh, 220px)"
+    }
+   ],
+   "corner": "stationery/corner-acanthus",
+   "rule": "double",
+   "lineMetal": true,
+   "bands": {
+    "b": {
+     "src": "collection/band-garland",
+     "k": 0.44,
+     "plate": "foil",
+     "gap": 0.02
+    }
+   },
+   "pattern": {
+    "src": "collection/tile-diaper",
+    "size": "clamp(60px, 11vmin, 96px)",
+    "plate": "relief",
+    "alpha": 1,
+    "quiet": 0.0
+   }
+  }
+ },
+ {
+  "key": "grand-relief",
+  "km": "ចម្លាក់ធំអធិកអធម",
+  "en": "Grand Khmer Relief Composition",
+  "group": "relief",
+  "pattern": "none",
+  "dark": false,
+  "base": "#f1e7d6",
+  "shade": "#dfd0b6",
+  "light": "rgb(255 249 236 / 0.85)",
+  "metal": [
+   "#86653c",
+   "#b99862",
+   "#e2cc9a",
+   "#9c7b49"
+  ],
+  "ink": "#45311f",
+  "line": "#7a6450",
+  "petal": "#e2b9ae",
+  "heart": "#e3c487",
+  "leaf": "#a8b39a",
+  "size": 460,
+  "foil": 0.95,
+  "bloom": 0.3,
+  "relief": 0,
+  "fibre": 0.42,
+  "centre": 0,
+  "kline": 0,
+  "lineAlpha": 0.76,
+  "compose": {
+   "art": [
+    {
+     "src": "collection/arch",
+     "corner": "tc",
+     "size": "min(70%, 40dvh, 540px)",
+     "plate": "relief"
+    }
+   ],
+   "corner": "collection/corner-plain-double",
+   "rule": "double",
+   "lineMetal": false,
+   "depth": "deep",
+   "bands": {
+    "b": {
+     "src": "collection/band-balusters",
+     "k": 0.5,
+     "plate": "relief",
+     "gap": 0.03
+    },
+    "l": {
+     "src": "collection/band-colonnette-v",
+     "k": 0.2,
+     "plate": "relief"
+    },
+    "r": {
+     "src": "collection/band-colonnette-v",
+     "k": 0.2,
+     "plate": "relief"
+    }
+   }
+  }
+ },
+ {
+  "key": "vintage-rose",
+  "km": "ផ្កាកុលាបឆ្លាក់បុរាណ",
+  "en": "Vintage Rose Engraving",
+  "group": "floral",
+  "pattern": "none",
+  "dark": false,
+  "base": "#f8f2e7",
+  "shade": "#e9ddc8",
+  "light": "rgb(255 253 246 / 0.9)",
+  "metal": [
+   "#8a693d",
+   "#bf9d66",
+   "#e6d2a6",
+   "#a5834f"
+  ],
+  "ink": "#4a3527",
+  "line": "#6e5341",
+  "petal": "#e2b9ae",
+  "heart": "#e3c487",
+  "leaf": "#a8b39a",
+  "size": 460,
+  "foil": 0.9,
+  "bloom": 0.42,
+  "relief": 0,
+  "fibre": 0.42,
+  "centre": 0,
+  "kline": 0,
+  "lineAlpha": 0.76,
+  "compose": {
+   "art": [
+    {
+     "src": "collection/rose-spray",
+     "corner": "bl",
+     "size": "a"
+    },
+    {
+     "src": "collection/rose-single",
+     "corner": "tr",
+     "size": "c"
+    }
+   ],
+   "corner": "collection/corner-single-sprig",
+   "rule": "single",
+   "lineMetal": false
+  }
+ },
+ {
+  "key": "camellia-elegance",
+  "km": "ផ្កាកាមេលៀ",
+  "en": "Camellia Elegance",
+  "group": "floral",
+  "pattern": "none",
+  "dark": false,
+  "base": "#f8f2e7",
+  "shade": "#e9ddc8",
+  "light": "rgb(255 253 246 / 0.9)",
+  "metal": [
+   "#8a693d",
+   "#bf9d66",
+   "#e6d2a6",
+   "#a5834f"
+  ],
+  "ink": "#4a3527",
+  "line": "#6e5341",
+  "petal": "#e2b9ae",
+  "heart": "#e3c487",
+  "leaf": "#a8b39a",
+  "size": 460,
+  "foil": 0.9,
+  "bloom": 0.45,
+  "relief": 0,
+  "fibre": 0.42,
+  "centre": 0,
+  "kline": 0,
+  "lineAlpha": 0.76,
+  "compose": {
+   "art": [
+    {
+     "src": "collection/camellia-spray",
+     "corner": "bl",
+     "size": "a"
+    },
+    {
+     "src": "collection/camellia-single",
+     "corner": "tr",
+     "size": "c"
+    }
+   ],
+   "corner": "stationery/corner-floral",
+   "rule": "double",
+   "lineMetal": false
+  }
  },
  {
   "key": "floral-branches",
-  "km": "មែកផ្កា",
-  "en": "Floral Branches",
+  "km": "មែកផ្ការីក",
+  "en": "Flowering Branches",
+  "group": "floral",
+  "pattern": "none",
   "dark": false,
-  "base": "#faf4ea",
-  "shade": "#ebdfcb",
-  "light": "rgb(255 252 246 / 0.9)",
+  "base": "#faf3ec",
+  "shade": "#ecdccd",
+  "light": "rgb(255 252 248 / 0.9)",
   "metal": [
    "#8c6c45",
    "#c2a16f",
    "#e8d4ab",
    "#a8875a"
   ],
+  "ink": "#4b3128",
+  "line": "#6c4d40",
   "petal": "#e4b3ad",
   "heart": "#e8c78c",
   "leaf": "#97aea4",
+  "size": 460,
   "foil": 0.88,
-  "bloom": 0.55,
-  "fibre": 0.38,
-  "ink": "#4b3128",
-  "line": "#6c4d40",
-  "lineAlpha": 0.72,
+  "bloom": 0.5,
+  "relief": 0,
+  "fibre": 0.42,
+  "centre": 0,
+  "kline": 0,
+  "lineAlpha": 0.76,
   "compose": {
    "art": [
     {
-     "comp": "camellia-spray",
+     "src": "collection/branch-hang",
+     "corner": "tr",
+     "size": "a"
+    },
+    {
+     "src": "collection/branch-hang",
+     "corner": "bl",
+     "size": "a"
+    }
+   ],
+   "corner": "collection/corner-single-sprig",
+   "rule": "single",
+   "lineMetal": false
+  }
+ },
+ {
+  "key": "ornamental-garden",
+  "km": "សួនផ្ការចនា",
+  "en": "Ornamental Garden",
+  "group": "floral",
+  "pattern": "none",
+  "dark": false,
+  "base": "#f8f2e7",
+  "shade": "#e9ddc8",
+  "light": "rgb(255 253 246 / 0.9)",
+  "metal": [
+   "#8a693d",
+   "#bf9d66",
+   "#e6d2a6",
+   "#a5834f"
+  ],
+  "ink": "#4a3527",
+  "line": "#6e5341",
+  "petal": "#e2b9ae",
+  "heart": "#e3c487",
+  "leaf": "#a8b39a",
+  "size": 460,
+  "foil": 0.9,
+  "bloom": 0.5,
+  "relief": 0,
+  "fibre": 0.42,
+  "centre": 0,
+  "kline": 0,
+  "lineAlpha": 0.76,
+  "compose": {
+   "art": [
+    {
+     "src": "collection/garden-corner",
      "corner": "bl",
      "size": "a"
     },
     {
-     "comp": "branch-hang",
+     "src": "collection/rose-single",
      "corner": "tr",
-     "size": "b"
-    },
-    {
-     "comp": "camellia-single",
-     "corner": "br",
      "size": "c"
     }
    ],
-   "lineMetal": false,
-   "corner": "floral"
-  },
+   "corner": "stationery/corner-floral",
+   "rule": "double",
+   "lineMetal": false
+  }
+ },
+ {
+  "key": "botanical-engraving",
+  "km": "រុក្ខជាតិឆ្លាក់ល្អិត",
+  "en": "Fine Botanical Engraving",
+  "group": "floral",
+  "pattern": "none",
+  "dark": false,
+  "base": "#f8f2e7",
+  "shade": "#e9ddc8",
+  "light": "rgb(255 253 246 / 0.9)",
+  "metal": [
+   "#8a693d",
+   "#bf9d66",
+   "#e6d2a6",
+   "#a5834f"
+  ],
+  "ink": "#4a3527",
+  "line": "#6e5341",
+  "petal": "#e2b9ae",
+  "heart": "#e3c487",
+  "leaf": "#a8b39a",
   "size": 460,
+  "foil": 0.9,
+  "bloom": 0.0,
   "relief": 0,
+  "fibre": 0.42,
   "centre": 0,
   "kline": 0,
+  "lineAlpha": 0.92,
+  "compose": {
+   "art": [
+    {
+     "src": "collection/rose-single",
+     "corner": "bl",
+     "size": "c"
+    },
+    {
+     "src": "collection/camellia-single",
+     "corner": "br",
+     "size": "c"
+    },
+    {
+     "src": "collection/branch-hang",
+     "corner": "tr",
+     "size": "c"
+    }
+   ],
+   "corner": "collection/corner-plain-single",
+   "rule": "single",
+   "lineMetal": false
+  }
+ },
+ {
+  "key": "floral-corners",
+  "km": "ជ្រុងផ្កាដ៏វិចិត្រ",
+  "en": "Floral Corner Masterpiece",
+  "group": "floral",
   "pattern": "none",
-  "group": "stationery"
+  "dark": false,
+  "base": "#f8f2e7",
+  "shade": "#e9ddc8",
+  "light": "rgb(255 253 246 / 0.9)",
+  "metal": [
+   "#8a693d",
+   "#bf9d66",
+   "#e6d2a6",
+   "#a5834f"
+  ],
+  "ink": "#4a3527",
+  "line": "#6e5341",
+  "petal": "#e2b9ae",
+  "heart": "#e3c487",
+  "leaf": "#a8b39a",
+  "size": 460,
+  "foil": 0.9,
+  "bloom": 0.45,
+  "relief": 0,
+  "fibre": 0.42,
+  "centre": 0,
+  "kline": 0,
+  "lineAlpha": 0.76,
+  "compose": {
+   "art": [
+    {
+     "src": "collection/camellia-spray",
+     "corner": "bl",
+     "size": "b"
+    },
+    {
+     "src": "collection/camellia-spray",
+     "corner": "br",
+     "size": "b"
+    },
+    {
+     "src": "collection/branch-hang",
+     "corner": "tl",
+     "size": "c"
+    },
+    {
+     "src": "collection/branch-hang",
+     "corner": "tr",
+     "size": "c"
+    }
+   ],
+   "corner": "stationery/corner-floral",
+   "rule": "double",
+   "lineMetal": false
+  }
+ },
+ {
+  "key": "flowering-vine",
+  "km": "វល្លិផ្ការ៉ូមែនទិក",
+  "en": "Romantic Flowering Vine",
+  "group": "floral",
+  "pattern": "none",
+  "dark": false,
+  "base": "#faf3ec",
+  "shade": "#ecdccd",
+  "light": "rgb(255 252 248 / 0.9)",
+  "metal": [
+   "#8c6c45",
+   "#c2a16f",
+   "#e8d4ab",
+   "#a8875a"
+  ],
+  "ink": "#4b3128",
+  "line": "#6c4d40",
+  "petal": "#e2b9ae",
+  "heart": "#e3c487",
+  "leaf": "#a8b39a",
+  "size": 460,
+  "foil": 0.9,
+  "bloom": 0.45,
+  "relief": 0,
+  "fibre": 0.42,
+  "centre": 0,
+  "kline": 0,
+  "lineAlpha": 0.76,
+  "compose": {
+   "art": [
+    {
+     "src": "collection/camellia-single",
+     "corner": "bl",
+     "size": "c"
+    },
+    {
+     "src": "collection/camellia-single",
+     "corner": "tr",
+     "size": "c"
+    }
+   ],
+   "corner": "collection/corner-plain-single",
+   "rule": "single",
+   "lineMetal": false,
+   "bands": {
+    "l": {
+     "src": "collection/band-vine-v",
+     "k": 0.4,
+     "plate": "line"
+    },
+    "r": {
+     "src": "collection/band-vine-v",
+     "k": 0.4,
+     "plate": "line"
+    }
+   }
+  }
+ },
+ {
+  "key": "antique-floral-frame",
+  "km": "ស៊ុមផ្កាបុរាណ",
+  "en": "Antique Floral Frame",
+  "group": "floral",
+  "pattern": "none",
+  "dark": false,
+  "base": "#f5ecdc",
+  "shade": "#e5d6bc",
+  "light": "rgb(255 250 238 / 0.9)",
+  "metal": [
+   "#86643a",
+   "#bb9760",
+   "#e5cf9c",
+   "#9e7b47"
+  ],
+  "ink": "#47311f",
+  "line": "#765536",
+  "petal": "#e2b9ae",
+  "heart": "#e3c487",
+  "leaf": "#a8b39a",
+  "size": 460,
+  "foil": 0.9,
+  "bloom": 0.4,
+  "relief": 0,
+  "fibre": 0.42,
+  "centre": 0,
+  "kline": 0,
+  "lineAlpha": 0.76,
+  "compose": {
+   "art": [],
+   "corner": "stationery/corner-loop",
+   "rule": "double",
+   "lineMetal": false,
+   "bands": {
+    "t": {
+     "src": "collection/band-vine",
+     "k": 0.42,
+     "plate": "foil"
+    },
+    "b": {
+     "src": "collection/band-vine",
+     "k": 0.42,
+     "plate": "foil"
+    }
+   }
+  }
  },
  {
   "key": "champagne-botanical",
-  "km": "រុក្ខជាតិពណ៌សំប៉ាញ",
-  "en": "Champagne Botanical",
+  "km": "សួនរុក្ខជាតិពណ៌សំប៉ាញ",
+  "en": "Champagne Botanical Garden",
+  "group": "floral",
+  "pattern": "none",
   "dark": false,
   "base": "#f1e5cf",
   "shade": "#ddcaa8",
@@ -159,89 +1477,91 @@
    "#e5cf9c",
    "#9e7b47"
   ],
+  "ink": "#47321f",
+  "line": "#7d5d38",
   "petal": "#d6b399",
   "heart": "#d8b878",
   "leaf": "#b9ae8b",
+  "size": 460,
   "foil": 0.92,
   "bloom": 0.14,
-  "fibre": 0.48,
-  "ink": "#47321f",
-  "line": "#7d5d38",
+  "relief": 0,
+  "fibre": 0.42,
+  "centre": 0,
+  "kline": 0,
   "lineAlpha": 0.92,
   "compose": {
    "art": [
     {
-     "comp": "camellia-spray",
+     "src": "collection/camellia-spray",
      "corner": "bl",
      "size": "a"
     },
     {
-     "comp": "branch-hang",
+     "src": "collection/branch-hang",
      "corner": "tr",
      "size": "b"
-    }
-   ],
-   "blind": [
+    },
     {
-     "comp": "camellia-single",
+     "src": "collection/camellia-single",
      "corner": "br",
-     "size": "c"
+     "size": "c",
+     "plate": "blind"
     }
    ],
-   "lineMetal": true,
-   "corner": "acanthus"
-  },
-  "size": 460,
-  "relief": 0,
-  "centre": 0,
-  "kline": 0,
-  "pattern": "none",
-  "group": "stationery"
+   "corner": "stationery/corner-acanthus",
+   "rule": "double",
+   "lineMetal": true
+  }
  },
  {
-  "key": "burgundy-gold",
-  "km": "ក្រហមទំពាំងបាយជូរ និងមាស",
-  "en": "Burgundy & Gold",
-  "dark": true,
-  "base": "#5a1f2b",
-  "shade": "#3a111b",
-  "light": "rgb(255 214 196 / 0.1)",
+  "key": "grand-floral",
+  "km": "សមាសភាពផ្កាដ៏អធិកអធម",
+  "en": "Grand Floral Composition",
+  "group": "floral",
+  "pattern": "none",
+  "dark": false,
+  "base": "#f8f2e7",
+  "shade": "#e9ddc8",
+  "light": "rgb(255 253 246 / 0.9)",
   "metal": [
-   "#a07a42",
-   "#d2ae6a",
-   "#efdba4",
-   "#b48d4e"
+   "#8a693d",
+   "#bf9d66",
+   "#e6d2a6",
+   "#a5834f"
   ],
-  "petal": "#cf9690",
-  "heart": "#d6ad68",
-  "leaf": "#97956f",
-  "foil": 1,
-  "bloom": 0.2,
-  "fibre": 0.32,
-  "ink": "#f3e4cc",
-  "line": "#e0c38b",
-  "lineAlpha": 0.92,
+  "ink": "#4a3527",
+  "line": "#6e5341",
+  "petal": "#e2b9ae",
+  "heart": "#e3c487",
+  "leaf": "#a8b39a",
+  "size": 460,
+  "foil": 0.9,
+  "bloom": 0.45,
+  "relief": 0,
+  "fibre": 0.42,
+  "centre": 0,
+  "kline": 0,
+  "lineAlpha": 0.76,
   "compose": {
    "art": [
     {
-     "comp": "camellia-spray",
-     "corner": "bl",
-     "size": "a"
-    },
-    {
-     "comp": "branch-hang",
-     "corner": "tr",
-     "size": "b"
+     "src": "collection/garden-head",
+     "corner": "tc",
+     "size": "wide"
     }
    ],
-   "lineMetal": true,
-   "corner": "acanthus"
-  },
-  "size": 460,
-  "relief": 0,
-  "centre": 0,
-  "kline": 0,
-  "pattern": "none",
-  "group": "stationery"
+   "corner": "stationery/corner-floral",
+   "rule": "double",
+   "lineMetal": false,
+   "bands": {
+    "b": {
+     "src": "collection/band-vine",
+     "k": 0.42,
+     "plate": "line",
+     "gap": 0.02
+    }
+   }
+  }
  }
 ]

@@ -17,39 +17,63 @@
  *                  hue, so the room, the envelope and the card read as one set;
  *   dark papers    the card's writing turned light (their --c-* colours).
  */
+import collection from "./collection-art.json";
 import art from "./stationery-art.json";
 import data from "./paper-themes.json";
 
-export type PaperGroup = "stationery";
+export type PaperGroup = "khmer" | "relief" | "floral";
 
-/** One drawing placed in one corner (scripts/stationery-art.py). */
+type Corner = "tl" | "tr" | "bl" | "br" | "tc" | "bc";
+/**
+ * One piece of artwork placed on the sheet (scripts/collection-art.py and
+ * scripts/stationery-art.py). `src` is "<folder>/<name>"; a drawing in
+ * plates (a scene) prints all its plates, a single shape prints on `plate`.
+ */
 type Placement = {
-  comp: string;
-  corner: "tl" | "tr" | "bl" | "br";
-  size: "a" | "b" | "c";
+  src: string;
+  corner: Corner;
+  /** "a" | "b" | "c" | "crest" | "mark", or any CSS width. */
+  size: string;
+  plate?: "foil" | "line" | "relief" | "blind";
   /** Set beside a large corner ornament, along the foot, instead of in front of it. */
   beside?: boolean;
 };
 
+/** A band of repeating ornament along one edge, between the corners. */
+type Band = {
+  src: string;
+  /** Thickness, as a share of the corner's width. */
+  k: number;
+  plate: "foil" | "line" | "relief" | "blind";
+  /** Distance in from the inner rule, as a share of the corner's width. */
+  gap?: number;
+};
+
 /**
- * A composed paper — one of the stationery suites. Instead of a repeating
- * tile, a few drawings are printed into chosen corners of a clean sheet,
- * with the suite's own frame corners and double rule, crest and dividers.
+ * A composed paper. A clean sheet; drawings set in chosen places; a frame of
+ * corners and rules; optionally bands of repeating ornament along the edges,
+ * a fine all-over pattern that steps back from the middle, and a recessed
+ * channel. Every layer is a plate printed in one way (ink, foil, emboss, or
+ * blind), so a design is a composition and a finish, not a tile and a tint.
  */
 export type Compose = {
-  /** Printed in colour: wash plates, the engraving, and the foil accents. */
   art: Placement[];
-  /** Printed blind: pressed into the sheet with no ink. */
-  blind?: Placement[];
   /** The engraving struck in metal rather than printed in ink. */
   lineMetal: boolean;
-  /**
-   * The frame corners: the pack's acanthus (or a larger setting of it) on
-   * the double rule, or a lighter corner of a camellia and flowering sprigs.
-   */
-  corner: "acanthus" | "acanthus-grand" | "floral";
+  /** Corner drawing: "<folder>/<name>" (its -tl/-tr/-bl/-br mirrors). */
+  corner: string;
+  /** How wide a corner prints. */
+  cornerW?: string;
+  /** The rules between the corners. */
+  rule?: "double" | "single" | "none";
   /** The pack's medallion at the middle of the head and foot rules. */
   mid?: boolean;
+  bands?: { t?: Band; b?: Band; l?: Band; r?: Band };
+  pattern?: { src: string; size: string; plate: "foil" | "line" | "relief"; alpha: number; quiet?: number };
+  /** A recessed channel inside the rules. */
+  recess?: boolean;
+  /** How the relief plate is lit: a shallow emboss, or a deeper carving. */
+  depth?: "soft" | "deep";
 };
 
 export type PaperDef = {
@@ -81,10 +105,12 @@ export type PaperDef = {
   compose?: Compose;
 };
 
-export const PAPERS = data as PaperDef[];
+export const PAPERS = data as unknown as PaperDef[];
 
 export const PAPER_GROUPS: { key: PaperGroup; km: string; en: string }[] = [
-  { key: "stationery", km: "ក្រដាសលិខិតមង្គល", en: "Wedding stationery" },
+  { key: "khmer", km: "ក្បាច់រចនាបុរាណខ្មែរ", en: "Traditional Khmer ornament" },
+  { key: "relief", km: "ក្បាច់ចម្លាក់បុរាណខ្មែរ", en: "Khmer sculpture & relief" },
+  { key: "floral", km: "ក្បាច់ផ្កា និងរុក្ខជាតិ", en: "Floral & botanical" },
 ];
 
 /* ── colour arithmetic ─────────────────────────────────────────────────── */
@@ -137,33 +163,40 @@ export function roomOf(p: PaperDef): string[] {
   return [0.34, 0.25, 0.15, 0.085].map((l) => fromHsl(h, s, l));
 }
 
-/* ── the stationery suites ────────────────────────────────────────────── */
+/* ── the composed papers ──────────────────────────────────────────────── */
 
 type Plate = "petal" | "leaf" | "heart" | "line" | "foil";
-const ART = art as unknown as {
-  compositions: Record<string, { plates: Record<string, Plate[]> }>;
-  ornaments: Record<string, [number, number] | ["pack", string]>;
-  corners: { outer: number; inner: number; outerW: number; innerW: number };
+type Manifest = {
+  scenes: Record<string, { w: number; h: number; plates: Record<string, Plate[]> }>;
+  solids: Record<string, { w: number; h: number; variants: string[] }>;
 };
-const ART_DIR = "/art/stationery";
+const COLLECTION = collection as unknown as Manifest;
+const STATIONERY = art as unknown as {
+  ornaments: Record<string, [number, number] | ["pack", string]>;
+  corners: { outer: number; inner: number };
+};
 
 /*
- * How large each drawing prints: a share of the card's width, held back by
- * the screen's height (so a phone on its side does not get a spray taller
- * than the card), and by a ceiling on a wide desktop card.
+ * How large a drawing prints: a share of the card's width, held back by the
+ * screen's height (a phone on its side never gets a spray taller than the
+ * card) and by a ceiling on a wide desktop card.
  */
-const SIZE = {
+const SIZE: Record<string, string> = {
   a: "min(70%, 52dvh, 540px)",
   b: "min(48%, 38dvh, 400px)",
   c: "min(38%, 30dvh, 300px)",
+  crest: "min(46%, 28dvh, 330px)",
+  wide: "min(66%, 30dvh, 480px)",
+  mark: "min(16%, 10dvh, 96px)",
 };
+const sizeOf = (s: string) => SIZE[s] ?? s;
 
 /*
- * Where each drawing sits: inside the double rule, so the rule is the line a
- * spray grows from. A hanging branch starts below the upper corner ornament
- * rather than across it.
+ * Where each piece sits: inside the rules (the rule is the line a spray
+ * grows from); a hanging branch below the upper corner ornament; a crest
+ * centred in the head, a mark centred on the foot.
  */
-function at(c: Placement["corner"], beside = false): string {
+function at(c: Corner, beside = false): string {
   const top = "calc(var(--bt-ch) * 0.62)";
   const x = beside ? "calc(var(--corner-w, 100px) * 0.72)" : "var(--bt-in)";
   switch (c) {
@@ -172,23 +205,49 @@ function at(c: Placement["corner"], beside = false): string {
     case "br":
       return `right ${x} bottom var(--bt-in)`;
     case "tl":
-      return `left var(--bt-in) top ${top}`;
+      return `left ${x} top ${top}`;
+    case "tr":
+      return `right ${x} top ${top}`;
+    case "tc":
+      return "center top calc(var(--bt-in) + var(--corner-w, 100px) * 0.06)";
     default:
-      return `right var(--bt-in) top ${top}`;
+      return "center bottom calc(var(--bt-in) + var(--corner-w, 100px) * 0.06)";
   }
 }
 
-function layers(list: Placement[], plates: Plate[]): string {
+/** The files a placement prints on one plate (none where it has nothing there). */
+function filesOf(pl: Placement, plate: Plate | "relief" | "blind"): string[] {
+  const [dir, name] = pl.src.split("/");
+  const sc = COLLECTION.scenes[name];
+  const fills: Plate[] = ["petal", "leaf", "heart"];
+  if (dir === "collection" && sc) {
+    const have = sc.plates[pl.corner] ?? [];
+    const file = (q: Plate) => `/art/collection/${name}-${pl.corner}-${q}.svg`;
+    // a drawing carved or pressed rather than printed: its washes become the
+    // carved shapes; its engraving still prints
+    if (pl.plate === "relief" || pl.plate === "blind") {
+      if (plate === pl.plate) return fills.filter((q) => have.includes(q)).map(file);
+      return plate === "line" && have.includes("line") && pl.plate === "relief" ? [file("line")] : [];
+    }
+    return have.includes(plate as Plate) ? [file(plate as Plate)] : [];
+  }
+  // a single shape: printed on its own plate, in the variant for its place
+  if ((pl.plate ?? "foil") !== plate) return [];
+  const variants = COLLECTION.solids[name]?.variants ?? [""];
+  const v = pl.corner === "bc" && variants.includes("flip") ? "-flip" : variants.includes(pl.corner) ? `-${pl.corner}` : "";
+  return [`/art/${dir}/${name}${v}.svg`];
+}
+
+function layers(list: Placement[], plates: (Plate | "relief" | "blind")[]): string {
   const out: string[] = [];
   for (const pl of list) {
-    const have = ART.compositions[pl.comp]?.plates[pl.corner] ?? [];
     for (const plate of plates) {
-      if (have.includes(plate)) {
-        out.push(`url(${ART_DIR}/${pl.comp}-${pl.corner}-${plate}.svg) ${at(pl.corner, pl.beside)} / ${SIZE[pl.size]} no-repeat`);
-      }
+      for (const f of filesOf(pl, plate)) out.push(`url(${f}) ${at(pl.corner, pl.beside)} / ${sizeOf(pl.size)} no-repeat`);
     }
   }
-  return out.length ? out.join(",") : "none";
+  // nothing on this plate: an empty mask (not "none", which would show the
+  // plate's whole colour across the sheet)
+  return out.length ? out.join(",") : "linear-gradient(transparent, transparent)";
 }
 
 const metalRamp = (deg: number) =>
@@ -196,7 +255,7 @@ const metalRamp = (deg: number) =>
   `var(--pp-metal-3) 66%,var(--pp-metal-1) 82%,var(--pp-metal-0) 100%)`;
 
 /**
- * The suites' crest and four dividers, by ornament role (see lib/designKit):
+ * The papers' crest and four dividers, by ornament role (see lib/designKit):
  * the crest (a camellia over the pack's scroll), a double rule with the
  * pack's rule ends, a flowering branch, the pack's symmetrical scroll, and
  * the pack's long rule with flowering sprigs for the major sections.
@@ -216,35 +275,59 @@ const SUITE_ORNAMENTS: Record<string, [string, number]> = {
   rosette: ["mark-blossom", 0.8],
   mark: ["mark-camellia", 0.6],
 };
+const PACK_SIZES: Record<string, [number, number]> = { "scroll-diamond": [292.4, 93.7] };
 
 function ornamentVars(): string {
   return Object.entries(SUITE_ORNAMENTS)
     .map(([role, [file, scale]]) => {
-      const o = ART.ornaments[file];
-      // one of the pack's own pieces, used as drawn
+      const o = STATIONERY.ornaments[file];
       const [src, w, h] =
         o[0] === "pack"
           ? [`/kit/flourish/${o[1]}.svg`, ...PACK_SIZES[o[1] as string]]
-          : [`${ART_DIR}/${file}.svg`, o[0], o[1]];
+          : [`/art/stationery/${file}.svg`, o[0], o[1]];
       return `--orn-${role}:url(${src});--orn-${role}-ar:${w} / ${h};--orn-${role}-scale:${scale};`;
     })
     .join("");
 }
-const PACK_SIZES: Record<string, [number, number]> = { "scroll-diamond": [292.4, 93.7], medallion: [149.2, 79.7] };
+const ORNAMENTS = ornamentVars();
 
-/** Corner drawings: how wide each prints. */
-const CORNER_WIDTH: Record<Compose["corner"], string> = {
-  acanthus: "min(24%, 16dvh, 160px)",
-  "acanthus-grand": "min(30%, 16dvh, 210px)",
-  floral: "min(24%, 16dvh, 160px)",
+/* How each kind of plate is painted. */
+const PAINT = {
+  foil: metalRamp(125),
+  line: "var(--pc-line-paint)",
+  relief: "var(--pc-stone)",
+  blind: "rgb(60 40 20 / 0.05)",
 };
+const LIT = {
+  soft: "drop-shadow(-0.7px -0.7px 0 rgb(255 255 255 / 0.85)) drop-shadow(0.8px 1px 0.4px rgb(70 48 24 / 0.28))",
+  deep: "drop-shadow(-1px -1px 0 rgb(255 255 255 / 0.9)) drop-shadow(1.2px 1.6px 0.8px rgb(60 40 20 / 0.36)) drop-shadow(0 0 0.4px rgb(60 40 20 / 0.2))",
+  blind: "drop-shadow(0.8px 0.8px 0 rgb(255 255 255 / 0.75)) drop-shadow(-0.6px -0.6px 0 rgb(60 40 20 / 0.24))",
+};
+const DARK_LIT = "drop-shadow(-0.6px -0.6px 0 rgb(255 236 200 / 0.18)) drop-shadow(0.9px 1.1px 0.5px rgb(0 0 0 / 0.45))";
+
+function bandVars(edge: "t" | "b" | "l" | "r", b: Band | undefined, dark: boolean): string {
+  if (!b) return `--pb-${edge}-on:none;`;
+  const [dir, name] = b.src.split("/");
+  const vertical = edge === "l" || edge === "r";
+  const solids = COLLECTION.solids[name];
+  const v = vertical ? "" : edge === "b" && solids?.variants.includes("b") ? "-b" : solids?.variants.includes("t") ? "-t" : "";
+  const file = `/art/${dir}/${name}${v}.svg`;
+  const filter = b.plate === "relief" ? (dark ? DARK_LIT : LIT.soft) : b.plate === "blind" ? LIT.blind : "none";
+  return (
+    `--pb-${edge}-on:block;--pb-${edge}-m:url(${file});--pb-${edge}-k:${b.k};--pb-${edge}-gap:${b.gap ?? 0.04};` +
+    `--pb-${edge}-paint:${PAINT[b.plate]};--pb-${edge}-f:${filter};`
+  );
+}
 
 function composeCss(p: PaperDef, sel: string): string {
   const c = p.compose!;
-  const file = c.corner === "acanthus-grand" ? "acanthus" : c.corner;
-  const cornerSrc = (k: string) => `url(${ART_DIR}/corner-${file}-${k}.svg)`;
-  const blind = c.blind ?? [];
-  const fills: Plate[] = ["petal", "leaf", "heart"];
+  const [cdir, cname] = c.corner.split("/");
+  const cornerSrc = (k: string) => `url(/art/${cdir}/${cname}-${k}.svg)`;
+  const rule = c.rule ?? "double";
+  const single = cname.startsWith("corner-single");
+  const pt = c.pattern;
+  const relief = c.art.filter((a) => a.plate === "relief");
+  const blind = c.art.filter((a) => a.plate === "blind");
   // The placements read the corner's measured size (--bt-in, --bt-ch), which
   // lives on the card's sheet, so they are declared there and not on <html>:
   // a custom property is resolved where it is declared.
@@ -253,19 +336,56 @@ function composeCss(p: PaperDef, sel: string): string {
     `--pc-petal:${layers(c.art, ["petal"])};--pc-leaf:${layers(c.art, ["leaf"])};--pc-heart:${layers(c.art, ["heart"])};` +
     `--pc-line:${layers(c.art, ["line"])};--pc-foil:${layers(c.art, ["foil"])};` +
     `--pc-sheen:${layers(c.art, c.lineMetal ? ["foil", "line"] : ["foil"])};` +
-    `--pc-line-paint:${c.lineMetal ? metalRamp(118) : p.line};` +
-    `--pc-blind:${layers(blind, fills)};` +
-    `--pc-blind-on:${blind.length ? "block" : "none"};}` +
+    `--pc-relief:${layers(relief, ["relief"])};--pc-relief-on:${relief.length ? "block" : "none"};` +
+    `--pc-blind:${layers(blind, ["blind"])};--pc-blind-on:${blind.length ? "block" : "none"};` +
+    `}` +
     `html${sel}{` +
-    // the frame: corners, the double rule between them, and (for the
-    // vintage suite) the pack's medallion at the middle of the head and foot
+    `--pc-line-paint:${c.lineMetal ? metalRamp(118) : p.line};` +
+    `--pc-stone:${p.dark ? shadeHex(p.base, 0.06) : shadeHex(p.base, -0.035)};` +
+    `--pc-lit:${p.dark ? DARK_LIT : LIT[c.depth ?? "soft"]};` +
+    // the frame: corners, and the rules between them
     `--bt-m-tl:${cornerSrc("tl")};--bt-m-tr:${cornerSrc("tr")};--bt-m-bl:${cornerSrc("bl")};--bt-m-br:${cornerSrc("br")};` +
-    `--bt-cw:${CORNER_WIDTH[c.corner]};--bt-ar:1;--bt-arn:1;--bt-paint:${metalRamp(125)};` +
-    `--bt-ro:${ART.corners.outer};--bt-ri:${ART.corners.inner};--bt-inr:${ART.corners.inner};` +
+    `--bt-cw:${c.cornerW ?? "min(24%, 16dvh, 160px)"};--bt-ar:1;--bt-arn:1;--bt-paint:${metalRamp(125)};` +
+    (single
+      ? `--bt-ro:0.065;--bt-ri:0.065;--bt-inr:0.085;`
+      : `--bt-ro:${STATIONERY.corners.outer};--bt-ri:${STATIONERY.corners.inner};--bt-inr:${STATIONERY.corners.inner};`) +
+    // bands run up to the corner ornament, or nearly to the corner where it is only the rules
+    `--pb-end:${cname.startsWith("corner-plain") ? 0.3 : 0.92};` +
+    `--bt-wo-k:${rule === "none" ? 0 : 1};--bt-wi-k:${rule === "double" ? 1 : 0};` +
     `--bt-mid:${c.mid ? "block" : "none"};--bt-gap:${c.mid ? "1" : "0"};` +
-    ornamentVars() +
-    `}`
+    bandVars("t", c.bands?.t, p.dark) +
+    bandVars("b", c.bands?.b, p.dark) +
+    bandVars("l", c.bands?.l, p.dark) +
+    bandVars("r", c.bands?.r, p.dark) +
+    (pt
+      ? `--pt-on:block;--pt-m:url(/art/${pt.src}.svg);--pt-size:${pt.size};--pt-paint:${PAINT[pt.plate]};--pt-a:${pt.alpha};` +
+        `--pt-quiet:${pt.quiet ?? 0.15};--pt-f:${pt.plate === "relief" ? (p.dark ? DARK_LIT : LIT.soft) : "none"};`
+      : `--pt-on:none;`) +
+    `--rc-on:${c.recess ? "block" : "none"};` +
+    ORNAMENTS +
+    `}` +
+    clearOfBands(c, sel)
   );
+}
+
+/*
+ * The words keep clear of the bands. Head and foot bands: the cover, which
+ * rises into the frame's bands on a large sheet (CardShell, --band-keep),
+ * stops short of them. Side bands: the invitation's text is held in from
+ * them (less the padding its sections already have).
+ */
+function clearOfBands(c: Compose, sel: string): string {
+  const b = c.bands ?? {};
+  const inr = c.corner.includes("corner-single") || c.corner.includes("corner-plain-single") ? 0.085 : STATIONERY.corners.inner;
+  const reach = (x?: Band) => (x ? inr + (x.gap ?? 0.04) + x.k + 0.05 : 0);
+  let css = "";
+  const keep = Math.max(reach(b.t), reach(b.b));
+  if (keep) css += `html${sel} .card-sheet{--band-keep:${Math.max(0.3, keep).toFixed(3)}!important}`;
+  const side = Math.max(reach(b.l), reach(b.r));
+  if (side) {
+    css += `html${sel} .frame-safe{padding-inline:max(0px, calc(var(--corner-w, 100px) * ${side.toFixed(3)} + 4px - 1rem))}`;
+  }
+  return css;
 }
 
 /* ── the stylesheet ────────────────────────────────────────────────────── */

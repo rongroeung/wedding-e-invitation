@@ -1,0 +1,434 @@
+{
+ "scenes": {
+  "engraved-corner": {
+   "w": 600,
+   "h": 600,
+   "plates": {
+    "tl": [
+     "line"
+    ],
+    "tr": [
+     "line"
+    ],
+    "bl": [
+     "line"
+    ],
+    "br": [
+     "line"
+    ]
+   }
+  },
+  "engraved-crest": {
+   "w": 960,
+   "h": 334,
+   "plates": {
+    "": [
+     "line"
+    ],
+    "flip": [
+     "line"
+    ]
+   }
+  },
+  "rose-spray": {
+   "w": 1000,
+   "h": 1000,
+   "plates": {
+    "bl": [
+     "petal",
+     "leaf",
+     "line",
+     "foil"
+    ],
+    "br": [
+     "petal",
+     "leaf",
+     "line",
+     "foil"
+    ]
+   }
+  },
+  "rose-single": {
+   "w": 600,
+   "h": 600,
+   "plates": {
+    "bl": [
+     "petal",
+     "leaf",
+     "line",
+     "foil"
+    ],
+    "br": [
+     "petal",
+     "leaf",
+     "line",
+     "foil"
+    ],
+    "tl": [
+     "petal",
+     "leaf",
+     "line",
+     "foil"
+    ],
+    "tr": [
+     "petal",
+     "leaf",
+     "line",
+     "foil"
+    ]
+   }
+  },
+  "garden-corner": {
+   "w": 1000,
+   "h": 1000,
+   "plates": {
+    "bl": [
+     "petal",
+     "leaf",
+     "heart",
+     "line",
+     "foil"
+    ],
+    "br": [
+     "petal",
+     "leaf",
+     "heart",
+     "line",
+     "foil"
+    ]
+   }
+  },
+  "garden-head": {
+   "w": 1000,
+   "h": 360,
+   "plates": {
+    "tc": [
+     "petal",
+     "leaf",
+     "heart",
+     "line",
+     "foil"
+    ],
+    "bc": [
+     "petal",
+     "leaf",
+     "heart",
+     "line",
+     "foil"
+    ]
+   }
+  },
+  "camellia-spray": {
+   "w": 1000,
+   "h": 1000,
+   "plates": {
+    "bl": [
+     "petal",
+     "leaf",
+     "heart",
+     "line",
+     "foil"
+    ],
+    "br": [
+     "petal",
+     "leaf",
+     "heart",
+     "line",
+     "foil"
+    ],
+    "tl": [
+     "petal",
+     "leaf",
+     "heart",
+     "line",
+     "foil"
+    ],
+    "tr": [
+     "petal",
+     "leaf",
+     "heart",
+     "line",
+     "foil"
+    ]
+   }
+  },
+  "branch-hang": {
+   "w": 1000,
+   "h": 1000,
+   "plates": {
+    "tr": [
+     "petal",
+     "leaf",
+     "heart",
+     "line",
+     "foil"
+    ],
+    "tl": [
+     "petal",
+     "leaf",
+     "heart",
+     "line",
+     "foil"
+    ],
+    "br": [
+     "petal",
+     "leaf",
+     "heart",
+     "line",
+     "foil"
+    ],
+    "bl": [
+     "petal",
+     "leaf",
+     "heart",
+     "line",
+     "foil"
+    ]
+   }
+  },
+  "camellia-single": {
+   "w": 600,
+   "h": 600,
+   "plates": {
+    "bl": [
+     "petal",
+     "leaf",
+     "heart",
+     "line",
+     "foil"
+    ],
+    "br": [
+     "petal",
+     "leaf",
+     "heart",
+     "line",
+     "foil"
+    ],
+    "tl": [
+     "petal",
+     "leaf",
+     "heart",
+     "line",
+     "foil"
+    ],
+    "tr": [
+     "petal",
+     "leaf",
+     "heart",
+     "line",
+     "foil"
+    ]
+   }
+  }
+ },
+ "solids": {
+  "tile-diaper": {
+   "w": 120,
+   "h": 120,
+   "variants": [
+    ""
+   ]
+  },
+  "band-garland": {
+   "w": 240,
+   "h": 96,
+   "variants": [
+    "t",
+    "b"
+   ]
+  },
+  "band-balusters": {
+   "w": 44,
+   "h": 120,
+   "variants": [
+    "t",
+    "b"
+   ]
+  },
+  "band-colonnette-v": {
+   "w": 40,
+   "h": 160,
+   "variants": [
+    ""
+   ]
+  },
+  "band-lozenge": {
+   "w": 70,
+   "h": 70,
+   "variants": [
+    "t",
+    "b"
+   ]
+  },
+  "band-scroll": {
+   "w": 197.0,
+   "h": 80,
+   "variants": [
+    "t",
+    "b"
+   ]
+  },
+  "band-scroll-v": {
+   "w": 80,
+   "h": 197.0,
+   "variants": [
+    ""
+   ]
+  },
+  "band-vine": {
+   "w": 360,
+   "h": 120,
+   "variants": [
+    "t",
+    "b"
+   ]
+  },
+  "band-vine-v": {
+   "w": 120,
+   "h": 360,
+   "variants": [
+    ""
+   ]
+  },
+  "arch": {
+   "w": 640,
+   "h": 250,
+   "variants": [
+    ""
+   ]
+  },
+  "kbach-crest": {
+   "w": 418.0,
+   "h": 269.5,
+   "variants": [
+    "",
+    "flip"
+   ]
+  },
+  "naga-crest": {
+   "w": 444.6,
+   "h": 135.3,
+   "variants": [
+    "",
+    "flip"
+   ]
+  },
+  "kbach-medallion": {
+   "w": 327.5,
+   "h": 164.9,
+   "variants": [
+    "",
+    "flip"
+   ]
+  },
+  "corner-phka": {
+   "w": 400,
+   "h": 400,
+   "variants": [
+    "tl",
+    "tr",
+    "bl",
+    "br"
+   ]
+  },
+  "corner-single-phka": {
+   "w": 400,
+   "h": 400,
+   "variants": [
+    "tl",
+    "tr",
+    "bl",
+    "br"
+   ]
+  },
+  "corner-single-sprig": {
+   "w": 400,
+   "h": 400,
+   "variants": [
+    "tl",
+    "tr",
+    "bl",
+    "br"
+   ]
+  },
+  "corner-plain-double": {
+   "w": 400,
+   "h": 400,
+   "variants": [
+    "tl",
+    "tr",
+    "bl",
+    "br"
+   ]
+  },
+  "corner-plain-single": {
+   "w": 400,
+   "h": 400,
+   "variants": [
+    "tl",
+    "tr",
+    "bl",
+    "br"
+   ]
+  },
+  "pack-scroll-bow": {
+   "w": 333.5,
+   "h": 96.5,
+   "variants": [
+    "",
+    "flip"
+   ]
+  },
+  "pack-scroll-knot": {
+   "w": 257.7,
+   "h": 82.8,
+   "variants": [
+    "",
+    "flip"
+   ]
+  },
+  "pack-medallion": {
+   "w": 149.2,
+   "h": 79.7,
+   "variants": [
+    "",
+    "flip"
+   ]
+  },
+  "pack-rosette-c": {
+   "w": 75.1,
+   "h": 75.0,
+   "variants": [
+    "",
+    "flip"
+   ]
+  },
+  "pack-corner-loop": {
+   "w": 451.1,
+   "h": 420.5,
+   "variants": [
+    "tl",
+    "tr",
+    "bl",
+    "br"
+   ]
+  },
+  "pack-acanthus": {
+   "w": 228.1,
+   "h": 247.7,
+   "variants": [
+    "tl",
+    "tr",
+    "bl",
+    "br"
+   ]
+  },
+  "mark-phka": {
+   "w": 100,
+   "h": 100,
+   "variants": [
+    ""
+   ]
+  }
+ }
+}
