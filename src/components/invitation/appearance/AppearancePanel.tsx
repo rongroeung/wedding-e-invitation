@@ -10,6 +10,7 @@ import {
   FX_MODE_KEYS,
   PAPER_THEMES,
   PAPER_THEME_KEYS,
+  PAPER_TONES,
   type PaperTheme,
 } from "@/lib/appearance";
 
@@ -197,6 +198,36 @@ export function AppearancePanel({
                 </div>
               ))}
             </fieldset>
+
+            {/* the paper colour under the design; "design" keeps its own */}
+            {current.paper !== "couple" && (
+              <fieldset className="ap-group">
+                <legend className="ap-legend">
+                  ពណ៌ក្រដាស <span>· Paper colour</span>
+                </legend>
+                <div className="ap-tones">
+                  {[{ key: "design", km: "តាមក្បាច់", en: "Design's own", base: "" }, ...PAPER_TONES].map((t) => (
+                    <label key={t.key} className="ap-tone" title={`${t.km} · ${t.en}`}>
+                      <input
+                        type="radio"
+                        name={`${id}-tone`}
+                        value={t.key}
+                        checked={(current.tone || "design") === t.key}
+                        onChange={() => choose({ tone: t.key })}
+                      />
+                      <span
+                        className={`ap-tone-dot ${t.key === "design" ? "ap-tone-design" : ""}`}
+                        style={t.base ? { background: t.base } : undefined}
+                      />
+                      <span className="ap-tone-label">
+                        {t.km}
+                        <small>{t.en}</small>
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            )}
 
             <fieldset className="ap-group">
               <legend className="ap-legend">

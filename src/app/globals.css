@@ -3215,17 +3215,24 @@
   transition: transform var(--pe-near-t, 1300ms) cubic-bezier(0.45, 0, 0.2, 1);
 }
 
-/* ── z 6 · the seal ─────────────────────────────────────────────────────── */
+/* ── the seal, on the flap's point ──────────────────────────────────────────
+   A child of the flap, so it turns with it: the flap is 58% of the envelope's
+   height and the point sits at 51% of it, so the seal's centre is at
+   51 / 58 = 87.93% of the flap. Same width as before (the flap is full
+   width), so it is the same size on the envelope. Like the flap's faces it
+   hides its back, so it leaves view as the flap passes upright. */
 .pe-seal,
 .pe-seal-shadow {
   position: absolute;
   left: 50%;
-  top: 51%;
+  top: 87.93%;
   width: 20%;
   aspect-ratio: 1;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 .pe-seal {
-  transform: translate3d(-50%, -50%, 6px);
+  transform: translate3d(-50%, -50%, 2px);
   transition: transform var(--pe-press-t, 300ms) cubic-bezier(0.3, 0, 0.2, 1);
 }
 .pe-wax {
@@ -3253,32 +3260,18 @@
 }
 .pe-seal-shadow {
   border-radius: 50%;
-  transform: translate3d(-47%, -45%, 5px) scale(0.98);
+  transform: translate3d(-47%, -45%, 1px) scale(0.98);
   background: radial-gradient(closest-side, rgb(40 15 10 / 0.5), rgb(40 15 10 / 0.22) 72%, transparent);
   filter: blur(0.07em);
   transition: transform var(--pe-press-t, 300ms) ease, filter var(--pe-press-t, 300ms) ease;
 }
 /* pressed: the wax gives a fraction, the shadow tightens under it */
-.pe-pressed .pe-seal { transform: translate3d(-50%, -50%, 5.5px) scale(0.975); }
-.pe-pressed .pe-seal-shadow { transform: translate3d(-48.5%, -47.5%, 5px) scale(0.96); filter: blur(0.04em); }
-/* released, lifted, and carried away by hand — not shrunk, not faded on the
-   spot: it travels, and it only fades once it is off the envelope */
-.pe-lifted .pe-seal { animation: pe-seal-away var(--pe-lift-t, 930ms) cubic-bezier(0.4, 0, 0.3, 1) forwards; }
-.pe-lifted .pe-seal-shadow { animation: pe-seal-shadow-away var(--pe-lift-t, 930ms) cubic-bezier(0.4, 0, 0.3, 1) forwards; }
-@keyframes pe-seal-away {
-  0%   { transform: translate3d(-50%, -50%, 5.5px) scale(0.975); opacity: 1; }
-  12%  { transform: translate3d(-50%, -51%, 9px) scale(1); opacity: 1; }
-  30%  { transform: translate3d(-49%, -60%, 46px) rotate(-2deg); opacity: 1; }
-  82%  { transform: translate3d(230%, -230%, 150px) rotate(-11deg); opacity: 1; }
-  100% { transform: translate3d(330%, -290%, 170px) rotate(-13deg); opacity: 0; }
-}
-@keyframes pe-seal-shadow-away {
-  0%   { transform: translate3d(-48.5%, -47.5%, 5px) scale(0.96); filter: blur(0.04em); opacity: 1; }
-  12%  { transform: translate3d(-46%, -44%, 5px) scale(1.02); filter: blur(0.12em); opacity: 0.9; }
-  30%  { transform: translate3d(-38%, -34%, 5px) scale(1.12); filter: blur(0.4em); opacity: 0.55; }
-  60%  { transform: translate3d(10%, -60%, 5px) scale(1.2); filter: blur(0.8em); opacity: 0; }
-  100% { opacity: 0; }
-}
+.pe-pressed .pe-seal { transform: translate3d(-50%, -50%, 1.5px) scale(0.975); }
+.pe-pressed .pe-seal-shadow { transform: translate3d(-48.5%, -47.5%, 1px) scale(0.96); filter: blur(0.04em); }
+/* released: the wax lets go of the pocket and settles back to rest on the
+   flap, which then lifts and takes it with it. It never leaves the envelope. */
+.pe-lifted .pe-seal { transform: translate3d(-50%, -50%, 2.5px) scale(1); }
+.pe-lifted .pe-seal-shadow { transform: translate3d(-46%, -44%, 1px) scale(1); filter: blur(0.09em); }
 
 /* ── The set: dusk, a heading, and light type ──────────────────────────── */
 .room-dusk {
@@ -3374,8 +3367,7 @@
   .pe-flap,
   .pe-seal,
   .pe-flap-shade-wrap { transition-duration: 1ms !important; }
-  .pe-lifted .pe-seal,
-  .pe-lifted .pe-seal-shadow { animation-duration: 1ms !important; }
+  .pe-seal-shadow { transition-duration: 1ms !important; }
   .pe-flap-out::before,
   .pe-flap-in::before { transition-duration: 1ms !important; transition-delay: 0ms !important; }
 }
@@ -4157,6 +4149,22 @@ html[data-fx] .cv-crest::after { animation-delay: 3s; }
 .ap-tab small { display: block; font-size: 0.6rem; opacity: 0.7; }
 .ap-tab[aria-selected="true"] { border-color: #a8833f; background: #f4ead6; box-shadow: inset 0 0 0 1px #b8955c; }
 .ap-tab:focus-visible { outline: 2px solid #8a6a3a; outline-offset: 2px; }
+/* paper colours: a row of small swatches with their names */
+.ap-tones { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.45rem 0.3rem; }
+.ap-tone { position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+.ap-tone input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.ap-tone-dot {
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 50%;
+  border: 1px solid rgb(120 96 60 / 0.35);
+  box-shadow: inset 0 1px 2px rgb(255 255 255 / 0.6), 0 1px 2px rgb(60 40 20 / 0.12);
+}
+.ap-tone-design { background: conic-gradient(#f8f2e7 0 25%, #efd9d6 0 50%, #e1e7ee 0 75%, #5a1f2b 0); }
+.ap-tone-label { margin-top: 0.2rem; font-size: 0.62rem; line-height: 1.5; text-align: center; }
+.ap-tone-label small { display: block; font-size: 0.58rem; opacity: 0.7; }
+.ap-tone input:checked + .ap-tone-dot { box-shadow: 0 0 0 2px #fbf8f2, 0 0 0 4px #b8955c; }
+.ap-tone input:focus-visible + .ap-tone-dot { outline: 2px solid #8a6a3a; outline-offset: 4px; }
 .ap-swatch { position: relative; display: block; cursor: pointer; }
 .ap-swatch input, .ap-option input, .ap-segment input { position: absolute; opacity: 0; width: 1px; height: 1px; }
 .ap-swatch-paper {

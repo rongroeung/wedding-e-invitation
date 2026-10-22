@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { FX_LEVEL_KEYS, FX_MODE_KEYS, PAPER_THEME_KEYS } from "@/lib/appearance";
+import { FX_LEVEL_KEYS, FX_MODE_KEYS, PAPER_THEME_KEYS, TONE_KEYS } from "@/lib/appearance";
 import { BACKDROP_PRESET_KEYS } from "@/lib/backgrounds";
 import { DESIGN_KIT_KEYS } from "@/lib/designKit";
 import { FRAME_MOTIFS } from "@/lib/frame";
@@ -177,6 +177,7 @@ const schema = z.object({
   appearancePaper: z.enum(PAPER_THEME_KEYS).optional(),
   appearanceFx: z.enum(FX_MODE_KEYS).optional(),
   appearanceLevel: z.enum(FX_LEVEL_KEYS).optional(),
+  appearanceTone: z.enum(TONE_KEYS).optional(),
   appearanceGuestPanel: z.boolean().optional(),
 
   frameEmboss: z.boolean().optional(),

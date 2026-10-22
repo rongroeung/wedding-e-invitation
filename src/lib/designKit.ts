@@ -155,12 +155,6 @@ export function designKitCss(key: string | null | undefined): string {
     .join(",");
   // the generated kits print their own mark on the seal and the flap
   const generic = LEGACY_KIT_KEYS.includes(kit.key) ? ".kit-generated{display:none!important}" : "";
-  /*
-   * The stationery papers carry their own crest and dividers, drawn from the
-   * vintage pack, and they apply over the default (vintage) kit. A kit the
-   * couple chose themselves wins over the paper's — hence the stronger
-   * selector for every other kit.
-   */
-  const root = kit.key === "vintage-flourish" ? ":root" : "html:root:root";
-  return `${root}{${vars}}${others ? `${others}{display:none!important}` : ""}${generic}`;
+  // the kit alone decides the crest and the dividers, on every paper
+  return `:root{${vars}}${others ? `${others}{display:none!important}` : ""}${generic}`;
 }

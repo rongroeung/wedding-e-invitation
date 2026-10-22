@@ -4,14 +4,15 @@ import { useSyncExternalStore } from "react";
 
 import {
   type Appearance,
-  DARK_PAPERS,
   type FxLevel,
   type FxMode,
   type PaperTheme,
   STORAGE_KEY,
+  isDarkSheet,
   isFx,
   isLevel,
   isPaper,
+  isTone,
 } from "@/lib/appearance";
 
 /**
@@ -30,8 +31,10 @@ function attrs(): Appearance {
   const paper = h.getAttribute("data-paper-theme");
   const fx = h.getAttribute("data-fx");
   const level = h.getAttribute("data-fx-level");
+  const tone = h.getAttribute("data-paper-tone");
   return {
     paper: (isPaper(paper) ? paper : "classic-ivory") as PaperTheme,
+    tone: isTone(tone) ? tone : "design",
     fx: (isFx(fx) ? fx : "none") as FxMode,
     level: (isLevel(level) ? level : "medium") as FxLevel,
   };
@@ -40,7 +43,9 @@ function attrs(): Appearance {
 function apply(a: Appearance) {
   const h = document.documentElement;
   h.setAttribute("data-paper-theme", a.paper);
-  if (DARK_PAPERS.includes(a.paper)) h.setAttribute("data-paper-dark", "");
+  if (a.tone && a.tone !== "design") h.setAttribute("data-paper-tone", a.tone);
+  else h.removeAttribute("data-paper-tone");
+  if (isDarkSheet(a.paper, a.tone)) h.setAttribute("data-paper-dark", "");
   else h.removeAttribute("data-paper-dark");
   h.setAttribute("data-fx", a.fx);
   h.setAttribute("data-fx-level", a.level);
@@ -96,7 +101,7 @@ function subscribe(cb: () => void) {
     observer = new MutationObserver(() => listeners.forEach((l) => l()));
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ["data-paper-theme", "data-fx", "data-fx-level"],
+      attributeFilter: ["data-paper-theme", "data-paper-tone", "data-fx", "data-fx-level"],
     });
   }
   return () => {
@@ -110,11 +115,11 @@ function subscribe(cb: () => void) {
 
 const snapshot = () => {
   const a = attrs();
-  return `${a.paper}|${a.fx}|${a.level}`;
+  return `${a.paper}|${a.fx}|${a.level}|${a.tone}`;
 };
 
 export function useAppearance(server: Appearance): Appearance {
-  const key = useSyncExternalStore(subscribe, snapshot, () => `${server.paper}|${server.fx}|${server.level}`);
-  const [paper, fx, level] = key.split("|");
-  return { paper: paper as PaperTheme, fx: fx as FxMode, level: level as FxLevel };
+  const key = useSyncExternalStore(subscribe, snapshot, () => `${server.paper}|${server.fx}|${server.level}|${server.tone}`);
+  const [paper, fx, level, tone] = key.split("|");
+  return { paper: paper as PaperTheme, fx: fx as FxMode, level: level as FxLevel, tone };
 }

@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 
 import type { Appearance } from "@/lib/appearance";
 
+import { isDarkSheet } from "@/lib/appearance";
 import { startFx } from "./fxEngine";
 import { useAppearance } from "./store";
 
@@ -17,14 +18,16 @@ import { useAppearance } from "./store";
  * canvas starts on the client, after the page is interactive.
  */
 export function CardFx({ defaults, rich }: { defaults: Appearance; rich: boolean }) {
-  const { fx, level, paper } = useAppearance(defaults);
+  const { fx, level, paper, tone } = useAppearance(defaults);
+  // a dark paper colour chosen over the design needs the motion's dark palette too
+  const dark = isDarkSheet(paper, tone);
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const canvas = ref.current;
     if (!canvas || fx === "none") return;
-    return startFx(canvas, { fx, level, paper, rich });
-  }, [fx, level, paper, rich]);
+    return startFx(canvas, { fx, level, paper, rich, ...(dark ? { tone: "dark" as const } : {}) });
+  }, [fx, level, paper, rich, dark]);
 
   if (fx === "none") return null;
   return (

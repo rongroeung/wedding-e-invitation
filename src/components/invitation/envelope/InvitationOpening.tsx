@@ -48,8 +48,8 @@ const at = (step: Step) => ORDER.indexOf(step);
  *
  *   0.00  —      anticipation: the guest has tapped; nothing moves yet
  *   0.07  press  the seal is pressed very slightly against the paper
- *   0.12  lift   …released, lifted with its shadow separating, and carried
- *                away by hand (the lift runs 0.15 of the run)
+ *   0.12  lift   …released: the wax lets go of the pocket and settles on the
+ *                flap's point, where it stays (it turns away with the flap)
  *   0.27  flap   the flap lifts at its point and turns back on its hinge
  *                (0.225 of the run); its lining comes round with it
  *   0.50  card   the card is drawn up out of the pocket at a slight angle,
@@ -60,8 +60,8 @@ const at = (step: Step) => ORDER.indexOf(step);
  *   0.995 done   the overlay is unmounted
  *
  * Each beat starts a moment before the last one has fully settled, so the
- * movement overlaps the way a hand does — but the seal is always gone before
- * the flap moves, and the flap is past upright before the card starts out,
+ * movement overlaps the way a hand does — but the seal has always let go
+ * before the flap moves, and the flap is past upright before the card starts out,
  * because the physical action needs them to be.
  *
  * Everything only moves forward and every timer is on `timers`, so a skip, a

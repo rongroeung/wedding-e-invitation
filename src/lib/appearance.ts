@@ -1,4 +1,7 @@
 import { PAPERS, type PaperGroup } from "./paperThemes";
+import { DARK_TONES, isTone, PAPER_TONES, TONE_KEYS } from "./paperTones";
+
+export { PAPER_TONES, TONE_KEYS, isTone };
 
 /**
  * Appearance: the paper the invitation is printed on, and the live layer of
@@ -7,7 +10,7 @@ import { PAPERS, type PaperGroup } from "./paperThemes";
  * The couple choose the defaults in the dashboard. A guest may change them for
  * themselves from the small settings button on the invitation; that choice is
  * kept in this browser only (`localStorage`) and contains nothing but these
- * three appearance values.
+ * appearance values (the design, its paper colour, the motion and how much).
  *
  * How it reaches the page: the choice is written as three attributes on
  * `<html>` (`data-paper-theme`, `data-fx`, `data-fx-level`). Every rule that
@@ -52,7 +55,8 @@ export const FX_LEVELS = {
 export type FxLevel = keyof typeof FX_LEVELS;
 export const FX_LEVEL_KEYS = Object.keys(FX_LEVELS) as [FxLevel, ...FxLevel[]];
 
-export type Appearance = { paper: PaperTheme; fx: FxMode; level: FxLevel };
+/** `tone` is the paper colour (lib/paperTones); "design" keeps the design's own. */
+export type Appearance = { paper: PaperTheme; fx: FxMode; level: FxLevel; tone: string };
 
 export const STORAGE_KEY = "wedding-appearance-v1";
 
@@ -69,12 +73,21 @@ export const STORAGE_KEY = "wedding-appearance-v1";
 export function appearanceBootScript(defaults: Appearance): string {
   const d = JSON.stringify(defaults);
   const keys = JSON.stringify(PAPER_THEME_KEYS);
+  const tones = JSON.stringify(TONE_KEYS);
   const dark = JSON.stringify(DARK_PAPERS);
-  // a saved paper that no longer exists (one that was retired) falls back to
-  // the couple's default rather than leaving the sheet without colours
-  return `(function(){try{var d=${d},K=${keys},D=${dark},a=d,s=null;try{s=JSON.parse(localStorage.getItem(${JSON.stringify(
+  const darkTones = JSON.stringify(DARK_TONES);
+  // a saved paper or colour that no longer exists falls back to the couple's
+  // default rather than leaving the sheet without colours
+  return `(function(){try{var d=${d},K=${keys},T=${tones},D=${dark},DT=${darkTones},a=d,s=null;try{s=JSON.parse(localStorage.getItem(${JSON.stringify(
     STORAGE_KEY,
-  )})||"null")}catch(e){}if(s&&typeof s==="object"){a={paper:K.indexOf(s.paper)>=0?s.paper:d.paper,fx:s.fx||d.fx,level:s.level||d.level}}var fx=a.fx;try{if((!s||!s.explicit)&&matchMedia("(prefers-reduced-motion: reduce)").matches)fx="none"}catch(e){}var h=document.documentElement;h.setAttribute("data-paper-theme",a.paper);if(D.indexOf(a.paper)>=0)h.setAttribute("data-paper-dark","");else h.removeAttribute("data-paper-dark");h.setAttribute("data-fx",fx);h.setAttribute("data-fx-level",a.level)}catch(e){}})();`;
+  )})||"null")}catch(e){}if(s&&typeof s==="object"){a={paper:K.indexOf(s.paper)>=0?s.paper:d.paper,tone:T.indexOf(s.tone)>=0?s.tone:d.tone,fx:s.fx||d.fx,level:s.level||d.level}}var fx=a.fx;try{if((!s||!s.explicit)&&matchMedia("(prefers-reduced-motion: reduce)").matches)fx="none"}catch(e){}var h=document.documentElement;h.setAttribute("data-paper-theme",a.paper);if(a.tone&&a.tone!=="design")h.setAttribute("data-paper-tone",a.tone);else h.removeAttribute("data-paper-tone");var dk=a.tone&&a.tone!=="design"?DT.indexOf(a.tone)>=0:D.indexOf(a.paper)>=0;if(dk&&a.paper!=="couple")h.setAttribute("data-paper-dark","");else h.removeAttribute("data-paper-dark");h.setAttribute("data-fx",fx);h.setAttribute("data-fx-level",a.level)}catch(e){}})();`;
+}
+
+/** Whether the sheet is printed light on dark: the colour decides, else the design. */
+export function isDarkSheet(paper: string, tone: string): boolean {
+  if (paper === "couple") return false;
+  if (tone && tone !== "design") return DARK_TONES.includes(tone);
+  return DARK_PAPERS.includes(paper);
 }
 
 export function isPaper(v: unknown): v is PaperTheme {
@@ -92,9 +105,11 @@ export function appearanceDefaults(w: {
   appearancePaper: string;
   appearanceFx: string;
   appearanceLevel: string;
+  appearanceTone?: string | null;
 }): Appearance {
   return {
     paper: isPaper(w.appearancePaper) ? w.appearancePaper : "classic-ivory",
+    tone: isTone(w.appearanceTone) ? w.appearanceTone : "design",
     fx: isFx(w.appearanceFx) ? w.appearanceFx : "dust",
     level: isLevel(w.appearanceLevel) ? w.appearanceLevel : "medium",
   };

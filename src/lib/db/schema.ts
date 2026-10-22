@@ -278,6 +278,8 @@ export const wedding = pgTable("wedding", {
   appearancePaper: text("appearance_paper").notNull().default("classic-ivory"),
   appearanceFx: text("appearance_fx").notNull().default("dust"),
   appearanceLevel: text("appearance_level").notNull().default("medium"),
+  /** The paper colour over the design (lib/paperTones); "design" keeps its own. */
+  appearanceTone: text("appearance_tone").notNull().default("design"),
   /** Whether guests see the small appearance-settings button. */
   appearanceGuestPanel: boolean("appearance_guest_panel").notNull().default(true),
   /** Wording on the button that carries on to the invitation. */

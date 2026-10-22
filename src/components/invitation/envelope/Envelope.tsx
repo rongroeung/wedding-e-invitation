@@ -286,6 +286,21 @@ export function Envelope({
                 <polyline points={line(FOIL)} />
               </svg>
             </div>
+            {/*
+              * The seal, and the shadow it throws, on the flap's point. It
+              * belongs to the flap: when the wax gives, the flap lifts and
+              * the seal goes up and back with it, out of sight as the flap
+              * passes upright — it stays on the envelope, as a sealed letter's
+              * seal does, rather than being carried off.
+              */}
+            {envelope.showSeal && (
+              <>
+                <span className="pe-seal-shadow" aria-hidden="true" />
+                <div className="pe-seal" aria-hidden="true">
+                  <WaxSeal text={sealText} />
+                </div>
+              </>
+            )}
           </div>
         </div>
 
@@ -302,15 +317,6 @@ export function Envelope({
           </div>
         </div>
 
-        {/* ── z 6 · the seal, and the shadow it throws on the flap ────────── */}
-        {envelope.showSeal && (
-          <>
-            <span className="pe-seal-shadow" aria-hidden="true" />
-            <div className="pe-seal" aria-hidden="true">
-              <WaxSeal text={sealText} />
-            </div>
-          </>
-        )}
       </div>
     </div>
   );

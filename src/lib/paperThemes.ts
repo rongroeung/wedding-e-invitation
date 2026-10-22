@@ -18,6 +18,7 @@
  *   dark papers    the card's writing turned light (their --c-* colours).
  */
 import collection from "./collection-art.json";
+import { DARK_INK, DARK_METAL, PAPER_TONES } from "./paperTones";
 import art from "./stationery-art.json";
 import data from "./paper-themes.json";
 
@@ -254,43 +255,6 @@ const metalRamp = (deg: number) =>
   `linear-gradient(${deg}deg,var(--pp-metal-0) 0%,var(--pp-metal-1) 18%,var(--pp-metal-2) 34%,var(--pp-metal-1) 50%,` +
   `var(--pp-metal-3) 66%,var(--pp-metal-1) 82%,var(--pp-metal-0) 100%)`;
 
-/**
- * The papers' crest and four dividers, by ornament role (see lib/designKit):
- * the crest (a camellia over the pack's scroll), a double rule with the
- * pack's rule ends, a flowering branch, the pack's symmetrical scroll, and
- * the pack's long rule with flowering sprigs for the major sections.
- */
-const SUITE_ORNAMENTS: Record<string, [string, number]> = {
-  crest: ["crest", 1],
-  title: ["divider-branch", 1.3],
-  "title-couple": ["divider-scroll", 1],
-  "title-program": ["divider-double", 1.5],
-  "title-venue": ["divider-branch", 1.3],
-  rule: ["divider-grand", 1],
-  star: ["divider-double", 1],
-  medallion: ["mark-camellia", 0.4],
-  fleuron: ["mark-blossom", 0.5],
-  wing: ["mark-blossom", 0.55],
-  share: ["divider-branch", 1.2],
-  rosette: ["mark-blossom", 0.8],
-  mark: ["mark-camellia", 0.6],
-};
-const PACK_SIZES: Record<string, [number, number]> = { "scroll-diamond": [292.4, 93.7] };
-
-function ornamentVars(): string {
-  return Object.entries(SUITE_ORNAMENTS)
-    .map(([role, [file, scale]]) => {
-      const o = STATIONERY.ornaments[file];
-      const [src, w, h] =
-        o[0] === "pack"
-          ? [`/kit/flourish/${o[1]}.svg`, ...PACK_SIZES[o[1] as string]]
-          : [`/art/stationery/${file}.svg`, o[0], o[1]];
-      return `--orn-${role}:url(${src});--orn-${role}-ar:${w} / ${h};--orn-${role}-scale:${scale};`;
-    })
-    .join("");
-}
-const ORNAMENTS = ornamentVars();
-
 /* How each kind of plate is painted. */
 const PAINT = {
   foil: metalRamp(125),
@@ -305,14 +269,15 @@ const LIT = {
 };
 const DARK_LIT = "drop-shadow(-0.6px -0.6px 0 rgb(255 236 200 / 0.18)) drop-shadow(0.9px 1.1px 0.5px rgb(0 0 0 / 0.45))";
 
-function bandVars(edge: "t" | "b" | "l" | "r", b: Band | undefined, dark: boolean): string {
+function bandVars(edge: "t" | "b" | "l" | "r", b: Band | undefined): string {
   if (!b) return `--pb-${edge}-on:none;`;
   const [dir, name] = b.src.split("/");
   const vertical = edge === "l" || edge === "r";
   const solids = COLLECTION.solids[name];
   const v = vertical ? "" : edge === "b" && solids?.variants.includes("b") ? "-b" : solids?.variants.includes("t") ? "-t" : "";
   const file = `/art/${dir}/${name}${v}.svg`;
-  const filter = b.plate === "relief" ? (dark ? DARK_LIT : LIT.soft) : b.plate === "blind" ? LIT.blind : "none";
+  // lit through variables, so a dark paper colour chosen over the design relights it
+  const filter = b.plate === "relief" ? "var(--lit-soft)" : b.plate === "blind" ? "var(--lit-blind)" : "none";
   return (
     `--pb-${edge}-on:block;--pb-${edge}-m:url(${file});--pb-${edge}-k:${b.k};--pb-${edge}-gap:${b.gap ?? 0.04};` +
     `--pb-${edge}-paint:${PAINT[b.plate]};--pb-${edge}-f:${filter};`
@@ -341,8 +306,7 @@ function composeCss(p: PaperDef, sel: string): string {
     `}` +
     `html${sel}{` +
     `--pc-line-paint:${c.lineMetal ? metalRamp(118) : p.line};` +
-    `--pc-stone:${p.dark ? shadeHex(p.base, 0.06) : shadeHex(p.base, -0.035)};` +
-    `--pc-lit:${p.dark ? DARK_LIT : LIT[c.depth ?? "soft"]};` +
+    `--pc-lit-light:${LIT[c.depth ?? "soft"]};` +
     // the frame: corners, and the rules between them
     `--bt-m-tl:${cornerSrc("tl")};--bt-m-tr:${cornerSrc("tr")};--bt-m-bl:${cornerSrc("bl")};--bt-m-br:${cornerSrc("br")};` +
     `--bt-cw:${c.cornerW ?? "min(24%, 16dvh, 160px)"};--bt-ar:1;--bt-arn:1;--bt-paint:${metalRamp(125)};` +
@@ -353,17 +317,18 @@ function composeCss(p: PaperDef, sel: string): string {
     `--pb-end:${cname.startsWith("corner-plain") ? 0.3 : 0.92};` +
     `--bt-wo-k:${rule === "none" ? 0 : 1};--bt-wi-k:${rule === "double" ? 1 : 0};` +
     `--bt-mid:${c.mid ? "block" : "none"};--bt-gap:${c.mid ? "1" : "0"};` +
-    bandVars("t", c.bands?.t, p.dark) +
-    bandVars("b", c.bands?.b, p.dark) +
-    bandVars("l", c.bands?.l, p.dark) +
-    bandVars("r", c.bands?.r, p.dark) +
+    bandVars("t", c.bands?.t) +
+    bandVars("b", c.bands?.b) +
+    bandVars("l", c.bands?.l) +
+    bandVars("r", c.bands?.r) +
     (pt
       ? `--pt-on:block;--pt-m:url(/art/${pt.src}.svg);--pt-size:${pt.size};--pt-paint:${PAINT[pt.plate]};--pt-a:${pt.alpha};` +
-        `--pt-quiet:${pt.quiet ?? 0.15};--pt-f:${pt.plate === "relief" ? (p.dark ? DARK_LIT : LIT.soft) : "none"};`
+        `--pt-quiet:${pt.quiet ?? 0.15};--pt-f:${pt.plate === "relief" ? "var(--lit-soft)" : "none"};`
       : `--pt-on:none;`) +
     `--rc-on:${c.recess ? "block" : "none"};` +
-    ORNAMENTS +
     `}` +
+    // on a dark paper an ink engraving prints in light ink instead
+    (c.lineMetal ? "" : `html${sel}[data-paper-dark]{--pc-line-paint:${DARK_INK}}`) +
     clearOfBands(c, sel)
   );
 }
@@ -425,6 +390,8 @@ export function paperThemeCss(): string {
       );
     }
   }
+  out.push(LIGHTING);
+  out.push(toneCss());
   // what every composed paper shares: its layers read the placements above
   const composed = PAPERS.filter((p) => p.compose).map((p) => `html[data-paper-theme="${p.key}"]`);
   if (composed.length) {
@@ -432,6 +399,50 @@ export function paperThemeCss(): string {
     out.push(COMPOSED_CSS.replaceAll("$C", C));
   }
   return out.join("\n");
+}
+
+/*
+ * How carved and pressed shapes are lit, and the tone of carved stone. Live
+ * variables, so a paper colour chosen over a design (paperTones) relights
+ * them: a light paper is lit from the upper left with a soft shade below; a
+ * dark paper with a faint warm highlight and a deeper shade.
+ */
+const LIGHTING =
+  `html{--pc-stone:color-mix(in srgb,var(--pp-base) 93%,#5a4228);--pc-lit:var(--pc-lit-light,${LIT.soft});` +
+  `--lit-soft:${LIT.soft};--lit-blind:${LIT.blind}}` +
+  `html[data-paper-dark]{--pc-stone:color-mix(in srgb,var(--pp-base) 86%,#ffffff);--pc-lit:${DARK_LIT};--lit-soft:${DARK_LIT};` +
+  `--lit-blind:drop-shadow(0.8px 0.8px 0 rgb(0 0 0 / 0.35)) drop-shadow(-0.6px -0.6px 0 rgb(255 236 200 / 0.14))}`;
+
+/*
+ * The paper colours (paperTones): each replaces the paper's tone and shading,
+ * the matched envelope and the room, and — on a dark colour — the gold and
+ * the card's writing. More specific than a design's own rule (html + an
+ * attribute), and written after it.
+ */
+function toneCss(): string {
+  return PAPER_TONES.map((t) => {
+    const sel = `html[data-paper-tone="${t.key}"]`;
+    const shade = shadeHex(t.base, t.dark ? -0.42 : -0.075);
+    const light = t.dark ? "rgb(255 222 200 / 0.1)" : "rgb(255 253 247 / 0.85)";
+    const env = t.dark ? shadeHex(t.base, 0.1) : t.base;
+    const room = roomOf({ dark: t.dark, base: t.base, shade } as PaperDef);
+    let css =
+      `${sel}{--pp-base:${t.base};--pp-shade:${shade};--pp-light:${light};` +
+      `--sync-env-paper:${env};--sync-env-paper-shade:${shadeHex(env, -0.07)};--sync-env-paper-deep:${shadeHex(env, -0.18)};` +
+      (t.dark ? `--sync-env-ink:${DARK_INK};` : "") +
+      `--room-0:${room[0]};--room-1:${room[1]};--room-2:${room[2]};--room-3:${room[3]};` +
+      (t.dark
+        ? `--pp-metal-0:${DARK_METAL[0]};--pp-metal-1:${DARK_METAL[1]};--pp-metal-2:${DARK_METAL[2]};--pp-metal-3:${DARK_METAL[3]};`
+        : "") +
+      `}`;
+    if (t.dark) {
+      const lift = (k: number) => rgbTriplet(shadeHex(t.base, k));
+      css +=
+        `${sel}[data-paper-dark] .card-stock{--c-text:${DARK_INK};--c-text-rgb:${rgbTriplet(DARK_INK)};` +
+        `--c-bg:${t.base};--c-bg-rgb:${rgbTriplet(t.base)};--c-cream-rgb:${lift(0.12)};--c-beige-rgb:${lift(0.22)}}`;
+    }
+    return css;
+  }).join("\n");
 }
 
 /* The rules every composed paper shares ($C is the list of them). */
@@ -450,7 +461,7 @@ $C .frame-side-rule{display:none}
 $C .candle-glow{display:none}
 $C .stage-near .stage-bokeh{display:none}
 $C .section-glow{opacity:0.4}
-$C .ps-relief{display:var(--pc-blind-on);opacity:1;mix-blend-mode:normal;background:none;-webkit-mask:none;mask:none;filter:drop-shadow(0.8px 0.8px 0 rgb(255 255 255 / 0.75)) drop-shadow(-0.6px -0.6px 0 rgb(60 40 20 / 0.24))}
+$C .ps-relief{display:var(--pc-blind-on);opacity:1;mix-blend-mode:normal;background:none;-webkit-mask:none;mask:none;filter:var(--lit-blind)}
 $C .ps-relief::before{content:"";position:absolute;inset:0;background:rgb(60 40 20 / 0.045);-webkit-mask:var(--pc-blind);mask:var(--pc-blind);-webkit-mask-composite:source-over;mask-composite:add}
 $C .ps-petal,$C .ps-leaf,$C .ps-heart,$C .ps-line,$C .ps-foil,$C .ps-sheen{-webkit-mask-composite:source-over;mask-composite:add}
 `;

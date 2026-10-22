@@ -9,7 +9,7 @@ import { mediaSrc } from "@/lib/media";
 import { BUILTIN_BAND_ART, CORNER_ART, FRAME_LABELS, FRAME_MOTIFS } from "@/lib/frame";
 import { DESIGN_KITS, DESIGN_KIT_KEYS, designKitOf } from "@/lib/designKit";
 import { BACKDROP_PRESETS, BACKDROP_PRESET_KEYS } from "@/lib/backgrounds";
-import { FX_LEVELS, FX_LEVEL_KEYS, FX_MODES, FX_MODE_KEYS, PAPER_THEMES, PAPER_THEME_KEYS } from "@/lib/appearance";
+import { FX_LEVELS, FX_LEVEL_KEYS, FX_MODES, FX_MODE_KEYS, PAPER_THEMES, PAPER_THEME_KEYS, PAPER_TONES } from "@/lib/appearance";
 import { ArtworkField, Button, Card, Field, Input, MediaUpload, Select, StatusMessage, Toggle, useApi } from "./ui";
 
 const PRESETS = [
@@ -67,6 +67,7 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
     appearancePaper: wedding.appearancePaper,
     appearanceFx: wedding.appearanceFx,
     appearanceLevel: wedding.appearanceLevel,
+    appearanceTone: wedding.appearanceTone,
     appearanceGuestPanel: wedding.appearanceGuestPanel,
   });
 
@@ -394,6 +395,37 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
                 strengthLabel={(value) => `កម្រិតពណ៌ក្រដាសគ្របលើរូប — ${value}%`}
                 strengthHint="ណែនាំយ៉ាងតិច ៥០% បើរូបមានពណ៌ច្រើន"
               />
+            </div>
+          </div>
+
+          <div>
+            <p className="mb-2 text-sm font-medium text-slate-700">
+              ពណ៌ក្រដាស <span className="text-slate-500">· Paper colour</span>
+            </p>
+            <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="ពណ៌ក្រដាស">
+              {[{ key: "design", km: "តាមក្បាច់", en: "Design's own", base: "" }, ...PAPER_TONES].map((t) => {
+                const chosen = (form.appearanceTone || "design") === t.key;
+                return (
+                  <button
+                    key={t.key}
+                    type="button"
+                    role="radio"
+                    aria-checked={chosen}
+                    onClick={() => setForm({ ...form, appearanceTone: t.key })}
+                    className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs ${
+                      chosen ? "border-amber-500 ring-2 ring-amber-300" : "border-slate-200 hover:border-amber-300"
+                    }`}
+                  >
+                    <span
+                      className="h-4 w-4 rounded-full border border-slate-300"
+                      style={{
+                        background: t.base || "conic-gradient(#f8f2e7 0 25%, #efd9d6 0 50%, #e1e7ee 0 75%, #5a1f2b 0)",
+                      }}
+                    />
+                    {t.km} <span className="text-slate-500">· {t.en}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
