@@ -152,8 +152,22 @@ export function ThemeStyle({ wedding }: { wedding: Wedding }) {
   // invitation — type and the spacing around it together, in proportion.
   const fontScale = Math.min(140, Math.max(70, wedding.fontScale)) / 100;
 
+  /*
+   * The base size grows on large screens: 16px up to about 1100px wide,
+   * rising to 20px on a full-HD screen. A fixed 16px left the type
+   * phone-sized on a card that spans a desktop monitor. It also follows the
+   * window's height (16px at 760px high, 20px at 1080px), so a wide but short
+   * laptop screen does not push the cover's contents off the card. Phones and
+   * tablets keep exactly the size they had. The couple's own scale applies on
+   * top of all of it.
+   */
+  const base = (px: number) => `${(px * fontScale).toFixed(3)}px`;
+  const rootSize =
+    `clamp(${base(16)}, min(calc(${(0.4878 * fontScale).toFixed(4)}vw + ${base(10.63)}), ` +
+    `calc(${(1.25 * fontScale).toFixed(4)}vh + ${base(6.5)})), ${base(20)})`;
+
   const css = `:root{
-    font-size:${(16 * fontScale).toFixed(2)}px;
+    font-size:${rootSize};
     --c-primary:${primary};
     --c-secondary:${gold};
     --c-accent:${accent};
@@ -225,10 +239,11 @@ export function ThemeStyle({ wedding }: { wedding: Wedding }) {
       <style dangerouslySetInnerHTML={{ __html: paperThemeCss() }} />
       {/*
         * The paper theme and the live layer, applied before the first paint:
-        * the guest's own saved choice if they made one, otherwise the
-        * couple's defaults. See `lib/appearance`.
+        * the couple's design, or a guest's own saved choice when the couple
+        * lets guests change the look and the choice was made against the
+        * couple's current design. See `lib/appearance`.
         */}
-      <script dangerouslySetInnerHTML={{ __html: appearanceBootScript(appearanceDefaults(wedding)) }} />
+      <script dangerouslySetInnerHTML={{ __html: appearanceBootScript(appearanceDefaults(wedding), wedding.appearanceGuestPanel) }} />
       {/*
         * The room, as a fixed sheet behind everything.
         *

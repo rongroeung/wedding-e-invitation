@@ -161,7 +161,7 @@ export function Gallery({ images }: { images: GalleryImage[] }) {
                   />
                 </span>
                 {image.caption && (
-                  <span className="pointer-events-none absolute inset-x-0 bottom-0 rounded-b-[14px] bg-gradient-to-t from-brown/75 to-transparent px-3 pb-3 pt-8 text-left text-[0.7rem] leading-relaxed text-cream opacity-0 transition-opacity duration-500 group-hover:opacity-100 khmer-wrap">
+                  <span className="gallery-caption khmer-wrap">
                     {image.caption}
                   </span>
                 )}

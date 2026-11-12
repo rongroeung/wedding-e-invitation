@@ -1,11 +1,12 @@
 import { z } from "zod";
 import { fail, isSameOrigin, ok, readJson } from "@/lib/api";
 import { clientKey, rateLimit } from "@/lib/rate-limit";
-import { trackView } from "@/lib/queries";
+import { getGuestByCode, getWeddingBySlug, trackView } from "@/lib/queries";
 
 const schema = z.object({
   path: z.string().max(200).default("/"),
   guestCode: z.string().max(80).default(""),
+  workspace: z.string().max(60).default("main"),
 });
 
 /** Records an invitation view for the dashboard counters. */
@@ -17,7 +18,10 @@ export async function POST(request: Request) {
   if (!parsed.success) return ok({ skipped: true });
 
   try {
-    await trackView(parsed.data.path, parsed.data.guestCode);
+    const { path, guestCode, workspace } = parsed.data;
+    const guest = guestCode ? await getGuestByCode(guestCode) : null;
+    const weddingId = guest ? guest.weddingId : (await getWeddingBySlug(workspace || "main"))?.id;
+    if (weddingId) await trackView(weddingId, path, guest ? guest.code : "");
   } catch {
     /* view tracking must never break the invitation */
   }

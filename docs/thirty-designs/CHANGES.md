@@ -152,3 +152,22 @@ The settings must offer them as three categories with thumbnails, a selected sta
 - **Other existing scripts:** envelope match, 17 kits (0 issues), 38 fonts.
 - **Visual review:** the 30-design sheet at phone size, six designs at desktop size, and the panel on phone.
 - **Not tested:** Safari, real devices.
+
+## Follow-up: matching head and foot, Sandstone Relief
+
+**Asked:** the ornaments at the head and the foot of a paper should be the same; Sandstone Relief should show its pattern in the centre too.
+
+- **Head and foot now match.** The foot ornament is the head ornament, mirrored:
+  - Khmer Classical Flourish: the pack crest.
+  - Engraved Antique Ornament: the engraved crest.
+  - Grand Ceremonial Ornament: the large pack crest.
+  - Recessed Relief Frame: the relief medallion (it had none at the foot).
+  - Heritage Engraving: the engraved medallion.
+  - Stone-and-Gold Elegance: the pack crest.
+  - Grand Floral Composition: the floral head arrangement, replacing the vine band.
+- **Sandstone Relief.** Its carved diaper pattern now runs across the whole sheet, centre included (`quiet` 1.0). Before, the pattern faded out behind the words.
+- **Tests run:**
+  - **Size checks:** these 8 designs × 6 sizes × fx none/dust, 96 runs, 0 problems.
+  - **Band and text overlap check:** 108 runs, 0 overlaps.
+  - **Cover renders reviewed:** Sandstone Relief and Grand Ceremonial at 390×844 and 1280×800. The text is readable and the foot crest clears the open button.
+  - **Thumbnails and concept sheet:** the 8 thumbnails and the concept sheet were regenerated.

@@ -19,6 +19,8 @@ export async function generateMetadata(): Promise<Metadata> {
   let description = "សូមគោរពអញ្ជើញចូលរួមជាភ្ញៀវកិត្តិយស ក្នុងពិធីមង្គលការរបស់យើងខ្ញុំ";
   let image = "/api/og";
   try {
+    // the site's own defaults are the default workspace's; /w/<slug> and
+    // /invite/<code> set their own wedding's (lib/metadata)
     const w = await getWedding();
     title = `${w.title} | ${w.groomName} & ${w.brideName}`;
     description = w.metaDescription || `${w.weddingDateKhmer} • ${w.venueName}`;

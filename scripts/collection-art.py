@@ -135,10 +135,15 @@ def shape_from_svg(path, drop=None):
     return shape, (vb[2], vb[3])
 
 
-def engraved(g, spacing=4.2, angle=-35, w_out=1.6, w_hatch=0.75, shade=0.55):
-    """A solid shape redrawn as an engraving: its outlines, and hatching that
-    fills only the side of each form turned from the light (bottom right),
-    so the shape reads as modelled rather than filled."""
+def engraved(g, spacing=8.5, angle=-35, w_out=3.4, w_hatch=1.7, shade=True):
+    """A solid shape redrawn as a copperplate engraving.
+
+    The outline in a fine line; then hatching laid only where each form
+    turns from the light (lower right) — a band inside every edge that faces
+    away — and, in the deepest part of that band, a second set of lines
+    crossing the first. The lit side is left as clean paper, so the forms
+    read as modelled rather than coloured in.
+    """
     it = Item()
     it.sil = g
     for p in getattr(g, "geoms", [g]):
@@ -150,22 +155,28 @@ def engraved(g, spacing=4.2, angle=-35, w_out=1.6, w_hatch=0.75, shade=0.55):
     x0, y0, x1, y1 = g.bounds
     span = max(x1 - x0, y1 - y0) * 1.5
     cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
-    a = math.radians(angle)
-    d = np.array([math.cos(a), math.sin(a)])
-    n = np.array([-d[1], d[0]])
-    # the shaded part: what lies within the shape but not within the shape
-    # shifted towards the light
-    lit = affinity.translate(g, -spacing * 1.6, -spacing * 1.6)
-    shadow = g.difference(lit).buffer(0)
-    k = -span
-    while k < span:
-        o = np.array([cx, cy]) + n * k
-        ln = LineString([o - d * span, o + d * span])
-        seg = ln.intersection(shadow if shade else g)
-        for s in sa.lines_of(seg):
-            if LineString(s).length > 1.5:
-                it.line("line", s, w_hatch)
-        k += spacing
+
+    def hatch(region, ang, step, w):
+        a = math.radians(ang)
+        d = np.array([math.cos(a), math.sin(a)])
+        n = np.array([-d[1], d[0]])
+        k = -span
+        while k < span:
+            o = np.array([cx, cy]) + n * k
+            seg = LineString([o - d * span, o + d * span]).intersection(region)
+            for s_ in sa.lines_of(seg):
+                if LineString(s_).length > 1.2:
+                    it.line("line", s_, w)
+            k += step
+
+    if not shade:
+        hatch(g.buffer(-w_out), angle, spacing, w_hatch)
+        return it
+    # the shaded band: inside the shape, outside the shape moved towards the light
+    band = g.difference(affinity.translate(g, -spacing * 2.4, -spacing * 2.4)).buffer(-w_out * 0.6)
+    deep = g.difference(affinity.translate(g, -spacing * 1.1, -spacing * 1.1)).buffer(-w_out * 0.6)
+    hatch(band, angle, spacing, w_hatch)
+    hatch(deep, angle + 70, spacing * 1.1, w_hatch * 0.85)
     return it
 
 
@@ -412,19 +423,22 @@ def corner_single_rule(ornament):
 
 
 def pack_engraved():
-    """The pack's acanthus corner and crest redrawn as engravings — outline
-    and hatching — for the engraved designs (printed, not foil)."""
+    """The pack's own ornaments redrawn as engravings (printed in ink, not
+    foil): its acanthus corner, its crest, its medallion, its bow scroll and
+    its star rule."""
     acan, _ = sa.pack("corner", drop=lambda bb: sa.long_thin(bb) or (bb[0] > 290 and bb[1] < 60) or (bb[1] > 330 and bb[0] < 60))
     x0, y0, x1, y1 = acan.bounds
-    acan = gtf(affinity.translate(acan, -x0, -y0), s=520 / max(x1 - x0, y1 - y0), dx=20, dy=20)
+    acan = gtf(affinity.translate(acan, -x0, -y0), s=540 / max(x1 - x0, y1 - y0), dx=24, dy=24)
     sc = Scene(600, 600)
-    sc.add(engraved(acan, spacing=5, w_out=2.2, w_hatch=1.0))
+    sc.add(engraved(acan))
     scene(sc, "engraved-corner", sa.MIRROR)
-    cr, (w, h) = sa.pack("crest")
-    s = 900 / w
-    sc = Scene(960, round(h * s + 40))
-    sc.add(engraved(gtf(cr, s=s, dx=30, dy=20), spacing=5, w_out=2.2, w_hatch=1.0))
-    scene(sc, "engraved-crest", {"": (0, 0), "flip": (0, 1)})
+    for name, width, out in (("crest", 900, "engraved-crest"), ("medallion", 520, "engraved-medallion"),
+                             ("scroll-bow", 760, "engraved-scroll-bow"), ("star-rule", 900, "engraved-star-rule")):
+        g, (w, h) = sa.pack(name)
+        s_ = width / w
+        sc = Scene(round(width + 60), round(h * s_ + 60))
+        sc.add(engraved(gtf(g, s=s_, dx=30, dy=30)))
+        scene(sc, out, {"tc": (0, 0), "bc": (0, 1)})
 
 
 # ── flowers ────────────────────────────────────────────────────────────────
@@ -651,7 +665,8 @@ def main():
     solid(sa.double_rule_corner(), "corner-plain-double", 400, 400, sa.MIRROR)
     solid(corner_single_rule(Point(0, 0).buffer(0.01)), "corner-plain-single", 400, 400, sa.MIRROR)
     # pack pieces kept as solids for relief and foil use
-    for name in ("scroll-bow", "scroll-knot", "medallion", "rosette-c", "corner-loop"):
+    for name in ("scroll-bow", "scroll-knot", "scroll-twin", "medallion", "rosette-a", "rosette-c", "rosette-d", "crest",
+                 "star-rule", "rule", "wing", "fleuron", "corner-loop"):
         g, (w, h) = sa.pack(name)
         solid(g, f"pack-{name}", w, h, {"": (0, 0), "flip": (0, 1)} if name != "corner-loop" else sa.MIRROR)
     acan, _ = sa.pack("corner", drop=lambda bb: sa.long_thin(bb) or (bb[0] > 290 and bb[1] < 60) or (bb[1] > 330 and bb[0] < 60))

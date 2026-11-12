@@ -8,8 +8,8 @@ import {
   fail,
   ok,
   guard,
-  requireAdmin,
 } from "@/lib/api";
+import { requireWorkspace } from "@/lib/workspace";
 import { getDb } from "@/lib/db";
 import { media } from "@/lib/db/schema";
 import { looksLikeImage, looksLikeVideo } from "@/lib/media-magic";
@@ -20,7 +20,7 @@ export const maxDuration = 60;
 /** Validated upload endpoint — stores the file as a row in the media table. */
 export async function POST(request: Request) {
   return guard(async () => {
-  const { response } = await requireAdmin(request);
+  const { weddingId, response } = await requireWorkspace(request);
   if (response) return response;
 
   let form: FormData;
@@ -61,6 +61,7 @@ export async function POST(request: Request) {
   const [row] = await db
     .insert(media)
     .values({
+      weddingId,
       filename: file.name.slice(0, 160) || "upload",
       mimeType: file.type,
       size: buffer.byteLength,

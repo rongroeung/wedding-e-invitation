@@ -1,5 +1,6 @@
-import { desc } from "drizzle-orm";
-import { fail, getSession } from "@/lib/api";
+import { desc, eq } from "drizzle-orm";
+import { fail } from "@/lib/api";
+import { getAdminContext } from "@/lib/workspace";
 import { getDb } from "@/lib/db";
 import { guests, rsvps } from "@/lib/db/schema";
 
@@ -7,15 +8,17 @@ export const dynamic = "force-dynamic";
 
 /** CSV export of guests or RSVPs (UTF-8 BOM so Excel renders Khmer correctly). */
 export async function GET(request: Request) {
-  const session = await getSession();
-  if (!session) return fail("Unauthorized", 401);
+  const ctx = await getAdminContext();
+  if (!ctx) return fail("Unauthorized", 401);
+  const weddingId = ctx.weddingId;
+  if (!weddingId) return fail("No workspace", 403);
 
   const type = new URL(request.url).searchParams.get("type") === "guests" ? "guests" : "rsvps";
   const db = await getDb();
 
   let rows: string[][];
   if (type === "guests") {
-    const data = await db.select().from(guests).orderBy(desc(guests.createdAt));
+    const data = await db.select().from(guests).where(eq(guests.weddingId, weddingId)).orderBy(desc(guests.createdAt));
     rows = [
       ["ឈ្មោះ", "ងារ", "ឈ្មោះឡាតាំង", "ចំនួនកៅអី", "លេខកូដ", "តំណអញ្ជើញ", "ចំនួនមើល", "កំណត់ចំណាំ"],
       ...data.map((g) => [
@@ -24,7 +27,7 @@ export async function GET(request: Request) {
       ]),
     ];
   } else {
-    const data = await db.select().from(rsvps).orderBy(desc(rsvps.updatedAt));
+    const data = await db.select().from(rsvps).where(eq(rsvps.weddingId, weddingId)).orderBy(desc(rsvps.updatedAt));
     rows = [
       ["ឈ្មោះ", "វត្តមាន", "ចំនួនអ្នកចូលរួម", "សារជូនពរ", "កាលបរិច្ឆេទ"],
       ...data.map((r) => [

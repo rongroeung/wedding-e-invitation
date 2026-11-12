@@ -1,9 +1,10 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
-import { fail, ok, readJson, requireAdmin } from "@/lib/api";
+import { fail, ok, readJson } from "@/lib/api";
 import { getDb } from "@/lib/db";
-import { users } from "@/lib/db/schema";
+import { users, workspaceMembers } from "@/lib/db/schema";
 import { hashPassword, passwordRule } from "@/lib/passwords";
+import { canAdminister, requireWorkspace } from "@/lib/workspace";
 
 export const dynamic = "force-dynamic";
 
@@ -15,9 +16,16 @@ const updateSchema = z.object({
 
 type Params = { params: Promise<{ id: string }> };
 
-/** Rename another administrator, or reset their password. */
+/**
+ * Rename another administrator, or reset their password.
+ *
+ * Only for an account that belongs to this workspace and to nothing this
+ * admin cannot manage: a couple can look after their own co-admin, but not
+ * reset the password of someone who also runs another wedding, nor the
+ * owner's.
+ */
 export async function PUT(request: Request, { params }: Params) {
-  const { response } = await requireAdmin(request);
+  const { ctx, weddingId, response } = await requireWorkspace(request);
   if (response) return response;
 
   const { id } = await params;
@@ -25,6 +33,7 @@ export async function PUT(request: Request, { params }: Params) {
   if (!parsed.success) {
     return fail(parsed.error.issues[0]?.message || "ទិន្នន័យមិនត្រឹមត្រូវ", 422);
   }
+  if (!(await canAdminister(ctx, weddingId, id))) return fail("រកមិនឃើញអ្នកប្រើប្រាស់", 404);
 
   const patch: Record<string, string> = {};
   if (parsed.data.name) patch.name = parsed.data.name;
@@ -45,24 +54,30 @@ export async function PUT(request: Request, { params }: Params) {
 }
 
 /**
- * Remove an administrator.
+ * Remove an administrator from this workspace.
  *
- * Two things are refused: deleting yourself, which would end your own session
- * mid-request, and deleting the last account, which would lock everyone out of
- * the dashboard with no way back in.
+ * Their account goes too once it manages nothing at all (and is not the
+ * owner's). Refused: removing yourself, which would end your own access
+ * mid-request, and removing a workspace's last admin unless you are the owner
+ * (who can always get back in).
  */
 export async function DELETE(request: Request, { params }: Params) {
-  const { session, response } = await requireAdmin(request);
+  const { ctx, weddingId, response } = await requireWorkspace(request);
   if (response) return response;
 
   const { id } = await params;
-  if (id === session!.sub) return fail("មិនអាចលុបគណនីផ្ទាល់ខ្លួនបានទេ", 409);
+  if (id === ctx.userId) return fail("មិនអាចលុបគណនីផ្ទាល់ខ្លួនបានទេ", 409);
 
   const db = await getDb();
-  const all = await db.select({ id: users.id }).from(users);
-  if (all.length <= 1) return fail("ត្រូវរក្សាទុកគណនីគ្រប់គ្រងយ៉ាងតិចមួយ", 409);
-  if (!all.some((u) => u.id === id)) return fail("រកមិនឃើញអ្នកប្រើប្រាស់", 404);
+  const members = await db.select({ userId: workspaceMembers.userId }).from(workspaceMembers).where(eq(workspaceMembers.weddingId, weddingId));
+  if (!members.some((m) => m.userId === id)) return fail("រកមិនឃើញអ្នកប្រើប្រាស់", 404);
+  if (!ctx.isOwner && members.length <= 1) return fail("ត្រូវរក្សាទុកគណនីគ្រប់គ្រងយ៉ាងតិចមួយ", 409);
 
-  await db.delete(users).where(eq(users.id, id));
+  const [target] = await db.select({ isOwner: users.isOwner }).from(users).where(eq(users.id, id)).limit(1);
+  if (target?.isOwner && !ctx.isOwner) return fail("រកមិនឃើញអ្នកប្រើប្រាស់", 404);
+
+  await db.delete(workspaceMembers).where(and(eq(workspaceMembers.userId, id), eq(workspaceMembers.weddingId, weddingId)));
+  const left = await db.select({ w: workspaceMembers.weddingId }).from(workspaceMembers).where(eq(workspaceMembers.userId, id)).limit(1);
+  if (!left.length && !target?.isOwner) await db.delete(users).where(eq(users.id, id));
   return ok({ id });
 }

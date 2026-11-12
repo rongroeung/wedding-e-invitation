@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import type { Guest, Rsvp } from "@/lib/db/schema";
+import { CAPTION_TOKENS, DEFAULT_CAPTION, captionWithoutLink, renderCaption } from "@/lib/shareCaption";
 import { Button, Card, Field, Input, Select, StatusMessage, Textarea, useApi } from "./ui";
 
 const TITLES = ["លោក", "លោកស្រី", "កញ្ញា", "អ្នកនាង", "ឯកឧត្តម", "លោកជំទាវ", "លោកគ្រូ", "អ្នកគ្រូ"];
@@ -11,10 +12,13 @@ export function GuestManager({
   guests,
   rsvps,
   siteUrl,
+  caption,
 }: {
   guests: Guest[];
   rsvps: Rsvp[];
   siteUrl: string;
+  /** The saved message template and the wedding details it can fill in. */
+  caption: { template: string; couple: string; date: string; venue: string };
 }) {
   const { busy, message, send, setMessage } = useApi();
   const [query, setQuery] = useState("");
@@ -27,6 +31,39 @@ export function GuestManager({
   });
   const [bulk, setBulk] = useState("");
   const [qrGuest, setQrGuest] = useState<Guest | null>(null);
+
+  /* ── the message that goes with each link ── */
+  const [template, setTemplate] = useState(caption.template || DEFAULT_CAPTION);
+  const captionRef = useRef<HTMLTextAreaElement>(null);
+  const valuesFor = (g: Pick<Guest, "title" | "name" | "code">) => ({
+    title: g.title,
+    name: g.name,
+    couple: caption.couple,
+    date: caption.date,
+    venue: caption.venue,
+    link: `${siteUrl}/invite/${g.code}`,
+  });
+  const sample = guests[0] ?? { title: "លោក", name: "ឈ្មោះភ្ញៀវ", code: "ABCD1234" };
+  function insertToken(token: string) {
+    const el = captionRef.current;
+    if (!el) return setTemplate((t) => t + token);
+    const { selectionStart: a, selectionEnd: b } = el;
+    const next = template.slice(0, a) + token + template.slice(b);
+    setTemplate(next);
+    requestAnimationFrame(() => {
+      el.focus();
+      el.setSelectionRange(a + token.length, a + token.length);
+    });
+  }
+  async function shareNative(g: Guest) {
+    const v = valuesFor(g);
+    try {
+      await navigator.share({ text: captionWithoutLink(template, v), url: v.link });
+    } catch {
+      /* cancelled, or not available: nothing to do */
+    }
+  }
+  const canShare = typeof navigator !== "undefined" && typeof navigator.share === "function";
 
   const rsvpByCode = useMemo(() => {
     const map = new Map<string, Rsvp>();
@@ -45,10 +82,10 @@ export function GuestManager({
     );
   }, [guests, query]);
 
-  async function copy(text: string) {
+  async function copy(text: string, what = "បានចម្លងតំណ") {
     try {
       await navigator.clipboard.writeText(text);
-      setMessage({ type: "ok", text: "បានចម្លងតំណ" });
+      setMessage({ type: "ok", text: what });
       setTimeout(() => setMessage(null), 2500);
     } catch {
       setMessage({ type: "error", text: "មិនអាចចម្លងបានទេ" });
@@ -71,6 +108,64 @@ export function GuestManager({
       </header>
 
       <StatusMessage message={message} />
+
+      <Card
+        title="សារភ្ជាប់ជាមួយតំណអញ្ជើញ"
+        description="សរសេរម្ដង ប្រព័ន្ធបំពេញឈ្មោះ និងតំណរបស់ភ្ញៀវម្នាក់ៗ · The message sent with each guest's link"
+      >
+        <div className="grid gap-5 lg:grid-cols-2">
+          <div className="space-y-3">
+            <Textarea
+              ref={captionRef}
+              rows={6}
+              maxLength={1000}
+              value={template}
+              onChange={(e) => setTemplate(e.target.value)}
+              aria-label="សារភ្ជាប់ជាមួយតំណ"
+            />
+            <div className="flex flex-wrap gap-1.5">
+              {CAPTION_TOKENS.map((t) => (
+                <button
+                  key={t.token}
+                  type="button"
+                  onClick={() => insertToken(t.token)}
+                  className="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs text-amber-800 hover:bg-amber-100"
+                  title={t.label}
+                >
+                  {t.token} <span className="text-amber-600/80">{t.label}</span>
+                </button>
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                disabled={busy}
+                onClick={() =>
+                  send("/api/admin/wedding", {
+                    method: "PUT",
+                    // the default wording is stored as "" so a later improvement to it reaches this wedding too
+                    body: JSON.stringify({ shareCaption: template.trim() === DEFAULT_CAPTION ? "" : template }),
+                    successText: "បានរក្សាទុកសារ",
+                  })
+                }
+              >
+                រក្សាទុកសារ
+              </Button>
+              <Button type="button" variant="ghost" onClick={() => setTemplate(DEFAULT_CAPTION)}>
+                ប្រើសារលំនាំដើម
+              </Button>
+            </div>
+          </div>
+          <div>
+            <p className="mb-1.5 text-xs font-medium text-slate-500">
+              ឧទាហរណ៍សម្រាប់ {sample.title} {sample.name}
+            </p>
+            <pre className="whitespace-pre-wrap break-words rounded-lg border border-slate-200 bg-slate-50 p-3 font-sans text-sm leading-relaxed text-slate-700">
+              {renderCaption(template, valuesFor(sample))}
+            </pre>
+          </div>
+        </div>
+      </Card>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card
@@ -202,7 +297,19 @@ export function GuestManager({
                         មិនទាន់ឆ្លើយតប
                       </span>
                     )}
+                    <Button
+                      variant="ghost"
+                      type="button"
+                      onClick={() => copy(renderCaption(template, valuesFor(guest)), "បានចម្លងសារ និងតំណ")}
+                    >
+                      ចម្លងសារ
+                    </Button>
                     <Button variant="ghost" type="button" onClick={() => copy(link)}>ចម្លងតំណ</Button>
+                    {canShare && (
+                      <Button variant="ghost" type="button" onClick={() => shareNative(guest)}>
+                        ចែករំលែក
+                      </Button>
+                    )}
                     <Button variant="ghost" type="button" onClick={() => setQrGuest(guest)}>QR</Button>
                     <Button
                       variant="ghost"
@@ -220,7 +327,7 @@ export function GuestManager({
                       កូដថ្មី
                     </Button>
                     <a
-                      href={`https://t.me/share/url?url=${encodeURIComponent(link)}`}
+                      href={`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(captionWithoutLink(template, valuesFor(guest)))}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"

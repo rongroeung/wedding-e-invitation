@@ -1,10 +1,10 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { getDb } from "@/lib/db";
 import { rsvps } from "@/lib/db/schema";
 import { clientKey, rateLimit } from "@/lib/rate-limit";
 import { fail, isSameOrigin, ok, readJson } from "@/lib/api";
-import { getGuestByCode } from "@/lib/queries";
+import { getGuestByCode, getWeddingBySlug } from "@/lib/queries";
 
 const schema = z.object({
   name: z.string().trim().min(1).max(120),
@@ -12,6 +12,8 @@ const schema = z.object({
   guestCount: z.number().int().min(0).max(20).default(1),
   message: z.string().trim().max(600).optional().default(""),
   guestCode: z.string().trim().max(80).optional().default(""),
+  /** The wedding's slug, for a reply without a guest code (the code says it otherwise). */
+  workspace: z.string().trim().max(60).optional().default("main"),
 });
 
 /** Public RSVP submission (rate limited, validated, same-origin only). */
@@ -29,8 +31,12 @@ export async function POST(request: Request) {
 
   const input = parsed.data;
   const guest = input.guestCode ? await getGuestByCode(input.guestCode) : null;
+  // a guest's code decides the wedding; an anonymous reply names it
+  const weddingId = guest ? guest.weddingId : (await getWeddingBySlug(input.workspace || "main"))?.id;
+  if (!weddingId) return fail("រកមិនឃើញពិធីមង្គលការ", 404);
 
   const values = {
+    weddingId,
     guestId: guest?.id ?? null,
     guestCode: guest?.code ?? "",
     name: input.name,
@@ -53,7 +59,7 @@ export async function POST(request: Request) {
     const existing = await db
       .select({ id: rsvps.id })
       .from(rsvps)
-      .where(eq(rsvps.guestCode, guest.code))
+      .where(and(eq(rsvps.guestCode, guest.code), eq(rsvps.weddingId, weddingId)))
       .limit(1);
     if (existing[0]) {
       await db

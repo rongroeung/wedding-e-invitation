@@ -66,7 +66,9 @@ export function choose(change: Partial<Appearance>) {
   const next = { ...attrs(), ...change };
   apply(next);
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...next, explicit: true }));
+    // remember which design of the couple's this choice was made against (see appearanceBasis)
+    const basis = document.documentElement.getAttribute("data-appearance-basis") ?? "";
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...next, explicit: true, basis }));
   } catch {
     /* private window or blocked storage: it still applies for this visit */
   }

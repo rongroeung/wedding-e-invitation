@@ -1,5 +1,6 @@
 import QRCode from "qrcode";
-import { fail, getSession } from "@/lib/api";
+import { fail } from "@/lib/api";
+import { getAdminContext, workspacePath } from "@/lib/workspace";
 import { siteUrl } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
@@ -9,13 +10,15 @@ export const dynamic = "force-dynamic";
  *   /api/admin/qr?code=ABC123&download=1
  */
 export async function GET(request: Request) {
-  const session = await getSession();
-  if (!session) return fail("Unauthorized", 401);
+  const ctx = await getAdminContext();
+  if (!ctx) return fail("Unauthorized", 401);
 
   const url = new URL(request.url);
   const code = (url.searchParams.get("code") ?? "").slice(0, 80);
   const download = url.searchParams.get("download") === "1";
-  const target = code ? `${siteUrl()}/invite/${encodeURIComponent(code)}` : siteUrl();
+  // without a guest code: the current workspace's own address
+  const home = ctx.workspace ? `${siteUrl()}${workspacePath(ctx.workspace.slug)}`.replace(/\/$/, "") || siteUrl() : siteUrl();
+  const target = code ? `${siteUrl()}/invite/${encodeURIComponent(code)}` : home;
 
   const png = await QRCode.toBuffer(target, {
     type: "png",

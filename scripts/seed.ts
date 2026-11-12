@@ -12,10 +12,14 @@ import {
   media,
   storyItems,
   users,
+  workspaceMembers,
   wedding,
   weddingEvents,
 } from "../src/lib/db/schema";
 import { placeholderPhoto } from "../src/lib/placeholder";
+
+/** The demo data is the default workspace ("main", served at "/"). */
+const W = "main";
 
 async function main() {
   const db = await getDb();
@@ -27,6 +31,8 @@ async function main() {
   if (existing.length === 0) {
     await db.insert(users).values({
       email,
+      // the first account is the platform owner (creates workspaces, assigns admins)
+      isOwner: true,
       name: "អ្នកគ្រប់គ្រង",
       passwordHash: await bcrypt.hash(password, 12),
     });
@@ -36,10 +42,15 @@ async function main() {
   }
 
   /* ── Wedding information ────────────────────────────────────── */
-  const hasWedding = await db.select().from(wedding).limit(1);
-  if (hasWedding.length === 0) {
-    await db.insert(wedding).values({
-      id: "main",
+  /*
+   * The workspaces migration (drizzle/0033) creates the default wedding row
+   * with only the schema's defaults, so "a row exists" no longer means "the
+   * couple filled it in": a row that has never been given a venue still gets
+   * the demo details.
+   */
+  const [existingWedding] = await db.select().from(wedding).where(eq(wedding.id, W)).limit(1);
+  if (!existingWedding || (!existingWedding.venueName && !existingWedding.weddingDateKhmer)) {
+    const demo = {
       weddingDate: new Date("2027-04-24T17:30:00+07:00"),
       weddingDateKhmer: "ថ្ងៃសៅរ៍ ទី ២៤ ខែ មេសា ឆ្នាំ ២០២៧",
       weddingTimeKhmer: "វេលាម៉ោង ០៥:៣០ នាទីល្ងាច",
@@ -66,22 +77,28 @@ async function main() {
         "ឯកឧត្តម លោកអ្នកឧកញ៉ា អ្នកឧកញ៉ា ឧកញ៉ា លោកជំទាវ លោក លោកស្រី អ្នកនាង កញ្ញា",
       invitationBody:
         "អញ្ជើញចូលរួម ជាអធិបតី និងជាភ្ញៀវកិត្តិយស ដើម្បីប្រសិទ្ធិពរជ័យសិរីមង្គលអាពាហ៍ពិពាហ៍ កូនប្រុស កូនស្រី របស់យើងខ្ញុំ",
-    });
+    };
+    if (existingWedding) await db.update(wedding).set(demo).where(eq(wedding.id, W));
+    else await db.insert(wedding).values({ id: W, slug: W, ...demo });
     console.log("✔ wedding information seeded");
   } else {
     console.log("• wedding row already exists, skipped");
   }
 
+  /* ── The first admin manages the first wedding ──────────────── */
+  const [firstUser] = await db.select().from(users).limit(1);
+  if (firstUser) await db.insert(workspaceMembers).values({ userId: firstUser.id, weddingId: W }).onConflictDoNothing();
+
   /* ── Programme ──────────────────────────────────────────────── */
   if ((await db.select().from(weddingEvents).limit(1)).length === 0) {
     await db.insert(weddingEvents).values([
-      { groupName: "ពេលព្រឹក", groupIcon: "🌸", timeLabel: "០៦:០០ នាទីព្រឹក", title: "ពិធីហែជំនូន", description: "ក្បួនហែជំនូនចេញដំណើរពីផ្ទះខាងកូនប្រុស", icon: "🌺", sortOrder: 1 },
-      { groupName: "ពេលព្រឹក", groupIcon: "🌸", timeLabel: "០៧:០០ នាទីព្រឹក", title: "ពិធីកាត់សក់", description: "ពិធីកាត់សក់ជូនពរដល់កូនកំលោះ នាងក្រមុំ", icon: "✂️", sortOrder: 2 },
-      { groupName: "ពេលព្រឹក", groupIcon: "🌸", timeLabel: "០៨:០០ នាទីព្រឹក", title: "ពិធីសំពះផ្ទឹម និងចងដៃ", description: "ពិធីប្រគេនពរជ័យពីមាតាបិតា និងញាតិសន្តាន", icon: "🙏", sortOrder: 3 },
-      { groupName: "ពេលព្រឹក", groupIcon: "🌸", timeLabel: "០៩:៣០ នាទីព្រឹក", title: "ពិធីបង្វិលពពិល", description: "ពិធីបង្វិលពពិលជូនពរដល់គូស្វាមីភរិយាថ្មី", icon: "🕯️", sortOrder: 4 },
-      { groupName: "ពេលល្ងាច", groupIcon: "🌙", timeLabel: "០៥:៣០ នាទីល្ងាច", title: "ទទួលភ្ញៀវកិត្តិយស", description: "សូមគោរពអញ្ជើញភ្ញៀវកិត្តិយសចូលរួមក្នុងពិធី", icon: "🌟", sortOrder: 5 },
-      { groupName: "ពេលល្ងាច", groupIcon: "🌙", timeLabel: "០៦:៣០ នាទីល្ងាច", title: "ពិធីស្វាគមន៍ និងថតរូបអនុស្សាវរីយ៍", description: "ថតរូបជាមួយគូស្វាមីភរិយាថ្មី", icon: "📷", sortOrder: 6 },
-      { groupName: "ពេលល្ងាច", groupIcon: "🌙", timeLabel: "០៧:០០ នាទីល្ងាច", title: "ពិធីជប់លៀងអាពាហ៍ពិពាហ៍", description: "អាហារពេលល្ងាច និងកម្មវិធីសិល្បៈ", icon: "🍽️", sortOrder: 7 },
+      { weddingId: W, groupName: "ពេលព្រឹក", groupIcon: "🌸", timeLabel: "០៦:០០ នាទីព្រឹក", title: "ពិធីហែជំនូន", description: "ក្បួនហែជំនូនចេញដំណើរពីផ្ទះខាងកូនប្រុស", icon: "🌺", sortOrder: 1 },
+      { weddingId: W, groupName: "ពេលព្រឹក", groupIcon: "🌸", timeLabel: "០៧:០០ នាទីព្រឹក", title: "ពិធីកាត់សក់", description: "ពិធីកាត់សក់ជូនពរដល់កូនកំលោះ នាងក្រមុំ", icon: "✂️", sortOrder: 2 },
+      { weddingId: W, groupName: "ពេលព្រឹក", groupIcon: "🌸", timeLabel: "០៨:០០ នាទីព្រឹក", title: "ពិធីសំពះផ្ទឹម និងចងដៃ", description: "ពិធីប្រគេនពរជ័យពីមាតាបិតា និងញាតិសន្តាន", icon: "🙏", sortOrder: 3 },
+      { weddingId: W, groupName: "ពេលព្រឹក", groupIcon: "🌸", timeLabel: "០៩:៣០ នាទីព្រឹក", title: "ពិធីបង្វិលពពិល", description: "ពិធីបង្វិលពពិលជូនពរដល់គូស្វាមីភរិយាថ្មី", icon: "🕯️", sortOrder: 4 },
+      { weddingId: W, groupName: "ពេលល្ងាច", groupIcon: "🌙", timeLabel: "០៥:៣០ នាទីល្ងាច", title: "ទទួលភ្ញៀវកិត្តិយស", description: "សូមគោរពអញ្ជើញភ្ញៀវកិត្តិយសចូលរួមក្នុងពិធី", icon: "🌟", sortOrder: 5 },
+      { weddingId: W, groupName: "ពេលល្ងាច", groupIcon: "🌙", timeLabel: "០៦:៣០ នាទីល្ងាច", title: "ពិធីស្វាគមន៍ និងថតរូបអនុស្សាវរីយ៍", description: "ថតរូបជាមួយគូស្វាមីភរិយាថ្មី", icon: "📷", sortOrder: 6 },
+      { weddingId: W, groupName: "ពេលល្ងាច", groupIcon: "🌙", timeLabel: "០៧:០០ នាទីល្ងាច", title: "ពិធីជប់លៀងអាពាហ៍ពិពាហ៍", description: "អាហារពេលល្ងាច និងកម្មវិធីសិល្បៈ", icon: "🍽️", sortOrder: 7 },
     ]);
     console.log("✔ programme seeded");
   }
@@ -89,10 +106,10 @@ async function main() {
   /* ── Love story ─────────────────────────────────────────────── */
   if ((await db.select().from(storyItems).limit(1)).length === 0) {
     await db.insert(storyItems).values([
-      { label: "ឆ្នាំ ២០១៩", title: "ថ្ងៃដំបូងដែលយើងបានស្គាល់គ្នា", description: "ការជួបគ្នាដំបូងនៅសាកលវិទ្យាល័យ ដែលបានក្លាយជាការចាប់ផ្តើមនៃរឿងរ៉ាវដ៏ស្រស់ស្អាត", sortOrder: 1 },
-      { label: "ឆ្នាំ ២០២១", title: "ការចាប់ផ្តើមនៃដំណើរជីវិតរបស់យើង", description: "យើងបានសម្រេចចិត្តដើរជាមួយគ្នា ក្នុងគ្រប់ពេលវេលាទាំងសុខ និងទុក្ខ", sortOrder: 2 },
-      { label: "ឆ្នាំ ២០២៦", title: "ថ្ងៃដែលយើងសម្រេចចិត្តដើររួមគ្នា", description: "ពិធីភ្ជាប់ពាក្យ ដោយមានវត្តមានមាតាបិតា និងញាតិសន្តានទាំងសងខាង", sortOrder: 3 },
-      { label: "ថ្ងៃរៀបការ", title: "ថ្ងៃដែលយើងចាប់ផ្តើមជីវិតគូ", description: "ថ្ងៃដ៏សិរីមង្គល ដែលយើងខ្ញុំសូមគោរពអញ្ជើញលោកអ្នកចូលរួមជាសក្ខីភាព", sortOrder: 4 },
+      { weddingId: W, label: "ឆ្នាំ ២០១៩", title: "ថ្ងៃដំបូងដែលយើងបានស្គាល់គ្នា", description: "ការជួបគ្នាដំបូងនៅសាកលវិទ្យាល័យ ដែលបានក្លាយជាការចាប់ផ្តើមនៃរឿងរ៉ាវដ៏ស្រស់ស្អាត", sortOrder: 1 },
+      { weddingId: W, label: "ឆ្នាំ ២០២១", title: "ការចាប់ផ្តើមនៃដំណើរជីវិតរបស់យើង", description: "យើងបានសម្រេចចិត្តដើរជាមួយគ្នា ក្នុងគ្រប់ពេលវេលាទាំងសុខ និងទុក្ខ", sortOrder: 2 },
+      { weddingId: W, label: "ឆ្នាំ ២០២៦", title: "ថ្ងៃដែលយើងសម្រេចចិត្តដើររួមគ្នា", description: "ពិធីភ្ជាប់ពាក្យ ដោយមានវត្តមានមាតាបិតា និងញាតិសន្តានទាំងសងខាង", sortOrder: 3 },
+      { weddingId: W, label: "ថ្ងៃរៀបការ", title: "ថ្ងៃដែលយើងចាប់ផ្តើមជីវិតគូ", description: "ថ្ងៃដ៏សិរីមង្គល ដែលយើងខ្ញុំសូមគោរពអញ្ជើញលោកអ្នកចូលរួមជាសក្ខីភាព", sortOrder: 4 },
     ]);
     console.log("✔ love story seeded");
   }
@@ -112,6 +129,7 @@ async function main() {
       const [row] = await db
         .insert(media)
         .values({
+          weddingId: W,
           filename: `demo-${i + 1}.svg`,
           mimeType: "image/svg+xml",
           size: svg.byteLength,
@@ -120,6 +138,7 @@ async function main() {
         })
         .returning();
       await db.insert(galleryImages).values({
+        weddingId: W,
         mediaId: row.id,
         caption: captions[i],
         sortOrder: i + 1,
@@ -129,7 +148,7 @@ async function main() {
   }
 
   /* ── Demo KHQR for the gift section ────────────────────────── */
-  const weddingRow = (await db.select().from(wedding).limit(1))[0];
+  const weddingRow = (await db.select().from(wedding).where(eq(wedding.id, W)).limit(1))[0];
   if (weddingRow && !weddingRow.giftQrMediaId && !weddingRow.giftQrUrl) {
     const { readFileSync, existsSync } = await import("node:fs");
     const qrPath = "public/frames/demo-khqr.png";
@@ -138,6 +157,7 @@ async function main() {
       const [row] = await db
         .insert(media)
         .values({
+          weddingId: W,
           filename: "demo-khqr.png",
           mimeType: "image/png",
           size: data.byteLength,
@@ -157,14 +177,15 @@ async function main() {
   if ((await db.select().from(guests).limit(1)).length === 0) {
     await db.insert(guests).values([
       {
+        weddingId: W,
         code: "K7Q4MXA2",
         title: "លោក",
         name: "ថេង រ័ត្នរង្សីរឿង",
         nameLatin: "Mr. Theng Rathrongroeung",
         allowedSeats: 2,
       },
-      { code: "P3WHY9TB", title: "លោកស្រី", name: "ចាន់ ដារ៉ា", allowedSeats: 2 },
-      { code: "R6JZ2NDK", title: "កញ្ញា", name: "សុវណ្ណ មករា", allowedSeats: 1 },
+      { weddingId: W, code: "P3WHY9TB", title: "លោកស្រី", name: "ចាន់ ដារ៉ា", allowedSeats: 2 },
+      { weddingId: W, code: "R6JZ2NDK", title: "កញ្ញា", name: "សុវណ្ណ មករា", allowedSeats: 1 },
     ]);
     console.log("✔ demo guests seeded");
   }

@@ -18,24 +18,22 @@ type Props = { className?: string; style?: CSSProperties };
  *
  * Drawn through a CSS mask: the file supplies the shape and the theme's gold
  * ramp is the metal, so a change of theme recolours every ornament together,
- * and the box is transparent wherever the ornament is not. `draw` makes it
- * open outward from its centre when its section is revealed.
+ * and the box is transparent wherever the ornament is not. Printed in place:
+ * it does not animate in.
  */
 export function Flourish({
   role,
   className = "",
   style,
-  draw = false,
 }: {
   role: OrnamentRole;
   className?: string;
   style?: CSSProperties;
-  draw?: boolean;
 }) {
   const art = DESIGN_KITS["vintage-flourish"].ornaments[role];
   return (
     <span
-      className={`flourish ${draw ? "flourish-draw" : ""} ${className}`}
+      className={`flourish ${className}`}
       style={
         {
           aspectRatio: `var(--orn-${role}-ar, ${art.w} / ${art.h})`,
@@ -62,7 +60,6 @@ export function FlourishDivider({
   return (
     <Flourish
       role={role}
-      draw
       className={`mx-auto ${className}`}
       style={{ width: `min(calc(${width}px * var(--orn-${role}-scale, 1)), 86%)` }}
     />

@@ -50,14 +50,14 @@ GRAND = "min(30%, 16dvh, 210px)"
 DESIGNS = [
     # ── A · ក្បាច់រចនាបុរាណខ្មែរ — Traditional Khmer ornament ───────────
     ("khmer-classical-flourish", "khmer", "ក្បាច់វល្លិខ្មែរបុរាណ", "Khmer Classical Flourish", IVORY, WASH, 0.95, 0.4, dict(
-        art=[P("collection/naga-crest", "tc", "crest"), P("collection/kbach-medallion", "bc", "min(30%, 18dvh, 210px)")],
+        art=[P("collection/pack-crest", "tc", "crest"), P("collection/pack-crest", "bc", "crest")],
         corner="stationery/corner-acanthus", rule="double", lineMetal=True)),
     ("intricate-scrollwork", "khmer", "ក្បាច់វល្លិល្អិតល្អន់", "Intricate Khmer Scrollwork", CREAM, WASH, 0.95, 0.4, dict(
         art=[], corner="stationery/corner-loop", rule="double", lineMetal=True,
         bands={"t": B("collection/band-scroll", 0.36, "foil"), "b": B("collection/band-scroll", 0.36, "foil")})),
     ("royal-ornament", "khmer", "ក្បាច់រាជស៊ីមេទ្រី", "Symmetrical Royal Ornament", CREAM, WASH, 0.95, 0.4, dict(
-        art=[P("collection/kbach-crest", "tc", "crest"), P("collection/kbach-medallion", "bc", "min(30%, 18dvh, 210px)")],
-        corner="collection/corner-phka", rule="double", lineMetal=True)),
+        art=[P("collection/pack-medallion", "tc", "min(40%, 22dvh, 280px)"), P("collection/pack-medallion", "bc", "min(30%, 16dvh, 210px)")],
+        corner="stationery/corner-loop", rule="double", lineMetal=True)),
     ("classic-ivory", "khmer", "ក្បាច់វល្លិ និងមែកផ្កា", "Flowing Botanical Ornament", IVORY, WASH, 0.92, 0.42, dict(
         art=[P("collection/camellia-spray", "bl", "a"), P("collection/branch-hang", "tr", "b")],
         corner="stationery/corner-acanthus", rule="double", lineMetal=False)),
@@ -67,24 +67,25 @@ DESIGNS = [
     ("vintage-gold", "khmer", "ជ្រុងក្បាច់ដ៏វិចិត្រ", "Ornamental Corner Masterpiece", CREAM, WASH, 0.95, 0.3, dict(
         art=[], corner="stationery/corner-acanthus", cornerW=GRAND, rule="double", mid=True, lineMetal=True)),
     ("continuous-border", "khmer", "ស៊ុមក្បាច់បន្តជាប់", "Continuous Ornamental Border", IVORY, WASH, 0.95, 0.4, dict(
-        art=[], corner="collection/corner-phka", rule="double", lineMetal=True,
+        art=[], corner="stationery/corner-acanthus", rule="double", lineMetal=True,
         bands={"t": B("collection/band-scroll", 0.3, "foil"), "b": B("collection/band-scroll", 0.3, "foil"),
                "l": B("collection/band-scroll-v", 0.3, "foil"), "r": B("collection/band-scroll-v", 0.3, "foil")})),
     ("engraved-antique", "khmer", "ក្បាច់ឆ្លាក់បុរាណ", "Engraved Antique Ornament", IVORY, WASH, 0.9, 0.4, dict(
-        art=[P("collection/engraved-corner", c, "min(34%, 21dvh, 230px)") for c in ("tl", "tr", "bl", "br")]
-            + [P("collection/engraved-crest", "tc", "crest")],
+        art=[P("collection/engraved-corner", c, "min(30%, 19dvh, 210px)", snug=True) for c in ("tl", "tr", "bl", "br")]
+            + [P("collection/engraved-crest", "tc", "crest"), P("collection/engraved-crest", "bc", "crest")],
         corner="collection/corner-plain-single", rule="single", lineMetal=False)),
     ("contemporary-khmer", "khmer", "បេតិកភណ្ឌខ្មែរសម័យថ្មី", "Contemporary Khmer Heritage", IVORY, WASH, 0.95, 0.4, dict(
-        art=[P("collection/naga-crest", "tc", "min(34%, 20dvh, 230px)"), P("collection/mark-phka", "bc", "mark")],
-        corner="collection/corner-single-phka", rule="single", lineMetal=True)),
+        art=[P("collection/pack-fleuron", "tc", "min(26%, 13dvh, 170px)"), P("collection/pack-fleuron", "bc", "min(20%, 10dvh, 130px)")]
+            + [P("collection/pack-rosette-c", c, "min(8%, 5dvh, 50px)", snug=True) for c in ("tl", "tr", "bl", "br")],
+        corner="collection/corner-plain-single", rule="single", lineMetal=True)),
     ("grand-ceremonial", "khmer", "ក្បាច់ពិធីដ៏អធិកអធម", "Grand Ceremonial Ornament", CREAM, WASH, 0.95, 0.4, dict(
-        art=[P("collection/kbach-crest", "tc", "crest")], corner="stationery/corner-acanthus", cornerW=GRAND, rule="double",
-        lineMetal=True, bands={"b": B("collection/band-garland", 0.46, "foil", 0.02)})),
+        art=[P("collection/pack-crest", "tc", "min(58%, 26dvh, 400px)"), P("collection/pack-crest", "bc", "min(58%, 26dvh, 400px)")],
+        corner="stationery/corner-acanthus", cornerW=GRAND, rule="double", lineMetal=True)),
 
     # ── B · ក្បាច់ចម្លាក់បុរាណខ្មែរ — Khmer sculpture & relief ───────────
     ("sandstone-relief", "relief", "ចម្លាក់ថ្មភក់", "Sandstone Relief", SAND, WASH, 0.9, 0.3, dict(
         art=[], corner="collection/corner-plain-single", rule="single", lineMetal=False,
-        pattern={"src": "collection/tile-diaper", "size": "clamp(60px, 11vmin, 96px)", "plate": "relief", "alpha": 1, "quiet": 0.0})),
+        pattern={"src": "collection/tile-diaper", "size": "clamp(60px, 11vmin, 96px)", "plate": "relief", "alpha": 1, "quiet": 1.0})),
     ("architectural-border", "relief", "ស៊ុមចម្លាក់ស្ថាបត្យកម្ម", "Architectural Carved Border", SAND, WASH, 0.9, 0.3, dict(
         art=[], corner="collection/corner-plain-double", rule="double", lineMetal=False, depth="deep",
         bands={"t": B("collection/band-balusters", 0.5, "relief", 0.03), "b": B("collection/band-balusters", 0.5, "relief", 0.03),
@@ -100,23 +101,24 @@ DESIGNS = [
         art=[], corner="collection/corner-plain-double", rule="double", lineMetal=False,
         bands={"t": B("collection/band-lozenge", 0.55, "relief", 0.03), "b": B("collection/band-lozenge", 0.55, "relief", 0.03)})),
     ("sculpted-scrollwork", "relief", "ក្បាច់វល្លិចម្លាក់", "Sculpted Scrollwork", SAND, WASH, 0.9, 0.3, dict(
-        art=[P("collection/pack-scroll-bow", "tc", "crest", "relief"), P("collection/pack-scroll-bow", "bc", "crest", "relief")]
-            + [P("collection/pack-acanthus", c, "min(26%, 17dvh, 180px)", "relief") for c in ("tl", "tr", "bl", "br")],
-        corner="collection/corner-plain-double", rule="double", lineMetal=False, depth="deep")),
+        art=[P("collection/pack-acanthus", c, "min(26%, 17dvh, 180px)", "relief", snug=True) for c in ("tl", "tr", "bl", "br")],
+        corner="collection/corner-plain-double", rule="double", lineMetal=False, depth="deep",
+        bands={"t": B("collection/band-scroll", 0.34, "relief", 0.02), "b": B("collection/band-scroll", 0.34, "relief", 0.02)})),
     ("recessed-frame", "relief", "ស៊ុមចម្លាក់ផត", "Recessed Relief Frame", IVORY, WASH, 0.9, 0.3, dict(
-        art=[P("collection/mark-phka", c, "mark", "relief") for c in ("tl", "tr", "bl", "br")], recess=True,
+        art=[P("collection/pack-rosette-c", c, "min(13%, 8dvh, 80px)", "relief", snug=True) for c in ("tl", "tr", "bl", "br")]
+            + [P("collection/pack-medallion", c, "min(36%, 20dvh, 250px)", "relief") for c in ("tc", "bc")], recess=True,
         corner="collection/corner-plain-single", rule="single", lineMetal=False)),
     ("heritage-engraving", "relief", "ចម្លាក់បេតិកភណ្ឌ", "Heritage Engraving", IVORY, WASH, 0.9, 0.3, dict(
-        art=[], corner="collection/corner-single-phka", rule="single", lineMetal=False,
-        bands={"t": B("collection/band-garland", 0.44, "line", 0.02), "b": B("collection/band-garland", 0.44, "line", 0.02)})),
+        art=[P("collection/engraved-medallion", "tc", "min(40%, 22dvh, 280px)"), P("collection/engraved-medallion", "bc", "min(40%, 22dvh, 280px)")],
+        corner="collection/corner-plain-single", rule="single", lineMetal=False)),
     ("stone-and-gold", "relief", "ថ្ម និងមាស", "Stone-and-Gold Elegance", SAND_DEEP, WASH, 0.95, 0.3, dict(
-        art=[P("collection/kbach-medallion", "tc", "min(32%, 18dvh, 220px)")], corner="stationery/corner-acanthus", rule="double",
-        lineMetal=True, bands={"b": B("collection/band-garland", 0.44, "foil", 0.02)},
+        art=[P("collection/pack-crest", "tc", "crest"), P("collection/pack-crest", "bc", "crest")],
+        corner="stationery/corner-acanthus", rule="double", lineMetal=True,
         pattern={"src": "collection/tile-diaper", "size": "clamp(60px, 11vmin, 96px)", "plate": "relief", "alpha": 1, "quiet": 0.0})),
     ("grand-relief", "relief", "ចម្លាក់ធំអធិកអធម", "Grand Khmer Relief Composition", SAND, WASH, 0.95, 0.3, dict(
-        art=[P("collection/arch", "tc", "min(70%, 40dvh, 540px)", "relief")], corner="collection/corner-plain-double", rule="double", lineMetal=False,
-        depth="deep", bands={"b": B("collection/band-balusters", 0.5, "relief", 0.03),
-                             "l": B("collection/band-colonnette-v", 0.2, "relief"), "r": B("collection/band-colonnette-v", 0.2, "relief")})),
+        art=[P("collection/pack-crest", "tc", "min(62%, 26dvh, 430px)", "relief"), P("collection/pack-medallion", "bc", "min(36%, 18dvh, 250px)", "relief")]
+            + [P("collection/pack-acanthus", c, "min(32%, 20dvh, 220px)", "relief", snug=True) for c in ("tl", "tr", "bl", "br")],
+        corner="collection/corner-plain-double", rule="double", lineMetal=False, depth="deep")),
 
     # ── C · ក្បាច់ផ្កា និងរុក្ខជាតិ — Floral & botanical ──────────────────
     ("vintage-rose", "floral", "ផ្កាកុលាបឆ្លាក់បុរាណ", "Vintage Rose Engraving", IVORY, WASH, 0.9, 0.42, dict(
@@ -150,8 +152,8 @@ DESIGNS = [
         art=[P("collection/camellia-spray", "bl", "a"), P("collection/branch-hang", "tr", "b"), P("collection/camellia-single", "br", "c", "blind")],
         corner="stationery/corner-acanthus", rule="double", lineMetal=True)),
     ("grand-floral", "floral", "សមាសភាពផ្កាដ៏អធិកអធម", "Grand Floral Composition", IVORY, WASH, 0.9, 0.45, dict(
-        art=[P("collection/garden-head", "tc", "wide")], corner="stationery/corner-floral", rule="double", lineMetal=False,
-        bands={"b": B("collection/band-vine", 0.42, "line", 0.02)})),
+        art=[P("collection/garden-head", c, "wide") for c in ("tc", "bc")], corner="stationery/corner-floral", rule="double",
+        lineMetal=False)),
 ]
 
 out = []

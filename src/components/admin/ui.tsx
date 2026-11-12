@@ -67,7 +67,8 @@ export function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
   );
 }
 
-export function Textarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
+/** React 19 passes `ref` as a prop, so it reaches the <textarea> through the spread. */
+export function Textarea(props: React.ComponentProps<"textarea">) {
   return (
     <textarea
       {...props}

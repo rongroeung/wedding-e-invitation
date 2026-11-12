@@ -657,6 +657,26 @@
     box-shadow: 0 10px 26px -12px rgba(74, 53, 39, 0.75);
   }
   .btn-gold:hover { filter: brightness(1.12); transform: translateY(-1px); }
+
+  /* The envelope's open button, in the wax seal's own gold (WaxSeal's
+     gradient stops): the seal and the button it is opened with are one set. */
+  .btn-seal {
+    @apply relative inline-flex items-center justify-center gap-2 rounded-full px-8 py-3 text-base font-semibold transition-all duration-500;
+    color: #3a2810;
+    background:
+      radial-gradient(120% 140% at 30% 20%, rgb(255 250 235 / 0.45), rgb(255 250 235 / 0) 55%),
+      linear-gradient(160deg, #ecd6a8 0%, #c7a163 38%, #a7834a 70%, #8d6a35 100%);
+    border: 1px solid #f3e2bb;
+    box-shadow:
+      inset 0 1px 0 rgb(255 248 228 / 0.7),
+      inset 0 -2px 4px rgb(77 56 24 / 0.35),
+      0 0 0 1px rgb(95 69 33 / 0.55),
+      0 12px 26px -10px rgb(40 28 12 / 0.75);
+    text-shadow: 0 1px 0 rgb(255 240 205 / 0.55);
+  }
+  .btn-seal:hover { filter: brightness(1.08); transform: translateY(-1px); }
+  .btn-seal:active { transform: translateY(0); }
+  .btn-seal:focus-visible { outline: 3px solid #f3e2bb; outline-offset: 3px; }
   .btn-gold:active { transform: translateY(0); }
 
   .btn-outline {
@@ -676,7 +696,27 @@
     box-shadow: 0 0 0 3px rgba(184, 145, 47, 0.28);
   }
 
-  .label { @apply mb-2 block text-sm; color: rgba(62, 42, 32, 0.88); }
+  /* the paper's own ink (dark on light papers, light on dark ones), not a fixed brown */
+  .label { @apply mb-2 block text-sm font-medium; color: rgb(var(--c-text-rgb) / 0.92); }
+  .field::placeholder { color: rgb(var(--c-text-rgb) / 0.5); }
+
+  /* A two-way choice (RSVP: attending / not). Built from the paper's tokens so it
+     reads on every paper: the chosen one is filled with the theme colour, the
+     other is a clear outline. */
+  .choice {
+    @apply rounded-xl border px-4 py-3 text-sm font-medium transition-all duration-300;
+    border-color: rgb(var(--gold-deep-rgb, 150 118 46) / 0.55);
+    background: rgb(var(--c-text-rgb) / 0.04);
+    color: rgb(var(--c-text-rgb) / 0.9);
+  }
+  .choice:hover { background: rgb(var(--c-text-rgb) / 0.08); }
+  .choice[aria-pressed="true"] {
+    border-color: var(--c-primary);
+    background: var(--c-primary);
+    color: #fffdf7;
+    box-shadow: 0 10px 22px -12px rgb(62 42 32 / 0.7);
+  }
+  .choice:focus-visible { outline: 2px solid var(--gold-1); outline-offset: 2px; }
 
   /* Scroll-reveal (progressive enhancement — visible by default without JS) */
   .reveal { opacity: 1; }
@@ -3677,27 +3717,8 @@
   mask: var(--fl) center / contain no-repeat;
 }
 
-/*
- * Dividers open outward from their centre as their section comes into view,
- * the way a rule is drawn. Only where the page's own reveal is running; with
- * no script, or reduced motion, they are simply printed.
- */
-.js .reveal .flourish-draw,
-.js .reveal.flourish-draw {
-  clip-path: inset(0 50% 0 50%);
-  transition: clip-path 1100ms cubic-bezier(0.33, 0, 0.2, 1) 200ms;
-}
-.js .reveal.is-visible .flourish-draw,
-.js .reveal.is-visible.flourish-draw {
-  clip-path: inset(0 0 0 0);
-}
-@media (prefers-reduced-motion: reduce) {
-  .js .reveal .flourish-draw,
-  .js .reveal.flourish-draw {
-    clip-path: none;
-    transition: none;
-  }
-}
+/* Dividers are printed in place: no opening, no delay (the couple asked for
+   the ornaments to be there from the start). */
 
 /* The scrolled end of the pack's long rule, where the name mark's line begins.
    Only at the start: at the far end the line runs into the bride's name, and
@@ -3998,6 +4019,22 @@ html[data-paper-dark] .card-stock .card-panel {
 html[data-paper-dark] .card-stock .field {
   background: rgb(255 240 228 / 0.1);
   color: var(--c-text);
+  border-color: rgb(var(--gold-1-rgb) / 0.55);
+}
+/* chosen answer on a dark paper: the same gold as the main button, dark text */
+html[data-paper-dark] .card-stock .choice[aria-pressed="true"] {
+  border-color: #ecd39f;
+  background: linear-gradient(110deg, #c8a466, #ecd39f 50%, #c8a466);
+  color: #2a1418;
+  box-shadow: 0 10px 22px -12px rgb(0 0 0 / 0.7);
+}
+html[data-paper-dark] .card-stock .choice:not([aria-pressed="true"]) {
+  border-color: rgb(var(--gold-1-rgb) / 0.6);
+  background: rgb(255 240 228 / 0.06);
+}
+html[data-paper-dark] .card-stock .btn-outline {
+  border-color: rgb(var(--gold-1-rgb) / 0.7);
+  color: var(--gold-lite);
 }
 html[data-paper-dark] .card-stock .namelogo-name { color: #e2c48c; text-shadow: none; }
 
@@ -4470,7 +4507,9 @@ html[data-paper-dark] .card-stock .cd-cell {
   flex-shrink: 0;
   width: var(--bt-cw, 18%);
   aspect-ratio: var(--bt-ar, 1);
-  background: var(--bt-paint, var(--bt-m) center / 100% 100% no-repeat);
+  /* the metal ramp, set here (not inherited ready-made) so each corner's angle applies */
+  background: linear-gradient(var(--bt-ang, 125deg), var(--pp-metal-0) 0%, var(--pp-metal-1) 18%, var(--pp-metal-2) 34%,
+    var(--pp-metal-1) 50%, var(--pp-metal-3) 66%, var(--pp-metal-1) 82%, var(--pp-metal-0) 100%);
   -webkit-mask: var(--bt-m) center / 100% 100% no-repeat;
   mask: var(--bt-m) center / 100% 100% no-repeat;
 }
@@ -4478,13 +4517,17 @@ html[data-paper-dark] .card-stock .cd-cell {
 .frame-edge.has-bt {
   filter: drop-shadow(0 0.6px 0 rgb(255 251 240 / 0.7)) drop-shadow(0 -0.4px 0 rgb(96 70 38 / 0.28));
 }
+html[data-paper-dark] .bt-border,
 html[data-paper-dark] .frame-edge.has-bt {
   filter: drop-shadow(0 0.6px 0 rgb(0 0 0 / 0.35)) drop-shadow(0 -0.4px 0 rgb(255 236 200 / 0.18));
 }
-.bt-tl { --bt-m: var(--bt-m-tl); }
-.bt-tr { --bt-m: var(--bt-m-tr); }
-.bt-bl { --bt-m: var(--bt-m-bl); }
-.bt-br { --bt-m: var(--bt-m-br); }
+/* each corner's metal is turned so the ramp passes its middle tone where the
+   corner's rules leave it, the tone the rules between the corners are in:
+   no change of colour at the joins */
+.bt-tl { --bt-m: var(--bt-m-tl); --bt-ang: 135deg; }
+.bt-tr { --bt-m: var(--bt-m-tr); --bt-ang: 225deg; }
+.bt-bl { --bt-m: var(--bt-m-bl); --bt-ang: 45deg; }
+.bt-br { --bt-m: var(--bt-m-br); --bt-ang: 315deg; }
 
 /* the double rule: outer and inner, along each side between the corners;
    the head and foot runs part in the middle where a suite sets a medallion */
@@ -4499,22 +4542,40 @@ html[data-paper-dark] .frame-edge.has-bt {
   --wi: calc(max(0.6px, calc(var(--corner-w, 100px) * 0.0045)) * var(--bt-wi-k, 1));
   --cw: var(--corner-w, 100px);
   --mw: calc(var(--corner-w, 100px) * 0.62);
-  --run-v: calc(100% - 2 * var(--bt-ch));
-  --run-h: calc((100% - 2 * var(--cw) - var(--mw) * var(--bt-gap, 0) - 8px * var(--bt-gap, 0)) / 2 + 0.5px);
+  /* where each rule takes over from the corner drawing: by default at the
+     corner's edge; a composed paper starts them where the drawing's own
+     rule leaves its notch (--bt-so/--bt-si, a share of the corner), so one
+     crisp line runs through instead of a hairline in the corner meeting a
+     heavier one (at phone sizes the corner's rule is under a pixel wide) */
+  --so: calc(var(--cw) * var(--bt-so, 1));
+  --si: calc(var(--cw) * var(--bt-si, 1));
+  --sov: calc(var(--bt-ch) * var(--bt-so, 1));
+  --siv: calc(var(--bt-ch) * var(--bt-si, 1));
+  --run-vo: calc(100% - 2 * var(--sov));
+  --run-vi: calc(100% - 2 * var(--siv));
+  --gapw: calc(var(--mw) * var(--bt-gap, 0) + 8px * var(--bt-gap, 0));
+  --run-ho: calc((100% - 2 * var(--so) - var(--gapw)) / 2 + 0.5px);
+  --run-hi: calc((100% - 2 * var(--si) - var(--gapw)) / 2 + 0.5px);
   --g: linear-gradient(var(--pp-metal-1), var(--pp-metal-1));
+  /* a gradient bar's position is its edge, the corner drawing's rule is
+     centred on its line: shift each bar by half its width so they meet */
+  --oo: calc(var(--o) - var(--wo) / 2);
+  --ii: calc(var(--i) - var(--wi) / 2);
   background:
-    var(--g) left var(--o) top var(--bt-ch) / var(--wo) var(--run-v) no-repeat,
-    var(--g) right var(--o) top var(--bt-ch) / var(--wo) var(--run-v) no-repeat,
-    var(--g) left var(--i) top var(--bt-ch) / var(--wi) var(--run-v) no-repeat,
-    var(--g) right var(--i) top var(--bt-ch) / var(--wi) var(--run-v) no-repeat,
-    var(--g) left var(--cw) top var(--o) / var(--run-h) var(--wo) no-repeat,
-    var(--g) right var(--cw) top var(--o) / var(--run-h) var(--wo) no-repeat,
-    var(--g) left var(--cw) top var(--i) / var(--run-h) var(--wi) no-repeat,
-    var(--g) right var(--cw) top var(--i) / var(--run-h) var(--wi) no-repeat,
-    var(--g) left var(--cw) bottom var(--o) / var(--run-h) var(--wo) no-repeat,
-    var(--g) right var(--cw) bottom var(--o) / var(--run-h) var(--wo) no-repeat,
-    var(--g) left var(--cw) bottom var(--i) / var(--run-h) var(--wi) no-repeat,
-    var(--g) right var(--cw) bottom var(--i) / var(--run-h) var(--wi) no-repeat;
+    var(--g) left var(--oo) top var(--sov) / var(--wo) var(--run-vo) no-repeat,
+    var(--g) right var(--oo) top var(--sov) / var(--wo) var(--run-vo) no-repeat,
+    var(--g) left var(--ii) top var(--siv) / var(--wi) var(--run-vi) no-repeat,
+    var(--g) right var(--ii) top var(--siv) / var(--wi) var(--run-vi) no-repeat,
+    var(--g) left var(--so) top var(--oo) / var(--run-ho) var(--wo) no-repeat,
+    var(--g) right var(--so) top var(--oo) / var(--run-ho) var(--wo) no-repeat,
+    var(--g) left var(--si) top var(--ii) / var(--run-hi) var(--wi) no-repeat,
+    var(--g) right var(--si) top var(--ii) / var(--run-hi) var(--wi) no-repeat,
+    var(--g) left var(--so) bottom var(--oo) / var(--run-ho) var(--wo) no-repeat,
+    var(--g) right var(--so) bottom var(--oo) / var(--run-ho) var(--wo) no-repeat,
+    var(--g) left var(--si) bottom var(--ii) / var(--run-hi) var(--wi) no-repeat,
+    var(--g) right var(--si) bottom var(--ii) / var(--run-hi) var(--wi) no-repeat;
+  /* the same pressed edge as the corners */
+  filter: drop-shadow(0 0.6px 0 rgb(255 251 240 / 0.7)) drop-shadow(0 -0.4px 0 rgb(96 70 38 / 0.28));
 }
 .bt-border::before,
 .bt-border::after {
@@ -4649,3 +4710,293 @@ html[data-paper-dark] .ps-recess {
   -webkit-mask-position: center bottom;
   mask-position: center bottom;
 }
+
+/* ══ Wedding colours (DressColors) ═══════════════════════════════════════════
+ * Swatches of cloth: the colour, lit from the upper left, a soft fold of shade
+ * across the lower right, a faint weave, and a fine gold rim. */
+.dress-palette {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(1rem, 4vw, 1.6rem) clamp(0.9rem, 4vw, 1.5rem);
+  /* no wider than one balanced row (DressColors sets --cols); a narrow
+     screen wraps sooner on its own */
+  max-width: calc(var(--cols, 4) * (clamp(4.4rem, 19vw, 5.4rem) + clamp(0.9rem, 4vw, 1.5rem)));
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+.dress-swatch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  width: clamp(4.4rem, 19vw, 5.4rem);
+  text-align: center;
+}
+.dress-chip {
+  position: relative;
+  display: block;
+  width: clamp(3.6rem, 15vw, 4.5rem);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 28%, rgb(255 255 255 / 0.38), rgb(255 255 255 / 0) 46%),
+    radial-gradient(circle at 70% 78%, rgb(0 0 0 / 0.2), rgb(0 0 0 / 0) 55%),
+    repeating-linear-gradient(45deg, rgb(255 255 255 / 0.05) 0 1px, rgb(0 0 0 / 0.035) 1px 2px),
+    var(--chip);
+  box-shadow:
+    0 0 0 2px rgb(255 252 244 / 0.95),
+    0 0 0 3px var(--pp-metal-1, #c29a5b),
+    0 6px 14px -6px rgb(60 40 20 / 0.45),
+    inset 0 -3px 6px rgb(0 0 0 / 0.12);
+}
+/* a pale colour gets an edge of its own, so it reads against cream paper */
+.dress-chip[data-pale] {
+  box-shadow:
+    inset 0 0 0 1px rgb(120 96 64 / 0.28),
+    0 0 0 2px rgb(255 252 244 / 0.95),
+    0 0 0 3px var(--pp-metal-1, #c29a5b),
+    0 6px 14px -6px rgb(60 40 20 / 0.45),
+    inset 0 -3px 6px rgb(0 0 0 / 0.08);
+}
+html[data-paper-dark] .dress-chip {
+  box-shadow:
+    0 0 0 2px rgb(0 0 0 / 0.35),
+    0 0 0 3px var(--pp-metal-2, #d2ae6a),
+    0 6px 14px -6px rgb(0 0 0 / 0.6),
+    inset 0 -3px 6px rgb(0 0 0 / 0.14);
+}
+.dress-name {
+  font-size: 0.8rem;
+  line-height: 1.7;
+}
+
+/* ══ The couple (Couple.tsx): groom and bride side by side, equal ═════════════ */
+.couple-row {
+  --ph: clamp(6.5rem, 30vw, 14rem);       /* photo diameter */
+  --hs: clamp(1.4rem, 5vw, 2.25rem);      /* heart size */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: start;
+  column-gap: clamp(0.5rem, 3vw, 2.5rem);
+  max-width: 44rem;
+  margin-inline: auto;
+}
+.couple-photo { width: var(--ph); height: var(--ph); max-width: 100%; }
+/* the heart sits level with the middle of the two photos */
+.couple-and { width: var(--hs); height: var(--hs); margin-top: calc(var(--ph) / 2 - var(--hs) / 2); }
+.couple-name { font-size: clamp(1rem, 3.6vw, 1.3rem); line-height: 1.9; }
+.couple-title { font-size: 0.85em; }
+
+/* ══ The couple on the invitation's face (InvitationMessage): groom | monogram | bride ══ */
+.msg-couple {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: clamp(0.5rem, 3vw, 2rem);
+}
+/* with the name logo switched off: groom | bride, two equal columns */
+.msg-couple.no-logo { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.msg-monogram { width: clamp(7rem, 29vw, 12.5rem); }
+
+/* The letter's text grows with the card: on a phone it fills the width as
+   before; on a wide screen the formal wording runs to about two thirds of the
+   card instead of a narrow 32rem column (and the root size grows too). */
+.msg-body { max-width: min(100%, 52rem); }
+.msg-venue { max-width: min(100%, 46rem); }
+.msg { max-width: 72rem; margin-inline: auto; }
+
+/* ══ Monogram crest (MonogramCrest) ═══════════════════════════════════════════
+ * A stationer's crest: hairline rings, a laurel, the initials, the date. One
+ * quiet foil: deeper antique gold on light papers, brighter gold on dark. No
+ * bevels or heavy shadows: those are what make a mark look stuck on. */
+.mc {
+  --mc-0: #6f5226; --mc-1: #b08a4c; --mc-2: #dcc086; --mc-3: #9a7639; --mc-4: #c7a463;
+  position: relative;
+  aspect-ratio: 1;
+  container-type: inline-size;
+}
+html[data-paper-dark] .mc { --mc-0: #8f6c37; --mc-1: #d9bd82; --mc-2: #f3e3b6; --mc-3: #c19b5c; --mc-4: #e9d29c; }
+.mc-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.mc-foil {
+  background: linear-gradient(115deg, var(--mc-0) 0%, var(--mc-1) 25%, var(--mc-2) 42%, var(--mc-3) 60%, var(--mc-4) 78%, var(--mc-0) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  /* a hair of light along the lower edge, as foil catches it: nothing more */
+  filter: drop-shadow(0 0.5px 0 rgb(255 255 255 / 0.55));
+}
+html[data-paper-dark] .mc-foil { filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.35)); }
+.mc-ini {
+  position: absolute;
+  inset: 29% 0 auto;
+  height: 28%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  white-space: nowrap;
+}
+.mc-pair { display: inline-flex; align-items: center; }
+.mc-sep {
+  width: 2.2cqw;
+  height: 2.2cqw;
+  margin-inline: 3.6cqw;
+  rotate: 45deg;
+  background: linear-gradient(135deg, var(--mc-2), var(--mc-3));
+}
+.mc-khmer .mc-letter { font-size: 15cqw; padding-top: 0.1em; }
+.mc-serif .mc-letter { font-size: 20cqw; }
+.mc-script .mc-letter { font-size: 25cqw; }
+.mc-script .mc-pair + .mc-pair .mc-letter { margin-left: -1.5cqw; }
+.mc-date {
+  position: absolute;
+  inset: 64.5% 0 auto;
+  text-align: center;
+  font-family: "Noto Serif Khmer", "Cormorant Garamond", serif;
+  font-size: 4.6cqw;
+  letter-spacing: 0.18em;
+  line-height: 1.4;
+}
+
+
+/* ══ The map picture, opened on the page (MapViewer) ══════════════════════════ */
+.map-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(20 14 10 / 0.86);
+  backdrop-filter: blur(3px);
+  overscroll-behavior: contain;
+  animation: map-viewer-in 180ms ease-out both;
+}
+@keyframes map-viewer-in { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .map-viewer { animation: none; } }
+.map-viewer-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: clamp(3.25rem, 7vh, 4.5rem) clamp(0.75rem, 3vw, 2rem);
+}
+.map-viewer-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 0.75rem;
+  background: #fff;
+  box-shadow: 0 20px 60px -20px rgb(0 0 0 / 0.7);
+  cursor: zoom-in;
+}
+/* full size: the picture at its own pixels, scrolled within the screen */
+.map-viewer-stage.is-full { display: block; overflow: auto; -webkit-overflow-scrolling: touch; }
+.map-viewer-stage.is-full .map-viewer-img { max-width: none; max-height: none; margin: auto; display: block; cursor: zoom-out; }
+.map-viewer-close {
+  position: absolute;
+  top: max(0.75rem, env(safe-area-inset-top));
+  right: max(0.75rem, env(safe-area-inset-right));
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 9999px;
+  background: rgb(255 250 240 / 0.95);
+  color: #2a1a12;
+  font-size: 1.1rem;
+  box-shadow: 0 6px 18px -6px rgb(0 0 0 / 0.6);
+}
+.map-viewer-close:focus-visible { outline: 3px solid #e3c487; outline-offset: 2px; }
+.map-viewer-hint {
+  position: absolute;
+  bottom: max(0.9rem, env(safe-area-inset-bottom));
+  left: 50%;
+  translate: -50% 0;
+  color: rgb(255 248 236 / 0.85);
+  font-size: 0.8rem;
+  pointer-events: none;
+}
+
+/* ══ The couple's own name-logo image (NameLogoImage) ═════════════════════════ */
+.msg-name-logo { display: block; width: clamp(7.5rem, 31vw, 14rem); }
+.name-logo-img { height: auto; object-fit: contain; }
+/* foil: the artwork (a mask built from the image) printed in the crest's gold */
+.name-logo-foil {
+  --mc-0: #6f5226; --mc-1: #b08a4c; --mc-2: #dcc086; --mc-3: #9a7639; --mc-4: #c7a463;
+  background: linear-gradient(125deg, var(--mc-0) 0%, var(--mc-1) 25%, var(--mc-2) 42%, var(--mc-3) 60%, var(--mc-4) 78%, var(--mc-0) 100%);
+  -webkit-mask: var(--nl-mask) center / contain no-repeat;
+  mask: var(--nl-mask) center / contain no-repeat;
+  filter: drop-shadow(0 0.5px 0 rgb(255 255 255 / 0.5));
+  transition: opacity 300ms ease;
+}
+html[data-paper-dark] .name-logo-foil {
+  --mc-0: #8f6c37; --mc-1: #d9bd82; --mc-2: #f3e3b6; --mc-3: #c19b5c; --mc-4: #e9d29c;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.35));
+}
+
+/* ══ The letter, rule to rule ════════════════════════════════════════════════
+ * On the composed papers the opened invitation scrolls from just inside the
+ * top rule to just inside the bottom one, instead of stopping at the corners'
+ * full height (which on a wide screen wasted a third of the card). The frame
+ * strips stay where they are; the scroller reaches up and down over them.
+ * Where a line meets a corner it dissolves into the corner's halo (the
+ * corner drawing widened a little), so words never run under the gold. A paper with a centred
+ * head or foot piece, or a head or foot band, keeps that end clear as before
+ * (--sv-top / --sv-bot = the band, set in paperThemes.ts). The fade
+ * (.scroll-fade) still dissolves the words as they reach the rule. */
+.card-sheet.sv-wide[data-bands] #card-scroll.scroll-fade {
+  position: absolute;
+  inset-inline: 0;
+  top: calc(var(--sv-top, calc(var(--bt-in) + 0.3rem)) - var(--band-top, 0px));
+  bottom: calc(var(--sv-bot, calc(var(--bt-in) + 0.3rem)) - var(--band-bottom, 0px));
+  height: auto;
+  /* where the scroller starts and ends, measured from the sheet's edges */
+  --svt: var(--sv-top, calc(var(--bt-in) + 0.3rem));
+  --svb: var(--sv-bot, calc(var(--bt-in) + 0.3rem));
+  /* visible = the soft top/bottom fade, minus the four corner halos (each
+     corner's own drawing widened a little, scripts/corner-halos.py), placed
+     exactly over the corners. The words come right up to the gold and
+     dissolve there, instead of running under it or stopping a whole corner
+     square short. */
+  -webkit-mask-image:
+    linear-gradient(to bottom, transparent 0, #000 2.25rem, #000 calc(100% - 2.25rem), transparent 100%),
+    var(--bt-h-tl, none), var(--bt-h-tr, none), var(--bt-h-bl, none), var(--bt-h-br, none);
+  -webkit-mask-size: 100% 100%, var(--corner-w, 100px) var(--bt-ch), var(--corner-w, 100px) var(--bt-ch), var(--corner-w, 100px) var(--bt-ch), var(--corner-w, 100px) var(--bt-ch);
+  -webkit-mask-position: 0 0, left 0 top calc(-1 * var(--svt)), right 0 top calc(-1 * var(--svt)), left 0 bottom calc(-1 * var(--svb)), right 0 bottom calc(-1 * var(--svb));
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-composite: source-out, source-over, source-over, source-over, source-over;
+  mask-image:
+    linear-gradient(to bottom, transparent 0, #000 2.25rem, #000 calc(100% - 2.25rem), transparent 100%),
+    var(--bt-h-tl, none), var(--bt-h-tr, none), var(--bt-h-bl, none), var(--bt-h-br, none);
+  mask-size: 100% 100%, var(--corner-w, 100px) var(--bt-ch), var(--corner-w, 100px) var(--bt-ch), var(--corner-w, 100px) var(--bt-ch), var(--corner-w, 100px) var(--bt-ch);
+  mask-position: 0 0, left 0 top calc(-1 * var(--svt)), right 0 top calc(-1 * var(--svt)), left 0 bottom calc(-1 * var(--svb)), right 0 bottom calc(-1 * var(--svb));
+  mask-repeat: no-repeat;
+  mask-composite: subtract, add, add, add, add;
+}
+
+/* ══ Gallery caption (Gallery.tsx) ═══════════════════════════════════════════
+ * A caption sits on a photograph, not on the paper, so it takes fixed photo
+ * colours: warm white on a soft dark scrim. (It used the theme's cream/brown
+ * tokens, which swap on the dark papers, giving dark text on a muddy band.)
+ * Shown on hover where there is hover; always shown on touch screens. */
+.gallery-caption {
+  pointer-events: none;
+  position: absolute;
+  inset-inline: 1.5px;
+  bottom: 1.5px;
+  border-radius: 0 0 14px 14px;
+  padding: 2.25rem 0.85rem 0.7rem;
+  text-align: left;
+  font-size: 0.8rem;
+  line-height: 1.7;
+  color: #fffaf0;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.55);
+  background: linear-gradient(to top, rgb(18 12 8 / 0.82) 0%, rgb(18 12 8 / 0.55) 45%, rgb(18 12 8 / 0) 100%);
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
+.group:hover .gallery-caption,
+.group:focus-visible .gallery-caption { opacity: 1; }
+@media (hover: none) { .gallery-caption { opacity: 1; } }

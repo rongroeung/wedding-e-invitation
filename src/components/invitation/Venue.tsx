@@ -1,13 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import type { Wedding } from "@/lib/db/schema";
+import { mediaSrc } from "@/lib/media";
+import { MapViewer } from "./MapViewer";
 import { Flourish, FlourishDivider } from "@/components/ui/Ornaments";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 
 /** ទីតាំងប្រារព្ធពិធី — venue details with a lazily-mounted Google Map. */
 export function Venue({ wedding }: { wedding: Wedding }) {
   const [mapLoaded, setMapLoaded] = useState(false);
+  const mapPicture = mediaSrc(wedding.venueMapMediaId, "");
+  const [mapOpen, setMapOpen] = useState(false);
+  const closeMap = useCallback(() => setMapOpen(false), []);
 
   return (
     <section id="venue" className="section-pad relative">
@@ -37,6 +42,30 @@ export function Venue({ wedding }: { wedding: Wedding }) {
               </a>
             )}
           </div>
+
+          {/* the couple's own map picture: shown whole, tap to open full size */}
+          {mapPicture && (
+            <button
+              type="button"
+              onClick={() => setMapOpen(true)}
+              className="group block w-full border-t border-gold/40 bg-cream/40 p-3 sm:p-4"
+              aria-label="ផែនទី — ចុចដើម្បីពង្រីក"
+              aria-haspopup="dialog"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={mapPicture}
+                alt="ផែនទីទៅកាន់ទីតាំងប្រារព្ធពិធី"
+                loading="lazy"
+                decoding="async"
+                className="mx-auto max-h-[70vh] w-auto max-w-full rounded-xl object-contain shadow-sm transition group-hover:brightness-105"
+              />
+              <span className="mt-2 block text-center text-xs text-ink/75 khmer-wrap">ចុចលើរូបដើម្បីពង្រីក</span>
+            </button>
+          )}
+          {mapOpen && mapPicture && (
+            <MapViewer src={mapPicture} alt="ផែនទីទៅកាន់ទីតាំងប្រារព្ធពិធី" onClose={closeMap} />
+          )}
 
           {wedding.mapEmbedUrl && (
             <div className="relative aspect-[4/3] w-full border-t border-gold/40 sm:aspect-[16/9]">

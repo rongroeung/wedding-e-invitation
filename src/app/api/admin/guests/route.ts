@@ -1,6 +1,7 @@
 import { desc, eq } from "drizzle-orm";
 import { z } from "zod";
-import { fail, ok, randomCode, readJson, requireAdmin, slugify } from "@/lib/api";
+import { fail, ok, randomCode, readJson, slugify } from "@/lib/api";
+import { requireWorkspace } from "@/lib/workspace";
 import { getDb } from "@/lib/db";
 import { guests } from "@/lib/db/schema";
 
@@ -22,10 +23,10 @@ const bulkSchema = z.object({
 });
 
 export async function GET(request: Request) {
-  const { response } = await requireAdmin(request);
+  const { weddingId, response } = await requireWorkspace(request);
   if (response) return response;
   const db = await getDb();
-  return ok(await db.select().from(guests).orderBy(desc(guests.createdAt)));
+  return ok(await db.select().from(guests).where(eq(guests.weddingId, weddingId)).orderBy(desc(guests.createdAt)));
 }
 
 const CODE_LENGTH = 8;
@@ -35,6 +36,9 @@ const CODE_LENGTH = 8;
  * the URL leaks who was invited to anyone who sees the link, and lets people
  * guess each other's invitations. A custom code can still be set by hand in the
  * dashboard when someone wants a memorable one.
+ *
+ * Codes are unique across every workspace (the link alone finds the wedding),
+ * so the clash check deliberately looks at all of them.
  */
 async function uniqueCode(preferred?: string) {
   const db = await getDb();
@@ -48,7 +52,7 @@ async function uniqueCode(preferred?: string) {
 }
 
 export async function POST(request: Request) {
-  const { response } = await requireAdmin(request);
+  const { weddingId, response } = await requireWorkspace(request);
   if (response) return response;
 
   const body = await readJson<unknown>(request);
@@ -65,6 +69,7 @@ export async function POST(request: Request) {
       const [row] = await db
         .insert(guests)
         .values({
+          weddingId,
           code,
           title: bulk.data.title,
           name,
@@ -82,6 +87,6 @@ export async function POST(request: Request) {
   const db = await getDb();
   // An explicit code is honoured (slugified); otherwise it is random.
   const code = await uniqueCode(parsed.data.code ? slugify(parsed.data.code) : undefined);
-  const [row] = await db.insert(guests).values({ ...parsed.data, code }).returning();
+  const [row] = await db.insert(guests).values({ ...parsed.data, code, weddingId }).returning();
   return ok(row, { status: 201 });
 }

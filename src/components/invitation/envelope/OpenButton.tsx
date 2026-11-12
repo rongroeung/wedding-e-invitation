@@ -27,7 +27,7 @@ export function OpenButton({
       <button
         type="button"
         onClick={onOpen}
-        className="btn-gold env-open-pulse min-h-[52px] min-w-[220px] khmer-wrap"
+        className="btn-seal env-open-pulse min-h-[52px] min-w-[220px] khmer-wrap"
       >
         {label}
       </button>

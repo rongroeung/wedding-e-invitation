@@ -68,10 +68,11 @@ export function CardShell({
    * The frame's head and foot, measured, for the closed cover on a large
    * sheet. The corners take their height from the card's width, so on a wide
    * sheet the two bands reserve a third of the height while the paper between
-   * the corners stands empty. The cover (and only the cover: the scrolling
-   * invitation keeps the structural frame, so content never passes under the
-   * gold) is allowed to rise into that space between the corners. CSS decides
-   * when (globals.css, "The cover on a wide sheet"); this only reports sizes.
+   * the corners stands empty. The cover may rise into that space between the
+   * corners (globals.css, "The cover on a wide sheet"), and so does the opened
+   * invitation on the composed papers: it reads from just inside the top rule
+   * to just inside the bottom one (globals.css, "The letter, rule to rule").
+   * CSS decides; this only reports sizes.
    */
   const sheet = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -126,7 +127,7 @@ export function CardShell({
               // joining the corners, and the ornament on it
               ["--band-keep" as string]: Math.max(0.3, frame.joinY + 0.14).toFixed(3),
             }}
-            className={`card-stock card-sheet paper relative flex w-full flex-col overflow-hidden ${
+            className={`card-stock card-sheet paper relative flex w-full flex-col overflow-hidden ${frame.custom ? "" : "sv-wide"} ${
               oneScreen ? "h-full" : "min-h-[100dvh]"
             }`}
           >

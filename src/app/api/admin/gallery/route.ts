@@ -1,6 +1,7 @@
-import { asc } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { z } from "zod";
-import { fail, ok, readJson, requireAdmin } from "@/lib/api";
+import { fail, ok, readJson } from "@/lib/api";
+import { ownsMedia, requireWorkspace } from "@/lib/workspace";
 import { getDb } from "@/lib/db";
 import { galleryImages } from "@/lib/db/schema";
 
@@ -14,19 +15,20 @@ const schema = z.object({
 });
 
 export async function GET(request: Request) {
-  const { response } = await requireAdmin(request);
+  const { weddingId, response } = await requireWorkspace(request);
   if (response) return response;
   const db = await getDb();
-  return ok(await db.select().from(galleryImages).orderBy(asc(galleryImages.sortOrder)));
+  return ok(await db.select().from(galleryImages).where(eq(galleryImages.weddingId, weddingId)).orderBy(asc(galleryImages.sortOrder)));
 }
 
 export async function POST(request: Request) {
-  const { response } = await requireAdmin(request);
+  const { weddingId, response } = await requireWorkspace(request);
   if (response) return response;
   const parsed = schema.safeParse(await readJson<unknown>(request));
   if (!parsed.success) return fail("Invalid data", 422);
   if (!parsed.data.mediaId && !parsed.data.url) return fail("Photo required", 422);
+  if (parsed.data.mediaId && !(await ownsMedia(weddingId, parsed.data.mediaId))) return fail("Photo not found", 404);
   const db = await getDb();
-  const [row] = await db.insert(galleryImages).values(parsed.data).returning();
+  const [row] = await db.insert(galleryImages).values({ ...parsed.data, weddingId }).returning();
   return ok(row, { status: 201 });
 }

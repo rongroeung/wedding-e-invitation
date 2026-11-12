@@ -70,7 +70,23 @@ export const STORAGE_KEY = "wedding-appearance-v1";
  * chosen an animation here, motion starts off. An explicit choice in the
  * settings panel is the guest's own decision and is honoured.
  */
-export function appearanceBootScript(defaults: Appearance): string {
+/**
+ * What a guest's saved choice was made against: the couple's design at the
+ * time. When the couple changes their design, saved choices made against the
+ * old one no longer match and are dropped, so the new design reaches every
+ * guest (a guest can choose again afterwards). Choices saved before this
+ * existed carry no basis and count as stale too.
+ */
+export function appearanceBasis(d: Appearance): string {
+  return `${d.paper}|${d.tone}|${d.fx}|${d.level}`;
+}
+
+/**
+ * `allowGuest`: the couple lets guests change the look (the settings panel).
+ * When they don't, a saved choice is never applied: everyone sees the
+ * couple's design.
+ */
+export function appearanceBootScript(defaults: Appearance, allowGuest = true): string {
   const d = JSON.stringify(defaults);
   const keys = JSON.stringify(PAPER_THEME_KEYS);
   const tones = JSON.stringify(TONE_KEYS);
@@ -78,9 +94,9 @@ export function appearanceBootScript(defaults: Appearance): string {
   const darkTones = JSON.stringify(DARK_TONES);
   // a saved paper or colour that no longer exists falls back to the couple's
   // default rather than leaving the sheet without colours
-  return `(function(){try{var d=${d},K=${keys},T=${tones},D=${dark},DT=${darkTones},a=d,s=null;try{s=JSON.parse(localStorage.getItem(${JSON.stringify(
-    STORAGE_KEY,
-  )})||"null")}catch(e){}if(s&&typeof s==="object"){a={paper:K.indexOf(s.paper)>=0?s.paper:d.paper,tone:T.indexOf(s.tone)>=0?s.tone:d.tone,fx:s.fx||d.fx,level:s.level||d.level}}var fx=a.fx;try{if((!s||!s.explicit)&&matchMedia("(prefers-reduced-motion: reduce)").matches)fx="none"}catch(e){}var h=document.documentElement;h.setAttribute("data-paper-theme",a.paper);if(a.tone&&a.tone!=="design")h.setAttribute("data-paper-tone",a.tone);else h.removeAttribute("data-paper-tone");var dk=a.tone&&a.tone!=="design"?DT.indexOf(a.tone)>=0:D.indexOf(a.paper)>=0;if(dk&&a.paper!=="couple")h.setAttribute("data-paper-dark","");else h.removeAttribute("data-paper-dark");h.setAttribute("data-fx",fx);h.setAttribute("data-fx-level",a.level)}catch(e){}})();`;
+  const basis = JSON.stringify(appearanceBasis(defaults));
+  const key = JSON.stringify(STORAGE_KEY);
+  return `(function(){try{var d=${d},K=${keys},T=${tones},D=${dark},DT=${darkTones},B=${basis},G=${allowGuest ? "true" : "false"},a=d,s=null;document.documentElement.setAttribute("data-appearance-basis",B);try{s=JSON.parse(localStorage.getItem(${key})||"null");if(s&&s.basis!==B){if(G)localStorage.removeItem(${key});s=null}}catch(e){}if(!G)s=null;if(s&&typeof s==="object"){a={paper:K.indexOf(s.paper)>=0?s.paper:d.paper,tone:T.indexOf(s.tone)>=0?s.tone:d.tone,fx:s.fx||d.fx,level:s.level||d.level}}var fx=a.fx;try{if((!s||!s.explicit)&&matchMedia("(prefers-reduced-motion: reduce)").matches)fx="none"}catch(e){}var h=document.documentElement;h.setAttribute("data-paper-theme",a.paper);if(a.tone&&a.tone!=="design")h.setAttribute("data-paper-tone",a.tone);else h.removeAttribute("data-paper-tone");var dk=a.tone&&a.tone!=="design"?DT.indexOf(a.tone)>=0:D.indexOf(a.paper)>=0;if(dk&&a.paper!=="couple")h.setAttribute("data-paper-dark","");else h.removeAttribute("data-paper-dark");h.setAttribute("data-fx",fx);h.setAttribute("data-fx-level",a.level)}catch(e){}})();`;
 }
 
 /** Whether the sheet is printed light on dark: the colour decides, else the design. */

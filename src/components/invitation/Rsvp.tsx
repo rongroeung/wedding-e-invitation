@@ -19,10 +19,14 @@ export type RsvpReply = Pick<RsvpRecord, "name" | "attending" | "guestCount" | "
  */
 export function Rsvp({
   guest,
+  workspace,
   reply = null,
   onSubmitted,
 }: {
   guest: Guest | null;
+  /** The wedding's address (its workspace slug), so a reply without a guest code
+   *  is filed under the right wedding. */
+  workspace: string;
   /** The guest's stored reply, or null if they have not answered. */
   reply?: RsvpReply | null;
   onSubmitted?: (attending: boolean) => void;
@@ -58,7 +62,7 @@ export function Rsvp({
       const response = await fetch("/api/rsvp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...payload, guestCode: guest?.code ?? "" }),
+        body: JSON.stringify({ ...payload, guestCode: guest?.code ?? "", workspace }),
       });
       const body = await response.json();
       if (!response.ok || !body.ok) throw new Error(body.error || "មិនអាចផ្ញើបានទេ");
@@ -106,7 +110,7 @@ export function Rsvp({
               </p>
 
               {/* What we recorded, so the guest can see it is right */}
-              <dl className="mx-auto mt-8 max-w-sm space-y-2.5 rounded-2xl bg-champagne/25 px-5 py-5 text-left">
+              <dl className="mx-auto mt-8 max-w-sm space-y-2.5 rounded-2xl border border-gold/30 bg-ink/[0.04] px-5 py-5 text-left">
                 <div className="flex items-baseline justify-between gap-4">
                   <dt className="text-xs text-ink/70 khmer-wrap">ឈ្មោះ</dt>
                   <dd className="text-sm text-heading khmer-wrap">{saved.name}</dd>
@@ -165,11 +169,7 @@ export function Rsvp({
                       key={String(option.value)}
                       type="button"
                       onClick={() => setAttending(option.value)}
-                      className={`rounded-xl border px-4 py-3 text-sm transition-all duration-300 khmer-wrap ${
-                        attending === option.value
-                          ? "border-gold bg-champagne/30 text-heading shadow-gold"
-                          : "border-gold/40 bg-white/60 text-ink/75"
-                      }`}
+                      className="choice khmer-wrap"
                       aria-pressed={attending === option.value}
                     >
                       <span className="mr-2" aria-hidden="true">{option.icon}</span>

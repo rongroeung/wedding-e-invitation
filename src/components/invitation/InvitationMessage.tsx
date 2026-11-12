@@ -1,4 +1,19 @@
 import type { Wedding } from "@/lib/db/schema";
+import { MonogramCrest } from "@/components/ui/MonogramCrest";
+import { mediaSrc } from "@/lib/media";
+import { NameLogoImage } from "./NameLogoImage";
+import { WEDDING_TIMEZONE, toKhmerNumber } from "@/lib/khmer";
+
+/** The wedding day as the crest prints it: ២៤ · ០៤ · ២០២៧ (in the wedding's time zone). */
+function crestDate(value: Date | string | null | undefined): string {
+  if (!value) return "";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "";
+  const parts = new Intl.DateTimeFormat("en-GB", { timeZone: WEDDING_TIMEZONE, day: "2-digit", month: "2-digit", year: "numeric" })
+    .formatToParts(d)
+    .reduce<Record<string, string>>((o, p) => ((o[p.type] = p.value), o), {});
+  return [parts.day, parts.month, parts.year].map((v) => toKhmerNumber(v)).join(" · ");
+}
 
 /**
  * The face of the card: both families, the formal wording, the couple, and the
@@ -6,7 +21,7 @@ import type { Wedding } from "@/lib/db/schema";
  */
 export function InvitationMessage({ wedding }: { wedding: Wedding }) {
   return (
-    <section id="invitation" className="section-pad relative text-center">
+    <section id="invitation" className="msg section-pad relative text-center">
       <h2 className="gold-text text-[1.35rem] leading-[1.9] khmer-wrap">
         {wedding.title}
       </h2>
@@ -27,19 +42,37 @@ export function InvitationMessage({ wedding }: { wedding: Wedding }) {
         * It addresses the honorifics, never the individual guest — the guest is
         * greeted by name on the cover instead.
         */}
-      <p className="mx-auto mt-3 max-w-[32rem] text-[0.9rem] leading-loose text-ink/90 khmer-wrap">
+      <p className="msg-body mx-auto mt-3 text-[0.9rem] leading-loose text-ink/90 khmer-wrap">
         {`${wedding.invitationHonorific} ${wedding.invitationBody}`.replace(/\s+/g, " ").trim()}
       </p>
 
-      {/* The couple */}
-      <div className="mt-10 grid grid-cols-2 gap-x-5">
-        <div>
+      {/* The couple, with their monogram between them: groom | mark | bride */}
+      <div className={`msg-couple mt-10 ${wedding.nameLogoEnabled ? "" : "no-logo"}`}>
+        <div className="min-w-0">
           <p className="text-xs text-ink/75 khmer-wrap">កូនប្រុសនាម</p>
           <p className="mt-2 text-lg font-semibold leading-loose text-heading khmer-wrap">
             {wedding.groomFullName}
           </p>
         </div>
-        <div>
+        {/* the couple's own name-logo image if they uploaded one; otherwise the drawn crest */}
+        {!wedding.nameLogoEnabled ? null : wedding.nameLogoMediaId ? (
+          <NameLogoImage
+            src={mediaSrc(wedding.nameLogoMediaId, "")}
+            mode={wedding.nameLogoMode}
+            alt={`${wedding.groomName} & ${wedding.brideName}`}
+            className="msg-monogram msg-name-logo"
+          />
+        ) : (
+        <MonogramCrest
+          text={wedding.monogram}
+          groom={wedding.groomName}
+          bride={wedding.brideName}
+          font={wedding.monogramFont}
+          date={crestDate(wedding.weddingDate)}
+          className="msg-monogram"
+        />
+        )}
+        <div className="min-w-0">
           <p className="text-xs text-ink/75 khmer-wrap">កូនស្រីនាម</p>
           <p className="mt-2 text-lg font-semibold leading-loose text-heading khmer-wrap">
             {wedding.brideFullName}
@@ -54,7 +87,7 @@ export function InvitationMessage({ wedding }: { wedding: Wedding }) {
       <p className="mt-3 text-lg font-semibold leading-loose text-heading khmer-wrap">
         {wedding.weddingDateKhmer}
       </p>
-      <p className="mx-auto mt-3 max-w-[26rem] text-[0.9rem] leading-loose text-ink/85 khmer-wrap">
+      <p className="msg-venue mx-auto mt-3 text-[0.9rem] leading-loose text-ink/85 khmer-wrap">
         {wedding.venueName}
         {wedding.venueAddress ? ` ${wedding.venueAddress}` : ""}
       </p>

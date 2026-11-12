@@ -38,6 +38,8 @@ type Placement = {
   plate?: "foil" | "line" | "relief" | "blind";
   /** Set beside a large corner ornament, along the foot, instead of in front of it. */
   beside?: boolean;
+  /** An upper-corner piece tucked right into the corner (its own corner art), not hung below it. */
+  snug?: boolean;
 };
 
 /** A band of repeating ornament along one edge, between the corners. */
@@ -197,8 +199,8 @@ const sizeOf = (s: string) => SIZE[s] ?? s;
  * grows from); a hanging branch below the upper corner ornament; a crest
  * centred in the head, a mark centred on the foot.
  */
-function at(c: Corner, beside = false): string {
-  const top = "calc(var(--bt-ch) * 0.62)";
+function at(c: Corner, beside = false, snug = false): string {
+  const top = snug ? "var(--bt-in)" : "calc(var(--bt-ch) * 0.62)";
   const x = beside ? "calc(var(--corner-w, 100px) * 0.72)" : "var(--bt-in)";
   switch (c) {
     case "bl":
@@ -243,7 +245,7 @@ function layers(list: Placement[], plates: (Plate | "relief" | "blind")[]): stri
   const out: string[] = [];
   for (const pl of list) {
     for (const plate of plates) {
-      for (const f of filesOf(pl, plate)) out.push(`url(${f}) ${at(pl.corner, pl.beside)} / ${sizeOf(pl.size)} no-repeat`);
+      for (const f of filesOf(pl, plate)) out.push(`url(${f}) ${at(pl.corner, pl.beside, pl.snug)} / ${sizeOf(pl.size)} no-repeat`);
     }
   }
   // nothing on this plate: an empty mask (not "none", which would show the
@@ -289,7 +291,7 @@ function composeCss(p: PaperDef, sel: string): string {
   const [cdir, cname] = c.corner.split("/");
   const cornerSrc = (k: string) => `url(/art/${cdir}/${cname}-${k}.svg)`;
   const rule = c.rule ?? "double";
-  const single = cname.startsWith("corner-single");
+  const single = cname.includes("single");
   const pt = c.pattern;
   const relief = c.art.filter((a) => a.plate === "relief");
   const blind = c.art.filter((a) => a.plate === "blind");
@@ -309,10 +311,14 @@ function composeCss(p: PaperDef, sel: string): string {
     `--pc-lit-light:${LIT[c.depth ?? "soft"]};` +
     // the frame: corners, and the rules between them
     `--bt-m-tl:${cornerSrc("tl")};--bt-m-tr:${cornerSrc("tr")};--bt-m-bl:${cornerSrc("bl")};--bt-m-br:${cornerSrc("br")};` +
+    // each corner's drawing widened a little (scripts/corner-halos.py): what the scrolling letter fades out of
+    `--bt-h-tl:${cornerSrc("halo-tl")};--bt-h-tr:${cornerSrc("halo-tr")};--bt-h-bl:${cornerSrc("halo-bl")};--bt-h-br:${cornerSrc("halo-br")};` +
     `--bt-cw:${c.cornerW ?? "min(24%, 16dvh, 160px)"};--bt-ar:1;--bt-arn:1;--bt-paint:${metalRamp(125)};` +
     (single
-      ? `--bt-ro:0.065;--bt-ri:0.065;--bt-inr:0.085;`
-      : `--bt-ro:${STATIONERY.corners.outer};--bt-ri:${STATIONERY.corners.inner};--bt-inr:${STATIONERY.corners.inner};`) +
+      ? `--bt-ro:0.065;--bt-ri:0.065;--bt-inr:0.085;--bt-so:0.13;--bt-si:0.13;`
+      : `--bt-ro:${STATIONERY.corners.outer};--bt-ri:${STATIONERY.corners.inner};--bt-inr:${STATIONERY.corners.inner};` +
+        // where the drawn rules leave their quarter-round notch (stationery-art.py double_rule_corner)
+        `--bt-so:0.125;--bt-si:0.135;`) +
     // bands run up to the corner ornament, or nearly to the corner where it is only the rules
     `--pb-end:${cname.startsWith("corner-plain") ? 0.3 : 0.92};` +
     `--bt-wo-k:${rule === "none" ? 0 : 1};--bt-wi-k:${rule === "double" ? 1 : 0};` +
@@ -345,6 +351,12 @@ function clearOfBands(c: Compose, sel: string): string {
   const reach = (x?: Band) => (x ? inr + (x.gap ?? 0.04) + x.k + 0.05 : 0);
   let css = "";
   const keep = Math.max(reach(b.t), reach(b.b));
+  // the letter reads rule to rule, except past a centred head or foot piece or
+  // a head or foot band: there it stops at the frame's band as before
+  const head = !!b.t || c.art.some((a) => a.corner === "tc");
+  const foot = !!b.b || c.art.some((a) => a.corner === "bc");
+  if (head) css += `html${sel} .card-sheet{--sv-top:var(--band-top)}`;
+  if (foot) css += `html${sel} .card-sheet{--sv-bot:var(--band-bottom)}`;
   if (keep) css += `html${sel} .card-sheet{--band-keep:${Math.max(0.3, keep).toFixed(3)}!important}`;
   const side = Math.max(reach(b.l), reach(b.r));
   if (side) {

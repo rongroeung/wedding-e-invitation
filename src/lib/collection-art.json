@@ -20,12 +20,48 @@
   },
   "engraved-crest": {
    "w": 960,
-   "h": 334,
+   "h": 354,
    "plates": {
-    "": [
+    "tc": [
      "line"
     ],
-    "flip": [
+    "bc": [
+     "line"
+    ]
+   }
+  },
+  "engraved-medallion": {
+   "w": 580,
+   "h": 338,
+   "plates": {
+    "tc": [
+     "line"
+    ],
+    "bc": [
+     "line"
+    ]
+   }
+  },
+  "engraved-scroll-bow": {
+   "w": 820,
+   "h": 280,
+   "plates": {
+    "tc": [
+     "line"
+    ],
+    "bc": [
+     "line"
+    ]
+   }
+  },
+  "engraved-star-rule": {
+   "w": 960,
+   "h": 305,
+   "plates": {
+    "tc": [
+     "line"
+    ],
+    "bc": [
      "line"
     ]
    }
@@ -387,6 +423,14 @@
     "flip"
    ]
   },
+  "pack-scroll-twin": {
+   "w": 246.8,
+   "h": 98.7,
+   "variants": [
+    "",
+    "flip"
+   ]
+  },
   "pack-medallion": {
    "w": 149.2,
    "h": 79.7,
@@ -395,9 +439,65 @@
     "flip"
    ]
   },
+  "pack-rosette-a": {
+   "w": 65.7,
+   "h": 65.1,
+   "variants": [
+    "",
+    "flip"
+   ]
+  },
   "pack-rosette-c": {
    "w": 75.1,
    "h": 75.0,
+   "variants": [
+    "",
+    "flip"
+   ]
+  },
+  "pack-rosette-d": {
+   "w": 65.8,
+   "h": 66.2,
+   "variants": [
+    "",
+    "flip"
+   ]
+  },
+  "pack-crest": {
+   "w": 663.9,
+   "h": 216.7,
+   "variants": [
+    "",
+    "flip"
+   ]
+  },
+  "pack-star-rule": {
+   "w": 468.3,
+   "h": 127.5,
+   "variants": [
+    "",
+    "flip"
+   ]
+  },
+  "pack-rule": {
+   "w": 908.2,
+   "h": 79.7,
+   "variants": [
+    "",
+    "flip"
+   ]
+  },
+  "pack-wing": {
+   "w": 94.8,
+   "h": 73.4,
+   "variants": [
+    "",
+    "flip"
+   ]
+  },
+  "pack-fleuron": {
+   "w": 113.4,
+   "h": 66.0,
    "variants": [
     "",
     "flip"

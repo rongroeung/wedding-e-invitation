@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { getDashboardStats, getWedding } from "@/lib/queries";
 import { toKhmerNumber } from "@/lib/khmer";
+import { pageWorkspace } from "@/lib/workspace";
+
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +26,9 @@ function Stat({ label, value, tone = "slate" }: { label: string; value: number; 
 }
 
 export default async function AdminDashboard() {
-  const [stats, wedding] = await Promise.all([getDashboardStats(), getWedding()]);
+  const weddingId = await pageWorkspace();
+  if (!weddingId) return null;
+  const [stats, wedding] = await Promise.all([getDashboardStats(weddingId), getWedding(weddingId)]);
 
   return (
     <div className="space-y-6">

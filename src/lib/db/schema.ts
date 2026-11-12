@@ -10,10 +10,22 @@ import {
   boolean,
   customType,
   integer,
+  jsonb,
   pgTable,
+  primaryKey,
   text,
   timestamp,
 } from "drizzle-orm/pg-core";
+
+/**
+ * The wedding (workspace) a row belongs to. No default here, so every insert
+ * has to name its wedding; the database keeps 'main' as a default only for
+ * rows written by the previous version during a rollout (drizzle/0033).
+ */
+const weddingId = () => text("wedding_id").notNull();
+
+/** One colour of the wedding palette. */
+export type DressColor = { hex: string; name: string };
 
 /** Raw binary column used for uploaded photos / audio / QR images. */
 export const bytea = customType<{ data: Buffer; default: false }>({
@@ -31,12 +43,15 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
   name: text("name").notNull().default("Admin"),
+  /** The platform owner: sees every workspace, creates them, assigns their admins. */
+  isOwner: boolean("is_owner").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
 /* ── Binary assets (kept in the DB so serverless hosts work out of the box) ─ */
 export const media = pgTable("media", {
   id: id(),
+  weddingId: weddingId(),
   filename: text("filename").notNull(),
   mimeType: text("mime_type").notNull(),
   size: integer("size").notNull().default(0),
@@ -57,9 +72,14 @@ export const media = pgTable("media", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-/* ── Wedding information (single row, id = "main") ─────────────────────── */
+/* ── Wedding information: one row per workspace ("main" is the first, at /) ─ */
 export const wedding = pgTable("wedding", {
   id: text("id").primaryKey().default("main"),
+  /** Its public address, /w/<slug> ("main" is also served at /). */
+  slug: text("slug").notNull().unique(),
+  /** What the workspace is called in the dashboard (the couple's names, say). */
+  workspaceName: text("workspace_name").notNull().default(""),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 
   // Cover
   title: text("title").notNull().default("សិរីមង្គលអាពាហ៍ពិពាហ៍"),
@@ -67,6 +87,12 @@ export const wedding = pgTable("wedding", {
   openButton: text("open_button").notNull().default("បើកលិខិត"),
   /** Decorative monogram on the cover, e.g. "S&K" or "ស ក". */
   monogram: text("monogram").notNull().default(""),
+  /** Show the name logo (image or drawn crest) between the groom's and bride's names. */
+  nameLogoEnabled: boolean("name_logo_enabled").notNull().default(true),
+  /** The couple's own name-logo image (an upload); replaces the drawn crest when set. */
+  nameLogoMediaId: text("name_logo_media_id"),
+  /** "foil": the image's light parts printed in gold; "original": the image as uploaded. */
+  nameLogoMode: text("name_logo_mode").notNull().default("foil"),
   /**
    * The face it is set in — a catalogue id, not a CSS family name.
    *
@@ -116,6 +142,8 @@ export const wedding = pgTable("wedding", {
   venueAddress: text("venue_address").notNull().default(""),
   mapUrl: text("map_url").notNull().default(""),
   mapEmbedUrl: text("map_embed_url").notNull().default(""),
+  /** The couple's own picture of the map (an upload); shown in the venue section. */
+  venueMapMediaId: text("venue_map_media_id"),
 
   // Closing blessing
   blessingThanks: text("blessing_thanks").notNull().default(""),
@@ -129,6 +157,15 @@ export const wedding = pgTable("wedding", {
   giftQrMediaId: text("gift_qr_media_id"),
   giftQrUrl: text("gift_qr_url").notNull().default(""),
   giftAccountName: text("gift_account_name").notNull().default(""),
+
+  /* ── Wedding colours: what guests are asked to wear ──────────────────
+     Empty until the couple adds a colour; the section is hidden until then. */
+  dressCodeEnabled: boolean("dress_code_enabled").notNull().default(true),
+  dressCodeTitle: text("dress_code_title").notNull().default("ពណ៌សម្លៀកបំពាក់"),
+  /** A line to guests, e.g. which colours to wear or to leave to the bride. */
+  dressCodeNote: text("dress_code_note").notNull().default(""),
+  /** In order: [{ hex: "#a4b8c4", name: "ខៀវស្រាល" }, …] (lib/dressColors). */
+  dressColors: jsonb("dress_colors").$type<DressColor[]>().notNull().default([]),
 
   // Music
   musicEnabled: boolean("music_enabled").notNull().default(false),
@@ -292,6 +329,9 @@ export const wedding = pgTable("wedding", {
   /** How far the ornament stands off the paper, 0–100. */
   frameDepth: integer("frame_depth").notNull().default(55),
 
+  /** The message sent with each guest's link; empty uses lib/shareCaption's default. */
+  shareCaption: text("share_caption").notNull().default(""),
+
   // SEO
   metaDescription: text("meta_description").notNull().default(""),
 
@@ -301,6 +341,7 @@ export const wedding = pgTable("wedding", {
 /* ── Wedding programme ─────────────────────────────────────────────────── */
 export const weddingEvents = pgTable("wedding_events", {
   id: id(),
+  weddingId: weddingId(),
   groupName: text("group_name").notNull().default("ពេលព្រឹក"),
   groupIcon: text("group_icon").notNull().default("🌸"),
   timeLabel: text("time_label").notNull().default(""),
@@ -314,6 +355,7 @@ export const weddingEvents = pgTable("wedding_events", {
 /* ── Love story timeline ───────────────────────────────────────────────── */
 export const storyItems = pgTable("story_items", {
   id: id(),
+  weddingId: weddingId(),
   label: text("label").notNull().default(""),
   title: text("title").notNull(),
   description: text("description").notNull().default(""),
@@ -323,6 +365,7 @@ export const storyItems = pgTable("story_items", {
 /* ── Gallery ───────────────────────────────────────────────────────────── */
 export const galleryImages = pgTable("gallery_images", {
   id: id(),
+  weddingId: weddingId(),
   mediaId: text("media_id"),
   url: text("url").notNull().default(""),
   caption: text("caption").notNull().default(""),
@@ -332,6 +375,7 @@ export const galleryImages = pgTable("gallery_images", {
 /* ── Guests ────────────────────────────────────────────────────────────── */
 export const guests = pgTable("guests", {
   id: id(),
+  weddingId: weddingId(),
   code: text("code").notNull().unique(),
   title: text("title").notNull().default("លោក"),
   name: text("name").notNull(),
@@ -347,6 +391,7 @@ export const guests = pgTable("guests", {
 /* ── RSVP ──────────────────────────────────────────────────────────────── */
 export const rsvps = pgTable("rsvps", {
   id: id(),
+  weddingId: weddingId(),
   guestId: text("guest_id").references(() => guests.id, { onDelete: "set null" }),
   guestCode: text("guest_code").notNull().default(""),
   name: text("name").notNull(),
@@ -362,10 +407,23 @@ export const rsvps = pgTable("rsvps", {
 /* ── Page views ────────────────────────────────────────────────────────── */
 export const pageViews = pgTable("page_views", {
   id: id(),
+  weddingId: weddingId(),
   guestCode: text("guest_code").notNull().default(""),
   path: text("path").notNull().default("/"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+/* ── Who may manage which wedding ──────────────────────────────────────── */
+export const workspaceMembers = pgTable(
+  "workspace_members",
+  {
+    userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    weddingId: text("wedding_id").notNull().references(() => wedding.id, { onDelete: "cascade" }),
+    role: text("role").notNull().default("admin"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.weddingId] })],
+);
 
 export type Wedding = typeof wedding.$inferSelect;
 export type WeddingEvent = typeof weddingEvents.$inferSelect;

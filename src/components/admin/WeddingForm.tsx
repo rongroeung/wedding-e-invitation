@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { Wedding } from "@/lib/db/schema";
 import { mediaSrc } from "@/lib/media";
 import { MonogramFontPicker } from "./MonogramFontPicker";
-import { Button, Card, Field, Input, MediaUpload, StatusMessage, Textarea, Toggle, useApi } from "./ui";
+import { Button, Card, Field, Input, MediaUpload, Select, StatusMessage, Textarea, Toggle, useApi } from "./ui";
 
 /** Master form for every piece of wedding content shown on the invitation. */
 export function WeddingForm({ wedding }: { wedding: Wedding }) {
@@ -77,6 +77,33 @@ export function WeddingForm({ wedding }: { wedding: Wedding }) {
               bride={form.brideName}
               onChange={(id) => set("monogramFont", id)}
             />
+          </Field>
+        </div>
+
+        {/* the name logo between the names: on or off, and the couple's own image */}
+        <div className="mt-4">
+          <Toggle
+            label="បង្ហាញឡូហ្គោឈ្មោះ · Show name logo"
+            hint="ឡូហ្គោនៅចន្លោះឈ្មោះកូនប្រុស និងកូនស្រី (រូបភាពដែលបានផ្ទុក ឬអក្សរផ្ចិតលំនាំដើម)"
+            checked={form.nameLogoEnabled}
+            onChange={(v) => set("nameLogoEnabled", v)}
+          />
+        </div>
+        <div className={`mt-4 grid gap-4 sm:grid-cols-2 ${form.nameLogoEnabled ? "" : "opacity-50"}`}>
+          <MediaUpload
+            label="រូបភាពឡូហ្គោឈ្មោះ (ស្រេចចិត្ត) · Name logo image"
+            currentSrc={mediaSrc(form.nameLogoMediaId, "")}
+            onUploaded={(id) => set("nameLogoMediaId", id)}
+            onClear={() => set("nameLogoMediaId", null)}
+          />
+          <Field
+            label="របៀបបង្ហាញឡូហ្គោ"
+            hint="មាស៖ ផ្នែកពណ៌ភ្លឺនៃរូបភាព បោះពុម្ពជាពណ៌មាស លើក្រដាសគ្រប់ពណ៌ (ផ្ទៃខាងក្រោយត្រូវបានដកចេញ)។ ដើម៖ បង្ហាញរូបភាពដូចដែលបានផ្ទុក។"
+          >
+            <Select value={form.nameLogoMode} onChange={(e) => set("nameLogoMode", e.target.value)}>
+              <option value="foil">មាស · Foil (light parts in gold)</option>
+              <option value="original">ដើម · Original image</option>
+            </Select>
           </Field>
         </div>
 
@@ -168,6 +195,15 @@ export function WeddingForm({ wedding }: { wedding: Wedding }) {
           <Field label="តំណ Google Maps Embed" hint="ឧ. https://www.google.com/maps?q=...&output=embed">
             <Input value={form.mapEmbedUrl} onChange={(e) => set("mapEmbedUrl", e.target.value)} />
           </Field>
+          <MediaUpload
+            label="រូបភាពផែនទី (ស្រេចចិត្ត) · Map picture"
+            currentSrc={mediaSrc(form.venueMapMediaId, "")}
+            onUploaded={(id) => set("venueMapMediaId", id)}
+            onClear={() => set("venueMapMediaId", null)}
+          />
+          <p className="text-xs text-slate-500">
+            រូបផែនទីផ្ទាល់ខ្លួន (ឧ. ផែនទីគូរ ឬរូបថតអេក្រង់) បង្ហាញក្នុងផ្នែកទីតាំង។ ភ្ញៀវអាចចុចដើម្បីពង្រីក។
+          </p>
         </div>
       </Card>
 

@@ -9,8 +9,8 @@ import {
   fail,
   ok,
   guard,
-  requireAdmin,
 } from "@/lib/api";
+import { requireWorkspace } from "@/lib/workspace";
 import { getDb } from "@/lib/db";
 import { media } from "@/lib/db/schema";
 import { looksLikeAudio, looksLikeImage, looksLikeVideo } from "@/lib/media-magic";
@@ -42,7 +42,7 @@ export const maxDuration = 60;
  */
 export async function POST(request: Request) {
   return guard(async () => {
-  const { response } = await requireAdmin(request);
+  const { weddingId, response } = await requireWorkspace(request);
   if (response) return response;
 
   let form: FormData;
@@ -109,6 +109,7 @@ export async function POST(request: Request) {
       .insert(media)
       .values({
         id: uploadId,
+        weddingId,
         filename,
         mimeType,
         kind,
@@ -134,7 +135,7 @@ export async function POST(request: Request) {
       size: sql`${media.size} + ${buffer.byteLength}`,
       complete: index === total - 1,
     })
-    .where(and(eq(media.id, uploadId), sql`${media.size} + ${buffer.byteLength} <= ${maxBytes}`))
+    .where(and(eq(media.id, uploadId), eq(media.weddingId, weddingId), sql`${media.size} + ${buffer.byteLength} <= ${maxBytes}`))
     .returning({ id: media.id, size: media.size, complete: media.complete });
 
   if (!appended.length) {

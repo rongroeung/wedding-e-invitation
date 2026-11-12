@@ -1,5 +1,5 @@
 /** Read helpers used by the public invitation pages. */
-import { asc, desc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, sql } from "drizzle-orm";
 import { getDb } from "./db";
 import {
   galleryImages,
@@ -23,26 +23,45 @@ export type InvitationData = {
   gallery: GalleryImage[];
 };
 
-/** Returns the wedding row, creating the default one on first run. */
-export async function getWedding(): Promise<Wedding> {
+/**
+ * A workspace's wedding row. The default workspace ("main", served at "/") is
+ * created on first run; any other id that does not exist throws, since only
+ * the owner creates workspaces (lib/workspace).
+ */
+export async function getWedding(weddingId = "main"): Promise<Wedding> {
   const db = await getDb();
-  const rows = await db.select().from(wedding).limit(1);
+  const rows = await db.select().from(wedding).where(eq(wedding.id, weddingId)).limit(1);
   if (rows.length > 0) return rows[0];
-  const [created] = await db.insert(wedding).values({ id: "main" }).returning();
-  return created;
+  if (weddingId !== "main") throw new Error(`workspace not found: ${weddingId}`);
+  const [created] = await db
+    .insert(wedding)
+    .values({ id: "main", slug: "main" })
+    .onConflictDoNothing()
+    .returning();
+  return created ?? (await db.select().from(wedding).where(eq(wedding.id, "main")).limit(1))[0];
 }
 
-export async function getInvitationData(): Promise<InvitationData> {
+/** The wedding at /w/<slug>, or null. */
+export async function getWeddingBySlug(slug: string): Promise<Wedding | null> {
+  if (!slug) return null;
+  const db = await getDb();
+  const rows = await db.select().from(wedding).where(eq(wedding.slug, slug)).limit(1);
+  return rows[0] ?? null;
+}
+
+export async function getInvitationData(weddingId = "main"): Promise<InvitationData> {
   const db = await getDb();
   const [weddingRow, events, story, gallery] = await Promise.all([
-    getWedding(),
-    db.select().from(weddingEvents).orderBy(asc(weddingEvents.sortOrder)),
-    db.select().from(storyItems).orderBy(asc(storyItems.sortOrder)),
-    db.select().from(galleryImages).orderBy(asc(galleryImages.sortOrder)),
+    getWedding(weddingId),
+    db.select().from(weddingEvents).where(eq(weddingEvents.weddingId, weddingId)).orderBy(asc(weddingEvents.sortOrder)),
+    db.select().from(storyItems).where(eq(storyItems.weddingId, weddingId)).orderBy(asc(storyItems.sortOrder)),
+    db.select().from(galleryImages).where(eq(galleryImages.weddingId, weddingId)).orderBy(asc(galleryImages.sortOrder)),
   ]);
   return { wedding: weddingRow, events, story, gallery };
 }
 
+/** A guest by their invitation code. Codes are unique across every workspace,
+ *  so the guest row also says which wedding the link belongs to. */
 export async function getGuestByCode(code: string): Promise<Guest | null> {
   if (!code) return null;
   const db = await getDb();
@@ -51,14 +70,14 @@ export async function getGuestByCode(code: string): Promise<Guest | null> {
 }
 
 /** Records an invitation view (guest counter + anonymous page-view log). */
-export async function trackView(path: string, guestCode = "") {
+export async function trackView(weddingId: string, path: string, guestCode = "") {
   const db = await getDb();
-  await db.insert(pageViews).values({ path, guestCode });
+  await db.insert(pageViews).values({ weddingId, path, guestCode });
   if (guestCode) {
     await db
       .update(guests)
       .set({ views: sql`${guests.views} + 1`, lastViewedAt: new Date() })
-      .where(eq(guests.code, guestCode));
+      .where(and(eq(guests.code, guestCode), eq(guests.weddingId, weddingId)));
   }
 }
 
@@ -88,12 +107,12 @@ export async function getGuestRsvpStatus(code: string): Promise<"attending" | "d
   return row.attending ? "attending" : "declined";
 }
 
-export async function getDashboardStats() {
+export async function getDashboardStats(weddingId: string) {
   const db = await getDb();
   const [guestRows, rsvpRows, viewRows] = await Promise.all([
-    db.select().from(guests),
-    db.select().from(rsvps).orderBy(desc(rsvps.updatedAt)),
-    db.select({ count: sql<number>`count(*)::int` }).from(pageViews),
+    db.select().from(guests).where(eq(guests.weddingId, weddingId)),
+    db.select().from(rsvps).where(eq(rsvps.weddingId, weddingId)).orderBy(desc(rsvps.updatedAt)),
+    db.select({ count: sql<number>`count(*)::int` }).from(pageViews).where(eq(pageViews.weddingId, weddingId)),
   ]);
 
   const attending = rsvpRows.filter((r) => r.attending);

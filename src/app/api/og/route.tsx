@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { getWedding } from "@/lib/queries";
+import { getWedding, getWeddingBySlug } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -9,10 +9,13 @@ export const runtime = "nodejs";
  * The Khmer font is fetched from Google Fonts and subset to only the glyphs we
  * actually draw, so the image stays small and renders correctly.
  */
-export async function GET() {
+export async function GET(request: Request) {
   let wedding;
   try {
-    wedding = await getWedding();
+    // ?w=<slug> for a workspace other than the default
+    const slug = new URL(request.url).searchParams.get("w");
+    wedding = slug ? await getWeddingBySlug(slug.slice(0, 60)) : await getWedding();
+    if (!wedding) return new Response("Not found", { status: 404 });
   } catch {
     return new Response("Not available", { status: 404 });
   }

@@ -1,6 +1,8 @@
 /**
  * Generates elegant SVG placeholder artwork for the demo gallery so a freshly
  * seeded site still looks finished before real photographs are uploaded.
+ * The mark is a pair of wedding rings with a small diamond: no flowers (the
+ * couple asked for no lotus anywhere, and the first mark here was one).
  */
 const PALETTES: [string, string, string][] = [
   ["#F6EBD8", "#E4CE9B", "#7B1F2F"],
@@ -31,13 +33,11 @@ export function placeholderPhoto(caption: string, index = 0): string {
     <rect x="36" y="36" width="728" height="928" rx="6"/>
     <rect x="50" y="50" width="700" height="900" rx="4" stroke-opacity=".16"/>
   </g>
-  <g transform="translate(400 470)" fill="${ink}" fill-opacity=".22">
-    <path d="M0-96C24-52 40-22 40 6c0 26-18 44-40 44S-40 32-40 6C-40-22-24-52 0-96Z"/>
-    <path d="M-46-46c-30 26-46 54-44 82 2 26 22 42 44 40 10-1 18-6 24-13-16-24-24-52-24-84Z" fill-opacity=".7"/>
-    <path d="M46-46c30 26 46 54 44 82-2 26-22 42-44 40-10-1-18-6-24-13 16-24 24-52 24-84Z" fill-opacity=".7"/>
-    <path d="M-96 6c-4 30 10 56 34 68 22 11 46 6 62-10-30-8-62-28-96-58Z" fill-opacity=".45"/>
-    <path d="M96 6c4 30-10 56-34 68-22 11-46 6-62-10 30-8 62-28 96-58Z" fill-opacity=".45"/>
+  <g transform="translate(400 470)" fill="none" stroke="${ink}" stroke-opacity=".3" stroke-width="7">
+    <circle cx="-34" cy="12" r="62"/>
+    <circle cx="34" cy="12" r="62"/>
   </g>
+  <path d="M400 360l18 20-18 20-18-20Z" fill="${ink}" fill-opacity=".3"/>
   <circle cx="400" cy="470" r="170" fill="none" stroke="${ink}" stroke-opacity=".2" stroke-width="1"/>
 </svg>`;
 }

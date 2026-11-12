@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ThemeStyle } from "@/components/ThemeStyle";
 import { FieldReport } from "@/components/invitation/FieldReport";
 import { InvitationPage } from "@/components/invitation/InvitationPage";
+import { weddingMetadata } from "@/lib/metadata";
 import { getGuestByCode, getGuestRsvp, getInvitationData, getWedding } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
@@ -25,14 +26,16 @@ const BUILD =
 
 export async function generateMetadata({ params }: Pick<Params, "params">): Promise<Metadata> {
   const { code } = await params;
-  const [wedding, guest] = await Promise.all([getWedding(), getGuestByCode(decodeURIComponent(code))]);
+  const guest = await getGuestByCode(decodeURIComponent(code));
+  // the code says which wedding this is; an unknown code gets the default's
+  const wedding = await getWedding(guest?.weddingId ?? "main").catch(() => getWedding());
   const title = `${wedding.title} | ${wedding.groomName} & ${wedding.brideName}`;
-  return {
+  return weddingMetadata(wedding, {
     title: guest ? `${title} — ${guest.title} ${guest.name}` : title,
     description: guest
       ? `សូមគោរពអញ្ជើញ ${guest.title} ${guest.name} • ${wedding.weddingDateKhmer}`
       : wedding.metaDescription,
-  };
+  });
 }
 
 /** Personalised invitation: /invite/<code> */
@@ -51,7 +54,7 @@ export default async function GuestInvitation({ params, searchParams }: Params) 
   const guest = await getGuestByCode(decodeURIComponent(code));
   if (!guest) notFound();
 
-  const [data, reply] = await Promise.all([getInvitationData(), getGuestRsvp(guest.code)]);
+  const [data, reply] = await Promise.all([getInvitationData(guest.weddingId), getGuestRsvp(guest.code)]);
   const rsvpStatus = reply ? (reply.attending ? "attending" : "declined") : "pending";
   return (
     <>

@@ -13,6 +13,7 @@ import { Contact } from "./Contact";
 import { Couple } from "./Couple";
 import { Cover } from "./Cover";
 import { DateSection } from "./DateSection";
+import { DressColors } from "./DressColors";
 import { InvitationOpening } from "./envelope/InvitationOpening";
 import { Gallery } from "./Gallery";
 import { Gift } from "./Gift";
@@ -154,6 +155,7 @@ export function InvitationPage({
 
   const contentRef = useRef<HTMLDivElement>(null);
   const tracked = useRef(false);
+  const workspaceSlug = wedding.slug;
   const open = useCallback(() => setOpened(true), []);
   const envelopeOver = useCallback(() => setEnvelopeDone(true), []);
   const veilCleared = useCallback(() => {
@@ -251,12 +253,12 @@ export function InvitationPage({
     fetch("/api/track", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ path: window.location.pathname, guestCode: guest?.code ?? "" }),
+      body: JSON.stringify({ path: window.location.pathname, guestCode: guest?.code ?? "", workspace: workspaceSlug }),
       signal: controller.signal,
       keepalive: true,
     }).catch(() => undefined);
     return () => controller.abort();
-  }, [guest?.code]);
+  }, [guest?.code, workspaceSlug]);
 
   /* Scroll-reveal animations. */
   useEffect(() => {
@@ -385,11 +387,13 @@ export function InvitationPage({
         <DateSection wedding={wedding} />
         {wedding.showProgram && <Program events={events} />}
         <Venue wedding={wedding} />
+        <DressColors wedding={wedding} />
         {wedding.showLoveStory && <LoveStory items={story} />}
         {wedding.showGallery && <Gallery images={gallery} />}
         {wedding.showRsvp && (
           <Rsvp
             guest={guest}
+            workspace={wedding.slug}
             reply={rsvpReply}
             onSubmitted={(attending) => setRsvpStatus(attending ? "attending" : "declined")}
           />

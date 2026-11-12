@@ -31,14 +31,14 @@
   "compose": {
    "art": [
     {
-     "src": "collection/naga-crest",
+     "src": "collection/pack-crest",
      "corner": "tc",
      "size": "crest"
     },
     {
-     "src": "collection/kbach-medallion",
+     "src": "collection/pack-crest",
      "corner": "bc",
-     "size": "min(30%, 18dvh, 210px)"
+     "size": "crest"
     }
    ],
    "corner": "stationery/corner-acanthus",
@@ -126,17 +126,17 @@
   "compose": {
    "art": [
     {
-     "src": "collection/kbach-crest",
+     "src": "collection/pack-medallion",
      "corner": "tc",
-     "size": "crest"
+     "size": "min(40%, 22dvh, 280px)"
     },
     {
-     "src": "collection/kbach-medallion",
+     "src": "collection/pack-medallion",
      "corner": "bc",
-     "size": "min(30%, 18dvh, 210px)"
+     "size": "min(30%, 16dvh, 210px)"
     }
    ],
-   "corner": "collection/corner-phka",
+   "corner": "stationery/corner-loop",
    "rule": "double",
    "lineMetal": true
   }
@@ -300,7 +300,7 @@
   "lineAlpha": 0.92,
   "compose": {
    "art": [],
-   "corner": "collection/corner-phka",
+   "corner": "stationery/corner-acanthus",
    "rule": "double",
    "lineMetal": true,
    "bands": {
@@ -361,26 +361,35 @@
     {
      "src": "collection/engraved-corner",
      "corner": "tl",
-     "size": "min(34%, 21dvh, 230px)"
+     "size": "min(30%, 19dvh, 210px)",
+     "snug": true
     },
     {
      "src": "collection/engraved-corner",
      "corner": "tr",
-     "size": "min(34%, 21dvh, 230px)"
+     "size": "min(30%, 19dvh, 210px)",
+     "snug": true
     },
     {
      "src": "collection/engraved-corner",
      "corner": "bl",
-     "size": "min(34%, 21dvh, 230px)"
+     "size": "min(30%, 19dvh, 210px)",
+     "snug": true
     },
     {
      "src": "collection/engraved-corner",
      "corner": "br",
-     "size": "min(34%, 21dvh, 230px)"
+     "size": "min(30%, 19dvh, 210px)",
+     "snug": true
     },
     {
      "src": "collection/engraved-crest",
      "corner": "tc",
+     "size": "crest"
+    },
+    {
+     "src": "collection/engraved-crest",
+     "corner": "bc",
      "size": "crest"
     }
    ],
@@ -421,17 +430,41 @@
   "compose": {
    "art": [
     {
-     "src": "collection/naga-crest",
+     "src": "collection/pack-fleuron",
      "corner": "tc",
-     "size": "min(34%, 20dvh, 230px)"
+     "size": "min(26%, 13dvh, 170px)"
     },
     {
-     "src": "collection/mark-phka",
+     "src": "collection/pack-fleuron",
      "corner": "bc",
-     "size": "mark"
+     "size": "min(20%, 10dvh, 130px)"
+    },
+    {
+     "src": "collection/pack-rosette-c",
+     "corner": "tl",
+     "size": "min(8%, 5dvh, 50px)",
+     "snug": true
+    },
+    {
+     "src": "collection/pack-rosette-c",
+     "corner": "tr",
+     "size": "min(8%, 5dvh, 50px)",
+     "snug": true
+    },
+    {
+     "src": "collection/pack-rosette-c",
+     "corner": "bl",
+     "size": "min(8%, 5dvh, 50px)",
+     "snug": true
+    },
+    {
+     "src": "collection/pack-rosette-c",
+     "corner": "br",
+     "size": "min(8%, 5dvh, 50px)",
+     "snug": true
     }
    ],
-   "corner": "collection/corner-single-phka",
+   "corner": "collection/corner-plain-single",
    "rule": "single",
    "lineMetal": true
   }
@@ -468,23 +501,20 @@
   "compose": {
    "art": [
     {
-     "src": "collection/kbach-crest",
+     "src": "collection/pack-crest",
      "corner": "tc",
-     "size": "crest"
+     "size": "min(58%, 26dvh, 400px)"
+    },
+    {
+     "src": "collection/pack-crest",
+     "corner": "bc",
+     "size": "min(58%, 26dvh, 400px)"
     }
    ],
    "corner": "stationery/corner-acanthus",
    "cornerW": "min(30%, 16dvh, 210px)",
    "rule": "double",
-   "lineMetal": true,
-   "bands": {
-    "b": {
-     "src": "collection/band-garland",
-     "k": 0.46,
-     "plate": "foil",
-     "gap": 0.02
-    }
-   }
+   "lineMetal": true
   }
  },
  {
@@ -526,7 +556,7 @@
     "size": "clamp(60px, 11vmin, 96px)",
     "plate": "relief",
     "alpha": 1,
-    "quiet": 0.0
+    "quiet": 1.0
    }
   }
  },
@@ -784,46 +814,52 @@
   "compose": {
    "art": [
     {
-     "src": "collection/pack-scroll-bow",
-     "corner": "tc",
-     "size": "crest",
-     "plate": "relief"
-    },
-    {
-     "src": "collection/pack-scroll-bow",
-     "corner": "bc",
-     "size": "crest",
-     "plate": "relief"
-    },
-    {
      "src": "collection/pack-acanthus",
      "corner": "tl",
      "size": "min(26%, 17dvh, 180px)",
-     "plate": "relief"
+     "plate": "relief",
+     "snug": true
     },
     {
      "src": "collection/pack-acanthus",
      "corner": "tr",
      "size": "min(26%, 17dvh, 180px)",
-     "plate": "relief"
+     "plate": "relief",
+     "snug": true
     },
     {
      "src": "collection/pack-acanthus",
      "corner": "bl",
      "size": "min(26%, 17dvh, 180px)",
-     "plate": "relief"
+     "plate": "relief",
+     "snug": true
     },
     {
      "src": "collection/pack-acanthus",
      "corner": "br",
      "size": "min(26%, 17dvh, 180px)",
-     "plate": "relief"
+     "plate": "relief",
+     "snug": true
     }
    ],
    "corner": "collection/corner-plain-double",
    "rule": "double",
    "lineMetal": false,
-   "depth": "deep"
+   "depth": "deep",
+   "bands": {
+    "t": {
+     "src": "collection/band-scroll",
+     "k": 0.34,
+     "plate": "relief",
+     "gap": 0.02
+    },
+    "b": {
+     "src": "collection/band-scroll",
+     "k": 0.34,
+     "plate": "relief",
+     "gap": 0.02
+    }
+   }
   }
  },
  {
@@ -858,27 +894,43 @@
   "compose": {
    "art": [
     {
-     "src": "collection/mark-phka",
+     "src": "collection/pack-rosette-c",
      "corner": "tl",
-     "size": "mark",
-     "plate": "relief"
+     "size": "min(13%, 8dvh, 80px)",
+     "plate": "relief",
+     "snug": true
     },
     {
-     "src": "collection/mark-phka",
+     "src": "collection/pack-rosette-c",
      "corner": "tr",
-     "size": "mark",
-     "plate": "relief"
+     "size": "min(13%, 8dvh, 80px)",
+     "plate": "relief",
+     "snug": true
     },
     {
-     "src": "collection/mark-phka",
+     "src": "collection/pack-rosette-c",
      "corner": "bl",
-     "size": "mark",
+     "size": "min(13%, 8dvh, 80px)",
+     "plate": "relief",
+     "snug": true
+    },
+    {
+     "src": "collection/pack-rosette-c",
+     "corner": "br",
+     "size": "min(13%, 8dvh, 80px)",
+     "plate": "relief",
+     "snug": true
+    },
+    {
+     "src": "collection/pack-medallion",
+     "corner": "tc",
+     "size": "min(36%, 20dvh, 250px)",
      "plate": "relief"
     },
     {
-     "src": "collection/mark-phka",
-     "corner": "br",
-     "size": "mark",
+     "src": "collection/pack-medallion",
+     "corner": "bc",
+     "size": "min(36%, 20dvh, 250px)",
      "plate": "relief"
     }
    ],
@@ -918,24 +970,21 @@
   "kline": 0,
   "lineAlpha": 0.76,
   "compose": {
-   "art": [],
-   "corner": "collection/corner-single-phka",
-   "rule": "single",
-   "lineMetal": false,
-   "bands": {
-    "t": {
-     "src": "collection/band-garland",
-     "k": 0.44,
-     "plate": "line",
-     "gap": 0.02
+   "art": [
+    {
+     "src": "collection/engraved-medallion",
+     "corner": "tc",
+     "size": "min(40%, 22dvh, 280px)"
     },
-    "b": {
-     "src": "collection/band-garland",
-     "k": 0.44,
-     "plate": "line",
-     "gap": 0.02
+    {
+     "src": "collection/engraved-medallion",
+     "corner": "bc",
+     "size": "min(40%, 22dvh, 280px)"
     }
-   }
+   ],
+   "corner": "collection/corner-plain-single",
+   "rule": "single",
+   "lineMetal": false
   }
  },
  {
@@ -970,22 +1019,19 @@
   "compose": {
    "art": [
     {
-     "src": "collection/kbach-medallion",
+     "src": "collection/pack-crest",
      "corner": "tc",
-     "size": "min(32%, 18dvh, 220px)"
+     "size": "crest"
+    },
+    {
+     "src": "collection/pack-crest",
+     "corner": "bc",
+     "size": "crest"
     }
    ],
    "corner": "stationery/corner-acanthus",
    "rule": "double",
    "lineMetal": true,
-   "bands": {
-    "b": {
-     "src": "collection/band-garland",
-     "k": 0.44,
-     "plate": "foil",
-     "gap": 0.02
-    }
-   },
    "pattern": {
     "src": "collection/tile-diaper",
     "size": "clamp(60px, 11vmin, 96px)",
@@ -1027,34 +1073,50 @@
   "compose": {
    "art": [
     {
-     "src": "collection/arch",
+     "src": "collection/pack-crest",
      "corner": "tc",
-     "size": "min(70%, 40dvh, 540px)",
+     "size": "min(62%, 26dvh, 430px)",
      "plate": "relief"
+    },
+    {
+     "src": "collection/pack-medallion",
+     "corner": "bc",
+     "size": "min(36%, 18dvh, 250px)",
+     "plate": "relief"
+    },
+    {
+     "src": "collection/pack-acanthus",
+     "corner": "tl",
+     "size": "min(32%, 20dvh, 220px)",
+     "plate": "relief",
+     "snug": true
+    },
+    {
+     "src": "collection/pack-acanthus",
+     "corner": "tr",
+     "size": "min(32%, 20dvh, 220px)",
+     "plate": "relief",
+     "snug": true
+    },
+    {
+     "src": "collection/pack-acanthus",
+     "corner": "bl",
+     "size": "min(32%, 20dvh, 220px)",
+     "plate": "relief",
+     "snug": true
+    },
+    {
+     "src": "collection/pack-acanthus",
+     "corner": "br",
+     "size": "min(32%, 20dvh, 220px)",
+     "plate": "relief",
+     "snug": true
     }
    ],
    "corner": "collection/corner-plain-double",
    "rule": "double",
    "lineMetal": false,
-   "depth": "deep",
-   "bands": {
-    "b": {
-     "src": "collection/band-balusters",
-     "k": 0.5,
-     "plate": "relief",
-     "gap": 0.03
-    },
-    "l": {
-     "src": "collection/band-colonnette-v",
-     "k": 0.2,
-     "plate": "relief"
-    },
-    "r": {
-     "src": "collection/band-colonnette-v",
-     "k": 0.2,
-     "plate": "relief"
-    }
-   }
+   "depth": "deep"
   }
  },
  {
@@ -1549,19 +1611,16 @@
      "src": "collection/garden-head",
      "corner": "tc",
      "size": "wide"
+    },
+    {
+     "src": "collection/garden-head",
+     "corner": "bc",
+     "size": "wide"
     }
    ],
    "corner": "stationery/corner-floral",
    "rule": "double",
-   "lineMetal": false,
-   "bands": {
-    "b": {
-     "src": "collection/band-vine",
-     "k": 0.42,
-     "plate": "line",
-     "gap": 0.02
-    }
-   }
+   "lineMetal": false
   }
  }
 ]

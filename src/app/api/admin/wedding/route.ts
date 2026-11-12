@@ -4,11 +4,13 @@ import { BACKDROP_PRESET_KEYS } from "@/lib/backgrounds";
 import { DESIGN_KIT_KEYS } from "@/lib/designKit";
 import { FRAME_MOTIFS } from "@/lib/frame";
 import { z } from "zod";
-import { fail, getSession, ok, readJson, requireAdmin } from "@/lib/api";
+import { fail, ok, readJson } from "@/lib/api";
+import { getAdminContext, ownsMedia, requireWorkspace } from "@/lib/workspace";
 import { getDb } from "@/lib/db";
 import { wedding } from "@/lib/db/schema";
 import { getWedding } from "@/lib/queries";
 import { MONOGRAM_FONT_IDS } from "@/lib/monogram-fonts";
+import { MAX_DRESS_COLORS } from "@/lib/dressColors";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +23,9 @@ const schema = z.object({
      `font-family` on a public page, and an id nobody offers would leave the
      mark in a fallback serif with nothing to explain why. */
   monogramFont: z.enum(MONOGRAM_FONT_IDS).optional(),
+  nameLogoEnabled: z.boolean().optional(),
+  nameLogoMediaId: z.string().max(80).nullable().optional(),
+  nameLogoMode: z.enum(["foil", "original"]).optional(),
   coverPhotoId: z.string().max(80).nullable().optional(),
   coverPhotoUrl: z.string().max(500).optional(),
 
@@ -53,11 +58,19 @@ const schema = z.object({
   venueAddress: z.string().max(400).optional(),
   mapUrl: z.string().max(600).optional(),
   mapEmbedUrl: z.string().max(900).optional(),
+  venueMapMediaId: z.string().max(80).nullable().optional(),
 
   blessingThanks: z.string().max(600).optional(),
   blessingWish: z.string().max(600).optional(),
 
   giftEnabled: z.boolean().optional(),
+  dressCodeEnabled: z.boolean().optional(),
+  dressCodeTitle: z.string().max(120).optional(),
+  dressCodeNote: z.string().max(400).optional(),
+  dressColors: z
+    .array(z.object({ hex: z.string().regex(/^#[0-9a-fA-F]{6}$/), name: z.string().trim().max(40) }))
+    .max(MAX_DRESS_COLORS)
+    .optional(),
   giftIntro: z.string().max(400).optional(),
   giftNote: z.string().max(400).optional(),
   giftQrMediaId: z.string().max(80).nullable().optional(),
@@ -184,23 +197,32 @@ const schema = z.object({
   frameDepth: z.number().int().min(0).max(100).optional(),
 
   metaDescription: z.string().max(400).optional(),
+  shareCaption: z.string().max(1000).optional(),
 });
 
 export async function GET() {
-  const session = await getSession();
-  if (!session) return fail("Unauthorized", 401);
-  return ok(await getWedding());
+  const ctx = await getAdminContext();
+  if (!ctx) return fail("Unauthorized", 401);
+  if (!ctx.weddingId) return fail("No workspace", 403);
+  return ok(await getWedding(ctx.weddingId));
 }
 
 export async function PUT(request: Request) {
-  const { response } = await requireAdmin(request);
+  const { weddingId, response } = await requireWorkspace(request);
   if (response) return response;
 
   const parsed = schema.safeParse(await readJson<unknown>(request));
   if (!parsed.success) return fail("Invalid data", 422, { issues: parsed.error.flatten() });
 
   const { weddingDate, ...rest } = parsed.data;
-  await getWedding(); // makes sure the row exists
+  await getWedding(weddingId); // makes sure the row exists
+
+  // every upload it points at has to be this wedding's own
+  for (const [key, value] of Object.entries(rest)) {
+    if (/(MediaId|PhotoId|PosterId)$/.test(key) && typeof value === "string" && value) {
+      if (!(await ownsMedia(weddingId, value))) return fail("File not found", 404, { field: key });
+    }
+  }
 
   const db = await getDb();
   const [updated] = await db
@@ -210,7 +232,7 @@ export async function PUT(request: Request) {
       ...(weddingDate ? { weddingDate: new Date(weddingDate) } : {}),
       updatedAt: new Date(),
     })
-    .where(eq(wedding.id, "main"))
+    .where(eq(wedding.id, weddingId))
     .returning();
 
   return ok(updated);

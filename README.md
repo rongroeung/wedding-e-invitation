@@ -128,6 +128,51 @@ than filing a second, so the RSVP list never shows the same guest twice.
 
 ---
 
+## 👗 Wedding colours
+
+**Admin → ពណ៌សម្លៀកបំពាក់** sets the colours guests are asked to wear:
+- up to eight colours, each with an optional name, in the order you choose;
+- a title, and an optional note (for example, a colour to leave to the bride).
+
+The invitation shows them after the venue as swatches of cloth with a fine
+gold rim, readable on light and dark papers. The section stays hidden until
+at least one colour is set, and it can be switched off. Each workspace has its
+own colours.
+
+---
+
+## 🗂️ Workspaces — one per wedding
+
+One deployment can host several weddings. Each wedding is a **workspace** with
+its own details, design, programme, gallery, guests, guest links, replies,
+uploads and admin logins.
+
+- **The first wedding** is workspace `main`, still at `/`. Everything that
+  existed before workspaces belongs to it, and every guest link already sent
+  keeps working.
+- **Other weddings** are at `/w/<address>`, e.g. `https://your-domain.com/w/dara-sophea`.
+- **Guest links** stay `/invite/<code>`. Codes are unique across all
+  workspaces, so the code alone finds the right wedding.
+- **The site owner** is the first admin account. Only the owner sees
+  **Admin → កន្លែងធ្វើការទាំងអស់**, where you can:
+  - create workspaces;
+  - rename a workspace or change its address;
+  - give a workspace admins (an existing account, or a new one with a password);
+  - take admins off;
+  - delete a workspace and all of its data. You must type its address to
+    confirm, and `main` cannot be deleted.
+- **Other admins** see only the workspaces they belong to. With more than one,
+  a switcher at the top of the sidebar changes which wedding the dashboard
+  works on. A couple can add a co-admin with a new account, but cannot attach
+  an existing account or reach another wedding's data; every request is
+  checked on the server.
+
+The database change is `drizzle/0033_workspaces.sql`. It is applied
+automatically on first use, like the others, and is safe to run on a live
+database.
+
+---
+
 ## ✉️ The 3D envelope
 
 The invitation arrives sealed. A guest sees a gold-ornamented envelope with the
@@ -385,7 +430,7 @@ scripts/                         # migrate, seed, optional font download
 ### Administrator accounts
 
 **Admin → គណនីគ្រប់គ្រង** is where you change your own password and add the
-other people who should be able to sign in. Changing your own password asks for
+other people who should be able to sign in to the current workspace. Changing your own password asks for
 the current one — the session proves who you are, but not that you are the one
 at the keyboard. New passwords are at least ten characters. Deleting your own
 account, or the last remaining one, is refused, so the dashboard can never be

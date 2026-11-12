@@ -1,5 +1,6 @@
 "use client";
 
+import { workspacePath } from "@/lib/workspacePath";
 import { useState } from "react";
 import type { Wedding } from "@/lib/db/schema";
 import {
@@ -568,7 +569,7 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
           រក្សាទុក
         </Button>
         <a
-          href="/"
+          href={workspacePath(wedding.slug)}
           target="_blank"
           rel="noreferrer"
           className="text-sm text-amber-700 underline-offset-4 hover:underline"

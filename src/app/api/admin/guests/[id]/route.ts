@@ -1,6 +1,7 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
-import { fail, ok, randomCode, readJson, requireAdmin, slugify } from "@/lib/api";
+import { fail, ok, randomCode, readJson, slugify } from "@/lib/api";
+import { requireWorkspace } from "@/lib/workspace";
 import { getDb } from "@/lib/db";
 import { guests } from "@/lib/db/schema";
 
@@ -20,7 +21,7 @@ const schema = z.object({
 type Params = { params: Promise<{ id: string }> };
 
 export async function PUT(request: Request, { params }: Params) {
-  const { response } = await requireAdmin(request);
+  const { weddingId, response } = await requireWorkspace(request);
   if (response) return response;
   const parsed = schema.safeParse(await readJson<unknown>(request));
   if (!parsed.success) return fail("Invalid data", 422);
@@ -44,16 +45,16 @@ export async function PUT(request: Request, { params }: Params) {
     if (clash[0] && clash[0].id !== id) return fail("លេខកូដនេះមានរួចហើយ", 409);
   }
 
-  const [row] = await db.update(guests).set(values).where(eq(guests.id, id)).returning();
+  const [row] = await db.update(guests).set(values).where(and(eq(guests.id, id), eq(guests.weddingId, weddingId))).returning();
   if (!row) return fail("Not found", 404);
   return ok(row);
 }
 
 export async function DELETE(request: Request, { params }: Params) {
-  const { response } = await requireAdmin(request);
+  const { weddingId, response } = await requireWorkspace(request);
   if (response) return response;
   const { id } = await params;
   const db = await getDb();
-  await db.delete(guests).where(eq(guests.id, id));
+  await db.delete(guests).where(and(eq(guests.id, id), eq(guests.weddingId, weddingId)));
   return ok({ deleted: id });
 }
