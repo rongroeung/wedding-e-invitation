@@ -82,7 +82,6 @@ export function Rsvp({
     <section id="rsvp" className="section-pad relative">
       <div className="mx-auto max-w-2xl">
         <SectionTitle
-          eyebrow="បញ្ជាក់វត្តមាន"
           title={confirmed ? "សូមអរគុណ" : "សូមមេត្តាចូលរួមបញ្ជាក់វត្តមាន"}
           subtitle={
             confirmed
@@ -211,7 +210,6 @@ export function Rsvp({
                   </div>
                   <p className="mt-2 text-xs text-ink/72 khmer-wrap">
                     ចំនួន {toKhmerNumber(guestCount)} នាក់
-                    {guest ? ` (កៅអីដែលបានរៀបចំ៖ ${toKhmerNumber(guest.allowedSeats)})` : ""}
                   </p>
                 </div>
               )}

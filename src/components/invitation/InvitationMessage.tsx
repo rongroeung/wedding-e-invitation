@@ -27,14 +27,14 @@ export function InvitationMessage({ wedding }: { wedding: Wedding }) {
       </h2>
 
       {/* Both sets of parents, side by side as on a printed card */}
-      <div className="mt-8 grid grid-cols-2 gap-x-5 gap-y-1 text-[0.95rem] leading-loose text-heading khmer-wrap">
+      <div className="mt-8 grid grid-cols-2 gap-x-5 gap-y-1 text-[0.95rem] title-face msg-ink khmer-wrap">
         <p>{wedding.groomFatherName}</p>
         <p>{wedding.brideFatherName}</p>
         <p>{wedding.groomMotherName}</p>
         <p>{wedding.brideMotherName}</p>
       </div>
 
-      <p className="mt-9 text-sm text-gold-1 khmer-wrap">{wedding.subtitle}</p>
+      <p className="mt-9 text-sm title-face msg-ink khmer-wrap">{wedding.invitationLead}</p>
 
       {/*
         * One continuous sentence: the honorifics run straight into the
@@ -42,15 +42,15 @@ export function InvitationMessage({ wedding }: { wedding: Wedding }) {
         * It addresses the honorifics, never the individual guest — the guest is
         * greeted by name on the cover instead.
         */}
-      <p className="msg-body mx-auto mt-3 text-[0.9rem] leading-loose text-ink/90 khmer-wrap">
+      <p className="msg-body mx-auto mt-3 text-[0.9rem] leading-loose msg-ink khmer-wrap">
         {`${wedding.invitationHonorific} ${wedding.invitationBody}`.replace(/\s+/g, " ").trim()}
       </p>
 
       {/* The couple, with their monogram between them: groom | mark | bride */}
       <div className={`msg-couple mt-10 ${wedding.nameLogoEnabled ? "" : "no-logo"}`}>
         <div className="min-w-0">
-          <p className="text-xs text-ink/75 khmer-wrap">កូនប្រុសនាម</p>
-          <p className="mt-2 text-lg font-semibold leading-loose text-heading khmer-wrap">
+          <p className="text-xs title-face msg-ink khmer-wrap">កូនប្រុសនាម</p>
+          <p className="mt-2 text-lg title-face msg-ink khmer-wrap">
             {wedding.groomFullName}
           </p>
         </div>
@@ -73,35 +73,31 @@ export function InvitationMessage({ wedding }: { wedding: Wedding }) {
         />
         )}
         <div className="min-w-0">
-          <p className="text-xs text-ink/75 khmer-wrap">កូនស្រីនាម</p>
-          <p className="mt-2 text-lg font-semibold leading-loose text-heading khmer-wrap">
+          <p className="text-xs title-face msg-ink khmer-wrap">កូនស្រីនាម</p>
+          <p className="mt-2 text-lg title-face msg-ink khmer-wrap">
             {wedding.brideFullName}
           </p>
         </div>
       </div>
 
-      {/* When and where */}
-      <p className="mt-10 text-[0.9rem] leading-loose text-ink/90 khmer-wrap">
-        ដែលនឹងប្រព្រឹត្តទៅ {wedding.weddingTimeKhmer}
+      {/* When and where: the couple's own wording, line by line, each falling
+          back to the one built from the date, time and venue fields */}
+      <p className="mt-10 text-[0.9rem] leading-loose msg-ink khmer-wrap">
+        {wedding.invitationWhenIntro.trim() || `ដែលនឹងប្រព្រឹត្តទៅ ${wedding.weddingTimeKhmer}`}
       </p>
-      <p className="mt-3 text-lg font-semibold leading-loose text-heading khmer-wrap">
-        {wedding.weddingDateKhmer}
+      {wedding.invitationLunarDate.trim() && (
+        <p className="msg-venue mx-auto mt-2 text-[0.9rem] leading-loose msg-ink khmer-wrap">
+          {wedding.invitationLunarDate.trim()}
+        </p>
+      )}
+      <p className="mt-3 text-lg title-face msg-ink khmer-wrap">
+        {wedding.invitationDateLine.trim() || wedding.weddingDateKhmer}
       </p>
-      <p className="msg-venue mx-auto mt-3 text-[0.9rem] leading-loose text-ink/85 khmer-wrap">
-        {wedding.venueName}
-        {wedding.venueAddress ? ` ${wedding.venueAddress}` : ""}
+      <p className="msg-venue mx-auto mt-3 text-[0.9rem] leading-loose msg-ink khmer-wrap">
+        {wedding.invitationPlace.trim() ||
+          `${wedding.venueName}${wedding.venueAddress ? ` ${wedding.venueAddress}` : ""}`}
       </p>
 
-      {wedding.mapUrl && (
-        <a
-          href={wedding.mapUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn-outline mt-8 khmer-wrap"
-        >
-          បើកផែនទី <span aria-hidden="true">📍</span>
-        </a>
-      )}
 
     </section>
   );

@@ -47,6 +47,11 @@ const schema = z.object({
   bridePhotoId: z.string().max(80).nullable().optional(),
   bridePhotoUrl: z.string().max(500).optional(),
 
+  invitationLead: z.string().max(160).optional(),
+  invitationWhenIntro: z.string().max(160).optional(),
+  invitationLunarDate: z.string().max(300).optional(),
+  invitationDateLine: z.string().max(200).optional(),
+  invitationPlace: z.string().max(400).optional(),
   invitationHonorific: z.string().max(300).optional(),
   invitationBody: z.string().max(900).optional(),
 

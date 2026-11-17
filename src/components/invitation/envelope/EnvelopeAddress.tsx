@@ -1,5 +1,6 @@
 import type { Guest, Wedding } from "@/lib/db/schema";
 import { coverName } from "../CoverContent";
+import { KbachNameFrame } from "./KbachNameFrame";
 
 /**
  * Who the envelope is addressed to, set on the envelope scene itself.
@@ -38,9 +39,12 @@ export function EnvelopeAddress({
     <div className={`env-address ${gone ? "env-address-gone" : ""}`} aria-hidden="true">
       {wedding.subtitle && <p className="env-address-lead khmer-wrap">{wedding.subtitle}</p>}
 
-      <p className={`env-address-name khmer-wrap ${name.latin ? "env-address-latin" : ""}`}>
-        {name.text}
-      </p>
+      {/* the guest's name, in light gold inside a frame of Khmer scrollwork */}
+      <KbachNameFrame>
+        <p className={`env-address-name khmer-wrap ${name.latin ? "env-address-latin" : ""}`}>
+          {name.text}
+        </p>
+      </KbachNameFrame>
     </div>
   );
 }

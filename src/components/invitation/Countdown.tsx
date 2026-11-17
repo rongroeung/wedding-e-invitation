@@ -38,7 +38,7 @@ export function Countdown({ date }: { date: string }) {
 
   if (remaining === null) {
     return (
-      <div className="reveal mt-10 text-center">
+      <div className="reveal text-center">
         <p className="gold-text text-lg leading-loose khmer-wrap">
           សូមអបអរសាទរដល់គូស្វាមីភរិយាថ្មី! ❤️
         </p>
@@ -47,10 +47,10 @@ export function Countdown({ date }: { date: string }) {
   }
 
   return (
-    <div className="reveal mt-10">
-      <p className="text-center text-xs text-gold-deep">
-        រាប់ថយក្រោយដល់ថ្ងៃមង្គលការ
-      </p>
+    <div className="reveal">
+      <h3 className="text-center">
+        <span className="gold-text text-[1.35rem] leading-[1.9] khmer-wrap">រាប់ថយក្រោយដល់ថ្ងៃមង្គលការ</span>
+      </h3>
       <FlourishDivider role="star" width={180} className="my-5" />
 
       <div className="mx-auto grid max-w-md grid-cols-4 gap-2 sm:gap-4">

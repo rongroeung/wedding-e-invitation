@@ -19,7 +19,7 @@ export function Program({ events }: { events: WeddingEvent[] }) {
   return (
     <section id="program" className="section-pad relative">
       <div className="mx-auto max-w-3xl">
-        <SectionTitle eyebrow="កម្មវិធី" title="កម្មវិធីសិរីមង្គលអាពាហ៍ពិពាហ៍" flourish="title-program" />
+        <SectionTitle title="កម្មវិធីសិរីមង្គលអាពាហ៍ពិពាហ៍" flourish="title-program" />
 
         <div className="space-y-12">
           {Object.entries(groups).map(([groupName, group]) => (

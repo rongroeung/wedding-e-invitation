@@ -16,7 +16,7 @@ export function LoveStory({ items }: { items: StoryItem[] }) {
   return (
     <section id="story" className="section-pad relative">
       <div className="mx-auto max-w-2xl">
-        <SectionTitle eyebrow="ដំណើរជីវិត" title="រឿងរ៉ាវស្នេហារបស់យើង" />
+        <SectionTitle title="រឿងរ៉ាវស្នេហារបស់យើង" />
 
         <ol className="relative mx-auto max-w-xl pl-9">
           <span

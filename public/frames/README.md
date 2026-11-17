@@ -15,3 +15,5 @@ this kbach band.
 > These files came from artwork the project owner provided. If you reuse this
 > project, replace them with artwork you hold the rights to, or upload your own
 > through **Admin → រូបរាង → ស៊ុមសំបុត្រ**.
+- `kbach-name-frame.webp` — the guest-name plate on the envelope page: the top-left frame cut from the couple's own reference sheet (supplied 2026-11-17), glow specks removed, gold remapped by luminance to the open button's champagne ramp, red panel cut out, upscaled 2× (1512×402).
+- `kbach-name-panel-mask.png` — that panel's shape, as an alpha mask; CSS fills it with the room colours.

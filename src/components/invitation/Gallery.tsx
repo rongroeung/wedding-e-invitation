@@ -138,9 +138,9 @@ export function Gallery({ images }: { images: GalleryImage[] }) {
       {/* a reading measure, not the card's width: on a wide sheet two columns
           made every photograph half a screen tall */}
       <div className="mx-auto max-w-3xl">
-        <SectionTitle eyebrow="រូបភាព" title="អនុស្សាវរីយ៍របស់យើង" />
+        <SectionTitle title="អនុស្សាវរីយ៍របស់យើង" />
 
-        <div className="reveal columns-2 gap-3 sm:columns-3 sm:gap-4">
+        <div className="reveal columns-1 gap-3 sm:columns-3 sm:gap-4">
           {images.map((image, index) => (
             <button
               key={image.id}

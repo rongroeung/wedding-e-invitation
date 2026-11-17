@@ -128,6 +128,18 @@ export const wedding = pgTable("wedding", {
   bridePhotoUrl: text("bride_photo_url").notNull().default(""),
 
   // Formal invitation wording
+  /** The letter's opening line, above the honorifics (the cover and envelope use `subtitle`). */
+  invitationLead: text("invitation_lead").notNull().default("យើងខ្ញុំមានកិត្តិយសសូមគោរពអញ្ជើញ"),
+  /*
+   * The letter's "when and where", as the couple word it (each one optional:
+   * an empty line falls back to the one built from the date, time and venue
+   * fields). Opening line, the lunar date, the emphasised solar date and
+   * time, and the place.
+   */
+  invitationWhenIntro: text("invitation_when_intro").notNull().default(""),
+  invitationLunarDate: text("invitation_lunar_date").notNull().default(""),
+  invitationDateLine: text("invitation_date_line").notNull().default(""),
+  invitationPlace: text("invitation_place").notNull().default(""),
   invitationHonorific: text("invitation_honorific")
     .notNull()
     .default("ឯកឧត្តម លោកអ្នកឧកញ៉ា អ្នកឧកញ៉ា ឧកញ៉ា លោកជំទាវ លោក លោកស្រី អ្នកនាង កញ្ញា"),
@@ -245,8 +257,8 @@ export const wedding = pgTable("wedding", {
   envelopeSkipLabel: text("envelope_skip_label").notNull().default("រំលង"),
   /* The heading on the set above the envelope, and the script line under it.
      Empty hides either one. */
-  envelopeTitle: text("envelope_title").notNull().default("សិរីសួស្តីអាពាហ៍ពិពាហ៍"),
-  envelopeSubtitle: text("envelope_subtitle").notNull().default("The Wedding Invitation"),
+  envelopeTitle: text("envelope_title").notNull().default("សិរីមង្គលអាពាហ៍ពិពាហ៍"),
+  envelopeSubtitle: text("envelope_subtitle").notNull().default(""),
 
   /* ── The pre-wedding film, played between the envelope and the curtains ──
      One beat, in the one place it belongs: the envelope has just been opened

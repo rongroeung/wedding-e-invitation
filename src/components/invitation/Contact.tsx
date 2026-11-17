@@ -39,19 +39,19 @@ export function Contact({ wedding }: { wedding: Wedding }) {
   return (
     <section id="contact" className="section-pad relative">
       <div className="mx-auto max-w-3xl">
-        <SectionTitle eyebrow="ព័ត៌មានទំនាក់ទំនង" title="ទំនាក់ទំនង" />
+        <SectionTitle title="ទំនាក់ទំនង" />
         <div className="grid gap-4">
           <ContactCard
             role="កូនប្រុស"
             title={wedding.groomTitle}
-            name={wedding.groomName}
+            name={wedding.groomFullName}
             phone={wedding.groomPhone}
             action="ទូរស័ព្ទទៅកូនប្រុស"
           />
           <ContactCard
             role="កូនស្រី"
             title={wedding.brideTitle}
-            name={wedding.brideName}
+            name={wedding.brideFullName}
             phone={wedding.bridePhone}
             action="ទូរស័ព្ទទៅកូនស្រី"
           />

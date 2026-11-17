@@ -19,7 +19,6 @@ export function DressColors({ wedding }: { wedding: Wedding }) {
     <section id="dress-colours" className="section-pad relative">
       <div className="mx-auto max-w-2xl">
         <SectionTitle
-          eyebrow="ការស្លៀកពាក់"
           title={wedding.dressCodeTitle || "ពណ៌សម្លៀកបំពាក់"}
           subtitle={wedding.dressCodeNote || undefined}
         />

@@ -28,6 +28,7 @@ export const PAPER_TONES: PaperTone[] = [
   { key: "blue", km: "ខៀវស្រអាប់", en: "Dusty Blue", base: "#e1e7ee", dark: false },
   { key: "lavender", km: "ស្វាយស្រាល", en: "Lavender", base: "#eae4ef", dark: false },
   { key: "burgundy", km: "ក្រហមទំពាំងបាយជូរ", en: "Burgundy", base: "#5a1f2b", dark: true },
+  { key: "pringtum", km: "ព្រីងទុំ", en: "Ripe Java Plum", base: "#661a3b", dark: true },
   { key: "navy", km: "ខៀវរាត្រី", en: "Midnight Navy", base: "#1e2a3f", dark: true },
   { key: "emerald", km: "បៃតងត្បូងមរកត", en: "Emerald", base: "#1d3b32", dark: true },
   { key: "charcoal", km: "ប្រផេះធ្យូង", en: "Charcoal", base: "#2b2927", dark: true },

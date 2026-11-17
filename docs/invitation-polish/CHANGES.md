@@ -256,3 +256,187 @@ burgundy at 390px (touch); gallery screenshot shows the ring placeholders;
 migration re-run on a copy of the database (no new rows, 0 lotus images in
 use); opening suite 18/18; full-page run at 7 sizes with no overflow or
 errors; `tsc --noEmit` clean.
+
+## Section headings, letter ink, phone gallery
+
+- **Gallery on phones:** one column below 640px (`columns-1`); three from `sm` up.
+- **RSVP:** the "(កៅអីដែលបានរៀបចំ៖ N)" seat note under the guest counter is removed.
+- **Section eyebrows removed:** គូស្វាមីភរិយាថ្មី, កម្មវិធី, ទីកន្លែង, ការស្លៀកពាក់, ដំណើរជីវិត,
+  រូបភាព, បញ្ជាក់វត្តមាន, ចំណងដៃ, ព័ត៌មានទំនាក់ទំនង (removed at the call sites; `SectionTitle`
+  still accepts `eyebrow` but nothing passes one).
+- **Couple title:** "កូនប្រុស និង កូនស្រី" → "គូស្វាមីភរិយា".
+- **Date section:** "ថ្ងៃដ៏សិរីមង្គល" and "រាប់ថយក្រោយដល់ថ្ងៃមង្គលការ" are now title-size gold headings
+  (same 1.35rem as section titles); the date line drops from 1.35rem to 1.05rem.
+- **Contact:** cards show `groomFullName` / `brideFullName` instead of the short names.
+- **Letter ink:** every line of the សិរីមង្គលអាពាហ៍ពិពាហ៍ letter (parents, សូមគោរពអញ្ជើញ, the body,
+  the couple's names and labels, time, date, venue) uses one colour, `.msg .msg-ink`:
+  light gold `--gold-2` (#e5cb93) on dark papers; on light papers the paper's printing gold
+  `--gold-1`, since a light gold would not read on ivory.
+
+Checked in a browser (navy at 390 and 1339, ivory at 1339): seat note and eyebrows absent,
+couple title, heading/date font sizes (21.6/16.8px phone, 23.2/18.0px desktop), gallery
+column count 1 on phone and 3 on desktop, one letter colour per paper, full names in contact;
+screenshots reviewed. `tsc --noEmit` and `next build` clean. The earlier opening/full-page
+regression scripts were not re-run this round.
+
+## Date block removed; couple after the countdown; letter in Muol
+
+- **ថ្ងៃដ៏សិរីមង្គល removed:** `DateSection` is now the countdown alone (heading, date,
+  time and ព.ស. year dropped — the letter already states them). It renders nothing when the
+  countdown is switched off. The countdown lost its own top margin, since it now opens the section.
+- **Order:** letter → រាប់ថយក្រោយដល់ថ្ងៃមង្គលការ → គូស្វាមីភរិយា → programme … (InvitationPage).
+- **Letter in Khmer OS Muol Light:** the four parents' names, សូមគោរពអញ្ជើញ, កូនប្រុសនាម/កូនស្រីនាម
+  with the couple's names, and the date line now carry `.title-face` (the face of the
+  សិរីមង្គលអាពាហ៍ពិពាហ៍ title); `font-semibold` dropped on those, as Muol is drawn heavy already.
+  The invitation body, the time line and the venue stay in the body face.
+
+Checked in a browser (navy 1339 and 390, ivory 1339): section order, the date block gone, the
+highlighted lines computed as "Khmer OS Muol Light" with the font loaded; screenshots reviewed.
+`tsc --noEmit` and `next build` clean.
+
+## Envelope set: heading, framed guest name, greeting, button ink
+
+- **Heading:** សិរីសួស្តីអាពាហ៍ពិពាហ៍ → សិរីមង្គលអាពាហ៍ពិពាហ៍; the "The Wedding Invitation" script
+  line is gone. Both are stored values (`envelope_title`, `envelope_subtitle`), so
+  `0040_envelope_heading_mongkol.sql` updates rows still holding the old defaults (both spellings,
+  ស្តី and ស្ដី) and changes the column defaults; schema defaults match. A couple's own wording is
+  left alone, and the admin can still type a line under the heading if they want one.
+- **Guest name:** light gold (#f1dfba, the heading's colour and glow) inside `KbachNameFrame`, a
+  frame of Khmer scrollwork: stepped double-rule corners holding a scroll that curls back at both
+  ends, a crest of scrolls and a lozenge at the middle of the top and bottom rules, CSS rules between
+  them so it fits any name. No flowers or petals. The address may be wider than the envelope
+  (min(92vw, 48rem)) so a name stays on one line on a desktop; on phones the frame's inner margin
+  narrows so a long Latin surname does not break mid-word. `--env-chrome` (the height the envelope
+  leaves for the furniture) grows by the frame's height: 372px, 226px below 620px tall.
+- **សូមគោរពអញ្ជើញ:** clamp(1.1rem, 4.4vw, 1.3rem) (was ~0.82rem); 0.95rem on short screens.
+- **Open button text:** `.btn-seal` now uses the letter's open-button ink (#2a1418, weight 500, no
+  text shadow, as `.btn-gold` on the dark papers). On light papers the letter's button is white on
+  brown; the envelope button stays dark because its face is the light seal gold.
+
+Checked in a browser at 1050×925, 1440×760, 390×844, 390×700, 360×640 and 844×390 (Latin and Khmer
+guest names): heading text, no script line, greeting size, name colour, button colour/weight, no
+horizontal scroll, name not breaking mid-word; screenshots and a 2× close-up of the frame reviewed.
+`tsc --noEmit` and `next build` clean.
+
+## Gilt name plaque; cover type; letter greeting of its own; no map button in the letter
+
+- **Map button removed from the letter** (InvitationMessage). The venue section keeps its map.
+- **Envelope name box → gilt plaque** (`KbachNameFrame`, rewritten): a bevelled plate of polished
+  gold (metal ramp lit from the upper left, dark outline, drop shadow, faint glow) around a recessed
+  panel of dark grained card (SVG fractal-noise grain, inset shadow, translucent so it takes the
+  room's colour) with a fine inner gold rule. Cast-gold corner brackets with a scroll, a faceted
+  lozenge and a bead, and a faceted jewel with side scrolls at the top and bottom, all filled and
+  stroked with the same metal ramp and casting a small shadow. Name lettering is set as if pressed
+  into the card. Scrolls, lozenges and beads only.
+- **Cover (លិខិត page):** title and guest name in the letter's light gold (`--msg-ink`: gold-2 on
+  dark papers, gold-1 on light ones; the photo-cover overrides still win); the ថ្ងៃ/ទី/ខែ/ឆ្នាំ labels
+  ×1.4 and the greeting ×1.3 (em-scaled spans, so every container-size rule keeps its proportions);
+  បើកលិខិត in bold (700).
+- **Letter greeting is its own setting:** new column `invitation_lead` (`0041_invitation_lead.sql`,
+  default យើងខ្ញុំមានកិត្តិយសសូមគោរពអញ្ជើញ), shown above the honorifics in the letter, editable in admin
+  (អត្ថបទអញ្ជើញផ្លូវការ → ឃ្លាបើកលិខិត). The cover and envelope keep `subtitle` (សូមគោរពអញ្ជើញ), whose admin
+  hint now says where it appears.
+
+Checked in a browser: letter greeting text and no map button (navy 1339/390, ivory 1339); cover
+colours, label/greeting sizes and bold button (computed and screenshots, navy and ivory); plaque at 2×
+with Khmer and Latin names, envelope page at 1050×925, 390×844 and 844×390 with no horizontal
+scroll. `tsc --noEmit` and `next build` clean.
+
+## Carved-gold Khmer name frame (envelope page)
+
+Request: a guest-name frame like the user's reference sheet (gold carved Khmer frames around red panels). The design is original and follows only the general style. The reference's flower rosettes are left out (no-lotus rule).
+
+- `envelope/KbachNameFrame.tsx` is rewritten. It draws one SVG at the box's measured pixel size (ResizeObserver), so no ornament stretches, whatever the name's length:
+  - the moulding has an outer rim, a twisted-rope band and an inner rim, with chamfered, pointed ends;
+  - the panel is deep red velvet: a radial gradient, a turbulence nap and a fine gold fillet;
+  - at each end, a "wing" of flame tongues (kbach phleung). They grow from a stem and stream outward, with curled tips and barbs. The middle holds a spear flame and a faceted jewel in a collar;
+  - top and bottom crests have a flame spire and tongues running along the rail;
+  - the tongues that run in over the rail are drawn only when the frame is about one line tall, so on a two- or three-line name they don't cross the text.
+- The metal comes from one lighting filter. Every piece is drawn as a grey height map, then `feDiffuseLighting` (tinted gold) and `feSpecularLighting` light it from the upper left, and the frame casts a shadow.
+- CSS: all geometry is in `--knf-u`:
+  - 54px by default;
+  - 34px below 480px wide;
+  - 30px below 380px wide, where a Latin name also gets letter-spacing .03em so the surname stays whole;
+  - 26px on short screens.
+- CSS: the frame has a min-width of 9.5u, so a short name still shows some rail.
+- CSS: `--env-chrome` is 392px, or 234px when the screen is shorter than 620px.
+- Checked:
+  - screenshots at 1050×925 (Latin and Khmer names; navy, ivory and wine), 390×844, 360×640, 844×390, 1440×760 and 390×700;
+  - no horizontal scroll at any size;
+  - the button stays on screen, including at 844×390;
+  - tsc and `next build` are clean.
+
+## Name frame: the couple's own carved-gold plate (replaces the drawn frame)
+
+The code-drawn flame frame was rejected as "spiky / claw-like" and "not Khmer enough". At the user's choice, the name now sits on their own artwork: the top-left frame of the reference sheet they supplied. That is the rope-scroll border with pointed ends and a crest top and bottom, and it has no flower rosettes.
+
+- Asset `public/frames/kbach-name-frame.webp` (1512×402, 120 KB):
+  - cropped at the row-2 crest join;
+  - semi-transparent glow specks (alpha ≤ 70) removed;
+  - Lanczos 2× upscale with a light unsharp mask.
+- `KbachNameFrame.tsx` is now a plain plate:
+  - the image is shown whole at its own aspect ratio and never stretched;
+  - the name sits on one line in the panel's straight part (inset 38.5% / 15% / 30.5%);
+  - the name is scaled down with `--knf-fit` (ResizeObserver, and again on `document.fonts.ready`) only when it's too long. Measured fit is 0.70 at 360px and 0.77 at 390px for the long Latin name, and 1 on desktop.
+- CSS:
+  - plate width is min(34rem, 100vw − 1.5rem), full width minus 1.25rem on phones, and 16rem on short screens;
+  - `--env-chrome` is 392px, or 250px on short screens.
+- Checked with screenshots at 1050×925 (Latin and Khmer names), 390×844, 360×640, 844×390, 1440×760 and 390×700. There is no horizontal scroll. tsc and `next build` are clean.
+
+## Name plate: champagne border, panel in the paper's colour
+
+Request: make the frame's border the same colour as the បើកសំបុត្រអញ្ជើញ button, and its background the same colour as the paper.
+- **Border:** `kbach-name-frame.webp` is regenerated from the source cut. The gold is remapped by luminance onto the `.btn-seal` champagne ramp (#ecd6a8 / #c7a163 / #a7834a / #8d6a35, with darker shadows and #fff9ee highlights), so the carving's light and shade survive. The red panel is cut out (flood fill from the centre, 1px grow, 0.7px feather).
+- **Panel:** new `kbach-name-panel-mask.png` (its shape, as alpha). `.knf::before` fills it, masked, with the room's own shades: `--room-0…2` from paperThemes.ts, falling back to the burgundy room's values. It has a soft edge vignette and sits under the border (`isolation: isolate`, z-index −1).
+- **Checked:** screenshots on the default (cocoa), navy and ivory papers at 1050×925 and 390×844. The panel computed to each paper's room colours. tsc and `next build` are clean.
+
+## Cover (លិខិត): the name plate, and a larger time and venue
+
+Request: put the guest-name frame on the cover too, and make the time line (វេលាម៉ោង … · ព.ស. …) and the venue line larger.
+- **Name plate:** `CoverContent.tsx` wraps `.cv-guest` in `<KbachNameFrame className="knf-cover">`. `KbachNameFrame` takes a `className`, and its fit rules now apply to any child (`.knf .knf-body > *`).
+  - `.knf.knf-cover` is width min(27rem, 88cqw, 52cqh). In the two-column landscape layout it is min(30cqw, 12.5rem).
+  - Its panel is the paper itself: `--pp-base`, darkening to `--pp-shade`.
+  - A Latin name on the plate gets letter-spacing .03em.
+- **Time and venue:** both are wrapped in `.cv-up` at 1.3em, with line-height 1.65.
+- **Room for the plate:** the couple's names logo gives some height back.
+  - It is capped at 47cqh in both large-card blocks (was 52 and 58), and at 41cqh when the container is 380–640px tall and at least 520px wide.
+  - `.cv-open` margin-top is 3–3.2cqh (was 4–4.4).
+- **Checked:** the cover content (`.cv`) measured against its shell at 1344×944, 1050×925, 1440×760, 390×844, 390×700, 360×640 and 844×390, with Khmer and Latin names. Nothing overflows; 844×390 fits with 1px to spare. Screenshots were taken on navy, ivory and the default paper. tsc and `next build` are clean.
+
+## Envelope page fits a full-screen desktop; cover name plate removed
+
+Requests:
+- On a full-screen desktop, the envelope page cut off the title and hid the hint (សូមចុចដើម្បីបើកសំបុត្រអញ្ជើញ).
+- On the cover, remove the guest-name frame and give the name more space above and below.
+
+Changes:
+- **Root cause of the desktop cut-off:** `--env-chrome` (the height reserved for the heading, name plate, button and hint) was 392px. The real furniture measures ~428px at 1050×925 and ~482px on a large desktop, where the heading is sized from the envelope. The fix sets it to 436px by default and 500px at (min-width:1200px) and (min-height:860px). Short screens stay at 250px.
+- Measured title-top / hint-bottom at 1919×945 (8 / 936), 1920×1080, 1440×760, 1344×944, 1280×720, 1050×925, 390×844 and 360×640. The heading and hint are fully on screen at every size. At 844×390 the hint is hidden by design and the button bottom is at 388.
+- **Cover:** `CoverContent.tsx` no longer uses `KbachNameFrame`, and the `.knf-cover` CSS is gone. The couple's names logo and `.cv-open` margins are back to their earlier values.
+- **Guest-name spacing:** `.cv .cv-guest` now has margin 1.6cqh / 2.6cqh, or 2.2cqh / 3.4cqh on the large cover. The two-column landscape cover keeps its own tight spacing.
+- **Laptop fit:** on a 380–640px-tall wide cover, the names logo is capped at 45cqh so everything fits. Measured overflow is −4px at 1440×760, −4px at 1344×944, −2px at 1050×925, and fits at 390×844, 390×700, 360×640 and 844×390.
+- tsc and `next build` are clean.
+
+## The letter's "when and where" in the couple's own wording
+
+Request: four lines, as given.
+- ដែលនឹងប្រព្រឹត្តទៅនៅ
+- ថ្ងៃសៅរ៍ ១០កើត ខែមិគសិរ ឆ្នាំមមី អដ្ឋស័ក ពុទ្ធសករាជ ២៥៧០ ត្រូវនឹង
+- **ថ្ងៃទី១៩ ខែធ្នូ ឆ្នាំ២០២៦ វេលាម៉ោង ៥ៈ៣០ ល្ងាច** (emphasised)
+- នៅគេហដ្ឋានខាងស្រី ស្ថិតនៅ ភូមិព្រៃទទឹង ឃុំជ្រៃ ស្រុកថ្មគោល ខេត្តបាត់ដំបង ដោយមេត្រីភាព។
+
+Changes:
+- **New settings:** `invitationWhenIntro`, `invitationLunarDate`, `invitationDateLine` and `invitationPlace` are added to the schema, the admin API and the WeddingForm card អត្ថបទអញ្ជើញផ្លូវការ.
+- **Migration `0042_invitation_when_where.sql`:** adds the four columns and writes the couple's wording into the existing invitation, but only if all four are still empty.
+- **`InvitationMessage.tsx`:** each line falls back to the old built line when its setting is empty. The lunar line is shown only when set. The date line keeps the emphasised Muol style.
+- **Not changed:** the cover's date grid, the countdown and the time line under it still come from the wedding date and time settings.
+- **Checked:** the four lines render with these exact texts (15.4px / 15.4px / 19.3px Muol / 15.4px on desktop; 14.4 / 14.4 / 18 / 14.4px on a phone). Screenshots were taken at 1340 and 390 wide. tsc and `next build` are clean.
+
+## New paper colour: ព្រីងទុំ (#661a3b)
+
+- `paperTones.ts`: added `{ key: "pringtum", km: "ព្រីងទុំ", en: "Ripe Java Plum", base: "#661a3b", dark: true }`, listed after Burgundy with the dark papers. The paper, the envelope matched to it, the room, the light ink and gold, the admin choice and the guest's paper picker all come from this list, so nothing else needed changing.
+- Checked in a browser with the tone selected:
+  - `data-paper-tone="pringtum"` and `data-paper-dark` are set, and the room shade `--room-0` is #8a2350;
+  - the letter's ink is the dark-paper light gold;
+  - screenshots of the envelope page, the cover and the letter.
+- tsc and `next build` are clean.

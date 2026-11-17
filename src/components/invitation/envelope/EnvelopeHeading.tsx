@@ -1,6 +1,7 @@
 /**
  * The ceremonial heading on the set, above the envelope:
- * សិរីសួស្តីអាពាហ៍ពិពាហ៍ in Moul, and a small script line under it.
+ * សិរីមង្គលអាពាហ៍ពិពាហ៍ in Moul, and an optional script line under it (empty
+ * by default).
  *
  * Both come from the record (`envelopeTitle`, `envelopeSubtitle`) so a couple
  * can reword or remove either; an empty value takes the line away. It leaves

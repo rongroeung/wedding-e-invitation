@@ -20,7 +20,7 @@ export function Gift({ wedding }: { wedding: Wedding }) {
   return (
     <section id="gift" className="section-pad relative">
       <div className="mx-auto max-w-md">
-        <SectionTitle eyebrow="ចំណងដៃ" title="ចំណងដៃ" subtitle={wedding.giftIntro} />
+        <SectionTitle title="ចំណងដៃ" subtitle={wedding.giftIntro} />
 
         <p className="reveal mx-auto mb-8 max-w-sm text-center text-[0.85rem] leading-loose text-ink/80 khmer-wrap">
           {wedding.giftNote}

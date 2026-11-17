@@ -17,7 +17,7 @@ export function Venue({ wedding }: { wedding: Wedding }) {
   return (
     <section id="venue" className="section-pad relative">
       <div className="mx-auto max-w-3xl">
-        <SectionTitle eyebrow="ទីកន្លែង" title="ទីតាំងប្រារព្ធពិធី" flourish="title-venue" />
+        <SectionTitle title="ទីតាំងប្រារព្ធពិធី" flourish="title-venue" />
 
         <div className="reveal card-panel gold-border overflow-hidden rounded-[26px]">
           <div className="px-6 py-10 text-center sm:px-10">

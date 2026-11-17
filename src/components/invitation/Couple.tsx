@@ -46,7 +46,7 @@ export function Couple({ wedding }: { wedding: Wedding }) {
   return (
     <section id="couple" className="section-pad relative">
       <div className="mx-auto max-w-5xl">
-        <SectionTitle eyebrow="គូស្វាមីភរិយាថ្មី" title="កូនប្រុស និង កូនស្រី" flourish="title-couple" />
+        <SectionTitle title="គូស្វាមីភរិយា" flourish="title-couple" />
 
         {/* groom | heart | bride — one row on every screen, two equal columns */}
         <div className="couple-row">

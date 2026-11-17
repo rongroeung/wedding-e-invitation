@@ -52,7 +52,7 @@ export function WeddingForm({ wedding }: { wedding: Wedding }) {
           <Field label="ចំណងជើងធំ">
             <Input value={form.title} onChange={(e) => set("title", e.target.value)} />
           </Field>
-          <Field label="អត្ថបទខាងលើ">
+          <Field label="អត្ថបទខាងលើ" hint="នៅលើគម្រប និងស្រោមសំបុត្រ ឧ. សូមគោរពអញ្ជើញ">
             <Input value={form.subtitle} onChange={(e) => set("subtitle", e.target.value)} />
           </Field>
           <Field label="អក្សរលើប៊ូតុងបើកសំបុត្រ">
@@ -157,6 +157,27 @@ export function WeddingForm({ wedding }: { wedding: Wedding }) {
 
       <Card title="អត្ថបទអញ្ជើញផ្លូវការ">
         <div className="space-y-4">
+          <Field
+            label="ឃ្លាបើកលិខិត"
+            hint="បង្ហាញនៅក្នុងលិខិតអញ្ជើញ ខាងលើងារកិត្តិយស — ដាច់ដោយឡែកពី «អត្ថបទខាងលើ» នៅលើគម្រប និងស្រោមសំបុត្រ"
+          >
+            <Input value={form.invitationLead} onChange={(e) => set("invitationLead", e.target.value)} maxLength={160} />
+          </Field>
+          <Field
+            label="ថ្ងៃខែ និងទីតាំង — ឃ្លាចាប់ផ្ដើម"
+            hint="ឧ. ដែលនឹងប្រព្រឹត្តទៅនៅ — ទុកទទេ ដើម្បីប្រើ «ដែលនឹងប្រព្រឹត្តទៅ» និងម៉ោង"
+          >
+            <Input value={form.invitationWhenIntro} onChange={(e) => set("invitationWhenIntro", e.target.value)} maxLength={160} />
+          </Field>
+          <Field label="ថ្ងៃខែ និងទីតាំង — ថ្ងៃខែតាមចន្ទគតិ" hint="ឧ. ថ្ងៃសៅរ៍ ១០កើត ខែមិគសិរ … ត្រូវនឹង — ទុកទទេ ដើម្បីលាក់">
+            <Textarea rows={2} value={form.invitationLunarDate} onChange={(e) => set("invitationLunarDate", e.target.value)} maxLength={300} />
+          </Field>
+          <Field label="ថ្ងៃខែ និងទីតាំង — ថ្ងៃខែ និងម៉ោង (អក្សរធំ)" hint="ទុកទទេ ដើម្បីប្រើ «ថ្ងៃខែជាភាសាខ្មែរ»">
+            <Input value={form.invitationDateLine} onChange={(e) => set("invitationDateLine", e.target.value)} maxLength={200} />
+          </Field>
+          <Field label="ថ្ងៃខែ និងទីតាំង — ទីតាំង" hint="ទុកទទេ ដើម្បីប្រើឈ្មោះ និងអាសយដ្ឋានទីកន្លែង">
+            <Textarea rows={2} value={form.invitationPlace} onChange={(e) => set("invitationPlace", e.target.value)} maxLength={400} />
+          </Field>
           <Field
             label="ងារកិត្តិយស"
             hint="បង្ហាញជានិច្ចនៅលើសំបុត្រ — ភ្ញៀវត្រូវបានស្វាគមន៍តាមឈ្មោះនៅលើគម្របវិញ"

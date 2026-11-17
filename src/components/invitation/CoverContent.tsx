@@ -38,7 +38,7 @@ function DateGrid({ date }: { date: Date }) {
     <dl className="cv-date" aria-label="កាលបរិច្ឆេទ">
       {cells.map(([label, value]) => (
         <div key={label} className="cv-date-cell">
-          <dt className="cv-date-label">{label}</dt>
+          <dt className="cv-date-label"><span className="cv-up">{label}</span></dt>
           <dd className="cv-date-value khmer-wrap">{value}</dd>
         </div>
       ))}
@@ -82,17 +82,25 @@ export function CoverContent({
         className="cv-names"
       />
 
-      {wedding.subtitle && <p className="cv-lead khmer-wrap">{wedding.subtitle}</p>}
+      {wedding.subtitle && (
+        <p className="cv-lead khmer-wrap">
+          <span className="cv-up">{wedding.subtitle}</span>
+        </p>
+      )}
       <p className={`cv-guest ${name.latin ? "cv-guest-latin" : "khmer-wrap"}`}>{name.text}</p>
 
       {!Number.isNaN(date.getTime()) && <DateGrid date={date} />}
 
       {(wedding.weddingTimeKhmer || wedding.buddhistYear) && (
         <p className="cv-time khmer-wrap">
-          {[wedding.weddingTimeKhmer, wedding.buddhistYear].filter(Boolean).join(" · ")}
+          <span className="cv-up">{[wedding.weddingTimeKhmer, wedding.buddhistYear].filter(Boolean).join(" · ")}</span>
         </p>
       )}
-      {wedding.venueName && <p className="cv-venue khmer-wrap">{wedding.venueName}</p>}
+      {wedding.venueName && (
+        <p className="cv-venue khmer-wrap">
+          <span className="cv-up">{wedding.venueName}</span>
+        </p>
+      )}
 
       {action}
     </div>

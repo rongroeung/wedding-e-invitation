@@ -662,7 +662,10 @@
      gradient stops): the seal and the button it is opened with are one set. */
   .btn-seal {
     @apply relative inline-flex items-center justify-center gap-2 rounded-full px-8 py-3 text-base font-semibold transition-all duration-500;
-    color: #3a2810;
+    /* the same ink, weight and finish as the letter's own open button
+       (បើកលិខិត, .btn-gold on the dark papers): one set of buttons */
+    color: #2a1418;
+    font-weight: 500;
     background:
       radial-gradient(120% 140% at 30% 20%, rgb(255 250 235 / 0.45), rgb(255 250 235 / 0) 55%),
       linear-gradient(160deg, #ecd6a8 0%, #c7a163 38%, #a7834a 70%, #8d6a35 100%);
@@ -672,7 +675,6 @@
       inset 0 -2px 4px rgb(77 56 24 / 0.35),
       0 0 0 1px rgb(95 69 33 / 0.55),
       0 12px 26px -10px rgb(40 28 12 / 0.75);
-    text-shadow: 0 1px 0 rgb(255 240 205 / 0.55);
   }
   .btn-seal:hover { filter: brightness(1.08); transform: translateY(-1px); }
   .btn-seal:active { transform: translateY(0); }
@@ -2723,7 +2725,8 @@
 }
 
 .env-address-lead {
-  font-size: clamp(0.82rem, calc(var(--env-w, 20rem) / 27), 1.3rem);
+  /* (--env-w is not set at this level, so this follows the viewport) */
+  font-size: clamp(1.1rem, 4.4vw, 1.3rem);
   letter-spacing: 0.02em;
   line-height: 2;
   color: rgb(var(--gold-1-rgb) / 0.9);
@@ -2797,7 +2800,7 @@
    * recovered without the type getting any harder to read.
    */
   .env-address-lead {
-    font-size: 0.7rem;
+    font-size: 0.95rem;
     line-height: 1.5;
   }
 
@@ -3367,7 +3370,11 @@
   color: rgb(247 214 222 / 0.88);
 }
 .env-veil .env-address-lead { color: rgb(241 223 186 / 0.86); }
-.env-veil .env-address-name { color: #fbeff2; }
+.env-veil .env-address-name {
+  /* the heading's light gold, with its glow: name and title read as one */
+  color: #f1dfba;
+  text-shadow: 0 1px 0 rgb(0 0 0 / 0.35), 0 0 22px rgb(201 169 110 / 0.3);
+}
 .env-veil .env-hint { color: rgb(251 239 242 / 0.7); }
 .env-veil .env-skip { color: rgb(251 239 242 / 0.6); }
 .env-veil .env-skip:hover { color: rgb(251 239 242 / 0.95); }
@@ -3396,7 +3403,8 @@
   }
 }
 @media (max-height: 620px) {
-  .env-veil { --env-chrome: 190px; }
+  /* +36px for the frame around the guest's name */
+  .env-veil { --env-chrome: 226px; }
   .env-heading-title { font-size: 1rem; line-height: 1.85; }
   .env-heading-sub { display: none; }
 }
@@ -5000,3 +5008,116 @@ html[data-paper-dark] .name-logo-foil {
 .group:hover .gallery-caption,
 .group:focus-visible .gallery-caption { opacity: 1; }
 @media (hover: none) { .gallery-caption { opacity: 1; } }
+
+/* ── The letter (សិរីមង្គលអាពាហ៍ពិពាហ៍): every line in one gold ──
+   Parents, the invitation, the couple's names, time, date and place were set
+   in three different inks (heading, body, gold). They now share one: a light
+   gold on the dark papers, and the paper's own printing gold on the light
+   ones, where a light gold would not read against ivory. */
+.msg .msg-ink { color: var(--msg-ink, var(--gold-1)); }
+html[data-paper-dark] .card-stock { --msg-ink: var(--gold-2); }
+
+
+/* ── The guest's name on the envelope set, on the carved-gold name plate ──
+   (KbachNameFrame). The plate is the couple's own artwork, shown whole at its
+   own proportions (1512×402) and never stretched. The name sits in the red
+   panel (inset to the panel's straight part, clear of the pointed ends and
+   the crests) on one line, scaled down by --knf-fit (set by the component)
+   only when it is longer than the panel. */
+.knf {
+  position: relative;
+  isolation: isolate;
+  width: min(34rem, calc(100vw - 1.5rem));
+  aspect-ratio: 1512 / 402;
+  margin: 0.55rem auto 0.1rem;
+  /* the carved border, recoloured to the open button's champagne gold
+     (.btn-seal's #ecd6a8 → #8d6a35); its panel is cut out, see ::before */
+  background: url("/frames/kbach-name-frame.webp") center / 100% 100% no-repeat;
+  filter: drop-shadow(0 6px 10px rgb(0 0 0 / 0.4));
+}
+/* the panel, in the paper's own colour: the shades the envelope's room is
+   painted with (--room-0…2 from paperThemes.ts, and the burgundy room's own
+   values when there are none), in the panel's exact shape */
+.knf::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(70% 120% at 50% 45%, transparent 55%, rgb(0 0 0 / 0.22) 100%),
+    radial-gradient(90% 150% at 50% 42%, var(--room-0, #5e2b38) 0%, var(--room-1, #4a1f2b) 62%, var(--room-2, #2e1119) 100%);
+  -webkit-mask: url("/frames/kbach-name-panel-mask.png") center / 100% 100% no-repeat;
+  mask: url("/frames/kbach-name-panel-mask.png") center / 100% 100% no-repeat;
+}
+.knf-body {
+  position: absolute;
+  inset: 36.5% 15% 28.5%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.knf .knf-body > * {
+  flex: none;
+  width: max-content;
+  max-width: none;
+  margin: 0;
+  white-space: nowrap;
+  line-height: 1.4;
+  transform: scale(var(--knf-fit, 1));
+}
+.knf-body > .env-address-name {
+  /* light gold lettering, pressed in a little */
+  text-shadow:
+    0 1px 0 rgb(40 0 2 / 0.8),
+    0 0 12px rgb(230 190 110 / 0.28);
+}
+
+/* The plate makes the furniture above the envelope taller; the envelope's
+   fit (--env-chrome, the height it leaves for the heading, name and button)
+   grows by the same amount, so nothing is pushed off screen. */
+.env-veil { --env-chrome: 436px; }
+/* a large desktop lets the envelope (and the heading, which is sized from
+   it) grow, so the furniture around it is taller there */
+@media (min-width: 1200px) and (min-height: 860px) {
+  .env-veil { --env-chrome: 500px; }
+}
+.env-address:has(.knf) { max-width: none; padding-inline: 0; }
+@media (max-width: 480px) {
+  .knf { width: calc(100vw - 1.25rem); }
+}
+
+/* a short screen (a phone held sideways): a smaller plate */
+@media (max-height: 620px) {
+  .knf { width: min(16rem, calc(100vw - 1.5rem)); margin-top: 0.2rem; margin-bottom: 0; }
+  .env-veil { --env-chrome: 250px; }
+}
+
+
+/* ── The cover (លិខិត page) ──
+   The title and the guest's name in the letter's light gold (the paper's
+   printing gold on light papers, where a light gold would not read); the
+   date labels and the greeting larger, by an em factor so every container
+   size above keeps its proportions; the open button's words in bold. */
+.cv-title,
+.cv-guest { color: var(--msg-ink, var(--gold-1)); }
+html[data-paper-dark] .cv-title,
+html[data-paper-dark] .cv-guest { text-shadow: 0 1px 0 rgb(0 0 0 / 0.35), 0 0 22px rgb(201 169 110 / 0.22); }
+.cv-date-label .cv-up { font-size: 1.4em; }
+.cv-lead .cv-up { font-size: 1.3em; }
+/* the time and the venue under the date, larger by the same em factor */
+.cv-time .cv-up, .cv-venue .cv-up { font-size: 1.3em; }
+.cv-time, .cv-venue { line-height: 1.65; }
+/* The guest's name on the cover, with more air above and below it (the
+   two-column cover, a phone held sideways, keeps its own tight spacing) */
+@container (min-height: 301px) {
+  .cv .cv-guest { margin-top: 1.6cqh; margin-bottom: 2.6cqh; }
+}
+@container (min-height: 380px) and (min-width: 520px) {
+  .cv .cv-guest { margin-top: 2.2cqh; margin-bottom: 3.4cqh; }
+}
+/* a wide but shortish cover (a laptop screen): the couple's names give back
+   the height the larger time and venue lines and the guest's spacing take */
+@container (max-height: 640px) and (min-height: 380px) and (min-width: 520px) {
+  .cv-names { width: min(64cqw, 45cqh, 640px); }
+}
+.cv-open { font-weight: 700; }

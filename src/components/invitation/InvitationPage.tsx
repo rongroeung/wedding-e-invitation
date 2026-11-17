@@ -383,8 +383,8 @@ export function InvitationPage({
         aria-hidden={!opened}
       >
         <InvitationMessage wedding={wedding} />
-        <Couple wedding={wedding} />
         <DateSection wedding={wedding} />
+        <Couple wedding={wedding} />
         {wedding.showProgram && <Program events={events} />}
         <Venue wedding={wedding} />
         <DressColors wedding={wedding} />
