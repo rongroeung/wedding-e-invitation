@@ -331,6 +331,13 @@ export const wedding = pgTable("wedding", {
   appearanceTone: text("appearance_tone").notNull().default("design"),
   /** Whether guests see the small appearance-settings button. */
   appearanceGuestPanel: boolean("appearance_guest_panel").notNull().default(true),
+  /**
+   * Bumped every time the couple saves their appearance settings. It is part
+   * of what a guest's saved look is checked against (appearanceBasis), so a
+   * save makes every browser show the couple's design again, even when the
+   * values themselves did not change.
+   */
+  appearanceRev: integer("appearance_rev").notNull().default(0),
   /** Wording on the button that carries on to the invitation. */
 
   /* ── The gold frame as pressed foil rather than a flat picture ─────────

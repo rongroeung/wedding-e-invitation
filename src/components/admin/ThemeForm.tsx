@@ -555,7 +555,7 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
           <Button
             type="button"
             disabled={busy}
-            onClick={() => send("/api/admin/wedding", { method: "PUT", body: JSON.stringify(form), successText: "បានរក្សាទុករូបរាង" })}
+            onClick={() => send("/api/admin/wedding", { method: "PUT", body: JSON.stringify({ ...form, appearanceSaved: true }), successText: "បានរក្សាទុករូបរាង" })}
           >
             រក្សាទុក
           </Button>

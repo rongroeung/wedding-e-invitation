@@ -61,7 +61,7 @@ export function WeddingForm({ wedding }: { wedding: Wedding }) {
           <Field label="អក្សរផ្ចិត (Monogram)" hint="ឧ. S&L ឬ ស ក — បង្ហាញនៅលើគម្របសំបុត្រ">
             <Input value={form.monogram} maxLength={12} onChange={(e) => set("monogram", e.target.value)} />
           </Field>
-          <Field label="រូបភាពគម្រប (URL)" hint="ឬផ្ទុករូបភាពខាងក្រោម">
+          <Field label="រូបភាពគម្រប (URL)" hint="បង្ហាញតែជារូបភាពនៃតំណអញ្ជើញ ពេលចែករំលែក (មិនបង្ហាញនៅក្នុងសំបុត្រ) — ឬផ្ទុករូបភាពខាងក្រោម">
             <Input value={form.coverPhotoUrl} onChange={(e) => set("coverPhotoUrl", e.target.value)} />
           </Field>
         </div>

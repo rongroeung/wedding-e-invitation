@@ -3636,24 +3636,6 @@
   .cv-open { margin-top: 4cqh; }
 }
 
-/* With the couple's photograph behind it, the writing turns light. */
-.cover-photo {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background:
-    linear-gradient(180deg, rgb(20 10 14 / 0.62) 0%, rgb(20 10 14 / 0.4) 42%, rgb(20 10 14 / 0.74) 100%),
-    var(--cover-photo) center / cover no-repeat;
-}
-.cover-on-photo .cv-title,
-.cover-on-photo .cv-guest,
-.cover-on-photo .cv-date-value { color: #fbf1f3; text-shadow: 0 1px 8px rgb(0 0 0 / 0.45); }
-.cover-on-photo .cv-lead,
-.cover-on-photo .cv-date-label { color: #ecd9b0; }
-.cover-on-photo .cv-time,
-.cover-on-photo .cv-venue { color: rgb(251 241 243 / 0.9); }
-.cover-on-photo .namelogo-name { color: #ecd9b0; text-shadow: 0 1px 8px rgb(0 0 0 / 0.5); }
-
 /* A short screen: the crest goes before anything that carries information. */
 @container (max-height: 420px) {
   .cv-crest { display: none; }
@@ -3698,8 +3680,6 @@
   .cv-time, .cv-venue { display: none; }
   .cv-open { margin-top: 0.7rem; min-height: 40px; padding-block: 0.4rem; }
 }
-/* On a dark photograph the dark button needs an edge to stand on. */
-.cover-on-photo .cv-open { box-shadow: 0 0 0 1px rgb(236 217 176 / 0.75), 0 8px 22px -10px rgb(0 0 0 / 0.6); }
 
 /* ══ The couple's vintage flourish pack ═════════════════════════════════════
  *
@@ -4338,12 +4318,6 @@ html[data-fx] .cv-crest::after { animation-delay: 3s; }
      100/0.86 cqw − 2 × corner − 2.5rem */
   .card-sheet[data-bands] .cover-root .cv {
     max-width: min(48rem, calc(116.28cqw - 2 * var(--corner-w, 0px) - 2.5rem));
-  }
-  /* a cover photograph stays in the panel between the bands, as before, so
-     it never paints over the gold corners */
-  .card-sheet[data-bands] .cover-root .cover-photo {
-    top: calc(var(--band-top) * (1 - var(--band-keep)));
-    bottom: calc(var(--band-bottom) * (1 - var(--band-keep)));
   }
 }
 

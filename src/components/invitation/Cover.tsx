@@ -3,7 +3,6 @@
 import type { Guest, Wedding } from "@/lib/db/schema";
 import { CoverContent } from "./CoverContent";
 import { LiveBackdrop } from "./LiveBackdrop";
-import { mediaSrc } from "@/lib/media";
 
 /**
  * The closed card. A monogram, the guest's name, and one button — nothing else,
@@ -27,11 +26,10 @@ export function Cover({
   reveal?: boolean;
 }) {
   /*
-   * The couple's cover photograph, when there is one, fills the cover under a
-   * controlled dark overlay and the writing turns light. Without one the cover
-   * is the card's own paper, exactly as before.
+   * The cover is always the card's own paper. The couple's cover photograph
+   * (រូបភាពគម្រប) is used only as the picture of the invitation link when it
+   * is shared (metadata.ts / layout.tsx), never on the invitation itself.
    */
-  const photo = mediaSrc(wedding.coverPhotoId, wedding.coverPhotoUrl);
   return (
     <div
       className={`cover-root absolute inset-0 z-30 transition-all duration-[900ms] ease-[cubic-bezier(.7,0,.25,1)] ${
@@ -45,17 +43,8 @@ export function Cover({
          * own `.paper`, which made the cover a second, differently toned piece
          * of paper laid between the frame's head and foot.
          */
-        className={`cover-shell relative flex h-full w-full flex-col items-center justify-center overflow-hidden text-center ${
-          photo ? "cover-on-photo" : ""
-        }`}
+        className="cover-shell relative flex h-full w-full flex-col items-center justify-center overflow-hidden text-center"
       >
-        {photo && (
-          <span
-            className="cover-photo"
-            style={{ ["--cover-photo" as string]: `url("${photo.replace(/"/g, "%22")}")` }}
-            aria-hidden="true"
-          />
-        )}
         {/* No sheen: it is clipped to this box, so each pass lit a band with
             hard top and bottom edges across the sheet. */}
         <LiveBackdrop count={14} sheen={false} />

@@ -440,3 +440,50 @@ Changes:
   - the letter's ink is the dark-paper light gold;
   - screenshots of the envelope page, the cover and the letter.
 - tsc and `next build` are clean.
+
+## The cover photograph (រូបភាពគម្រប) is only the link preview
+
+Request: the cover photograph should not appear on the cover (លិខិត) page, only on the shared invitation link.
+- `Cover.tsx` no longer lays the photograph under the cover. The `.cover-photo` and `.cover-on-photo` styles are removed from globals.css, including the light-writing overrides and the banded-card placement.
+- `InvitationOpening.tsx` no longer passes the photograph to `CinemaRoom`, so the blurred photograph behind the envelope is gone as well. CinemaRoom's optional `photo` prop is unchanged and simply unused.
+- The link preview is unchanged: `metadata.ts` and `layout.tsx` still use the cover photograph as `og:image`.
+- The admin hint for the field now says it is shown only as the shared link's picture.
+- Checked on the production build, with a cover photograph temporarily set in the local DB (then cleared):
+  - `og:image` was the photograph;
+  - there was no `.cover-photo` or `.cover-on-photo` on the cover and no `.room-dusk-photo` behind the envelope;
+  - the screenshot shows the cover on its paper.
+- tsc and `next build` are clean.
+
+## Music echo, a missing music button, and Safari vs Chrome showing different papers
+
+Reported on the Vercel site:
+- Safari shows a different paper from Chrome.
+- In Chrome the music sometimes doesn't show or play.
+- The music sounds echoed and different from the upload.
+
+**Echo (root cause):** `InvitationPage` renders two `MusicPlayer`s: a floating one for phones and one in the desktop rail. Only CSS hid one of them. Each owned its own `<audio>`, both were mounted and both were told to start, so the song played twice, slightly offset. The upload is not altered: the media route serves the file as stored, with no transcoding.
+- `MusicPlayer.tsx` is rewritten around a single module-level `Audio` element shared by every button. The buttons only display and toggle it (via `useSyncExternalStore`).
+
+**Not starting:** the music is started when the envelope finishes, a moment after the guest's tap, so outside the gesture. iOS Safari, and Chrome in some cases, refuse that silently.
+- The first tap anywhere unlocks the element with a muted play-then-pause inside the gesture.
+- If a start is still refused, the next tap starts it.
+- Taps on a music button are left to the button.
+- If the guest turns the music off, it is never restarted for them.
+
+**Button missing:** the floating button sat inside the card, under ancestors with transforms, filters and containment, which makes `position: fixed` relative to them rather than to the screen. It is now portalled to `<body>` (z-index 60, `xl:hidden`, `data-music-toggle`).
+
+**Different papers in different browsers:** a guest's own pick in the appearance panel is saved per browser (`localStorage`), and it was kept until the couple *changed* a value. A browser that had once picked a paper kept showing it while another browser showed the couple's design.
+- New `appearance_rev` column (migration `0043_appearance_rev.sql`), added to the boot script's basis.
+- The admin appearance page's save sends `appearanceSaved: true`. The API bumps the rev, so every browser's saved pick is dropped on its next visit and everyone sees the couple's design again.
+- Turning off the guest panel stops saved picks from applying at all.
+
+**Checked on the production build in Chromium, with a 20 s test WAV temporarily set as the music (since removed):**
+- Phone (390×844):
+  - before the tap, nothing plays;
+  - after the envelope opens, exactly one audio element is playing;
+  - the floating button is on `<body>`, on screen and hit-testable (`elementFromPoint`);
+  - toggle off and on both work.
+- Desktop (1440×900): one audio element plays, and the floating button is hidden.
+- Theme: a saved "pringtum" pick with basis `…|0` applied; after the rev was bumped to 1, it was dropped and the couple's design showed (the rev was reset to 0 afterwards).
+- Not tested in real Safari or WebKit, since no WebKit browser is installed here.
+- tsc and `next build` are clean.

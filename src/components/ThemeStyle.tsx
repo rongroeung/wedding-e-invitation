@@ -243,7 +243,7 @@ export function ThemeStyle({ wedding }: { wedding: Wedding }) {
         * lets guests change the look and the choice was made against the
         * couple's current design. See `lib/appearance`.
         */}
-      <script dangerouslySetInnerHTML={{ __html: appearanceBootScript(appearanceDefaults(wedding), wedding.appearanceGuestPanel) }} />
+      <script dangerouslySetInnerHTML={{ __html: appearanceBootScript(appearanceDefaults(wedding), wedding.appearanceGuestPanel, wedding.appearanceRev) }} />
       {/*
         * The room, as a fixed sheet behind everything.
         *

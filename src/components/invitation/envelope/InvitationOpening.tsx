@@ -10,7 +10,6 @@ import { envelopeFace } from "@/lib/artwork";
 import { Envelope } from "./Envelope";
 import { EnvelopeAddress } from "./EnvelopeAddress";
 import { EnvelopeHeading } from "./EnvelopeHeading";
-import { mediaSrc } from "@/lib/media";
 import { OpenButton } from "./OpenButton";
 import { OpenEnvelopeLink } from "./OpenEnvelopeLink";
 import { OpeningTransition } from "./OpeningTransition";
@@ -172,8 +171,8 @@ export function InvitationOpening({
     ["--env-seal" as string]: syncOr("seal", envelope.seal),
     ["--env-seal-ink" as string]: syncOr("seal-ink", envelope.sealInk),
   };
-  /* The couple's cover photograph, blurred and darkened behind the envelope. */
-  const photo = mediaSrc(wedding.coverPhotoId, wedding.coverPhotoUrl);
+  /* The couple's cover photograph is not laid behind the envelope: it is used
+     only as the picture of the shared invitation link. */
   const timers = useRef<number[]>([]);
   const opened = useRef(false);
   const checked = useRef(false);
@@ -544,7 +543,7 @@ export function InvitationOpening({
      * fading is taken away.
      */
     <OpeningTransition gone={step === "fill"} duration={Math.round(D * 0.08)}>
-      <CinemaRoom lit={index >= at("lift")} rich={rich} photo={photo} wedding={wedding} synced={match} />
+      <CinemaRoom lit={index >= at("lift")} rich={rich} wedding={wedding} synced={match} />
 
       <div
         className="env-stage flex h-full w-full items-center justify-center px-4"

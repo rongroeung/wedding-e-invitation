@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { FX_LEVEL_KEYS, FX_MODE_KEYS, PAPER_THEME_KEYS, TONE_KEYS } from "@/lib/appearance";
 import { BACKDROP_PRESET_KEYS } from "@/lib/backgrounds";
 import { DESIGN_KIT_KEYS } from "@/lib/designKit";
@@ -197,6 +197,8 @@ const schema = z.object({
   appearanceLevel: z.enum(FX_LEVEL_KEYS).optional(),
   appearanceTone: z.enum(TONE_KEYS).optional(),
   appearanceGuestPanel: z.boolean().optional(),
+  /** Sent by the appearance page's save: every guest goes back to the couple's design. */
+  appearanceSaved: z.boolean().optional(),
 
   frameEmboss: z.boolean().optional(),
   frameDepth: z.number().int().min(0).max(100).optional(),
@@ -219,7 +221,7 @@ export async function PUT(request: Request) {
   const parsed = schema.safeParse(await readJson<unknown>(request));
   if (!parsed.success) return fail("Invalid data", 422, { issues: parsed.error.flatten() });
 
-  const { weddingDate, ...rest } = parsed.data;
+  const { weddingDate, appearanceSaved, ...rest } = parsed.data;
   await getWedding(weddingId); // makes sure the row exists
 
   // every upload it points at has to be this wedding's own
@@ -235,6 +237,9 @@ export async function PUT(request: Request) {
     .set({
       ...rest,
       ...(weddingDate ? { weddingDate: new Date(weddingDate) } : {}),
+      // a save of the appearance settings sends every guest back to the
+      // couple's design (see appearanceRev)
+      ...(appearanceSaved ? { appearanceRev: sql`${wedding.appearanceRev} + 1` } : {}),
       updatedAt: new Date(),
     })
     .where(eq(wedding.id, weddingId))
