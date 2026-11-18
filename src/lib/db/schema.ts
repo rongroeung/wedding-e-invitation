@@ -229,6 +229,8 @@ export const wedding = pgTable("wedding", {
   frameTint: boolean("frame_tint").notNull().default(false),
   /** Hold the frame on screen and scroll the invitation inside it. */
   frameSticky: boolean("frame_sticky").notNull().default(true),
+  /** Whether the card has a border at all (ស៊ុមសំបុត្រ): the corner or band art and its rules. */
+  frameEnabled: boolean("frame_enabled").notNull().default(true),
   /** Frame artwork size, as a percentage of the card's width. */
   frameScale: integer("frame_scale").notNull().default(60),
   /** Overall type size for the invitation, as a percentage. */

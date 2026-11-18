@@ -127,17 +127,17 @@ export function CardShell({
               // joining the corners, and the ornament on it
               ["--band-keep" as string]: Math.max(0.3, frame.joinY + 0.14).toFixed(3),
             }}
-            className={`card-stock card-sheet paper relative flex w-full flex-col overflow-hidden ${frame.custom ? "" : "sv-wide"} ${
+            className={`card-stock card-sheet paper relative flex w-full flex-col overflow-hidden ${frame.custom ? "" : "sv-wide"} ${frame.shown ? "" : "no-frame"} ${
               oneScreen ? "h-full" : "min-h-[100dvh]"
             }`}
           >
             {/* the paper the card is printed on, then the live layer above it */}
             <PaperSurface />
             {/* a botanical suite's double rule, between its corners */}
-            {!frame.custom && <span className="bt-border" aria-hidden="true" />}
+            {frame.shown && !frame.custom && <span className="bt-border" aria-hidden="true" />}
             {atmosphere}
 
-            <FrameEdge frame={frame} edge="top" />
+            {frame.shown && <FrameEdge frame={frame} edge="top" />}
 
             <div className="relative z-20 min-h-0 flex-1">
               {frame.sideRules && (
@@ -168,7 +168,7 @@ export function CardShell({
               {cover}
             </div>
 
-            <FrameEdge frame={frame} edge="bottom" />
+            {frame.shown && <FrameEdge frame={frame} edge="bottom" />}
           </div>
 
           {curtains}

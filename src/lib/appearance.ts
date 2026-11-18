@@ -86,7 +86,13 @@ export function appearanceBasis(d: Appearance): string {
  * When they don't, a saved choice is never applied: everyone sees the
  * couple's design.
  */
-export function appearanceBootScript(defaults: Appearance, allowGuest = true, rev = 0): string {
+export function appearanceBootScript(
+  defaults: Appearance,
+  allowGuest = true,
+  rev = 0,
+  /** The couple's own picture is a dark one, printed on light (Theme 2). */
+  coupleDark = false,
+): string {
   const d = JSON.stringify(defaults);
   const keys = JSON.stringify(PAPER_THEME_KEYS);
   const tones = JSON.stringify(TONE_KEYS);
@@ -97,12 +103,13 @@ export function appearanceBootScript(defaults: Appearance, allowGuest = true, re
   // the couple's current design, and how many times they have saved it
   const basis = JSON.stringify(`${appearanceBasis(defaults)}|${rev}`);
   const key = JSON.stringify(STORAGE_KEY);
-  return `(function(){try{var d=${d},K=${keys},T=${tones},D=${dark},DT=${darkTones},B=${basis},G=${allowGuest ? "true" : "false"},a=d,s=null;document.documentElement.setAttribute("data-appearance-basis",B);try{s=JSON.parse(localStorage.getItem(${key})||"null");if(s&&s.basis!==B){if(G)localStorage.removeItem(${key});s=null}}catch(e){}if(!G)s=null;if(s&&typeof s==="object"){a={paper:K.indexOf(s.paper)>=0?s.paper:d.paper,tone:T.indexOf(s.tone)>=0?s.tone:d.tone,fx:s.fx||d.fx,level:s.level||d.level}}var fx=a.fx;try{if((!s||!s.explicit)&&matchMedia("(prefers-reduced-motion: reduce)").matches)fx="none"}catch(e){}var h=document.documentElement;h.setAttribute("data-paper-theme",a.paper);if(a.tone&&a.tone!=="design")h.setAttribute("data-paper-tone",a.tone);else h.removeAttribute("data-paper-tone");var dk=a.tone&&a.tone!=="design"?DT.indexOf(a.tone)>=0:D.indexOf(a.paper)>=0;if(dk&&a.paper!=="couple")h.setAttribute("data-paper-dark","");else h.removeAttribute("data-paper-dark");h.setAttribute("data-fx",fx);h.setAttribute("data-fx-level",a.level)}catch(e){}})();`;
+  return `(function(){try{var d=${d},K=${keys},T=${tones},D=${dark},DT=${darkTones},B=${basis},G=${allowGuest ? "true" : "false"},CD=${coupleDark ? "true" : "false"},a=d,s=null;document.documentElement.setAttribute("data-appearance-basis",B);try{s=JSON.parse(localStorage.getItem(${key})||"null");if(s&&s.basis!==B){if(G)localStorage.removeItem(${key});s=null}}catch(e){}if(!G)s=null;if(s&&typeof s==="object"){a={paper:K.indexOf(s.paper)>=0?s.paper:d.paper,tone:T.indexOf(s.tone)>=0?s.tone:d.tone,fx:s.fx||d.fx,level:s.level||d.level}}var fx=a.fx;try{if((!s||!s.explicit)&&matchMedia("(prefers-reduced-motion: reduce)").matches)fx="none"}catch(e){}var h=document.documentElement;h.setAttribute("data-paper-theme",a.paper);if(a.tone&&a.tone!=="design")h.setAttribute("data-paper-tone",a.tone);else h.removeAttribute("data-paper-tone");var dk=a.tone&&a.tone!=="design"?DT.indexOf(a.tone)>=0:D.indexOf(a.paper)>=0;if(CD)h.setAttribute("data-couple-dark","");else h.removeAttribute("data-couple-dark");if(a.paper==="couple"?CD:dk)h.setAttribute("data-paper-dark","");else h.removeAttribute("data-paper-dark");h.setAttribute("data-fx",fx);h.setAttribute("data-fx-level",a.level)}catch(e){}})();`;
 }
 
 /** Whether the sheet is printed light on dark: the colour decides, else the design. */
 export function isDarkSheet(paper: string, tone: string): boolean {
-  if (paper === "couple") return false;
+  // the couple's own picture is light unless the boot script marked it dark
+  if (paper === "couple") return typeof document !== "undefined" && document.documentElement.hasAttribute("data-couple-dark");
   if (tone && tone !== "design") return DARK_TONES.includes(tone);
   return DARK_PAPERS.includes(paper);
 }

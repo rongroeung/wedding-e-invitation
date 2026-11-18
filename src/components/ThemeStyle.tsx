@@ -1,5 +1,6 @@
 import { backdropVars, cardBackdrop, pageBackdrop } from "@/lib/artwork";
 import { designKitCss } from "@/lib/designKit";
+import { themeKeyOf, type InvitationThemeKey } from "@/lib/invitationTheme";
 import { appearanceBootScript, appearanceDefaults } from "@/lib/appearance";
 import { paperThemeCss } from "@/lib/paperThemes";
 import type { Wedding } from "@/lib/db/schema";
@@ -12,7 +13,40 @@ import type { Wedding } from "@/lib/db/schema";
  * rather than hard-coding keeps the theme editor meaningful while guaranteeing
  * the dark end of the ramp stays dark enough to read on an ivory page.
  */
+/*
+ * Themes 2 and 3 print the card on a picture. Under the writing the picture
+ * is washed and veiled (backdropVars), and here the writing itself is made
+ * firmer: a deeper ink than the light-paper gold, and a soft halo of the
+ * paper's colour round every letter so a busy patch of photograph never runs
+ * through a stroke.
+ */
+/* Theme 2's shade: a warm dark brown laid over the photograph, which lowers
+   its contrast (the way a darkroom print is toned down) rather than fading it
+   towards white, so light writing stands clear on it. */
+const PHOTO_SHADE_RGB = "40 25 16";
+
+function sceneReadingCss(theme: InvitationThemeKey): string {
+  if (theme === "photo") {
+    // printed light on the toned photograph: the dark-paper colours, in brown
+    const glow = "0 1px 2px rgb(0 0 0 / 0.6), 0 0 10px rgb(0 0 0 / 0.35)";
+    return `
+  html[data-paper-dark] .card-stock{--c-bg:#2c1c13;--c-bg-rgb:44 28 19;--c-cream-rgb:72 50 34;--c-beige-rgb:92 66 46;--msg-ink:#f2deb0}
+  .card-stock .frame-safe :is(p,li,dt,dd,label,span,h3,h4,time,a):not(.btn-seal):not([class*="bg-"]){text-shadow:${glow}}
+  .card-stock .frame-safe :is(h1,h2,.gold-text,.title-face,.cv-title){filter:drop-shadow(0 1px 2px rgb(0 0 0 / 0.55))}
+  `;
+  }
+  const ink = "#3d4a2c";
+  const halo = "0 0 2px rgb(var(--c-bg-rgb) / 0.95), 0 0 8px rgb(var(--c-bg-rgb) / 0.9), 0 0 16px rgb(var(--c-bg-rgb) / 0.6)";
+  return `
+  .card-stock{--msg-ink:${ink};--c-text:${ink};--c-text-rgb:${channels(ink)}}
+  .card-stock .frame-safe :is(p,li,dt,dd,label,span,h3,h4,time,a):not(.btn-seal):not([class*="bg-"]){text-shadow:${halo}}
+  .card-stock .frame-safe :is(h1,h2,.gold-text,.title-face,.cv-title){filter:drop-shadow(0 0 3px rgb(var(--c-bg-rgb) / 0.95)) drop-shadow(0 0 8px rgb(var(--c-bg-rgb) / 0.75))}
+  `;
+}
+
 export function ThemeStyle({ wedding }: { wedding: Wedding }) {
+  const theme = themeKeyOf(wedding.invitationTheme);
+  const scene = theme === "photo" || theme === "garden";
   const gold = sanitize(wedding.colorSecondary, "#C29A5B");
   const primary = sanitize(wedding.colorPrimary, "#4A3527");
   const accent = sanitize(wedding.colorAccent, "#E3D3B8");
@@ -210,12 +244,13 @@ export function ThemeStyle({ wedding }: { wedding: Wedding }) {
     --f-heading:${sanitizeFont(wedding.fontHeading, "'Khmer OS Muol Light'")};
     --f-body:${sanitizeFont(wedding.fontBody, "'Noto Sans Khmer'")};
     ${backdropVars("page", page, channels(background))}
-    ${backdropVars("card", card, channels(background))}
+    ${backdropVars("card", card, theme === "photo" ? PHOTO_SHADE_RGB : channels(background), theme === "photo" ? 0.3 : scene ? 0.55 : 0)}
   }
   /* The same fold shading in grey, for a curtain wearing the couple's own
      cloth. See the note beside "greys" above. */
   .curtain-skinned{${greys.map((g, i) => `--vel-t${i}:${g};`).join("")}}
   ${designKitCss(wedding.designKit)}
+  ${scene ? sceneReadingCss(theme) : ""}
   ${
     /*
      * A page picture lives on a fixed sheet behind everything (\`.page-backdrop\`),
@@ -243,7 +278,7 @@ export function ThemeStyle({ wedding }: { wedding: Wedding }) {
         * lets guests change the look and the choice was made against the
         * couple's current design. See `lib/appearance`.
         */}
-      <script dangerouslySetInnerHTML={{ __html: appearanceBootScript(appearanceDefaults(wedding), wedding.appearanceGuestPanel, wedding.appearanceRev) }} />
+      <script dangerouslySetInnerHTML={{ __html: appearanceBootScript(appearanceDefaults(wedding), wedding.appearanceGuestPanel, wedding.appearanceRev, theme === "photo") }} />
       {/*
         * The room, as a fixed sheet behind everything.
         *

@@ -39,8 +39,8 @@ export const GARDEN_MEDIA = {
 };
 
 /* How much of the paper's colour is washed over the picture under the writing. */
-const PHOTO_WASH = 62;
-const GARDEN_WASH = 38;
+const PHOTO_WASH = 58;
+const GARDEN_WASH = 42;
 
 /**
  * The wedding as the guest's invitation renders it under its theme.

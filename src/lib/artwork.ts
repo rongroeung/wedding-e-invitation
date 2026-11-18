@@ -143,17 +143,28 @@ export function backdropVars(
   backdrop: Backdrop | null,
   /** The `r g b` triple of the colour being washed over the picture. */
   groundRgb: string,
+  /**
+   * A further, softer veil of the same colour, strongest in the middle of the
+   * card where the writing is and gone at the edges, so a picture can stay
+   * clearly visible around the words without fighting them (Themes 2 and 3).
+   */
+  readingVeil = 0,
 ): string {
   if (!backdrop) return "";
   const fitted = cssFit(backdrop.fit);
   const { repeat, position } = fitted;
   const size = backdrop.tile && backdrop.fit === "tile" ? backdrop.tile : fitted.size;
   const wash = `linear-gradient(rgb(${groundRgb} / ${backdrop.scrim}), rgb(${groundRgb} / ${backdrop.scrim}))`;
+  const veil =
+    readingVeil > 0
+      ? `radial-gradient(ellipse 62% 58% at 50% 50%, rgb(${groundRgb} / ${readingVeil}) 0%, rgb(${groundRgb} / ${(readingVeil * 0.75).toFixed(3)}) 55%, rgb(${groundRgb} / 0) 100%), `
+      : "";
+  const extra = (v: string) => (veil ? `${v}, ` : "");
   return [
-    `--${name}-bg:${wash}, url("${backdrop.src}");`,
-    `--${name}-bg-size:auto, ${size};`,
-    `--${name}-bg-repeat:repeat, ${repeat};`,
-    `--${name}-bg-position:center, ${position};`,
+    `--${name}-bg:${veil}${wash}, url("${backdrop.src}");`,
+    `--${name}-bg-size:${extra("auto")}auto, ${size};`,
+    `--${name}-bg-repeat:${extra("no-repeat")}repeat, ${repeat};`,
+    `--${name}-bg-position:${extra("center")}center, ${position};`,
   ].join("");
 }
 

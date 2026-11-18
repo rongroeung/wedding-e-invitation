@@ -5218,7 +5218,7 @@ html[data-paper-dark] .cv-guest { text-shadow: 0 1px 0 rgb(0 0 0 / 0.35), 0 0 22
   display: inline-block;
   padding: 0.5em 1.4em;
   font-family: var(--f-heading);
-  font-size: clamp(1rem, 5.4cqw, 1.8rem);
+  font-size: clamp(0.95rem, 4.3cqw, 1.35rem);
   line-height: 1.8;
   color: #4d5a3a;
   background: linear-gradient(rgb(255 253 247 / 0.82), rgb(255 250 240 / 0.72));

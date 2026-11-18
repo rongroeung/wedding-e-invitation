@@ -542,3 +542,37 @@ Changes:
 - **`artwork.ts` `backdropOf`:** a preset value of `src:<url>` lays that picture directly. Only the themes use it.
 - **`InvitationMessage.tsx`:** between the groom's and bride's names, the monogram crest or name-logo image is replaced by "ជាគូនឹង" (Muol, `msg-join`), in every theme. The now-unused imports and `crestDate` are removed.
 - **Checked:** screenshots at 1344×944 and 390×844 of the cover and the letter's couple row, for Theme 2 (with a stand-in photo), Theme 3 and Theme 1. tsc and `next build` are clean.
+
+## Smaller garden guest name, a border switch, readable letters on pictures
+
+Requests:
+- The guest's name on the Theme 3 opening page is too big.
+- Add an option to turn off the border (ស៊ុមសំបុត្រ).
+- In Themes 2 and 3, the background makes the letter hard to read.
+
+Changes:
+- **Garden guest ribbon:** the font size drops from clamp(1rem, 5.4cqw, 1.8rem) to clamp(0.95rem, 4.3cqw, 1.35rem).
+- **Border switch:** new `frame_enabled` column (migration `0045_frame_enabled.sql`, default true), with a toggle "បង្ហាញស៊ុមសំបុត្រ" at the top of the admin ស៊ុមសំបុត្រ card.
+  - `frameConfig().shown`; when it is false, `CardShell` draws no FrameEdge (top or bottom), no `bt-border` and no side rules, and the card gets a `no-frame` class.
+- **Readability on pictures (Themes 2 and 3):**
+  - `backdropVars()` takes a `readingVeil`: a radial wash of the paper colour, 0.55 in the middle fading to 0 at the edges, layered over the flat wash. The picture therefore stays clear round the edges and calm behind the words.
+  - `ThemeStyle` adds `sceneReadingCss`:
+    - a deeper ink (#3f2a1d for photo, #3d4a2c for garden) for `--msg-ink` and `--c-text`;
+    - a paper-coloured halo (`text-shadow`) on body text inside `.frame-safe`;
+    - for gradient or gold titles, a `drop-shadow` halo instead, because a text-shadow would show through background-clip text.
+  - Washes are 60% for photo and 42% for garden.
+- **Checked:** screenshots at 390×844 and 1344×944 of the cover and the letter for both themes with the border off, using a stand-in photo for Theme 2 (since removed), plus the 1920×945 garden opening. tsc and `next build` are clean.
+
+## Theme 2: a toned-down photograph under light writing
+
+Request: in Theme 2, lower the background's contrast rather than fading it, so the letter reads clearly (a sample was given: a dark, warm-toned photo with light gold writing).
+
+- The photo is now covered by a warm dark-brown layer (`PHOTO_SHADE_RGB` 40 25 16, at 58%, plus a 0.30 reading veil in the middle) instead of the paper-coloured wash. This lowers its contrast like a toned print rather than whitening it.
+- The card is printed light on dark through the existing dark-paper rules.
+  - `appearanceBootScript` takes `coupleDark`. Theme 2 sets `data-couple-dark`, and with it `data-paper-dark`, even though its paper is the couple's own picture.
+  - `isDarkSheet()` honours that attribute, so the guest panel keeps it.
+- `sceneReadingCss(photo)`:
+  - the dark-paper colours, browned to match (`--c-bg` #2c1c13, the cream and beige surfaces, `--msg-ink` #f2deb0);
+  - a soft dark shadow under body text and titles.
+- Theme 3 is unchanged: light paper with dark sage ink and a paper-coloured halo.
+- Checked with a stand-in photo (since removed): `data-paper-dark` was set and the letter ink was rgb(242 222 176). Screenshots at 390×844 (cover, letter, programme, RSVP) and 1344×944. tsc and `next build` are clean.

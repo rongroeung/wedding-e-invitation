@@ -53,6 +53,7 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
     frameSideRules: wedding.frameSideRules,
     frameTint: wedding.frameTint,
     frameSticky: wedding.frameSticky,
+    frameEnabled: wedding.frameEnabled,
     frameScale: wedding.frameScale,
     fontScale: wedding.fontScale,
 
@@ -226,6 +227,14 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
         title="ស៊ុមសំបុត្រ"
         description="ប្រើក្បាច់សម្រេច ឬផ្ទុកក្បាច់ផ្ទាល់ខ្លួនរបស់លោកអ្នក"
       >
+        <div className="mb-5">
+          <Toggle
+            label="បង្ហាញស៊ុមសំបុត្រ"
+            hint="បិទ ដើម្បីដកស៊ុម (ក្បាច់ជ្រុង ក្បាច់ក្បាល-ជើង និងបន្ទាត់) ចេញពីសំបុត្រទាំងស្រុង · Turn off to remove the border"
+            checked={form.frameEnabled}
+            onChange={(v) => setForm({ ...form, frameEnabled: v })}
+          />
+        </div>
         <div className="grid gap-3 sm:grid-cols-2">
           {[
             { value: "builtin", title: "ក្បាច់សម្រេច", text: "ជ្រើសរើសពីក្បាច់ដែលមានស្រាប់" },

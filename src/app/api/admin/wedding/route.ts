@@ -118,6 +118,7 @@ const schema = z.object({
   frameSideRules: z.boolean().optional(),
   frameTint: z.boolean().optional(),
   frameSticky: z.boolean().optional(),
+  frameEnabled: z.boolean().optional(),
   frameScale: z.number().int().min(30).max(100).optional(),
   fontScale: z.number().int().min(70).max(140).optional(),
 

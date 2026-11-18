@@ -91,6 +91,8 @@ export const BUILTIN_BAND_ART: Record<string, { top: string; bottom: string }> =
  * into all four corners.
  */
 export type FrameConfig = {
+  /** The border is drawn at all (the couple can switch it off). */
+  shown: boolean;
   layout: "band" | "corner";
   /** Corner layout: the artwork, mirrored into the other three corners. */
   cornerSrc: string;
@@ -155,6 +157,8 @@ export function frameConfig(wedding: Wedding): FrameConfig {
       : "";
 
   return {
+    // the couple can turn the border off altogether (ស៊ុមសំបុត្រ)
+    shown: wedding.frameEnabled,
     layout,
     cornerSrc: custom ? uploadedTop : builtin?.layout === "corner" ? builtin.corner : "",
     topSrc,
@@ -162,7 +166,7 @@ export function frameConfig(wedding: Wedding): FrameConfig {
     // Built-in bands ship their own foot artwork, so nothing is mirrored.
     mirrorBottom: custom ? !uploadedBottom && wedding.frameMirrorBottom : false,
     // Artwork carries its own edge run; a rule between would fight it.
-    sideRules: layout === "band" && !builtin && !custom && wedding.frameSideRules,
+    sideRules: wedding.frameEnabled && layout === "band" && !builtin && !custom && wedding.frameSideRules,
     art: custom || Boolean(builtin),
     custom,
     // Only artwork needs tinting; the generated bands already use the theme.
