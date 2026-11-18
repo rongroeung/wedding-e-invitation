@@ -3,6 +3,7 @@
 import { FontPicker } from "./FontPicker";
 import { PAPER_GROUPS } from "@/lib/paperThemes";
 import { useState } from "react";
+import { INVITATION_THEMES, INVITATION_THEME_KEYS, themeKeyOf } from "@/lib/invitationTheme";
 import type { Wedding } from "@/lib/db/schema";
 import { FrameArt } from "@/components/ui/FrameArt";
 import { mediaSrc } from "@/lib/media";
@@ -69,6 +70,9 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
     appearanceLevel: wedding.appearanceLevel,
     appearanceTone: wedding.appearanceTone,
     appearanceGuestPanel: wedding.appearanceGuestPanel,
+    invitationTheme: themeKeyOf(wedding.invitationTheme) as string,
+    openingPhotoId: wedding.openingPhotoId,
+    openingPhotoUrl: wedding.openingPhotoUrl,
   });
 
   const colors: [keyof typeof form, string][] = [
@@ -87,6 +91,51 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
       </header>
 
       <StatusMessage message={message} />
+
+      <Card
+        title="ស្បែកសំបុត្រ (Theme)"
+        description="ជ្រើសរើសស្បែកមួយ សម្រាប់ភ្ញៀវទាំងអស់ · One theme for every guest"
+      >
+        <div className="grid gap-3 sm:grid-cols-3">
+          {INVITATION_THEME_KEYS.map((key) => {
+            const t = INVITATION_THEMES[key];
+            const on = form.invitationTheme === key;
+            return (
+              <button
+                key={key}
+                type="button"
+                aria-pressed={on}
+                onClick={() => setForm({ ...form, invitationTheme: key })}
+                className={`rounded-xl border p-3 text-left transition ${
+                  on ? "border-amber-500 bg-amber-50 ring-2 ring-amber-300" : "border-slate-200 hover:border-amber-400"
+                }`}
+              >
+                <p className="text-sm font-semibold text-slate-800">{t.km}</p>
+                <p className="mt-1 text-xs leading-relaxed text-slate-500">{t.hint}</p>
+              </button>
+            );
+          })}
+        </div>
+        {form.invitationTheme === "photo" && (
+          <div className="mt-5">
+            <MediaUpload
+              label="រូបថតទំព័រដំបូង (បញ្ឈរ) · Opening photo, portrait"
+              currentSrc={mediaSrc(form.openingPhotoId, form.openingPhotoUrl)}
+              onUploaded={(id) => setForm({ ...form, openingPhotoId: id })}
+              onClear={() => setForm({ ...form, openingPhotoId: null, openingPhotoUrl: "" })}
+            />
+            <p className="mt-2 text-xs text-slate-500">
+              រហូតដល់មានរូបថត ទំព័រដំបូងនៅតែបង្ហាញស្រោមសំបុត្រ · Until a photo is uploaded, the envelope stays.
+            </p>
+          </div>
+        )}
+        {form.invitationTheme === "garden" && (
+          <p className="mt-4 text-xs leading-relaxed text-slate-500">
+            ស្បែកសួនផ្កាប្រើក្រដាស ពណ៌ លំនាំ និងរូបភាពផ្ទៃខាងក្រោយរបស់វាផ្ទាល់ (គ្មានវាំងនន)។ ការកំណត់ខាងក្រោមត្រូវបានរក្សាទុក ហើយនឹងប្រើវិញ ពេលអ្នកប្ដូរទៅស្បែកទី ១ ឬ ២។
+            · The garden theme uses its own paper, colours, pattern and background, with no curtains. Your settings below are kept for Themes 1 and 2.
+          </p>
+        )}
+      </Card>
 
       <Card title="ឈុតពណ៌សម្រេច">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

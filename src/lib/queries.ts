@@ -1,4 +1,5 @@
 /** Read helpers used by the public invitation pages. */
+import { applyInvitationTheme } from "@/lib/invitationTheme";
 import { and, asc, desc, eq, sql } from "drizzle-orm";
 import { getDb } from "./db";
 import {
@@ -57,7 +58,8 @@ export async function getInvitationData(weddingId = "main"): Promise<InvitationD
     db.select().from(storyItems).where(eq(storyItems.weddingId, weddingId)).orderBy(asc(storyItems.sortOrder)),
     db.select().from(galleryImages).where(eq(galleryImages.weddingId, weddingId)).orderBy(asc(galleryImages.sortOrder)),
   ]);
-  return { wedding: weddingRow, events, story, gallery };
+  // the theme's own choices on top of the couple's saved settings
+  return { wedding: applyInvitationTheme(weddingRow), events, story, gallery };
 }
 
 /** A guest by their invitation code. Codes are unique across every workspace,

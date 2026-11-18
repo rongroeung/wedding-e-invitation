@@ -106,6 +106,11 @@ export const wedding = pgTable("wedding", {
   envelopeFlapMark: text("envelope_flap_mark").notNull().default("namelogo"),
   coverPhotoId: text("cover_photo_id"),
   coverPhotoUrl: text("cover_photo_url").notNull().default(""),
+  /** khmer | photo | garden (lib/invitationTheme). */
+  invitationTheme: text("invitation_theme").notNull().default("khmer"),
+  /** Theme 2's opening page: the couple's photograph, shown instead of the envelope. */
+  openingPhotoId: text("opening_photo_id"),
+  openingPhotoUrl: text("opening_photo_url").notNull().default(""),
 
   // Groom
   groomTitle: text("groom_title").notNull().default("លោក"),

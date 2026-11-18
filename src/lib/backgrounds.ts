@@ -48,6 +48,14 @@ export const BACKDROP_PRESETS = {
     fit: "cover",
     cardStrength: 40,
   },
+  /* Theme 3's flower arch (the couple's own picture), behind the invitation. */
+  "garden-arch": {
+    label: "សួនផ្កា និងទ្វារក្លោង",
+    src: "/themes/garden/garden-arch.webp",
+    thumb: "/themes/garden/garden-arch-thumb.webp",
+    fit: "cover",
+    cardStrength: 70,
+  },
 } satisfies Record<string, BackdropPreset>;
 
 export type BackdropPresetKey = keyof typeof BACKDROP_PRESETS;

@@ -1,19 +1,4 @@
 import type { Wedding } from "@/lib/db/schema";
-import { MonogramCrest } from "@/components/ui/MonogramCrest";
-import { mediaSrc } from "@/lib/media";
-import { NameLogoImage } from "./NameLogoImage";
-import { WEDDING_TIMEZONE, toKhmerNumber } from "@/lib/khmer";
-
-/** The wedding day as the crest prints it: ២៤ · ០៤ · ២០២៧ (in the wedding's time zone). */
-function crestDate(value: Date | string | null | undefined): string {
-  if (!value) return "";
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return "";
-  const parts = new Intl.DateTimeFormat("en-GB", { timeZone: WEDDING_TIMEZONE, day: "2-digit", month: "2-digit", year: "numeric" })
-    .formatToParts(d)
-    .reduce<Record<string, string>>((o, p) => ((o[p.type] = p.value), o), {});
-  return [parts.day, parts.month, parts.year].map((v) => toKhmerNumber(v)).join(" · ");
-}
 
 /**
  * The face of the card: both families, the formal wording, the couple, and the
@@ -46,32 +31,16 @@ export function InvitationMessage({ wedding }: { wedding: Wedding }) {
         {`${wedding.invitationHonorific} ${wedding.invitationBody}`.replace(/\s+/g, " ").trim()}
       </p>
 
-      {/* The couple, with their monogram between them: groom | mark | bride */}
-      <div className={`msg-couple mt-10 ${wedding.nameLogoEnabled ? "" : "no-logo"}`}>
+      {/* The couple: groom | ជាគូនឹង | bride */}
+      <div className="msg-couple mt-10">
         <div className="min-w-0">
           <p className="text-xs title-face msg-ink khmer-wrap">កូនប្រុសនាម</p>
           <p className="mt-2 text-lg title-face msg-ink khmer-wrap">
             {wedding.groomFullName}
           </p>
         </div>
-        {/* the couple's own name-logo image if they uploaded one; otherwise the drawn crest */}
-        {!wedding.nameLogoEnabled ? null : wedding.nameLogoMediaId ? (
-          <NameLogoImage
-            src={mediaSrc(wedding.nameLogoMediaId, "")}
-            mode={wedding.nameLogoMode}
-            alt={`${wedding.groomName} & ${wedding.brideName}`}
-            className="msg-monogram msg-name-logo"
-          />
-        ) : (
-        <MonogramCrest
-          text={wedding.monogram}
-          groom={wedding.groomName}
-          bride={wedding.brideName}
-          font={wedding.monogramFont}
-          date={crestDate(wedding.weddingDate)}
-          className="msg-monogram"
-        />
-        )}
+        {/* between the two names, the words that join them */}
+        <p className="msg-join self-center text-lg title-face msg-ink khmer-wrap">ជាគូនឹង</p>
         <div className="min-w-0">
           <p className="text-xs title-face msg-ink khmer-wrap">កូនស្រីនាម</p>
           <p className="mt-2 text-lg title-face msg-ink khmer-wrap">

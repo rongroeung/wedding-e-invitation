@@ -18,7 +18,7 @@ export function GuestManager({
   rsvps: Rsvp[];
   siteUrl: string;
   /** The saved message template and the wedding details it can fill in. */
-  caption: { template: string; couple: string; date: string; venue: string };
+  caption: { template: string; couple: string; date: string; venue: string; address: string };
 }) {
   const { busy, message, send, setMessage } = useApi();
   const [query, setQuery] = useState("");
@@ -41,6 +41,7 @@ export function GuestManager({
     couple: caption.couple,
     date: caption.date,
     venue: caption.venue,
+    address: caption.address,
     link: `${siteUrl}/invite/${g.code}`,
   });
   const sample = guests[0] ?? { title: "លោក", name: "ឈ្មោះភ្ញៀវ", code: "ABCD1234" };

@@ -14,6 +14,8 @@ import { Couple } from "./Couple";
 import { Cover } from "./Cover";
 import { DateSection } from "./DateSection";
 import { DressColors } from "./DressColors";
+import { SceneOpening } from "./envelope/SceneOpening";
+import { themeKeyOf } from "@/lib/invitationTheme";
 import { InvitationOpening } from "./envelope/InvitationOpening";
 import { Gallery } from "./Gallery";
 import { Gift } from "./Gift";
@@ -128,6 +130,15 @@ export function InvitationPage({
   const frame = frameConfig(wedding);
   const envelope = envelopeConfig(wedding);
   const envelopeShown = envelope.enabled && !skipEnvelope;
+  /*
+   * The opening page under the invitation's theme: the envelope (Theme 1), the
+   * couple's photograph (Theme 2, and only once one is uploaded — until then
+   * the envelope stands in) or the garden (Theme 3).
+   */
+  const theme = themeKeyOf(wedding.invitationTheme);
+  const openingPhoto = mediaSrc(wedding.openingPhotoId, wedding.openingPhotoUrl);
+  const scene: "photo" | "garden" | null =
+    theme === "garden" ? "garden" : theme === "photo" && openingPhoto ? "photo" : null;
   /*
    * Whether the velvet has been hung yet.
    *
@@ -482,17 +493,30 @@ export function InvitationPage({
 
       {/* `skipEnvelope` is the server honouring `?envelope=skip` — the one way
           past this overlay that needs no JavaScript at all. */}
-      {envelopeShown && (
-        <InvitationOpening
-          wedding={wedding}
-          guest={guest}
-          envelope={envelope}
-          frame={frame}
-          onStart={() => setVelvetHung(true)}
-          onOpen={envelopeOver}
-          onFinished={veilCleared}
-        />
-      )}
+      {envelopeShown &&
+        (scene ? (
+          /* Themes 2 and 3: a photograph or the garden in place of the envelope */
+          <SceneOpening
+            variant={scene}
+            photo={openingPhoto}
+            wedding={wedding}
+            guest={guest}
+            envelope={envelope}
+            onStart={() => setVelvetHung(true)}
+            onOpen={envelopeOver}
+            onFinished={veilCleared}
+          />
+        ) : (
+          <InvitationOpening
+            wedding={wedding}
+            guest={guest}
+            envelope={envelope}
+            frame={frame}
+            onStart={() => setVelvetHung(true)}
+            onOpen={envelopeOver}
+            onFinished={veilCleared}
+          />
+        ))}
     </>
   );
 }

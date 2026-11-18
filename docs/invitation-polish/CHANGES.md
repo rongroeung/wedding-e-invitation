@@ -487,3 +487,58 @@ Reported on the Vercel site:
 - Theme: a saved "pringtum" pick with basis `…|0` applied; after the rev was bumped to 1, it was dropped and the couple's design showed (the rev was reset to 0 afterwards).
 - Not tested in real Safari or WebKit, since no WebKit browser is installed here.
 - tsc and `next build` are clean.
+
+## {address} in the link message; three invitation themes
+
+Requests:
+- Add `{address}` to the message sent with each invitation link.
+- Add Theme 2, the same as Theme 1 but with the couple's photo on the opening page instead of the envelope.
+- Add Theme 3, a garden theme.
+
+The couple chose: one theme for everyone, set in admin; a new photo upload for Theme 2; both garden files are theirs to use; and the garden look across the whole invitation, with flowers allowed in that theme.
+
+- **`{address}`:** a new caption token for the venue address (`wedding.venueAddress`). It is in `shareCaption.ts`, the GuestManager token buttons and the guests page.
+- **Theme setting:**
+  - `invitation_theme` (khmer, photo or garden) and `opening_photo_id/url` are added by migration `0044_invitation_theme.sql`, with every existing invitation staying on khmer.
+  - `lib/invitationTheme.ts` holds the labels.
+  - In admin, the first card on រូបរាង is "ស្បែកសំបុត្រ (Theme)", with three choices and, for Theme 2, the photo upload.
+- **Theme 2 (photo):** `envelope/SceneOpening.tsx` replaces `InvitationOpening` when a photo is uploaded; until then the envelope stands in.
+  - Layout: the photo is full screen on a phone, and a 3:5 portrait over a blurred copy of itself on wider screens.
+  - Words: the envelope title at the top; the greeting, the guest's name on the gilt plate and the open button at the foot, over darkened gradients.
+  - It keeps the envelope's contract with the page: onStart, onOpen and onFinished; once per visit; the skip link; and the `<a href>` tap target that works without JavaScript. The music, film, curtains and cover therefore run exactly as after the envelope.
+- **Theme 3 (garden):**
+  - **Opening:** the couple's footage, cut to 0–5.5 s (`public/themes/garden/garden-intro.mp4`, muted, H.264). That ends just before its baked-in lettering appears, holding on the empty conservatory. The poster is that same last frame, so a phone that won't autoplay lands in the same place.
+  - **Words on the opening:** the heading, the couple's names logo, the greeting and the guest's name on a pale ribbon appear in the light under the arches. The button sits on the flower bed, and the hint is on a pale pill.
+  - **Invitation:** `applyInvitationTheme()` (in `getInvitationData`, so public pages only) overlays the garden's choices on the saved settings without changing them:
+    - the "flowering-vine" paper in its own tone;
+    - sage #55623F, gold #B8975C, blush #EADFD3, sheet #FBF8F1 and text #4A4A3A;
+    - the floral pattern;
+    - no curtains;
+    - a new "garden-arch" backdrop preset (the couple's flower-arch picture) behind the card.
+- **Checked:**
+  - **Theme 2:** checked in Chromium with a stand-in photo, at 390×844 and 1440×900. No horizontal scroll, and tapping the button removes the overlay and the curtains follow.
+  - **Theme 3:**
+    - the film plays and the words come in;
+    - after the tap there is no overlay and no curtains;
+    - screenshots of the letter, couple, programme, venue and RSVP sections on a phone show the garden paper, colours and button.
+  - **Theme 1:** still shows the envelope.
+  - **Admin:** the theme card renders, the photo upload appears for Theme 2, and saving Theme 3 stored `garden`.
+  - **`{address}`:** `renderCaption` fills it, run with tsx.
+  - **Build:** tsc and `next build` are clean, and all migrations apply to a freshly created database.
+  - **Not tested:** real Safari or WebKit, and the user's own Theme 2 photo.
+- The local test database was recreated with `db:setup` after a concurrent-access mistake on my side. That affects only this sandbox's demo data.
+
+## Themes 2 and 3: cover and letter on the opening picture; ជាគូនឹង on the letter
+
+Requests:
+- In Themes 2 and 3, the cover (page 2) and the letter (page 3) should have the same background as the opening page.
+- On the letter, replace the name logo with "ជាគូនឹង".
+
+Changes:
+- **`applyInvitationTheme`:**
+  - Both themes now use the "couple" paper (the card printed on a picture, as an uploaded card background does) with tone "design".
+  - **Theme 2:** the card background is the opening photo (`cardBgMediaId = openingPhotoId`, or the photo URL), cover-fit, with a 62% paper-colour wash under the writing.
+  - **Theme 3:** the card background is the garden film's last frame (`garden-still.webp`) with a 38% wash. `frameTint` is on, so the card's corner art takes the sage of the lettering instead of bright gold.
+- **`artwork.ts` `backdropOf`:** a preset value of `src:<url>` lays that picture directly. Only the themes use it.
+- **`InvitationMessage.tsx`:** between the groom's and bride's names, the monogram crest or name-logo image is replaced by "ជាគូនឹង" (Muol, `msg-join`), in every theme. The now-unused imports and `crestDate` are removed.
+- **Checked:** screenshots at 1344×944 and 390×844 of the cover and the letter's couple row, for Theme 2 (with a stand-in photo), Theme 3 and Theme 1. tsc and `next build` are clean.

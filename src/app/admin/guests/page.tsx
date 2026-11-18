@@ -27,6 +27,7 @@ export default async function AdminGuestsPage() {
         couple: [wedding.groomName, wedding.brideName].filter(Boolean).join(" & "),
         date: wedding.weddingDateKhmer,
         venue: wedding.venueName,
+        address: wedding.venueAddress,
       }}
     />
   );

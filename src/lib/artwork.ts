@@ -105,6 +105,8 @@ export type Backdrop = { src: string; fit: Fit; scrim: number; tile?: string };
 function backdropOf(mediaId: string | null, preset: string, fit: string, scrim: number): Backdrop | null {
   const src = mediaSrc(mediaId);
   if (src) return { src, fit: (fit as Fit) ?? "cover", scrim: clamp01(scrim) };
+  // a theme can lay a picture straight onto a surface (lib/invitationTheme)
+  if (preset.startsWith("src:")) return { src: preset.slice(4), fit: (fit as Fit) ?? "cover", scrim: clamp01(scrim) };
   const design = backdropPreset(preset);
   if (!design) return null;
   return { src: design.src, fit: design.fit, scrim: clamp01(scrim), tile: design.tile };

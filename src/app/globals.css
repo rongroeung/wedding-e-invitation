@@ -4771,7 +4771,7 @@ html[data-paper-dark] .dress-chip {
 .couple-name { font-size: clamp(1rem, 3.6vw, 1.3rem); line-height: 1.9; }
 .couple-title { font-size: 0.85em; }
 
-/* ══ The couple on the invitation's face (InvitationMessage): groom | monogram | bride ══ */
+/* ══ The couple on the invitation's face (InvitationMessage): groom | ជាគូនឹង | bride ══ */
 .msg-couple {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
@@ -4781,6 +4781,7 @@ html[data-paper-dark] .dress-chip {
 /* with the name logo switched off: groom | bride, two equal columns */
 .msg-couple.no-logo { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
 .msg-monogram { width: clamp(7rem, 29vw, 12.5rem); }
+.msg-join { padding-top: 1.6rem; white-space: nowrap; }
 
 /* The letter's text grows with the card: on a phone it fills the width as
    before; on a wide screen the formal wording runs to about two thirds of the
@@ -5095,3 +5096,141 @@ html[data-paper-dark] .cv-guest { text-shadow: 0 1px 0 rgb(0 0 0 / 0.35), 0 0 22
   .cv-names { width: min(64cqw, 45cqh, 640px); }
 }
 .cv-open { font-weight: 700; }
+
+/* ── Themes 2 and 3: the opening page as a picture (SceneOpening) ─────────
+   The picture fills a phone. On a wider screen it stands as a portrait in the
+   middle (3:5), over a blurred copy of itself. The frame is a size container,
+   so every size inside it follows the picture, not the window. */
+.scene {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  background: #120c0d;
+}
+.scene-garden { background: #f3eee4; }
+.scene-surround {
+  position: absolute;
+  inset: -48px;
+  background: center / cover no-repeat;
+  filter: blur(26px) brightness(0.5) saturate(1.05);
+  transform: scale(1.08);
+}
+.scene-garden .scene-surround { filter: blur(26px) brightness(1.02) saturate(0.95); opacity: 0.85; }
+.scene-frame {
+  position: relative;
+  container-type: size;
+  height: 100%;
+  width: min(100%, calc(100dvh * 0.6));
+  overflow: hidden;
+  box-shadow: 0 0 60px rgb(0 0 0 / 0.35);
+}
+.scene-media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1.8s cubic-bezier(0.3, 0, 0.3, 1);
+}
+.scene-leaving .scene-media { transform: scale(1.07); }
+
+/* legibility: the photograph is darkened at the top and the foot, where the
+   words are; the garden gets a soft light behind its words instead */
+.scene-shade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(to bottom, rgb(12 6 8 / 0.62) 0%, rgb(12 6 8 / 0) 30%),
+    linear-gradient(to top, rgb(12 6 8 / 0.82) 0%, rgb(12 6 8 / 0.5) 26%, rgb(12 6 8 / 0) 50%);
+}
+.scene-garden .scene-shade {
+  background: radial-gradient(ellipse 62% 30% at 50% 40%, rgb(255 253 247 / 0.72), rgb(255 253 247 / 0) 72%);
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+.scene-garden:has(.scene-words-in) .scene-shade { opacity: 1; }
+
+.scene-words {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  padding: max(6cqh, env(safe-area-inset-top)) 5cqw max(4.5cqh, env(safe-area-inset-bottom));
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.9s ease, transform 0.9s ease;
+}
+.scene-words-in { opacity: 1; transform: none; }
+.scene-leaving .scene-words { opacity: 0; transform: translateY(-14px); transition-duration: 0.7s; }
+.scene-top, .scene-foot { display: flex; flex-direction: column; align-items: center; width: 100%; }
+
+.scene-title {
+  font-family: var(--f-heading);
+  font-size: clamp(1.25rem, 7.4cqw, 2.6rem);
+  line-height: 1.9;
+  color: #f4e3b8;
+  text-shadow: 0 2px 10px rgb(0 0 0 / 0.55), 0 0 22px rgb(240 210 150 / 0.25);
+}
+.scene-lead {
+  font-size: clamp(1rem, 5cqw, 1.5rem);
+  line-height: 2;
+  color: #f4e3b8;
+  text-shadow: 0 2px 8px rgb(0 0 0 / 0.6);
+}
+.knf.knf-scene { width: 94cqw; margin: 0.4cqh auto 1.6cqh; }
+.scene .scene-open { margin-top: 0.5cqh; }
+.scene .btn-seal { min-width: min(220px, 60cqw); }
+.scene .env-hint { display: block; color: rgb(251 239 242 / 0.8); }
+
+/* the garden: sage lettering in the light under the arches, the guest's name
+   on a pale ribbon, and the button down on the flower bed */
+.scene-garden .scene-words { justify-content: flex-start; padding-top: 17cqh; }
+.scene-garden .scene-foot { flex: 1; }
+.scene-garden .scene-open { margin-top: auto; }
+.scene-garden .scene-title {
+  color: #4d5a3a;
+  font-size: clamp(1.15rem, 6.6cqw, 2.3rem);
+  text-shadow: 0 0 14px rgb(255 253 247 / 0.95), 0 0 4px rgb(255 253 247 / 0.9);
+}
+.scene-garden .scene-names {
+  width: min(72cqw, 34cqh);
+  margin: 0.4cqh 0 1cqh;
+  color: #a8854a;
+  filter: drop-shadow(0 0 8px rgb(255 253 247 / 0.95));
+}
+.scene-garden .scene-lead {
+  color: #4d5a3a;
+  font-size: clamp(0.95rem, 4.6cqw, 1.4rem);
+  text-shadow: 0 0 10px rgb(255 253 247 / 1), 0 0 3px rgb(255 253 247 / 0.9);
+}
+.scene-guest {
+  margin-top: 0.6cqh;
+  max-width: 92cqw;
+}
+.scene-guest > span {
+  display: inline-block;
+  padding: 0.5em 1.4em;
+  font-family: var(--f-heading);
+  font-size: clamp(1rem, 5.4cqw, 1.8rem);
+  line-height: 1.8;
+  color: #4d5a3a;
+  background: linear-gradient(rgb(255 253 247 / 0.82), rgb(255 250 240 / 0.72));
+  border: 1px solid rgb(184 151 92 / 0.75);
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 3px rgb(255 253 247 / 0.6), inset 0 0 0 4px rgb(184 151 92 / 0.35), 0 6px 18px -8px rgb(60 70 40 / 0.35);
+}
+.scene-guest-latin > span { font-family: var(--f-body); font-weight: 600; letter-spacing: 0.04em; font-size: clamp(0.9rem, 4.4cqw, 1.35rem); white-space: nowrap; }
+.scene-garden .env-hint {
+  color: #4d5a3a;
+  padding: 0.2rem 0.8rem;
+  border-radius: 999px;
+  background: rgb(255 253 247 / 0.78);
+}
+.scene-garden ~ .env-skip, .env-veil:has(.scene-garden) .env-skip { color: rgb(77 90 58 / 0.75); }

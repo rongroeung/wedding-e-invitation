@@ -1,4 +1,5 @@
 import { eq, sql } from "drizzle-orm";
+import { INVITATION_THEME_KEYS } from "@/lib/invitationTheme";
 import { FX_LEVEL_KEYS, FX_MODE_KEYS, PAPER_THEME_KEYS, TONE_KEYS } from "@/lib/appearance";
 import { BACKDROP_PRESET_KEYS } from "@/lib/backgrounds";
 import { DESIGN_KIT_KEYS } from "@/lib/designKit";
@@ -197,6 +198,9 @@ const schema = z.object({
   appearanceLevel: z.enum(FX_LEVEL_KEYS).optional(),
   appearanceTone: z.enum(TONE_KEYS).optional(),
   appearanceGuestPanel: z.boolean().optional(),
+  invitationTheme: z.enum(INVITATION_THEME_KEYS).optional(),
+  openingPhotoId: z.string().nullable().optional(),
+  openingPhotoUrl: z.string().max(1000).optional(),
   /** Sent by the appearance page's save: every guest goes back to the couple's design. */
   appearanceSaved: z.boolean().optional(),
 
