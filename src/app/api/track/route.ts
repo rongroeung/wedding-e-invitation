@@ -9,6 +9,9 @@ const schema = z.object({
   workspace: z.string().max(60).default("main"),
 });
 
+/* a view count is never worth a long wait */
+export const maxDuration = 15;
+
 /** Records an invitation view for the dashboard counters. */
 export async function POST(request: Request) {
   if (!isSameOrigin(request)) return fail("Bad origin", 403);

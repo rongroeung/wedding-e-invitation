@@ -636,3 +636,34 @@ Request: not only the parents' names and the date but all of the letter should f
   - screenshots look proportional;
   - no console errors or warnings;
   - tsc and `next build` are clean.
+
+## Vercel "Task timed out after 300 seconds" on /api/media and /api/track
+
+Report: Vercel logs show bursts of `/api/media/<id>` and `/api/track` failing with "Vercel Runtime Timeout Error: Task timed out after 300 seconds".
+
+**What was wrong:** every one of those routes waits on the database, and nothing in the connection code ever stopped waiting.
+- **The migration lock (the likely main cause).** Each cold instance ran `pg_advisory_lock` … `pg_advisory_unlock` before serving anything. Behind a connection pooler (a "pooled" Neon or Supabase URL), the lock and the unlock can run on different server connections, so the unlock frees nothing and the lock stays held by a pooled connection. Every instance that starts after that waits on the lock for ever, and so does every request it holds: all the pictures on a page time out together, which matches the bursts in the log.
+- **No timeouts on the pool.** There was no limit on waiting for a free connection, no keep-alive and no query timeout. A connection the host had cut while the function was frozen between requests could be reused and waited on until the 300-second wall.
+- **A failed start was cached.** If the first connection attempt failed, the rejected promise was kept, and every later request on that instance failed with it.
+- **All media came from the database for every guest,** so every image on every visit was a function call plus a database read, and the new image preloading asks for them all at once.
+
+**Changes:**
+- **`lib/db/index.ts` (real Postgres):**
+  - **Pool settings:** `max: 8`, `connectionTimeoutMillis` 10 s, `idleTimeoutMillis` 10 s, `keepAlive`, `query_timeout` 30 s, `statement_timeout` 30 s. Errors on idle connections are logged, not fatal.
+  - **Vercel:** `attachDatabasePool(pool)` from `@vercel/functions` (new dependency, 3.11.3), so Fluid compute closes idle connections before suspending an instance.
+  - **Migrations, fast path:** a plain read of the ledger. When every migration file is already recorded (almost every cold start), no lock is taken.
+  - **Migrations, when there is work:** one transaction on one connection, with `SET LOCAL lock_timeout '20s'` and `pg_advisory_xact_lock`. The lock ends with the commit or rollback on that same connection, so a pooler can't strand it, and a lock that can't be had becomes an error after 20 s instead of a hang.
+  - **Failed start:** no longer cached, so the next request retries.
+  - **PGlite:** unchanged.
+- **`lib/db/migrate.ts`:** new `migrationFiles()`.
+- **`/api/media/[id]`:**
+  - `maxDuration` 60;
+  - any database failure answers 503 with `Retry-After: 2` straight away;
+  - whole-file responses carry `CDN-Cache-Control: public, max-age=2592000, immutable`, so after the first guest each picture is served from Vercel's CDN, not the function and the database. Byte-range (206) responses are `no-store` on the CDN.
+- **`/api/track`:** `maxDuration` 15.
+
+**Checked against a real PostgreSQL 16 started locally**, with the production build and `DATABASE_URL` set:
+- **Burst:** 62 simultaneous requests (42 media, 20 track) all returned 200 in 0.3 s, with the CDN header present.
+- **Stuck lock:** another session held the migration lock while a migration was pending. The first request returned 503 after 20.1 s instead of hanging. Once the lock was released, the next request returned 200 in 0.16 s and applied the migration. The test migration and its ledger row were then removed.
+- **Not tested:** the user's Vercel and Neon/Supabase setup itself.
+- tsc and `next build` are clean.

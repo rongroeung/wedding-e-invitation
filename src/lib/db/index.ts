@@ -23,9 +23,35 @@ async function createDb(): Promise<DrizzleDb> {
     const { drizzle } = await import("drizzle-orm/node-postgres");
     const { Pool } = await import("pg");
     const { pgConnection } = await import("./pgConfig");
-    const pool = new Pool({ ...pgConnection(process.env.DATABASE_URL), max: 5 });
+    /*
+     * Every wait has an end. Without these a request could wait for ever —
+     * for a free connection, or on a connection the host had quietly cut while
+     * the function was frozen between requests — until Vercel killed it at
+     * 300 seconds ("Task timed out after 300 seconds"), with every picture on
+     * the page waiting behind it. Now a stuck wait fails in seconds and the
+     * next request gets a fresh connection.
+     */
+    const pool = new Pool({
+      ...pgConnection(process.env.DATABASE_URL),
+      max: 8,
+      connectionTimeoutMillis: 10_000, // waiting for a connection
+      idleTimeoutMillis: 10_000, // let idle connections go before the host drops them
+      keepAlive: true, // notice a dead socket instead of waiting on it
+      query_timeout: 30_000, // the client gives up on a query
+      statement_timeout: 30_000, // and so does the server
+    });
+    // a connection that dies while idle is dropped from the pool, not fatal
+    pool.on("error", (err) => console.error("[db] idle connection error:", err.message));
+    try {
+      // on Vercel's Fluid compute: close idle connections before the instance
+      // is suspended, so none is reused dead when it wakes
+      const { attachDatabasePool } = await import("@vercel/functions");
+      attachDatabasePool(pool);
+    } catch {
+      /* not on Vercel */
+    }
     const db = drizzle(pool, { schema }) as unknown as DrizzleDb;
-    await ensureSchema(db, true);
+    await ensureSchemaOnServer(pool);
     return db;
   }
 
@@ -65,7 +91,8 @@ async function createDb(): Promise<DrizzleDb> {
  */
 const MIGRATION_LOCK = 8_314_527;
 
-async function ensureSchema(db: DrizzleDb, lock = false) {
+/** The embedded database: one process, nothing to race. */
+async function ensureSchema(db: DrizzleDb) {
   const { adoptExistingSchema, applyMigrations } = await import("./migrate");
   const runner = {
     exec: (sql: string) => db.execute(sql as never),
@@ -74,27 +101,75 @@ async function ensureSchema(db: DrizzleDb, lock = false) {
       return result?.rows ?? [];
     },
   };
-  if (!lock) {
-    await adoptExistingSchema(runner);
-    await applyMigrations(runner);
-    return;
-  }
-  await runner.exec(`SELECT pg_advisory_lock(${MIGRATION_LOCK})`);
+  await adoptExistingSchema(runner);
+  await applyMigrations(runner);
+}
+
+/**
+ * The real database, on a serverless host.
+ *
+ * **Most cold starts have nothing to do**, so the first step is a plain read of
+ * the ledger: when every migration in the folder is already recorded, no lock
+ * is taken at all.
+ *
+ * When there is work, it runs in ONE transaction on ONE connection, under a
+ * *transaction-scoped* advisory lock (`pg_advisory_xact_lock`) with a time
+ * limit. The old session lock (`pg_advisory_lock` … `pg_advisory_unlock`) was
+ * the dangerous part: behind a connection pooler (Neon's and Supabase's
+ * "pooled" URLs) the lock and the unlock can land on different server
+ * connections, so the unlock frees nothing and the lock is held by a pooled
+ * connection for good. Every instance that started after that waited on it
+ * for ever, along with every request it was serving — the 300-second
+ * timeouts. A transaction lock is released by the commit or rollback itself,
+ * on the same connection, whatever sits in between; and `lock_timeout` turns a
+ * wait that cannot end into an error after 20 seconds.
+ */
+async function ensureSchemaOnServer(pool: import("pg").Pool) {
+  const { adoptExistingSchema, applyMigrations, migrationFiles } = await import("./migrate");
+  const files = migrationFiles();
+  if (files.length === 0) return;
+
+  const recorded = await pool
+    .query<{ name: string }>(`SELECT name FROM "__wedding_migrations"`)
+    .then((r) => new Set(r.rows.map((row) => row.name)))
+    .catch(() => null); // no ledger yet
+  if (recorded && files.every((f) => recorded.has(f))) return;
+
+  const client = await pool.connect();
   try {
+    await client.query("BEGIN");
+    await client.query("SET LOCAL lock_timeout = '20s'");
+    await client.query("SET LOCAL statement_timeout = '120s'");
+    await client.query(`SELECT pg_advisory_xact_lock(${MIGRATION_LOCK})`);
+    const runner = {
+      exec: (sql: string) => client.query(sql),
+      rows: async (sql: string) => (await client.query<{ name: string }>(sql)).rows,
+    };
     await adoptExistingSchema(runner);
     await applyMigrations(runner);
+    await client.query("COMMIT");
+  } catch (err) {
+    await client.query("ROLLBACK").catch(() => {});
+    throw err;
   } finally {
-    await runner.exec(`SELECT pg_advisory_unlock(${MIGRATION_LOCK})`);
+    client.release();
   }
 }
 
 export async function getDb(): Promise<DrizzleDb> {
   if (globalForDb.__weddingDb) return globalForDb.__weddingDb;
   if (!globalForDb.__weddingDbReady) {
-    globalForDb.__weddingDbReady = createDb().then((db) => {
-      globalForDb.__weddingDb = db;
-      return db;
-    });
+    globalForDb.__weddingDbReady = createDb().then(
+      (db) => {
+        globalForDb.__weddingDb = db;
+        return db;
+      },
+      (err) => {
+        // a failed start is not remembered: the next request tries again
+        globalForDb.__weddingDbReady = undefined;
+        throw err;
+      },
+    );
   }
   return globalForDb.__weddingDbReady;
 }

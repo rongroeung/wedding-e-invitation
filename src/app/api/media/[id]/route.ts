@@ -3,6 +3,9 @@ import { getDb } from "@/lib/db";
 import { media } from "@/lib/db/schema";
 
 export const dynamic = "force-dynamic";
+/* A picture that cannot be served in a minute will not be served at all;
+   failing then is better than holding the request until the 300-second wall. */
+export const maxDuration = 60;
 
 /**
  * Serves an uploaded photo, audio file or video straight from the database.
@@ -15,7 +18,18 @@ export const dynamic = "force-dynamic";
  * no error anywhere, on exactly the devices most of these guests are holding.
  * Scrubbing needs it too, but playing at all is the reason it is here.
  */
-export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(request: Request, ctx: { params: Promise<{ id: string }> }) {
+  try {
+    return await serve(request, ctx);
+  } catch (err) {
+    // the database is busy or unreachable: say so at once, and let the
+    // browser try again shortly, instead of hanging
+    console.error("[media] could not serve:", err instanceof Error ? err.message : err);
+    return new Response("Busy, try again", { status: 503, headers: { "Retry-After": "2", "Cache-Control": "no-store" } });
+  }
+}
+
+async function serve(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const db = await getDb();
   /*
@@ -77,6 +91,13 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     "Content-Type": file.mimeType,
     "Content-Length": String(size),
     "Cache-Control": "public, max-age=31536000, immutable",
+    /*
+     * Kept on Vercel's CDN as well as in the guest's browser. An upload never
+     * changes under its id (a new upload is a new id), so after the first
+     * guest each picture is served from the edge: the function and the
+     * database are not asked again for every guest who opens the invitation.
+     */
+    "CDN-Cache-Control": "public, max-age=2592000, immutable",
     "Content-Disposition": `inline; filename="${encodeURIComponent(file.filename)}"`,
     "X-Content-Type-Options": "nosniff",
     "Accept-Ranges": "bytes",
@@ -116,6 +137,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       status: 206,
       headers: {
         ...headers,
+        // a byte range is the browser's business; the CDN keeps whole files only
+        "CDN-Cache-Control": "no-store",
         "Content-Length": String(part.byteLength),
         "Content-Range": `bytes ${start}-${end}/${size}`,
       },

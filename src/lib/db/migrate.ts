@@ -17,6 +17,13 @@ export type SqlRunner = {
 
 const LEDGER = "__wedding_migrations";
 
+/** The migration files shipped with this build, in order. */
+export function migrationFiles(): string[] {
+  const dir = path.join(process.cwd(), "drizzle");
+  if (!existsSync(dir)) return [];
+  return readdirSync(dir).filter((f) => f.endsWith(".sql")).sort();
+}
+
 export async function applyMigrations(runner: SqlRunner, log: (message: string) => void = () => {}) {
   const dir = path.join(process.cwd(), "drizzle");
   if (!existsSync(dir)) {
