@@ -15,8 +15,9 @@ import { Cover } from "./Cover";
 import { DateSection } from "./DateSection";
 import { DressColors } from "./DressColors";
 import { ImagePreload } from "./ImagePreload";
+import { FitGroup } from "@/components/ui/FitLine";
 import { SceneOpening } from "./envelope/SceneOpening";
-import { themeKeyOf } from "@/lib/invitationTheme";
+import { sceneOf, themeKeyOf, type InvitationThemeKey } from "@/lib/invitationTheme";
 import { InvitationOpening } from "./envelope/InvitationOpening";
 import { Gallery } from "./Gallery";
 import { Gift } from "./Gift";
@@ -138,8 +139,11 @@ export function InvitationPage({
    */
   const theme = themeKeyOf(wedding.invitationTheme);
   const openingPhoto = mediaSrc(wedding.openingPhotoId, wedding.openingPhotoUrl);
-  const scene: "photo" | "garden" | null =
-    theme === "garden" ? "garden" : theme === "photo" && openingPhoto ? "photo" : null;
+  const scene: "photo" | InvitationThemeKey | null = sceneOf(theme)
+    ? theme
+    : theme === "photo" && openingPhoto
+      ? "photo"
+      : null;
   /*
    * Whether the velvet has been hung yet.
    *
@@ -394,6 +398,14 @@ export function InvitationPage({
         }`}
         aria-hidden={!opened}
       >
+        {/*
+          * The whole invitation, every section, at ONE scale on a phone: the
+          * scale the letter's one-line rows (the parents' names, the couple,
+          * the date) need to fit the screen. Sizing each section on its own
+          * left the letter small and the rest large; this keeps every heading,
+          * phrase, card and gap in the proportions they were designed in.
+          */}
+        <FitGroup zoom min={0.62}>
         <InvitationMessage wedding={wedding} />
         <DateSection wedding={wedding} />
         <Couple wedding={wedding} />
@@ -422,6 +434,7 @@ export function InvitationPage({
             {wedding.groomName} &amp; {wedding.brideName} · {wedding.title}
           </p>
         </footer>
+        </FitGroup>
       </main>
 
       {/* On phones the player floats over the card; on desktop it lives in the rail */}

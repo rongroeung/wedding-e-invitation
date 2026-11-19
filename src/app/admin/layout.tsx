@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/api";
 import { LogoutButton } from "@/components/admin/LogoutButton";
@@ -37,47 +37,24 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <div className="mx-auto flex max-w-7xl flex-col lg:flex-row">
-        <aside className="border-b border-slate-200 bg-white lg:min-h-screen lg:w-64 lg:border-b-0 lg:border-r">
-          <div className="px-5 py-5">
-            <p className="text-sm font-semibold text-slate-800">Wedding Admin</p>
-            <p className="mt-0.5 text-xs text-slate-500">
-              {ctx.workspace ? ctx.workspace.label : "សិរីមង្គលអាពាហ៍ពិពាហ៍"}
-            </p>
-          </div>
-          {ctx.workspace && ctx.workspaces.length > 1 && (
-            <WorkspaceSwitcher
-              current={ctx.workspace.id}
-              options={ctx.workspaces.map((w) => ({ id: w.id, label: w.label, slug: w.slug }))}
-            />
-          )}
-          <nav className="flex gap-1 overflow-x-auto px-3 pb-3 lg:flex-col lg:overflow-visible">
-            {nav.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="flex shrink-0 items-center gap-2.5 whitespace-nowrap rounded-lg px-3 py-2 text-sm text-slate-600 transition hover:bg-amber-50 hover:text-amber-800"
-              >
-                <span aria-hidden="true">{item.icon}</span>
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-          <div className="hidden border-t border-slate-100 px-5 py-4 lg:block">
-            <p className="truncate text-xs text-slate-500">{session.email}</p>
-            <div className="mt-3 flex flex-col gap-2">
-              <Link
-                href={ctx.workspace ? workspacePath(ctx.workspace.slug) : "/"}
-                target="_blank"
-                className="rounded-lg border border-slate-300 px-3 py-1.5 text-center text-xs text-slate-600 hover:bg-slate-50"
-              >
-                មើលសំបុត្រអញ្ជើញ ↗
-              </Link>
-              <LogoutButton />
-            </div>
-          </div>
-        </aside>
+        <AdminSidebar
+          nav={nav}
+          title="Wedding Admin"
+          subtitle={ctx.workspace ? ctx.workspace.label : "សិរីមង្គលអាពាហ៍ពិពាហ៍"}
+          email={session.email}
+          viewHref={ctx.workspace ? workspacePath(ctx.workspace.slug) : "/"}
+          switcher={
+            ctx.workspace && ctx.workspaces.length > 1 ? (
+              <WorkspaceSwitcher
+                current={ctx.workspace.id}
+                options={ctx.workspaces.map((w) => ({ id: w.id, label: w.label, slug: w.slug }))}
+              />
+            ) : undefined
+          }
+          logout={<LogoutButton />}
+        />
 
-        <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
+        <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8">
           {ctx.weddingId ? (
             children
           ) : (
@@ -89,10 +66,6 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             </div>
           )}
         </main>
-      </div>
-
-      <div className="border-t border-slate-200 bg-white px-4 py-3 lg:hidden">
-        <LogoutButton />
       </div>
     </div>
   );

@@ -71,7 +71,15 @@ export function FitGroup({
       frame = requestAnimationFrame(fit);
     };
     fit();
-    const ro = new ResizeObserver(schedule);
+    // only a change of width can change the fit (the zoom itself changes the
+    // height, and must not set off another round)
+    let width = el.getBoundingClientRect().width;
+    const ro = new ResizeObserver(() => {
+      const w = el.getBoundingClientRect().width;
+      if (Math.abs(w - width) < 0.5) return;
+      width = w;
+      schedule();
+    });
     ro.observe(el);
     document.fonts?.ready.then(schedule).catch(() => {});
     return () => {

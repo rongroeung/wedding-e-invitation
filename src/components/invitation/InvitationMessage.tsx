@@ -1,5 +1,5 @@
 import type { Wedding } from "@/lib/db/schema";
-import { Fit, FitGroup } from "@/components/ui/FitLine";
+import { Fit } from "@/components/ui/FitLine";
 
 /**
  * The face of the card: both families, the formal wording, the couple, and the
@@ -8,12 +8,7 @@ import { Fit, FitGroup } from "@/components/ui/FitLine";
 export function InvitationMessage({ wedding }: { wedding: Wedding }) {
   return (
     <section id="invitation" className="msg section-pad relative text-center">
-      {/*
-        * The whole letter is scaled as one to the phone's width — just enough
-        * for its one-line rows (the parents' names, the couple, the date) to
-        * fit — so every phrase keeps its size relative to the others.
-        */}
-      <FitGroup zoom min={0.62}>
+
       <h2 className="gold-text text-[1.35rem] leading-[1.9] khmer-wrap">
         {wedding.title}
       </h2>
@@ -72,7 +67,6 @@ export function InvitationMessage({ wedding }: { wedding: Wedding }) {
       </p>
 
 
-      </FitGroup>
     </section>
   );
 }

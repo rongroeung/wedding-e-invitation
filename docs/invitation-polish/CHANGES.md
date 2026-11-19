@@ -667,3 +667,83 @@ Report: Vercel logs show bursts of `/api/media/<id>` and `/api/track` failing wi
 - **Stuck lock:** another session held the migration lock while a migration was pending. The first request returned 503 after 20.1 s instead of hanging. Once the lock was released, the next request returned 200 in 0.16 s and applied the migration. The test migration and its ledger row were then removed.
 - **Not tested:** the user's Vercel and Neon/Supabase setup itself.
 - tsc and `next build` are clean.
+
+## Centred guest name on the cover; two envelope settings removed; mobile admin menu
+
+Requests:
+- The guest name on the cover isn't centred.
+- Remove "រូបរាងសំបុត្រ" and "រូបភាពផ្ទាល់ខ្លួនលើសំបុត្រ" from 3D Envelope & Frame.
+- Make the admin usable on a phone, with the navigation in a side drawer opened by a toggle button.
+
+**Cover guest name:**
+- **Cause:** `.cv-guest` (and `.cv-time`) keep `max-width: 94%` with side margins of 0. Since the one-line fit wrapped them in a block-level row, they sat against the left edge: the line was 11 px off centre at 502 px wide and 9 px at 390 px.
+- **Fix:** `.cv .cv-fit > .fit-cell { margin-inline: auto }`. Measured centre now equals the cover's centre (251/251 and 195/195).
+
+**Envelope admin:**
+- The "រូបរាងសំបុត្រ" card (envelope style picker, match-paper toggle, paper and gold colours) and the "រូបភាពផ្ទាល់ខ្លួនលើសំបុត្រ" card (a picture printed on the envelope) are removed from `EnvelopeForm`, along with the unused `ENVELOPE_STYLE_LIST` and `envelopeConfig` preview.
+- The saved values aren't touched, so nothing changes on a live invitation.
+
+**Admin navigation:** new `components/admin/AdminSidebar.tsx`, used by `app/admin/layout.tsx`.
+- **On a computer:** the same fixed left column as before (now sticky), with the current page highlighted.
+- **Below `lg`:**
+  - a slim sticky top bar with a ☰ button and the current page's name;
+  - the same column slides in from the left over a dimmed page;
+  - it closes on a link, the dimmed area, ✕, Esc or a page change; the page behind doesn't scroll while it is open, and it is `inert` while closed.
+- The old horizontally scrolling nav strip and the bottom logout bar are gone; the email, "មើលសំបុត្រអញ្ជើញ ↗" and logout now sit in the drawer on phones too.
+
+**Checked in Chromium:**
+- the cover measurements above;
+- admin at 390×844: the menu closed, then open, a navigation link closes it and loads the page, no horizontal scroll, no page errors;
+- the envelope page lists the remaining cards: បើក / បិទ, វាំងនន, ក្បាច់លើគម្របស្រោមសំបុត្រ, ត្រាបិទសំបុត្រ, ចលនា និងអក្សរ, ស៊ុមក្បាច់ខ្មែរ and វីដេអូមុនអាពាហ៍ពិពាហ៍;
+- admin at 1280×800;
+- tsc and `next build` are clean.
+
+## Every section at the letter's scale on a phone
+
+Request: the letter section fits the phone well, but the other sections don't. Every section's text should share one size and fit the screen together.
+
+- The zoomed `FitGroup` has moved from `InvitationMessage` to `InvitationPage`, where it now wraps every section in `<main>`: the letter, countdown, couple, programme, venue, dress colours, story, gallery, RSVP, gift, contact, blessing, share bar and footer.
+  - The letter's one-line rows (the parents' names, the couple and the date) still decide the scale.
+  - That one scale now applies to every heading, phrase, card, photo and gap, so all sections keep their designed proportions to each other.
+  - It is 1 on a computer.
+- `FitGroup` now re-measures only when its *width* changes. The zoom itself changes the height, and that must not trigger another pass.
+- Pop-ups (the gallery lightbox, the map viewer and the music button) are portalled to `<body>`, so the zoom doesn't affect them.
+- **Checked** with long mothers' names (since restored):
+  - the zoom is 0.713 at 352 px and 0.86 at 412 px;
+  - all nine section headings (h2) sit on one line at both widths;
+  - no horizontal scroll and no page errors;
+  - screenshots of the letter, countdown, couple, programme, venue and RSVP at 352 px.
+  - tsc and `next build` are clean.
+
+## Themes 4, 5 and 6
+
+Request: add three more themes from the user's three videos.
+
+**The films.** Each video is cut just before its baked-in lettering appears (a template couple's names, or "18th birthday" in the third), so the opening holds on a clean scene. The still is the frame right before the cut, checked by eye to contain no text.
+- Theme 4, palace garden (`palace`): 0–5.9 s.
+- Theme 5, golden palace (`golden`): 0–15.0 s. This is the longest; the open button can be tapped at any time.
+- Theme 6, red velvet stage (`velvet`): 0–4.0 s.
+
+Each is muted H.264 with faststart, saved in `public/themes/<key>/` as `-intro.mp4`, `-still.webp`, `-still-tiny.webp` and `-thumb.webp`. Garden now also has a thumbnail.
+
+**Generalised scene system:**
+- **`lib/invitationTheme.ts`:** a `SCENES` registry with one spec per film theme: film, still, thumbnail, dark or light, wash, shade, ink, palette, pattern and page backdrop. `applyInvitationTheme` applies any spec. `themeIsDark()` covers photo and velvet.
+  - Palace: Wedgwood blue, lavender and pale stone.
+  - Golden: champagne, ivory and gold.
+  - Velvet: garnet and candle gold, printed light on dark, shade 34 6 12.
+- **`ThemeStyle`:** the dark branch (garnet or brown dark-paper colours, light ink, dark text glow) is driven by the spec. The card's veil and the boot script's `coupleDark` follow `themeIsDark`.
+- **`SceneOpening`:** accepts any film theme. The words-reveal fallback is now 17 s.
+- **CSS:** `.scene-garden` becomes `.scene-film`, set by per-theme custom properties: `--sf-ink`, `--sf-glow`, `--sf-names`, `--sf-line`, `--sf-top` and `--sf-light-y`. `.scene-film-dark` is used for velvet.
+- **`InvitationPage`** and **`ImagePreload`** work from `sceneOf(theme)`.
+- **Admin:** the theme cards show a thumbnail and are laid out in two or three columns. One shared note is shown for all film themes.
+
+No migration is needed; the theme is stored as text.
+
+**Checked in Chromium for all three themes**, at 390×844 and 1440×900:
+- the film plays and the words appear;
+- the opening, the cover, and on a phone the letter and programme;
+- `data-paper-dark` is set for velvet only;
+- no page errors;
+- tsc and `next build` are clean.
+
+**Known nit:** on a wide desktop with the velvet theme, the side rail's info cards are pale on the dark backdrop.

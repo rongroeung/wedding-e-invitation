@@ -1,6 +1,6 @@
 import { backdropVars, cardBackdrop, pageBackdrop } from "@/lib/artwork";
 import { designKitCss } from "@/lib/designKit";
-import { themeKeyOf, type InvitationThemeKey } from "@/lib/invitationTheme";
+import { sceneOf, themeIsDark, themeKeyOf, type InvitationThemeKey } from "@/lib/invitationTheme";
 import { appearanceBootScript, appearanceDefaults } from "@/lib/appearance";
 import { paperThemeCss } from "@/lib/paperThemes";
 import type { Wedding } from "@/lib/db/schema";
@@ -26,16 +26,21 @@ import type { Wedding } from "@/lib/db/schema";
 const PHOTO_SHADE_RGB = "40 25 16";
 
 function sceneReadingCss(theme: InvitationThemeKey): string {
-  if (theme === "photo") {
-    // printed light on the toned photograph: the dark-paper colours, in brown
+  const spec = sceneOf(theme);
+  if (themeIsDark(theme)) {
+    // printed light on a toned-down picture: the dark-paper colours, in the
+    // picture's own shade (warm brown for a photograph, garnet for the velvet)
     const glow = "0 1px 2px rgb(0 0 0 / 0.6), 0 0 10px rgb(0 0 0 / 0.35)";
+    const bg = spec?.shade ?? "44 28 19";
+    const [r, g, b] = bg.split(" ").map(Number);
+    const lift = (n: number) => [r + n, g + n * 0.7, b + n * 0.7].map((v) => Math.round(Math.min(255, v))).join(" ");
     return `
-  html[data-paper-dark] .card-stock{--c-bg:#2c1c13;--c-bg-rgb:44 28 19;--c-cream-rgb:72 50 34;--c-beige-rgb:92 66 46;--msg-ink:#f2deb0}
+  html[data-paper-dark] .card-stock{--c-bg:rgb(${bg});--c-bg-rgb:${bg};--c-cream-rgb:${lift(28)};--c-beige-rgb:${lift(48)};--msg-ink:${spec?.ink ?? "#f2deb0"}}
   .card-stock .frame-safe :is(p,li,dt,dd,label,span,h3,h4,time,a):not(.btn-seal):not([class*="bg-"]){text-shadow:${glow}}
   .card-stock .frame-safe :is(h1,h2,.gold-text,.title-face,.cv-title){filter:drop-shadow(0 1px 2px rgb(0 0 0 / 0.55))}
   `;
   }
-  const ink = "#3d4a2c";
+  const ink = spec?.ink ?? "#3d4a2c";
   const halo = "0 0 2px rgb(var(--c-bg-rgb) / 0.95), 0 0 8px rgb(var(--c-bg-rgb) / 0.9), 0 0 16px rgb(var(--c-bg-rgb) / 0.6)";
   return `
   .card-stock{--msg-ink:${ink};--c-text:${ink};--c-text-rgb:${channels(ink)}}
@@ -46,7 +51,9 @@ function sceneReadingCss(theme: InvitationThemeKey): string {
 
 export function ThemeStyle({ wedding }: { wedding: Wedding }) {
   const theme = themeKeyOf(wedding.invitationTheme);
-  const scene = theme === "photo" || theme === "garden";
+  const scene = theme !== "khmer";
+  const dark = themeIsDark(theme);
+  const shadeRgb = theme === "photo" ? PHOTO_SHADE_RGB : (sceneOf(theme)?.shade ?? "");
   const gold = sanitize(wedding.colorSecondary, "#C29A5B");
   const primary = sanitize(wedding.colorPrimary, "#4A3527");
   const accent = sanitize(wedding.colorAccent, "#E3D3B8");
@@ -244,7 +251,7 @@ export function ThemeStyle({ wedding }: { wedding: Wedding }) {
     --f-heading:${sanitizeFont(wedding.fontHeading, "'Khmer OS Muol Light'")};
     --f-body:${sanitizeFont(wedding.fontBody, "'Noto Sans Khmer'")};
     ${backdropVars("page", page, channels(background))}
-    ${backdropVars("card", card, theme === "photo" ? PHOTO_SHADE_RGB : channels(background), theme === "photo" ? 0.3 : scene ? 0.55 : 0)}
+    ${backdropVars("card", card, dark ? shadeRgb : channels(background), dark ? 0.3 : scene ? 0.55 : 0)}
   }
   /* The same fold shading in grey, for a curtain wearing the couple's own
      cloth. See the note beside "greys" above. */
@@ -278,7 +285,7 @@ export function ThemeStyle({ wedding }: { wedding: Wedding }) {
         * lets guests change the look and the choice was made against the
         * couple's current design. See `lib/appearance`.
         */}
-      <script dangerouslySetInnerHTML={{ __html: appearanceBootScript(appearanceDefaults(wedding), wedding.appearanceGuestPanel, wedding.appearanceRev, theme === "photo") }} />
+      <script dangerouslySetInnerHTML={{ __html: appearanceBootScript(appearanceDefaults(wedding), wedding.appearanceGuestPanel, wedding.appearanceRev, dark) }} />
       {/*
         * The room, as a fixed sheet behind everything.
         *

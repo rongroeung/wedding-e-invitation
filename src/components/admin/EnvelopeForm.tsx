@@ -4,8 +4,6 @@ import { workspacePath } from "@/lib/workspacePath";
 import { useState } from "react";
 import type { Wedding } from "@/lib/db/schema";
 import {
-  ENVELOPE_STYLE_LIST,
-  envelopeConfig,
   sealInitials,
   type EnvelopeStyleKey,
 } from "@/lib/envelope";
@@ -67,10 +65,6 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
   const set = <K extends keyof typeof form>(key: K, value: (typeof form)[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
 
-  /* The preview resolves through exactly the same code the guest's envelope
-     does, so what is shown here cannot drift from what is sent. */
-  const preview = envelopeConfig({ ...wedding, ...form });
-
   return (
     <div className="space-y-6">
       <header>
@@ -116,136 +110,13 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
         </div>
       </Card>
 
-      <Card title="រូបរាងសំបុត្រ" description="ជ្រើសរើសម៉ូដ រួចកែពណ៌បើចង់">
-        <div className="mb-5">
-          <Toggle
-            label="ពណ៌ស្រោមសំបុត្រតាមក្រដាសលិខិត"
-            hint="បើក = ស្រោមសំបុត្រ ត្រាក្រមួន និងផ្ទៃខាងក្រោយ ប្រើពណ៌តាមក្រដាសដែលបានជ្រើស (ក្រដាស និងចលនា) ដើម្បីឱ្យស្រោម និងលិខិតត្រូវគ្នា។ បិទ = ប្រើម៉ូដខាងក្រោម។"
-            checked={form.envelopeMatchPaper}
-            onChange={(v) => set("envelopeMatchPaper", v)}
-          />
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {ENVELOPE_STYLE_LIST.map((style) => {
-            const active = form.envelopeStyle === style.key;
-            return (
-              <button
-                key={style.key}
-                type="button"
-                onClick={() => set("envelopeStyle", style.key)}
-                className={`rounded-xl border p-3 text-left transition ${
-                  active ? "border-amber-500 ring-2 ring-amber-200" : "border-slate-200 hover:border-amber-300"
-                }`}
-                aria-pressed={active}
-              >
-                <span
-                  className="mb-2 flex h-20 items-end justify-center rounded-lg p-2"
-                  style={{
-                    background: `linear-gradient(160deg, ${style.paper}, ${style.paperDeep})`,
-                    boxShadow: "inset 0 0 0 1px rgba(0,0,0,.06)",
-                  }}
-                >
-                  <span
-                    className="h-8 w-full rounded"
-                    style={{
-                      background: `linear-gradient(104deg, ${style.goldDeep}, ${style.gold}, ${style.goldLight}, ${style.gold})`,
-                      clipPath: "polygon(0 0, 100% 0, 50% 100%)",
-                      opacity: 0.85,
-                    }}
-                  />
-                </span>
-                <span className="block text-sm font-medium text-slate-800">{style.label}</span>
-                <span className="mt-0.5 block text-xs text-slate-500">{style.note}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="mt-5 grid gap-4 sm:grid-cols-2">
-          <Field label="ពណ៌ក្រដាស" hint="ទទេ = ប្រើពណ៌របស់ម៉ូដ">
-            <div className="flex items-center gap-2">
-              <input
-                type="color"
-                className="h-10 w-12 shrink-0 cursor-pointer rounded border border-slate-300"
-                value={form.envelopePaper || preview.paper}
-                onChange={(e) => set("envelopePaper", e.target.value)}
-                aria-label="ពណ៌ក្រដាស"
-              />
-              <Input
-                value={form.envelopePaper}
-                onChange={(e) => set("envelopePaper", e.target.value)}
-                placeholder={preview.paper}
-                maxLength={9}
-              />
-              {form.envelopePaper && (
-                <Button variant="ghost" type="button" onClick={() => set("envelopePaper", "")}>
-                  ដកចេញ
-                </Button>
-              )}
-            </div>
-          </Field>
-
-          <Field label="ពណ៌មាស" hint="ទទេ = ប្រើពណ៌របស់ម៉ូដ">
-            <div className="flex items-center gap-2">
-              <input
-                type="color"
-                className="h-10 w-12 shrink-0 cursor-pointer rounded border border-slate-300"
-                value={form.envelopeGold || preview.gold}
-                onChange={(e) => set("envelopeGold", e.target.value)}
-                aria-label="ពណ៌មាស"
-              />
-              <Input
-                value={form.envelopeGold}
-                onChange={(e) => set("envelopeGold", e.target.value)}
-                placeholder={preview.gold}
-                maxLength={9}
-              />
-              {form.envelopeGold && (
-                <Button variant="ghost" type="button" onClick={() => set("envelopeGold", "")}>
-                  ដកចេញ
-                </Button>
-              )}
-            </div>
-          </Field>
-        </div>
-      </Card>
-
-      <Card
-        title="រូបភាពផ្ទាល់ខ្លួនលើសំបុត្រ"
-        description="បញ្ចូលរូបភាពរបស់អ្នក ដើម្បីបោះពុម្ពលើក្រដាសសំបុត្រ"
-      >
-        {/*
-          * What this does and does not do, said plainly, because the couple
-          * cannot see it from the field alone: the picture is *printed on the
-          * paper*. The envelope still splits down the middle and still slides
-          * apart, the seal still holds it shut, and the picture runs across
-          * both halves as one drawing — it is not a replacement for the
-          * envelope, it is what the envelope is made of.
-          */}
-        <ArtworkField
-          label="រូបភាពលើសំបុត្រ"
-          hint="រូបនឹងបោះពុម្ពពេញសំបុត្រ ហើយនៅតែបែកជាពីរផ្នែករអិលចេញដូចដើម។ ទំហំណែនាំ ១០០០ × ១២៨០ ភីកសែល (បញ្ឈរ)។"
-          mediaId={form.envelopeFaceMediaId}
-          onMedia={(id) => set("envelopeFaceMediaId", id)}
-          fit={form.envelopeFaceFit}
-          /* No "tile": this one is drawn as a single <image> inside the
-             envelope's SVG, and SVG has no repeating paint. */
-          fits={["cover", "contain", "stretch"]}
-          onFit={(fit) => set("envelopeFaceFit", fit)}
-          strength={form.envelopeFaceScrim}
-          onStrength={(value) => set("envelopeFaceScrim", value)}
-          strengthLabel={(value) => `កម្រិតពន្លឺក្រដាសលើរូប — ${value}%`}
-          strengthHint="បង្កើនបើអក្សរមាស ឬក្បាច់មើលមិនច្បាស់លើរូប"
-        >
-          <Toggle
-            label="រក្សាស៊ុមមាស និងក្បាច់ផុសលើរូប"
-            hint="បិទ បើចង់ឃើញរូបភាពសុទ្ធ គ្មានក្បាច់ពីលើ"
-            checked={form.envelopeFaceOrnament}
-            onChange={(v) => set("envelopeFaceOrnament", v)}
-          />
-        </ArtworkField>
-      </Card>
-
+      {/*
+        * The envelope's own style and colours, and a picture printed on it,
+        * are no longer offered here: the envelope takes its colours from the
+        * letter's paper, and Themes 2 and 3 replace it with a picture. The
+        * saved values are left as they are, so nothing changes for an
+        * invitation that already uses them.
+        */}
       <Card
         title="វាំងនន"
         description="វាំងននដែលបើកចេញ បង្ហាញសំបុត្រ បន្ទាប់ពីស្រោមសំបុត្រ។ អាចបិទ ឬបញ្ចូលក្រណាត់ផ្ទាល់ខ្លួន"

@@ -4,7 +4,7 @@ import { preload } from "react-dom";
 import type { InvitationData } from "@/lib/queries";
 import { cardBackdrop, pageBackdrop } from "@/lib/artwork";
 import { frameConfig } from "@/lib/frame";
-import { GARDEN_MEDIA, themeKeyOf } from "@/lib/invitationTheme";
+import { sceneOf, themeKeyOf } from "@/lib/invitationTheme";
 import { mediaSrc } from "@/lib/media";
 
 /**
@@ -25,15 +25,15 @@ export function ImagePreload({ data, opening }: { data: InvitationData; /** the 
 
   const first = [
     theme === "photo" ? mediaSrc(wedding.openingPhotoId, wedding.openingPhotoUrl) : "",
-    theme === "garden" ? GARDEN_MEDIA.still : "",
+    sceneOf(theme)?.still ?? "",
     cardBackdrop(wedding)?.src ?? "",
     pageBackdrop(wedding)?.src ?? "",
     frame.shown ? frame.cornerSrc : "",
     frame.shown ? frame.topSrc : "",
     frame.shown ? frame.bottomSrc : "",
     // the name plate is only on the opening page
-    opening && theme !== "garden" ? "/frames/kbach-name-frame.webp" : "",
-    opening && theme !== "garden" ? "/frames/kbach-name-panel-mask.png" : "",
+    opening && !sceneOf(theme) ? "/frames/kbach-name-frame.webp" : "",
+    opening && !sceneOf(theme) ? "/frames/kbach-name-panel-mask.png" : "",
     wedding.nameLogoMediaId ? mediaSrc(wedding.nameLogoMediaId, "") : "",
   ];
   const later = [

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { Guest, Wedding } from "@/lib/db/schema";
 import type { EnvelopeConfig } from "@/lib/envelope";
-import { GARDEN_MEDIA } from "@/lib/invitationTheme";
+import { sceneOf, type InvitationThemeKey } from "@/lib/invitationTheme";
 import { NameLogo } from "@/components/ui/NameLogo";
 import { coverName } from "../CoverContent";
 import { envelopeSeenKey } from "./InvitationOpening";
@@ -21,7 +21,7 @@ const useIsoLayout = typeof window === "undefined" ? useEffect : useLayoutEffect
  * - **photo**: the couple's photograph, full height, with the heading at the
  *   top and the greeting, the guest's name on the gilt plate and the open
  *   button over the foot of the picture.
- * - **garden**: a short film walks into a flower-hung conservatory and holds
+ * - **a film theme** (3–6): a short film (the garden, the palace, the golden hall, the velvet stage) plays and holds
  *   on it; the heading, the couple's names and the guest's name then appear in
  *   the clear space under the arches.
  *
@@ -44,7 +44,8 @@ export function SceneOpening({
   onOpen,
   onFinished,
 }: {
-  variant: "photo" | "garden";
+  /** "photo" (Theme 2), or a film theme (3–6, lib/invitationTheme SCENES). */
+  variant: "photo" | InvitationThemeKey;
   /** Theme 2's photograph. */
   photo?: string;
   wedding: Wedding;
@@ -57,7 +58,8 @@ export function SceneOpening({
   type Step = "closed" | "leaving" | "gone" | "done";
   const [step, setStep] = useState<Step>("closed");
   /* The garden's words wait for the walk into the conservatory to finish. */
-  const [arrived, setArrived] = useState(variant !== "garden");
+  const film = variant === "photo" ? undefined : sceneOf(variant);
+  const [arrived, setArrived] = useState(!film);
   const timers = useRef<number[]>([]);
   const started = useRef(false);
   const opened = useRef(false);
@@ -114,7 +116,7 @@ export function SceneOpening({
    * words come in at the end of the walk, or at once if there is no walk.
    */
   useEffect(() => {
-    if (variant !== "garden") return;
+    if (!film) return;
     const v = video.current;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const arrive = () => setArrived(true);
@@ -124,14 +126,15 @@ export function SceneOpening({
     }
     v.addEventListener("ended", arrive);
     v.addEventListener("error", arrive);
-    const fallback = window.setTimeout(arrive, 7000);
+    // the longest film is 15 s; never leave the words hidden past that
+    const fallback = window.setTimeout(arrive, 17000);
     v.play().catch(arrive);
     return () => {
       v.removeEventListener("ended", arrive);
       v.removeEventListener("error", arrive);
       clearTimeout(fallback);
     };
-  }, [variant]);
+  }, [film]);
 
   const remember = useCallback(() => {
     try {
@@ -177,22 +180,26 @@ export function SceneOpening({
 
   const name = coverName(wedding, guest);
   const closed = step === "closed";
-  const garden = variant === "garden";
-  const backdrop = garden ? GARDEN_MEDIA.still : photo ?? "";
+  const garden = Boolean(film);
+  const backdrop = film ? film.still : photo ?? "";
 
   return (
     <OpeningTransition gone={step === "gone"} duration={step === "gone" ? 1000 : 420}>
-      <div className={`scene scene-${variant} ${step !== "closed" ? "scene-leaving" : ""}`}>
+      <div
+        className={`scene scene-${variant} ${film ? `scene-film ${film.dark ? "scene-film-dark" : ""}` : ""} ${
+          step !== "closed" ? "scene-leaving" : ""
+        }`}
+      >
         {/* the soft surround on a wide screen */}
         <span className="scene-surround" style={{ backgroundImage: `url("${backdrop}")` }} aria-hidden="true" />
 
         <div className="scene-frame">
-          {garden ? (
+          {film ? (
             <video
               ref={video}
               className="scene-media"
-              src={GARDEN_MEDIA.intro}
-              poster={GARDEN_MEDIA.still}
+              src={film.intro}
+              poster={film.still}
               muted
               playsInline
               preload="auto"

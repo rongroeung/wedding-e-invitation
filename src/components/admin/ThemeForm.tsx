@@ -3,7 +3,7 @@
 import { FontPicker } from "./FontPicker";
 import { PAPER_GROUPS } from "@/lib/paperThemes";
 import { useState } from "react";
-import { INVITATION_THEMES, INVITATION_THEME_KEYS, themeKeyOf } from "@/lib/invitationTheme";
+import { INVITATION_THEMES, INVITATION_THEME_KEYS, SCENES, themeKeyOf, type InvitationThemeKey } from "@/lib/invitationTheme";
 import type { Wedding } from "@/lib/db/schema";
 import { FrameArt } from "@/components/ui/FrameArt";
 import { mediaSrc } from "@/lib/media";
@@ -97,10 +97,11 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
         title="ស្បែកសំបុត្រ (Theme)"
         description="ជ្រើសរើសស្បែកមួយ សម្រាប់ភ្ញៀវទាំងអស់ · One theme for every guest"
       >
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {INVITATION_THEME_KEYS.map((key) => {
             const t = INVITATION_THEMES[key];
             const on = form.invitationTheme === key;
+            const thumb = SCENES[key]?.thumb;
             return (
               <button
                 key={key}
@@ -111,8 +112,16 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
                   on ? "border-amber-500 bg-amber-50 ring-2 ring-amber-300" : "border-slate-200 hover:border-amber-400"
                 }`}
               >
-                <p className="text-sm font-semibold text-slate-800">{t.km}</p>
-                <p className="mt-1 text-xs leading-relaxed text-slate-500">{t.hint}</p>
+                <span className="flex gap-3">
+                  {thumb && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={thumb} alt="" loading="lazy" className="h-20 w-11 shrink-0 rounded-md object-cover shadow-sm" />
+                  )}
+                  <span className="min-w-0">
+                    <span className="block text-sm font-semibold text-slate-800">{t.km}</span>
+                    <span className="mt-1 block text-xs leading-relaxed text-slate-500">{t.hint}</span>
+                  </span>
+                </span>
               </button>
             );
           })}
@@ -130,10 +139,10 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
             </p>
           </div>
         )}
-        {form.invitationTheme === "garden" && (
+        {SCENES[form.invitationTheme as InvitationThemeKey] && (
           <p className="mt-4 text-xs leading-relaxed text-slate-500">
-            ស្បែកសួនផ្កាប្រើក្រដាស ពណ៌ លំនាំ និងរូបភាពផ្ទៃខាងក្រោយរបស់វាផ្ទាល់ (គ្មានវាំងនន)។ ការកំណត់ខាងក្រោមត្រូវបានរក្សាទុក ហើយនឹងប្រើវិញ ពេលអ្នកប្ដូរទៅស្បែកទី ១ ឬ ២។
-            · The garden theme uses its own paper, colours, pattern and background, with no curtains. Your settings below are kept for Themes 1 and 2.
+            ស្បែកនេះប្រើវីដេអូ ក្រដាស ពណ៌ លំនាំ និងរូបភាពផ្ទៃខាងក្រោយរបស់វាផ្ទាល់ (គ្មានវាំងនន)។ ការកំណត់ខាងក្រោមត្រូវបានរក្សាទុក ហើយនឹងប្រើវិញ ពេលអ្នកប្ដូរទៅស្បែកទី ១ ឬ ២។
+            · This theme uses its own film, paper, colours, pattern and background, with no curtains. Your settings below are kept for Themes 1 and 2.
           </p>
         )}
       </Card>

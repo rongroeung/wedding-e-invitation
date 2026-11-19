@@ -5109,7 +5109,8 @@ html[data-paper-dark] .cv-guest { text-shadow: 0 1px 0 rgb(0 0 0 / 0.35), 0 0 22
   overflow: hidden;
   background: #120c0d;
 }
-.scene-garden { background: #f3eee4; }
+.scene-film { background: rgb(var(--sf-glow)); }
+.scene-film-dark { background: #14060a; }
 .scene-surround {
   position: absolute;
   inset: -48px;
@@ -5117,7 +5118,7 @@ html[data-paper-dark] .cv-guest { text-shadow: 0 1px 0 rgb(0 0 0 / 0.35), 0 0 22
   filter: blur(26px) brightness(0.5) saturate(1.05);
   transform: scale(1.08);
 }
-.scene-garden .scene-surround { filter: blur(26px) brightness(1.02) saturate(0.95); opacity: 0.85; }
+.scene-film:not(.scene-film-dark) .scene-surround { filter: blur(26px) brightness(1.02) saturate(0.95); opacity: 0.85; }
 .scene-frame {
   position: relative;
   container-type: size;
@@ -5146,12 +5147,12 @@ html[data-paper-dark] .cv-guest { text-shadow: 0 1px 0 rgb(0 0 0 / 0.35), 0 0 22
     linear-gradient(to bottom, rgb(12 6 8 / 0.62) 0%, rgb(12 6 8 / 0) 30%),
     linear-gradient(to top, rgb(12 6 8 / 0.82) 0%, rgb(12 6 8 / 0.5) 26%, rgb(12 6 8 / 0) 50%);
 }
-.scene-garden .scene-shade {
-  background: radial-gradient(ellipse 62% 30% at 50% 40%, rgb(255 253 247 / 0.72), rgb(255 253 247 / 0) 72%);
+.scene-film .scene-shade {
+  background: radial-gradient(ellipse 62% 30% at 50% var(--sf-light-y, 40%), rgb(var(--sf-glow) / var(--sf-light, 0.72)), rgb(var(--sf-glow) / 0) 72%);
   opacity: 0;
   transition: opacity 1.2s ease;
 }
-.scene-garden:has(.scene-words-in) .scene-shade { opacity: 1; }
+.scene-film:has(.scene-words-in) .scene-shade { opacity: 1; }
 
 .scene-words {
   position: absolute;
@@ -5192,26 +5193,41 @@ html[data-paper-dark] .cv-guest { text-shadow: 0 1px 0 rgb(0 0 0 / 0.35), 0 0 22
 .scene .btn-seal { min-width: min(220px, 60cqw); }
 .scene .env-hint { display: block; color: rgb(251 239 242 / 0.8); }
 
-/* the garden: sage lettering in the light under the arches, the guest's name
-   on a pale ribbon, and the button down on the flower bed */
-.scene-garden .scene-words { justify-content: flex-start; padding-top: 17cqh; }
-.scene-garden .scene-foot { flex: 1; }
-.scene-garden .scene-open { margin-top: auto; }
-.scene-garden .scene-title {
-  color: #4d5a3a;
-  font-size: clamp(1.15rem, 6.6cqw, 2.3rem);
-  text-shadow: 0 0 14px rgb(255 253 247 / 0.95), 0 0 4px rgb(255 253 247 / 0.9);
+/* The film themes (3–6): the words in the clear space of the film's last
+   frame, the guest's name on a ribbon, the button down at the foot. Each
+   theme sets its ink, the light behind the words (--sf-glow, `r g b`), the
+   names' colour and how far down the words start. */
+.scene-film {
+  --sf-ink: #4d5a3a;
+  --sf-glow: 255 253 247;
+  --sf-names: #a8854a;
+  --sf-line: 184 151 92;
+  --sf-top: 17cqh;
 }
-.scene-garden .scene-names {
+.scene-palace { --sf-ink: #2e3b63; --sf-glow: 250 251 255; --sf-names: #6f5a9a; --sf-line: 140 150 190; --sf-top: 8cqh; --sf-light-y: 26%; }
+.scene-golden { --sf-ink: #6a4a1c; --sf-glow: 255 251 240; --sf-names: #a8803e; --sf-line: 196 160 92; --sf-top: 14cqh; --sf-light-y: 36%; }
+.scene-velvet {
+  --sf-ink: #f4e3b8; --sf-glow: 30 4 10; --sf-names: #e2c48c; --sf-line: 214 182 120;
+  --sf-top: 27cqh; --sf-light-y: 46%; --sf-light: 0.55;
+}
+.scene-film .scene-words { justify-content: flex-start; padding-top: var(--sf-top); }
+.scene-film .scene-foot { flex: 1; }
+.scene-film .scene-open { margin-top: auto; }
+.scene-film .scene-title {
+  color: var(--sf-ink);
+  font-size: clamp(1.15rem, 6.6cqw, 2.3rem);
+  text-shadow: 0 0 14px rgb(var(--sf-glow) / 0.95), 0 0 4px rgb(var(--sf-glow) / 0.9);
+}
+.scene-film .scene-names {
   width: min(72cqw, 34cqh);
   margin: 0.4cqh 0 1cqh;
-  color: #a8854a;
-  filter: drop-shadow(0 0 8px rgb(255 253 247 / 0.95));
+  color: var(--sf-names);
+  filter: drop-shadow(0 0 8px rgb(var(--sf-glow) / 0.95));
 }
-.scene-garden .scene-lead {
-  color: #4d5a3a;
+.scene-film .scene-lead {
+  color: var(--sf-ink);
   font-size: clamp(0.95rem, 4.6cqw, 1.4rem);
-  text-shadow: 0 0 10px rgb(255 253 247 / 1), 0 0 3px rgb(255 253 247 / 0.9);
+  text-shadow: 0 0 10px rgb(var(--sf-glow) / 1), 0 0 3px rgb(var(--sf-glow) / 0.9);
 }
 .scene-guest {
   margin-top: 0.6cqh;
@@ -5223,20 +5239,24 @@ html[data-paper-dark] .cv-guest { text-shadow: 0 1px 0 rgb(0 0 0 / 0.35), 0 0 22
   font-family: var(--f-heading);
   font-size: clamp(0.95rem, 4.3cqw, 1.35rem);
   line-height: 1.8;
-  color: #4d5a3a;
-  background: linear-gradient(rgb(255 253 247 / 0.82), rgb(255 250 240 / 0.72));
-  border: 1px solid rgb(184 151 92 / 0.75);
+  color: var(--sf-ink);
+  background: linear-gradient(rgb(var(--sf-glow) / 0.82), rgb(var(--sf-glow) / 0.72));
+  border: 1px solid rgb(var(--sf-line) / 0.75);
   border-radius: 999px;
-  box-shadow: inset 0 0 0 3px rgb(255 253 247 / 0.6), inset 0 0 0 4px rgb(184 151 92 / 0.35), 0 6px 18px -8px rgb(60 70 40 / 0.35);
+  box-shadow: inset 0 0 0 3px rgb(var(--sf-glow) / 0.6), inset 0 0 0 4px rgb(var(--sf-line) / 0.35), 0 6px 18px -8px rgb(0 0 0 / 0.35);
 }
 .scene-guest-latin > span { font-family: var(--f-body); font-weight: 600; letter-spacing: 0.04em; font-size: clamp(0.9rem, 4.4cqw, 1.35rem); white-space: nowrap; }
-.scene-garden .env-hint {
-  color: #4d5a3a;
+.scene-film .env-hint {
+  color: var(--sf-ink);
   padding: 0.2rem 0.8rem;
   border-radius: 999px;
-  background: rgb(255 253 247 / 0.78);
+  background: rgb(var(--sf-glow) / 0.78);
 }
-.scene-garden ~ .env-skip, .env-veil:has(.scene-garden) .env-skip { color: rgb(77 90 58 / 0.75); }
+.env-veil:has(.scene-film) .env-skip { color: #3f4636; opacity: 0.8; }
+.env-veil:has(.scene-film-dark) .env-skip { color: #f4e3b8; }
+/* on the velvet the light behind the words is shadow, and the names glow */
+.scene-velvet .scene-names { filter: drop-shadow(0 0 6px rgb(0 0 0 / 0.7)) drop-shadow(0 0 14px rgb(240 200 130 / 0.25)); }
+.scene-velvet .scene-title { text-shadow: 0 2px 10px rgb(0 0 0 / 0.75), 0 0 22px rgb(240 200 130 / 0.3); }
 
 /* ── One-line text that shrinks a little on a narrow phone (FitLine.tsx) ── */
 .fit-cell { white-space: nowrap; min-width: 0; }
@@ -5248,3 +5268,6 @@ html[data-paper-dark] .cv-guest { text-shadow: 0 1px 0 rgb(0 0 0 / 0.35), 0 0 22
 @container (max-height: 300px) and (min-width: 560px) {
   .cv > .cv-fit { justify-self: stretch; }
 }
+/* the guest's name and the time line keep their 94% width, centred: inside
+   the measuring row their old 0 side margins left them hard against the left */
+.cv .cv-fit > .fit-cell { margin-inline: auto; }
