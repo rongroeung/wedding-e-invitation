@@ -747,3 +747,15 @@ No migration is needed; the theme is stored as text.
 - tsc and `next build` are clean.
 
 **Known nit:** on a wide desktop with the velvet theme, the side rail's info cards are pale on the dark backdrop.
+
+## The cover (page 2) scales as one on a phone
+
+Request: the cover's content should share one size and fit the phone, as page 3 does.
+
+- `CoverContent`: `.cv` is now itself a zoomed `FitGroup` (min 0.62). The guest's name and the time line are its `Fit` rows (no longer separate groups), and their need sets one scale for the crest, the title, the names logo, the greeting, the date grid, the venue, the button and the gaps.
+- **Root of a first-try failure:** the cover's width is in container units (`min(40rem, 90cqw)`), which a zoom shrinks along with the text, so the long name still didn't fit. `FitGroup` now also sets `--fit-zoom` (cleared when it measures), and `.cv.fit-group` divides its max-width by it: the column stays as wide as the cover and only its contents shrink.
+- **Checked** with a long guest name (since restored) and a stand-in photo (removed):
+  - the zoom is 0.80 at 352×860, 0.90 at 412×915, 0.93 at 320×640, and 1 at 1280 and on the two-column landscape cover;
+  - no row overflows, the name is centred, and the button stays inside the cover;
+  - no page errors;
+  - tsc and `next build` are clean.

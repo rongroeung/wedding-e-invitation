@@ -69,7 +69,12 @@ export function CoverContent({
   const date = new Date(wedding.weddingDate);
 
   return (
-    <div className="cv">
+    /*
+     * The whole cover at ONE scale on a narrow phone: the scale its one-line
+     * rows (the guest's name, the time line) need, applied to every line, the
+     * crest, the names and the gaps alike, as the invitation pages do.
+     */
+    <FitGroup zoom min={0.62} className="cv">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <Flourish role="crest" className="cv-crest" />
 
@@ -88,19 +93,19 @@ export function CoverContent({
           <span className="cv-up">{wedding.subtitle}</span>
         </p>
       )}
-      {/* the guest's name on one line, a little smaller on a narrow phone */}
-      <FitGroup className="cv-fit">
+      {/* the guest's name on one line: it sets the cover's scale */}
+      <div className="cv-fit">
         <Fit className={`cv-guest ${name.latin ? "cv-guest-latin" : ""}`}>{name.text}</Fit>
-      </FitGroup>
+      </div>
 
       {!Number.isNaN(date.getTime()) && <DateGrid date={date} />}
 
       {(wedding.weddingTimeKhmer || wedding.buddhistYear) && (
-        <FitGroup className="cv-fit">
+        <div className="cv-fit">
           <Fit className="cv-time">
           <span className="cv-up">{[wedding.weddingTimeKhmer, wedding.buddhistYear].filter(Boolean).join(" · ")}</span>
         </Fit>
-        </FitGroup>
+        </div>
       )}
       {wedding.venueName && (
         <p className="cv-venue khmer-wrap">
@@ -109,6 +114,6 @@ export function CoverContent({
       )}
 
       {action}
-    </div>
+    </FitGroup>
   );
 }

@@ -44,7 +44,10 @@ export function FitGroup({
       if (!cells.length) return;
       // measure on one line and at full size, whatever the last pass decided
       el.removeAttribute("data-fit-wrap");
-      if (zoom) el.style.removeProperty("zoom");
+      if (zoom) {
+        el.style.removeProperty("zoom");
+        el.style.removeProperty("--fit-zoom");
+      }
       const current = zoom ? 1 : parseFloat(el.style.getPropertyValue("--fit")) || 1;
       let scale = 1;
       for (const cell of cells) {
@@ -59,7 +62,12 @@ export function FitGroup({
       const fitted = scale >= 1 ? "1" : Math.max(min, scale * 0.995).toFixed(3);
       if (zoom) {
         // the whole block at one scale; the lines themselves stay at full size
-        if (Number(fitted) < 1) el.style.setProperty("zoom", fitted);
+        if (Number(fitted) < 1) {
+          el.style.setProperty("zoom", fitted);
+          // for a block whose width is set in container units, which a zoom
+          // would shrink along with the text (see .cv in globals.css)
+          el.style.setProperty("--fit-zoom", fitted);
+        }
         el.setAttribute("data-fit-zoom", fitted);
       } else {
         el.style.setProperty("--fit", fitted);
