@@ -1,4 +1,5 @@
 import type { Guest, Wedding } from "@/lib/db/schema";
+import { Fit, FitGroup } from "@/components/ui/FitLine";
 import { NameLogo } from "@/components/ui/NameLogo";
 import { Flourish } from "@/components/ui/Ornaments";
 import { KHMER_MONTHS, KHMER_WEEKDAYS, toKhmerNumber, zonedParts } from "@/lib/khmer";
@@ -87,14 +88,19 @@ export function CoverContent({
           <span className="cv-up">{wedding.subtitle}</span>
         </p>
       )}
-      <p className={`cv-guest ${name.latin ? "cv-guest-latin" : "khmer-wrap"}`}>{name.text}</p>
+      {/* the guest's name on one line, a little smaller on a narrow phone */}
+      <FitGroup className="cv-fit">
+        <Fit className={`cv-guest ${name.latin ? "cv-guest-latin" : ""}`}>{name.text}</Fit>
+      </FitGroup>
 
       {!Number.isNaN(date.getTime()) && <DateGrid date={date} />}
 
       {(wedding.weddingTimeKhmer || wedding.buddhistYear) && (
-        <p className="cv-time khmer-wrap">
+        <FitGroup className="cv-fit">
+          <Fit className="cv-time">
           <span className="cv-up">{[wedding.weddingTimeKhmer, wedding.buddhistYear].filter(Boolean).join(" · ")}</span>
-        </p>
+        </Fit>
+        </FitGroup>
       )}
       {wedding.venueName && (
         <p className="cv-venue khmer-wrap">

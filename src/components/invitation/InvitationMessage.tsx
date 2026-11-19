@@ -1,4 +1,5 @@
 import type { Wedding } from "@/lib/db/schema";
+import { Fit, FitGroup } from "@/components/ui/FitLine";
 
 /**
  * The face of the card: both families, the formal wording, the couple, and the
@@ -7,16 +8,23 @@ import type { Wedding } from "@/lib/db/schema";
 export function InvitationMessage({ wedding }: { wedding: Wedding }) {
   return (
     <section id="invitation" className="msg section-pad relative text-center">
+      {/*
+        * The whole letter is scaled as one to the phone's width — just enough
+        * for its one-line rows (the parents' names, the couple, the date) to
+        * fit — so every phrase keeps its size relative to the others.
+        */}
+      <FitGroup zoom min={0.62}>
       <h2 className="gold-text text-[1.35rem] leading-[1.9] khmer-wrap">
         {wedding.title}
       </h2>
 
       {/* Both sets of parents, side by side as on a printed card */}
-      <div className="mt-8 grid grid-cols-2 gap-x-5 gap-y-1 text-[0.95rem] title-face msg-ink khmer-wrap">
-        <p>{wedding.groomFatherName}</p>
-        <p>{wedding.brideFatherName}</p>
-        <p>{wedding.groomMotherName}</p>
-        <p>{wedding.brideMotherName}</p>
+      {/* each name on one line: on a narrow phone all four shrink together */}
+      <div className="mt-8 grid grid-cols-2 gap-x-3 gap-y-1 text-[0.95rem] title-face msg-ink sm:gap-x-5">
+        <Fit>{wedding.groomFatherName}</Fit>
+        <Fit>{wedding.brideFatherName}</Fit>
+        <Fit>{wedding.groomMotherName}</Fit>
+        <Fit>{wedding.brideMotherName}</Fit>
       </div>
 
       <p className="mt-9 text-sm title-face msg-ink khmer-wrap">{wedding.invitationLead}</p>
@@ -35,17 +43,13 @@ export function InvitationMessage({ wedding }: { wedding: Wedding }) {
       <div className="msg-couple mt-10">
         <div className="min-w-0">
           <p className="text-xs title-face msg-ink khmer-wrap">កូនប្រុសនាម</p>
-          <p className="mt-2 text-lg title-face msg-ink khmer-wrap">
-            {wedding.groomFullName}
-          </p>
+          <Fit className="mt-2 text-lg title-face msg-ink">{wedding.groomFullName}</Fit>
         </div>
         {/* between the two names, the words that join them */}
         <p className="msg-join self-center text-lg title-face msg-ink khmer-wrap">ជាគូនឹង</p>
         <div className="min-w-0">
           <p className="text-xs title-face msg-ink khmer-wrap">កូនស្រីនាម</p>
-          <p className="mt-2 text-lg title-face msg-ink khmer-wrap">
-            {wedding.brideFullName}
-          </p>
+          <Fit className="mt-2 text-lg title-face msg-ink">{wedding.brideFullName}</Fit>
         </div>
       </div>
 
@@ -59,15 +63,16 @@ export function InvitationMessage({ wedding }: { wedding: Wedding }) {
           {wedding.invitationLunarDate.trim()}
         </p>
       )}
-      <p className="mt-3 text-lg title-face msg-ink khmer-wrap">
-        {wedding.invitationDateLine.trim() || wedding.weddingDateKhmer}
-      </p>
+      <div className="mt-3 text-lg title-face msg-ink">
+        <Fit>{wedding.invitationDateLine.trim() || wedding.weddingDateKhmer}</Fit>
+      </div>
       <p className="msg-venue mx-auto mt-3 text-[0.9rem] leading-loose msg-ink khmer-wrap">
         {wedding.invitationPlace.trim() ||
           `${wedding.venueName}${wedding.venueAddress ? ` ${wedding.venueAddress}` : ""}`}
       </p>
 
 
+      </FitGroup>
     </section>
   );
 }

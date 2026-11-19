@@ -576,3 +576,63 @@ Request: in Theme 2, lower the background's contrast rather than fading it, so t
   - a soft dark shadow under body text and titles.
 - Theme 3 is unchanged: light paper with dark sage ink and a paper-coloured halo.
 - Checked with a stand-in photo (since removed): `data-paper-dark` was set and the letter ink was rgb(242 222 176). Screenshots at 390×844 (cover, letter, programme, RSVP) and 1344×944. tsc and `next build` are clean.
+
+## Centred name plate, one-line names and dates, the map shown, pictures preloaded
+
+Requests:
+- The guest name and its frame aren't centred.
+- On some phones the guest name and date on the cover, and the parents' names and date on the letter, break onto a new line.
+- The embedded map doesn't show.
+- All images should load up front.
+
+Changes:
+- **Plate centring (Theme 2 opening):**
+  - Cause: `.knf-scene` is 94cqw wide inside a 90cqw column, and auto side margins collapse to 0 on a box wider than its parent, so the plate hung 2cqw off to the right.
+  - Fix: `margin-inline: -2cqw`. Measured 17 px each side at 570 wide, 12 px at 412 and 10 px at 360.
+- **One-line text:** new `components/ui/FitLine.tsx`.
+  - `FitGroup` measures its `Fit` lines with a ResizeObserver, re-measuring once fonts load, and gives them one shared scale: the one the widest line needs, never above 1 and never below 0.6. Below that it lets them wrap.
+  - It is used for:
+    - the cover's guest name;
+    - the cover's time · BE year line;
+    - the letter's four parents' names, as one group so all four stay the same size;
+    - the letter's emphasised date line.
+  - The parents grid's column gap is 0.75rem on phones (1.25rem from `sm`).
+  - Measured with a long guest name ("លោក អ៊ាន សុខដាណា និង គូដណ្ដឹង") and long mothers' names, every line stayed on one line:
+    - 412 px: guest ×0.97, parents ×0.84, date ×0.88;
+    - 360 px: parents ×0.71;
+    - 320 px: parents ×0.62.
+- **Map:** `Venue.tsx` loads the iframe by itself when the section is within 800 px of the screen (IntersectionObserver), instead of waiting for a tap. The link is made frameable by `embeddableMapUrl()`:
+  - a pasted `<iframe>` snippet is reduced to its src;
+  - Google embed links are kept as they are;
+  - place links, short `maps.app.goo.gl` links and plain links become `maps.google.com/maps?q=…&output=embed`, using the link's coordinates when it has them and otherwise the venue's name and address;
+  - with no embed link at all, the Google Maps link is used.
+- **Preloading:** new `ImagePreload.tsx`. It calls React's `preload()` during render, so every picture becomes a `<link rel="preload" as="image">` in `<head>`:
+  - at high priority: the opening photo or garden still, the card and page backdrops, the frame art, the name plate and its mask, and the name-logo image;
+  - at low priority: the couple's portraits, every gallery photo, the gift QR and the map picture.
+- **Checked:** in Chromium, with a stand-in photo and the long names, all since restored:
+  - the plate measurements above;
+  - the fit scales above, with nothing overflowing;
+  - the preload links present in `<head>`;
+  - no iframe before scrolling, and the iframe with the converted src after scrolling to the venue;
+  - `embeddableMapUrl` run with tsx against five kinds of link.
+  - tsc and `next build` are clean.
+
+## The whole letter scales as one on a phone
+
+Request: not only the parents' names and the date but all of the letter should fit the phone, so the parents' names aren't smaller than the other phrases.
+
+- `FitGroup` gains a `zoom` mode. It measures its `Fit` lines at full size, works out the one scale the widest needs (between `min` and 1), and applies it to the whole block with CSS `zoom`. Every line, gap and margin then shrinks by the same factor and the proportions are kept. The lines inside aren't scaled again.
+- `InvitationMessage` wraps all its content in `<FitGroup zoom min={0.62}>`. The rows that must stay on one line are `Fit` cells:
+  - the four parents' names;
+  - the couple's two names;
+  - the emphasised date line.
+  
+  Everything else (the lead, the body, the lunar date, the place) scales with them and wraps normally.
+- A fit of exactly 1 is now 1, not 0.995.
+- `ImagePreload` skips the name plate and its mask when the opening page won't show (`?envelope=open`), which removes the browser's "preloaded but not used" warnings.
+- Checked with long mothers' names (since restored):
+  - zoom is 0.86 at 412 px, 0.733 at 360 px, 0.635 at 320 px and 1 at 1280 px;
+  - no `Fit` line overflows, and nothing wraps;
+  - screenshots look proportional;
+  - no console errors or warnings;
+  - tsc and `next build` are clean.

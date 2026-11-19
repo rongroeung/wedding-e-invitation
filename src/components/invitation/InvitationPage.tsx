@@ -14,6 +14,7 @@ import { Couple } from "./Couple";
 import { Cover } from "./Cover";
 import { DateSection } from "./DateSection";
 import { DressColors } from "./DressColors";
+import { ImagePreload } from "./ImagePreload";
 import { SceneOpening } from "./envelope/SceneOpening";
 import { themeKeyOf } from "@/lib/invitationTheme";
 import { InvitationOpening } from "./envelope/InvitationOpening";
@@ -444,6 +445,8 @@ export function InvitationPage({
    */
   return (
     <>
+      {/* every picture asked for up front (written into <head> as preload links) */}
+      <ImagePreload data={data} opening={envelopeShown} />
       {/*
         * The stage is the page, not a backdrop behind a scene that ends.
         *

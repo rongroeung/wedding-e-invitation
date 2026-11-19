@@ -5184,7 +5184,10 @@ html[data-paper-dark] .cv-guest { text-shadow: 0 1px 0 rgb(0 0 0 / 0.35), 0 0 22
   color: #f4e3b8;
   text-shadow: 0 2px 8px rgb(0 0 0 / 0.6);
 }
-.knf.knf-scene { width: 94cqw; margin: 0.4cqh auto 1.6cqh; }
+/* wider than the words' column (90cqw) by 2cqw each side, and centred on the
+   picture: auto margins would collapse to 0 on an overflowing box and push
+   the plate off to the right */
+.knf.knf-scene { width: 94cqw; margin: 0.4cqh -2cqw 1.6cqh; }
 .scene .scene-open { margin-top: 0.5cqh; }
 .scene .btn-seal { min-width: min(220px, 60cqw); }
 .scene .env-hint { display: block; color: rgb(251 239 242 / 0.8); }
@@ -5234,3 +5237,14 @@ html[data-paper-dark] .cv-guest { text-shadow: 0 1px 0 rgb(0 0 0 / 0.35), 0 0 22
   background: rgb(255 253 247 / 0.78);
 }
 .scene-garden ~ .env-skip, .env-veil:has(.scene-garden) .env-skip { color: rgb(77 90 58 / 0.75); }
+
+/* ── One-line text that shrinks a little on a narrow phone (FitLine.tsx) ── */
+.fit-cell { white-space: nowrap; min-width: 0; }
+.fit-inner { display: inline-block; white-space: nowrap; font-size: calc(1em * var(--fit, 1)); }
+.fit-group[data-fit-wrap] .fit-cell,
+.fit-group[data-fit-wrap] .fit-inner { white-space: normal; }
+/* the cover's one-line rows span the cover's width, so they can be measured */
+.cv > .cv-fit { width: 100%; text-align: center; }
+@container (max-height: 300px) and (min-width: 560px) {
+  .cv > .cv-fit { justify-self: stretch; }
+}

@@ -1,15 +1,61 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Wedding } from "@/lib/db/schema";
 import { mediaSrc } from "@/lib/media";
 import { MapViewer } from "./MapViewer";
 import { Flourish, FlourishDivider } from "@/components/ui/Ornaments";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 
-/** ទីតាំងប្រារព្ធពិធី — venue details with a lazily-mounted Google Map. */
+/**
+ * The map link as Google will actually draw inside a frame.
+ *
+ * What gets pasted into the admin field varies: the embed link Google gives
+ * (fine as it is), the whole `<iframe …>` snippet, a place link
+ * (`google.com/maps/place/…`, which Google refuses to show in a frame) or a
+ * short `maps.app.goo.gl` link (which can't be framed either). The snippet is
+ * reduced to its `src`; anything else that isn't an embed link is turned into
+ * one by searching for the place — its coordinates when the link carries
+ * them, otherwise the venue's name and address — which needs no API key.
+ */
+export function embeddableMapUrl(raw: string, venue: string): string {
+  let url = raw.trim();
+  const snippet = url.match(/src=["']([^"']+)["']/i);
+  if (snippet) url = snippet[1].replace(/&amp;/g, "&");
+  if (/\/maps\/embed|[?&]output=embed/.test(url)) return url;
+  const at = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/) ?? url.match(/[?&](?:q|ll|query)=(-?\d+\.\d+),(-?\d+\.\d+)/);
+  const query = at ? `${at[1]},${at[2]}` : venue.trim();
+  if (!query) return "";
+  return `https://maps.google.com/maps?q=${encodeURIComponent(query)}&z=16&output=embed`;
+}
+
+/** ទីតាំងប្រារព្ធពិធី — venue details with the Google Map, loaded as it nears the screen. */
 export function Venue({ wedding }: { wedding: Wedding }) {
   const [mapLoaded, setMapLoaded] = useState(false);
+  const mapBox = useRef<HTMLDivElement>(null);
+  // the embed link, or failing that the Google Maps link, made frameable
+  const mapSource = wedding.mapEmbedUrl.trim() || wedding.mapUrl.trim();
+  const embedUrl = mapSource ? embeddableMapUrl(mapSource, `${wedding.venueName} ${wedding.venueAddress}`) : "";
+  /* the map frame is fetched when the section comes near, not on a tap */
+  useEffect(() => {
+    const el = mapBox.current;
+    if (!el || mapLoaded) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setMapLoaded(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setMapLoaded(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: "800px 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [mapLoaded, embedUrl]);
   const mapPicture = mediaSrc(wedding.venueMapMediaId, "");
   const [mapOpen, setMapOpen] = useState(false);
   const closeMap = useCallback(() => setMapOpen(false), []);
@@ -67,11 +113,11 @@ export function Venue({ wedding }: { wedding: Wedding }) {
             <MapViewer src={mapPicture} alt="ផែនទីទៅកាន់ទីតាំងប្រារព្ធពិធី" onClose={closeMap} />
           )}
 
-          {wedding.mapEmbedUrl && (
-            <div className="relative aspect-[4/3] w-full border-t border-gold/40 sm:aspect-[16/9]">
+          {embedUrl && (
+            <div ref={mapBox} className="relative aspect-[4/3] w-full border-t border-gold/40 sm:aspect-[16/9]">
               {mapLoaded ? (
                 <iframe
-                  src={wedding.mapEmbedUrl}
+                  src={embedUrl}
                   title="ផែនទីទីតាំងប្រារព្ធពិធី"
                   className="h-full w-full"
                   loading="lazy"
@@ -86,9 +132,7 @@ export function Venue({ wedding }: { wedding: Wedding }) {
                 >
                   <span className="text-3xl" aria-hidden="true">📍</span>
                   <span className="text-sm text-heading khmer-wrap">មើលទីតាំងនៅលើផែនទី</span>
-                  <span className="text-[0.65rem] text-ink/72">
-                    ចុចដើម្បីផ្ទុកផែនទី (សន្សំទិន្នន័យអ៊ីនធឺណិត)
-                  </span>
+                  <span className="text-[0.65rem] text-ink/72">កំពុងផ្ទុកផែនទី…</span>
                 </button>
               )}
             </div>
