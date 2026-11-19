@@ -3565,7 +3565,7 @@
 }
 .cv-lead {
   margin: 0;
-  font-size: clamp(0.74rem, 2.4cqh, 1.08rem);
+  font-size: clamp(0.66rem, min(3.6cqw, 2.4cqh), 1.08rem);
   line-height: 1.9;
   color: rgb(var(--gold-1-rgb));
 }
@@ -3595,7 +3595,7 @@
 }
 .cv-date-cell + .cv-date-cell { border-left: 1px solid rgb(var(--gold-frame-rgb) / 0.45); }
 .cv-date-label {
-  font-size: clamp(0.6rem, 1.8cqh, 0.86rem);
+  font-size: clamp(0.56rem, min(3cqw, 1.8cqh), 0.86rem);
   line-height: 1.8;
   color: rgb(var(--gold-1-rgb));
 }
@@ -3609,7 +3609,9 @@
 .cv-time,
 .cv-venue {
   margin: 0;
-  font-size: clamp(0.7rem, 2.3cqh, 1.05rem);
+  /* bound by the width as well as the height: on a tall, narrow phone the
+     height alone made these lines larger than the guest's name above them */
+  font-size: clamp(0.6rem, min(3.3cqw, 2.3cqh), 1.05rem);
   line-height: 1.9;
   color: rgb(var(--c-text-rgb) / 0.85);
 }

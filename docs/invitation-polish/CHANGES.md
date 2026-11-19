@@ -759,3 +759,26 @@ Request: the cover's content should share one size and fit the phone, as page 3 
   - no row overflows, the name is centred, and the button stays inside the cover;
   - no page errors;
   - tsc and `next build` are clean.
+
+## Cover: the time and venue no longer outsize the guest's name on a small phone
+
+Request: on small phones, the date (time) and venue lines on the cover are too big compared to the other phrases.
+
+- **Cause:** `.cv-time`, `.cv-venue`, `.cv-lead` (សូមគោរពអញ្ជើញ) and the date labels were sized by the cover's *height* only (`cqh`), while the guest's name is bound by its width. On a tall, narrow phone the height made them as large as, or larger than, the guest's name. The ×1.3 and ×1.4 enlargements asked for earlier made it worse.
+- **Fix:** each is now bound by width as well, so it sizes to whichever is smaller:
+  - time and venue: `clamp(0.6rem, min(3.3cqw, 2.3cqh), 1.05rem)`;
+  - greeting: `clamp(0.66rem, min(3.6cqw, 2.4cqh), 1.08rem)`;
+  - date labels: `clamp(0.56rem, min(3cqw, 1.8cqh), 0.86rem)`.
+  
+  The desktop and large-card sizes are unchanged.
+- **Measured** (greeting / guest / date label / time and venue, in px):
+
+  | Viewport | Greeting | Guest | Date label | Time, venue |
+  |---|---|---|---|---|
+  | 375×860 | 15.1 (was 19.6) | 16.1 | 13.5 | 13.8 (was 14.6) |
+  | 360×740 | 14.5 | 15.5 | 13 | 13.3 |
+  | 320×640 | 13.7 | 14.4 | 12.5 | 12.5 |
+  | 1280×900 | 20.6 | 25 | 17 | 19.8 |
+
+  The 1280×900 figures are unchanged.
+- tsc and `next build` are clean.
