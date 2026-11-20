@@ -32,6 +32,7 @@ export const PAPER_TONES: PaperTone[] = [
   { key: "navy", km: "ខៀវរាត្រី", en: "Midnight Navy", base: "#1e2a3f", dark: true },
   { key: "emerald", km: "បៃតងត្បូងមរកត", en: "Emerald", base: "#1d3b32", dark: true },
   { key: "charcoal", km: "ប្រផេះធ្យូង", en: "Charcoal", base: "#2b2927", dark: true },
+  { key: "chocolate", km: "ត្នោតសូកូឡា", en: "Chocolate", base: "#2f1b10", dark: true },
 ];
 
 /** "design" keeps each design's own paper. */

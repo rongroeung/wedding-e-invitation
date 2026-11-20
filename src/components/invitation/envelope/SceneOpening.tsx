@@ -165,15 +165,16 @@ export function SceneOpening({
       jump();
       return;
     }
-    /* the words lift away and the picture leans in, then the scene dissolves */
+    /* the words lift away and the picture leans in then the scene dissolves */
     setStep("leaving");
+    const hold = 900;
     timers.current.push(
       window.setTimeout(() => {
         finish();
         setStep("gone");
-      }, 900),
+      }, hold),
     );
-    timers.current.push(window.setTimeout(clear, 900 + 1000));
+    timers.current.push(window.setTimeout(clear, hold + 1000));
   }, [clear, envelope.animate, finish, jump, remember]);
 
   if (step === "done") return null;
@@ -191,7 +192,9 @@ export function SceneOpening({
         }`}
       >
         {/* the soft surround on a wide screen */}
-        <span className="scene-surround" style={{ backgroundImage: `url("${backdrop}")` }} aria-hidden="true" />
+        {backdrop && (
+          <span className="scene-surround" style={{ backgroundImage: `url("${backdrop}")` }} aria-hidden="true" />
+        )}
 
         <div className="scene-frame">
           {film ? (

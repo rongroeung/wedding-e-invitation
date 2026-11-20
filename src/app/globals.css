@@ -5206,8 +5206,8 @@ html[data-paper-dark] .cv-guest { text-shadow: 0 1px 0 rgb(0 0 0 / 0.35), 0 0 22
   --sf-line: 184 151 92;
   --sf-top: 17cqh;
 }
-.scene-palace { --sf-ink: #2e3b63; --sf-glow: 250 251 255; --sf-names: #6f5a9a; --sf-line: 140 150 190; --sf-top: 8cqh; --sf-light-y: 26%; }
-.scene-golden { --sf-ink: #6a4a1c; --sf-glow: 255 251 240; --sf-names: #a8803e; --sf-line: 196 160 92; --sf-top: 14cqh; --sf-light-y: 36%; }
+.scene-palace { --sf-ink: #2e3b63; --sf-glow: 250 251 255; --sf-names: #6f5a9a; --sf-line: 140 150 190; --sf-top: 14cqh; --sf-light-y: 32%; }
+.scene-golden { --sf-ink: #6a4a1c; --sf-glow: 255 251 240; --sf-names: #a8803e; --sf-line: 196 160 92; --sf-top: 20cqh; --sf-light-y: 44%; }
 .scene-velvet {
   --sf-ink: #f4e3b8; --sf-glow: 30 4 10; --sf-names: #e2c48c; --sf-line: 214 182 120;
   --sf-top: 27cqh; --sf-light-y: 46%; --sf-light: 0.55;
@@ -5220,9 +5220,10 @@ html[data-paper-dark] .cv-guest { text-shadow: 0 1px 0 rgb(0 0 0 / 0.35), 0 0 22
   font-size: clamp(1.15rem, 6.6cqw, 2.3rem);
   text-shadow: 0 0 14px rgb(var(--sf-glow) / 0.95), 0 0 4px rgb(var(--sf-glow) / 0.9);
 }
+.scene-film .scene-title { margin-bottom: 1.4cqh; }
 .scene-film .scene-names {
   width: min(72cqw, 34cqh);
-  margin: 0.4cqh 0 1cqh;
+  margin: 0 0 2.4cqh;
   color: var(--sf-names);
   filter: drop-shadow(0 0 8px rgb(var(--sf-glow) / 0.95));
 }
@@ -5278,3 +5279,21 @@ html[data-paper-dark] .cv-guest { text-shadow: 0 1px 0 rgb(0 0 0 / 0.35), 0 0 22
    text, so the width is divided back out: the column stays as wide as the
    cover and only what is inside it gets smaller. */
 .cv.fit-group { max-width: calc(min(40rem, 90cqw) / var(--fit-zoom, 1)); }
+
+/* the film themes' words, given more air: title, names, greeting, guest */
+.scene-film .scene-guest { margin-top: 2cqh; }
+.scene-film .scene-shade { --sf-light: 0.78; }
+
+
+/* Theme 7 · ទ្វារក្លោងមាស: the words inside the golden arch, in deep wine
+   and gold, the guest's name on a ribbon that fits the arch's width */
+.scene-royal {
+  --sf-ink: #6e1f2b; --sf-glow: 253 248 238; --sf-names: #a9813f; --sf-line: 194 154 78;
+  --sf-top: 24cqh; --sf-light-y: 48%; --sf-light: 0.6;
+}
+.scene-royal .scene-words { padding-inline: 13cqw; }
+.scene-royal .scene-title { font-size: clamp(0.95rem, 5.4cqw, 1.9rem); white-space: nowrap; }
+.scene-royal .scene-names { width: min(60cqw, 30cqh); }
+.scene-royal .scene-guest { max-width: 70cqw; }
+.scene-royal .scene-guest > span { padding-inline: 1em; }
+.scene-royal .scene-open { width: 100vw; max-width: 100cqw; display: flex; flex-direction: column; align-items: center; }

@@ -24,6 +24,7 @@ export const INVITATION_THEMES = {
   palace: { km: "ស្បែកទី ៤ · វិមានសួនច្បារ", hint: "ទ្វារវិមាន និងសួនច្បារពណ៌ខៀវស្រាល · ពណ៌ខៀវ និងស្វាយ" },
   golden: { km: "ស្បែកទី ៥ · វិមានមាស", hint: "ប្រាសាទមាស និងជណ្ដើរផ្កា · ពណ៌ក្រែម និងមាស" },
   velvet: { km: "ស្បែកទី ៦ · វាំងននក្រហម", hint: "វាំងននវល្លិ៍ក្រហមបើក ចង្កៀងគ្រីស្តាល់ · ពណ៌ក្រហមចាស់ និងមាស" },
+  royal: { km: "ស្បែកទី ៧ · ទ្វារក្លោងមាស", hint: "ស្រោមសំបុត្រមាស ត្រាភ្លឺ រួចទ្វារក្លោងមាស · ពណ៌ក្រែម មាស និងក្រហមចាស់" },
 } as const;
 
 export type InvitationThemeKey = keyof typeof INVITATION_THEMES;
@@ -93,6 +94,15 @@ export const SCENES: Partial<Record<InvitationThemeKey, SceneSpec>> = {
     pattern: "floral",
     pageBg: "src:/themes/golden/golden-still.webp",
   }),
+  // the gilded envelope and the golden arch: cream, gold and a deep wine ink
+  royal: scene("royal", {
+    dark: false,
+    wash: 38,
+    ink: "#6e1f2b",
+    colors: { primary: "#7A2330", secondary: "#C29A4E", accent: "#F1E4CC", background: "#FBF5EA", text: "#5A3A2A" },
+    pattern: "floral",
+    pageBg: "src:/themes/royal/royal-still.webp",
+  }),
   // garnet velvet, candle gold
   velvet: scene("velvet", {
     dark: true,
@@ -121,6 +131,7 @@ export const GARDEN_MEDIA = {
 export function themeIsDark(theme: InvitationThemeKey): boolean {
   return theme === "photo" || Boolean(SCENES[theme]?.dark);
 }
+
 
 /* How much of the paper's colour is washed over the picture under the writing. */
 const PHOTO_WASH = 58;

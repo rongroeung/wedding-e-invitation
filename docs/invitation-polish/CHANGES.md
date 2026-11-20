@@ -782,3 +782,89 @@ Request: on small phones, the date (time) and venue lines on the cover are too b
 
   The 1280×900 figures are unchanged.
 - tsc and `next build` are clean.
+
+## Film themes (3–6): a living background, more space between the words, palace and golden words lower
+
+Requests:
+- The background of Themes 3–6 should always be alive.
+- The title, name logo, សូមគោរពអញ្ជើញ and guest name need more space between them.
+- On Themes 4 and 5, those words should sit a little lower.
+
+**A living background.** The films can't loop: each is cut before the template's own lettering, and its last seconds are fast camera moves. So once the film stops and the words appear:
+- **Breathing:** the held frame slowly pushes in and drifts, back and forth (`sceneBreathe`, 22 s). It uses the `scale`/`translate` properties so it adds to the lean-in on open.
+- **`SceneAmbience.tsx`:** CSS-only particles over the frame, placed from a fixed golden-ratio sequence so the server and the client draw the same thing:
+  - garden: pink, lavender and white petals falling and tumbling, plus floating light motes;
+  - palace: lavender and white petals, plus motes;
+  - golden: twinkling four-point sparkles, plus motes, with flickering glows at the three chandeliers;
+  - velvet: rising candle embers and falling red rose petals, with flickering glows at the chandelier and both candelabra.
+- It fades in over 2.4 s, and with reduced motion it is off entirely.
+
+**Spacing:**
+- title gets margin-bottom 1.4cqh;
+- names logo gets 0 above and 2.4cqh below (was 0.4 / 1);
+- guest ribbon gets margin-top 2cqh.
+
+Measured gaps at 390×844 are 11, 20 and 16 px.
+
+**Placement:** the words start lower, with the light behind them moving down to match.
+- palace: `--sf-top` 8cqh → 14cqh;
+- golden: 14cqh → 20cqh.
+
+**Checked** in Chromium at 390×844, 375×667 and 1440×900 for all four themes:
+- two screenshots 3 s apart differ (the scene is moving);
+- `sceneBreathe` is running and the particles are present;
+- the guest ribbon always ends above the button (at 375×667 the lowest is 464 px against a button at 547 px);
+- no page errors;
+- tsc and `next build` are clean.
+
+## Film themes still again; Theme 7 · សាលមាស (royal hall)
+
+Requests:
+- Themes 3–6 should no longer have an always-alive background.
+- Add a Theme 7, given as a screen recording of another vendor's (SAMBOT) live invitation for a different couple, plus its link.
+
+**Still again:** `SceneAmbience.tsx` is deleted, and its CSS (`sceneBreathe`, particles, flicker glows) is removed. The film plays and holds on its last frame as before. The extra spacing between the words and the lower placement on Themes 4 and 5 are kept.
+
+**Theme 7 is an original build, not a copy.** The recording is another vendor's product, made for another couple, with their names baked in. Under the standing rule against copying third-party artwork, none of its footage or images is used. Theme 7 is drawn here in CSS and SVG, in the same general mood: a royal reception hall in chocolate, champagne and gold, whose doors open on a burst of light.
+- **`envelope/RoyalStage.tsx`:**
+  - a chocolate wall with a faint, original gold damask (inline SVG);
+  - a champagne silk swag and side drapes with gold tassels;
+  - tall panelled dark doors under a gold arch;
+  - the couple's monogram crest (`MonogramCrest`) above;
+  - a gold balustrade and two softly flickering candle lights.
+  
+  On open, the leaves swing in (3D `rotateY`) onto a gold light that floods the hall, then the scene dissolves (1.6 s hold).
+- **`SceneOpening`:** the `royal` variant shows the stage instead of a picture or film, with the words in light gold on the doors and the guest's name on the gilt plate.
+- **`invitationTheme.ts`:**
+  - `royal` is in the theme list, with a `ROYAL` spec;
+  - `themeIsDark` includes royal;
+  - `applyInvitationTheme` sets the royal-ornament paper in a new **chocolate** tone (#2f1b10, added to `paperTones.ts`), a gold palette and no curtain.
+- **`ThemeStyle`:** uses the royal shade and ink.
+- **Admin:** a thumbnail (`public/themes/royal/royal-thumb.webp`).
+- **Checked** in Chromium at 390×844 and 1440×900:
+  - the stage, the doors mid-open with the light, the cover and, on a phone, the letter and programme;
+  - the tone is chocolate and `data-paper-dark` is set;
+  - no page errors;
+  - tsc and `next build` are clean.
+
+## Theme 7 replaced: ទ្វារក្លោងមាស, from the couple's video
+
+Request: replace Theme 7 with the newly supplied video.
+
+The video is 30.7 s, 720×1280. It shows a gilded envelope with a glowing wax seal opening, then a scroll ("Wedding Invitation" with Arabic calligraphy), a golden arch with another couple's names, a round schedule frame and "Awaiting Eyes", all with text baked in. Only parts without text are used.
+
+- **Film (`public/themes/royal/royal-intro.mp4`, 3.6 s):** the envelope from 0 to 2.5 s (its seal lights up and the flap begins to lift), cross-faded at 1.6 s into the golden arch. The scroll, with its "Wedding Invitation" and calligraphy, is never shown.
+- **Still (`royal-still.webp`):** the arch frame at 12 s, with all of its baked-in lettering (the names and parents' lines) and the vendor's small logo at the foot removed by inpainting (OpenCV Telea; mask = red ink + dark strokes inside the arch, plus the logo box). Checked by eye: the arch interior is clean cream, and the carved gold and roses are intact.
+- **Theme spec:** `royal` is now a normal film scene in `SCENES`, light, wash 38:
+  - wine ink #6e1f2b;
+  - colours: cream #FBF5EA, gold #C29A4E, wine #7A2330;
+  - floral pattern;
+  - the still behind the card on wide screens.
+- **Removed:** the drawn `RoyalStage.tsx`, the chocolate-only code paths for royal (`ROYAL`, the royal branches in `applyInvitationTheme` and `ThemeStyle`) and the royal-hall CSS. The "chocolate" paper tone stays available.
+- **Opening words:** inside the arch (padding 13cqw, starting 24cqh down), title on one line, in wine and gold; the guest's name is on the pale ribbon.
+- **Checked** in Chromium at 390×844, 375×667 and 1440×900:
+  - the film plays and the words appear;
+  - the cover, letter and programme;
+  - the guest's ribbon stays above the button (422 px against 547 px at 375×667);
+  - no page errors;
+  - tsc and `next build` are clean.
