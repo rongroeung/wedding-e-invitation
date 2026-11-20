@@ -868,3 +868,13 @@ The video is 30.7 s, 720×1280. It shows a gilded envelope with a glowing wax se
   - the guest's ribbon stays above the button (422 px against 547 px at 375×667);
   - no page errors;
   - tsc and `next build` are clean.
+
+## Theme 7 without the hands; guest name on one line; Theme 8 · ទ្វាររបងផ្កាកុលាប
+
+- **Theme 7 hands removed:** the arch still's lower middle (below 60% height, 8–92% width) is rebuilt: the arch interior's cream continues down and blends into a warm marble floor tone with fine noise. Gold and roses are kept by an HSV mask (S≥120 or V<150). The still and the intro film are regenerated.
+- **Guest name never wraps (film themes 3–8):** the ribbon is now a `FitGroup` (min 0.5) with the ribbon styling on `.fit-inner`, so a long name is set smaller instead of breaking. Measured with "លោក អ៊ាន សុខដាណា និង គូដណ្ដឹង": one line at 390, 375 and 1440 wide.
+- **Theme 8 (`rosegate`), from the user's video:** a wrought-iron gate opens onto a garden with a gazebo, waterfalls and hanging roses.
+  - **Film:** 0–5.45 s (before "The Wedding of / Chempaka & Umar" appears), cross-faded into the full rose-framed scene from 10 s with that lettering inpainted away.
+  - **Colours:** olive ink, blush names, cream sheet.
+  - **Words:** start 25cqh down, inside the clear sky.
+- **Checked** in Chromium at 390×844, 375×667 and 1440×900 for Themes 7 and 8, including the cover, letter and programme. No page errors; tsc and build are clean.

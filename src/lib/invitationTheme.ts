@@ -25,6 +25,7 @@ export const INVITATION_THEMES = {
   golden: { km: "ស្បែកទី ៥ · វិមានមាស", hint: "ប្រាសាទមាស និងជណ្ដើរផ្កា · ពណ៌ក្រែម និងមាស" },
   velvet: { km: "ស្បែកទី ៦ · វាំងននក្រហម", hint: "វាំងននវល្លិ៍ក្រហមបើក ចង្កៀងគ្រីស្តាល់ · ពណ៌ក្រហមចាស់ និងមាស" },
   royal: { km: "ស្បែកទី ៧ · ទ្វារក្លោងមាស", hint: "ស្រោមសំបុត្រមាស ត្រាភ្លឺ រួចទ្វារក្លោងមាស · ពណ៌ក្រែម មាស និងក្រហមចាស់" },
+  rosegate: { km: "ស្បែកទី ៨ · ទ្វាររបងផ្កាកុលាប", hint: "ទ្វាររបងដែកបើកចូលសួនច្បារ ផ្កាកុលាបព្យួរ · ពណ៌ស៊ីជម្ពូស្រាល បៃតងអូលីវ និងក្រែម" },
 } as const;
 
 export type InvitationThemeKey = keyof typeof INVITATION_THEMES;
@@ -102,6 +103,15 @@ export const SCENES: Partial<Record<InvitationThemeKey, SceneSpec>> = {
     colors: { primary: "#7A2330", secondary: "#C29A4E", accent: "#F1E4CC", background: "#FBF5EA", text: "#5A3A2A" },
     pattern: "floral",
     pageBg: "src:/themes/royal/royal-still.webp",
+  }),
+  // the rose gate: blush, olive and a warm cream sheet
+  rosegate: scene("rosegate", {
+    dark: false,
+    wash: 40,
+    ink: "#4a5530",
+    colors: { primary: "#5C6A3C", secondary: "#C48A8E", accent: "#F4E2DE", background: "#FCF8F3", text: "#4E4A3A" },
+    pattern: "floral",
+    pageBg: "src:/themes/rosegate/rosegate-still.webp",
   }),
   // garnet velvet, candle gold
   velvet: scene("velvet", {

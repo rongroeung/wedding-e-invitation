@@ -7,6 +7,7 @@ import { sceneOf, type InvitationThemeKey } from "@/lib/invitationTheme";
 import { NameLogo } from "@/components/ui/NameLogo";
 import { coverName } from "../CoverContent";
 import { envelopeSeenKey } from "./InvitationOpening";
+import { Fit, FitGroup } from "@/components/ui/FitLine";
 import { KbachNameFrame } from "./KbachNameFrame";
 import { OpenButton } from "./OpenButton";
 import { OpenEnvelopeLink } from "./OpenEnvelopeLink";
@@ -235,9 +236,11 @@ export function SceneOpening({
             <div className="scene-foot">
               {wedding.subtitle && <p className="scene-lead khmer-wrap">{wedding.subtitle}</p>}
               {garden ? (
-                <p className={`scene-guest khmer-wrap ${name.latin ? "scene-guest-latin" : ""}`}>
-                  <span>{name.text}</span>
-                </p>
+                /* the guest's name on its ribbon, always on one line: a long
+                   name is set smaller rather than broken (FitGroup) */
+                <FitGroup as="div" min={0.5} className={`scene-guest ${name.latin ? "scene-guest-latin" : ""}`}>
+                  <Fit as="p" className="scene-guest-cell">{name.text}</Fit>
+                </FitGroup>
               ) : (
                 <KbachNameFrame className="knf-scene">
                   <p className={`env-address-name khmer-wrap ${name.latin ? "env-address-latin" : ""}`}>
