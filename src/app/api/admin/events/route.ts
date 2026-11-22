@@ -8,13 +8,13 @@ import { weddingEvents } from "@/lib/db/schema";
 export const dynamic = "force-dynamic";
 
 const schema = z.object({
-  groupName: z.string().max(80).default("ពេលព្រឹក"),
-  groupIcon: z.string().max(8).default("🌸"),
+  groupName: z.string().max(160).default("ពេលព្រឹក"),
+  groupIcon: z.string().max(16).default("🌸"),
   timeLabel: z.string().max(80).default(""),
   title: z.string().trim().min(1).max(200),
   description: z.string().max(500).default(""),
   location: z.string().max(200).default(""),
-  icon: z.string().max(8).default(""),
+  icon: z.string().max(40).default(""),
   sortOrder: z.number().int().min(0).max(999).default(0),
 });
 

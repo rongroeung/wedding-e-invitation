@@ -959,3 +959,9 @@ Request: replace the closing thanks/wish (and the admin card "ពរជ័យប
 - **Gallery title:** អនុស្សាវរីយ៍របស់យើង → រូបភាពអនុស្សាវរីយ៍ (invitation and admin).
 - **`Venue.tsx`:** the small rosette above the venue name is removed.
 - Build is clean.
+
+## Fix: "Invalid data" when saving a programme item
+
+- **Cause:** the events API limited `icon` to 8 characters, which fits an emoji. The agenda icons are stored as names (`pi:offering-bowl`, 16 characters), so saving any item with one, new or edited, was rejected with 422.
+- **Fix:** `icon` max 40, `groupIcon` max 16 and `groupName` max 160 (for the long day headings), in both `api/admin/events` and `api/admin/events/[id]`.
+- **Checked** against the production build with an admin session: PUT with `pi:offering-bowl` returned 200, and POST with `pi:couple-feast` and a day-2 group name returned 201. The test item was deleted and the edited icon restored.
