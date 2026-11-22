@@ -36,7 +36,7 @@ function sceneReadingCss(theme: InvitationThemeKey): string {
     const lift = (n: number) => [r + n, g + n * 0.7, b + n * 0.7].map((v) => Math.round(Math.min(255, v))).join(" ");
     return `
   html[data-paper-dark] .card-stock{--c-bg:rgb(${bg});--c-bg-rgb:${bg};--c-cream-rgb:${lift(28)};--c-beige-rgb:${lift(48)};--msg-ink:${spec?.ink ?? "#f2deb0"}}
-  .card-stock .frame-safe :is(p,li,dt,dd,label,span,h3,h4,time,a):not(.btn-seal):not([class*="bg-"]){text-shadow:${glow}}
+  .card-stock .frame-safe :is(p,li,dt,dd,label,span,h3,h4,time,a):not(.btn-seal):not([class*="bg-"]):not(:is(a,button)[class*="btn"], :is(a,button)[class*="btn"] *, button, button *){text-shadow:${glow}}
   .card-stock .frame-safe :is(h1,h2,.gold-text,.title-face,.cv-title){filter:drop-shadow(0 1px 2px rgb(0 0 0 / 0.55))}
   `;
   }
@@ -44,7 +44,7 @@ function sceneReadingCss(theme: InvitationThemeKey): string {
   const halo = "0 0 2px rgb(var(--c-bg-rgb) / 0.95), 0 0 8px rgb(var(--c-bg-rgb) / 0.9), 0 0 16px rgb(var(--c-bg-rgb) / 0.6)";
   return `
   .card-stock{--msg-ink:${ink};--c-text:${ink};--c-text-rgb:${channels(ink)}}
-  .card-stock .frame-safe :is(p,li,dt,dd,label,span,h3,h4,time,a):not(.btn-seal):not([class*="bg-"]){text-shadow:${halo}}
+  .card-stock .frame-safe :is(p,li,dt,dd,label,span,h3,h4,time,a):not(.btn-seal):not([class*="bg-"]):not(:is(a,button)[class*="btn"], :is(a,button)[class*="btn"] *, button, button *){text-shadow:${halo}}
   .card-stock .frame-safe :is(h1,h2,.gold-text,.title-face,.cv-title){filter:drop-shadow(0 0 3px rgb(var(--c-bg-rgb) / 0.95)) drop-shadow(0 0 8px rgb(var(--c-bg-rgb) / 0.75))}
   `;
 }

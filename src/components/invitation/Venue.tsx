@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { Wedding } from "@/lib/db/schema";
 import { mediaSrc } from "@/lib/media";
 import { MapViewer } from "./MapViewer";
-import { Flourish, FlourishDivider } from "@/components/ui/Ornaments";
+import { FlourishDivider } from "@/components/ui/Ornaments";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 
 /**
@@ -67,8 +67,7 @@ export function Venue({ wedding }: { wedding: Wedding }) {
 
         <div className="reveal card-panel gold-border overflow-hidden rounded-[26px]">
           <div className="px-6 py-10 text-center sm:px-10">
-            <Flourish role="rosette" className="mx-auto w-7" />
-            <h3 className="mt-5 text-lg leading-loose text-heading khmer-wrap">
+            <h3 className="text-lg leading-loose text-heading khmer-wrap">
               {wedding.venueName}
             </h3>
             <FlourishDivider role="fleuron" width={64} className="my-5" />

@@ -49,6 +49,7 @@ const schema = z.object({
   bridePhotoUrl: z.string().max(500).optional(),
 
   invitationLead: z.string().max(160).optional(),
+  letterJoinText: z.boolean().optional(),
   invitationWhenIntro: z.string().max(160).optional(),
   invitationLunarDate: z.string().max(300).optional(),
   invitationDateLine: z.string().max(200).optional(),
@@ -68,6 +69,8 @@ const schema = z.object({
 
   blessingThanks: z.string().max(600).optional(),
   blessingWish: z.string().max(600).optional(),
+  thanksLetter: z.string().max(1500).optional(),
+  apologyLetter: z.string().max(1500).optional(),
 
   giftEnabled: z.boolean().optional(),
   dressCodeEnabled: z.boolean().optional(),

@@ -17,15 +17,15 @@ function ContactCard({
 }) {
   if (!phone) return null;
   return (
-    <div className="reveal card-panel gold-border rounded-2xl px-5 py-7 text-center">
+    <div className="reveal card-panel gold-border flex flex-col items-center rounded-2xl px-3 py-6 text-center sm:px-5 sm:py-7">
       <p className="text-xs text-gold-deep">{role}</p>
       <p className="mt-3 text-lg text-heading khmer-wrap">
         <span className="text-sm text-ink/75">{title} </span>
         {name}
       </p>
       <FlourishDivider role="fleuron" width={64} className="my-4" />
-      <p className="font-latin text-base tracking-wide text-ink/88">📞 {phone}</p>
-      <a href={`tel:${phone.replace(/\s/g, "")}`} className="btn-gold mt-5 text-sm">
+      <p className="mb-5 font-latin text-base tracking-wide text-ink/88 whitespace-nowrap">📞 {phone}</p>
+      <a href={`tel:${phone.replace(/\s/g, "")}`} className="btn-gold mt-auto px-4 text-sm whitespace-nowrap">
         {action}
       </a>
     </div>
@@ -40,7 +40,8 @@ export function Contact({ wedding }: { wedding: Wedding }) {
     <section id="contact" className="section-pad relative">
       <div className="mx-auto max-w-3xl">
         <SectionTitle title="ទំនាក់ទំនង" />
-        <div className="grid gap-4">
+        {/* the groom and the bride side by side, on one row, cards of equal height */}
+        <div className="grid grid-cols-2 gap-3 sm:gap-4">
           <ContactCard
             role="កូនប្រុស"
             title={wedding.groomTitle}

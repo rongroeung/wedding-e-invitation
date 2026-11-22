@@ -135,6 +135,8 @@ export const wedding = pgTable("wedding", {
   // Formal invitation wording
   /** The letter's opening line, above the honorifics (the cover and envelope use `subtitle`). */
   invitationLead: text("invitation_lead").notNull().default("យើងខ្ញុំមានកិត្តិយសសូមគោរពអញ្ជើញ"),
+  /** Between the two names on the letter: ជាគូនឹង (true) or the couple's monogram (false). */
+  letterJoinText: boolean("letter_join_text").notNull().default(false),
   /*
    * The letter's "when and where", as the couple word it (each one optional:
    * an empty line falls back to the one built from the date, time and venue
@@ -165,6 +167,9 @@ export const wedding = pgTable("wedding", {
   // Closing blessing
   blessingThanks: text("blessing_thanks").notNull().default(""),
   blessingWish: text("blessing_wish").notNull().default(""),
+  /** The closing letters: សេចក្ដីថ្លែងអំណរគុណ and លិខិតសូមអភ័យទោស (empty hides one). */
+  thanksLetter: text("thanks_letter").notNull().default("យើងខ្ញុំជា មាតាបិតា កូនប្រុស កូនស្រី សូមថ្លែងអំណរគុណ យ៉ាងជ្រាលជ្រៅចំពោះការចូលរួមជាអធិបតី និងជាភ្ញៀវកិត្តិយស ក្នុងពិធីសិរីមង្គលអាពាហ៍ពិពាហ៍ កូនប្រុស កូនស្រី របស់យើងខ្ញុំ។ យើងខ្ញុំ សូមគោរពជូនពរដល់ ឯកឧត្ដម លោកឧកញ៉ា លោកជំទាវ លោក លោកស្រី អ្នកនាង កញ្ញា និងភ្ញៀវកិត្តិយសទាំងអស់ សូមប្រកបតែភាពសុខដុម ចម្រុងចម្រើន និងសុភមង្គល ក្នុងក្រុមគ្រួសារជានិច្ចនិរន្តរ៍។"),
+  apologyLetter: text("apology_letter").notNull().default("យើងខ្ញុំជា មាតាបិតា កូនប្រុស កូនស្រី សូមអភ័យទោស ក្នុងករណីពុំបានជូនសំបុត្រអញ្ជើញដោយផ្ទាល់ និងការសរសេរឈ្មោះរបស់ភ្ញៀវកិត្តិយសមិនបានត្រឹមត្រូវ ឬពុំបានសរសេរឈ្មោះ។ វត្តមានរបស់ ឯកឧត្ដម លោកឧកញ៉ា លោកជំទាវ លោក លោកស្រី អ្នកនាង កញ្ញា គឺជាកិត្តិយសដ៏ឧត្ដុង្គឧត្ដមសម្រាប់គ្រួសារយើងខ្ញុំ។ សូមអរគុណ!"),
 
   // Digital gift
   giftEnabled: boolean("gift_enabled").notNull().default(true),

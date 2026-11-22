@@ -878,3 +878,84 @@ The video is 30.7 s, 720×1280. It shows a gilded envelope with a glowing wax se
   - **Colours:** olive ink, blush names, cream sheet.
   - **Words:** start 25cqh down, inside the clear sky.
 - **Checked** in Chromium at 390×844, 375×667 and 1440×900 for Themes 7 and 8, including the cover, letter and programme. No page errors; tsc and build are clean.
+
+## The couple's monogram between the names on the letter; ជាគូនឹង optional
+
+Request: replace "ជាគូនឹង" on the letter with the couple's Khmer monogram (a supplied gold PNG), in the same colour as the letter text, and keep an option to show ជាគូនឹង.
+- **Asset `public/brand/couple-monogram.webp`** (800×691, lossless): an alpha mask cut from the supplied image.
+  - The image was RGB with a checkerboard baked in, so the shape was taken from the gold's saturation.
+  - Its carving is kept as thinner ink, with alpha scaled by brightness (floor 0.25).
+- **`.msg-monogram-mark`:** filled with `var(--msg-ink)` through CSS `mask`, so it takes each paper's or theme's letter colour. Width is clamp(4.6rem, 22vw, 6.5rem), and it scales with the page zoom on phones.
+- **New `letter_join_text` setting** (migration `0046`, default off) adds ជាគូនឹង under the monogram. The toggle is in admin, under អត្ថបទអញ្ជើញផ្លូវការ, below ឃ្លាបើកលិខិត.
+- **Checked at 640 and 360 px:**
+  - the monogram colour equals the letter ink on Khmer/ivory (132 105 62), palace (46 59 99) and velvet (242 222 176);
+  - ជាគូនឹង shows only when the toggle is on;
+  - the names stay on one line;
+  - no errors.
+- tsc and `next build` are clean.
+
+## Monogram re-cut from the clean version; ជាគូនឹង instead of it, not with it
+
+- **Monogram:** the version cut from the gold PNG had blotchy, mottled edges, because that file had a checkerboard baked in and the shape came from colour. The couple then sent a white version with a real transparency channel. `couple-monogram.webp` is rebuilt from that alpha (339×294 cropped, Lanczos ×2 to 678×588, lossless), giving clean, solid strokes. The aspect ratio is updated.
+- **ជាគូនឹង is now an either/or:** with `letter_join_text` off (the default) the monogram shows; with it on, the words ជាគូនឹង show in its place. The admin label is "បង្ហាញ «ជាគូនឹង» ជំនួសស្លាកសញ្ញា", and the schema and migration comments are updated (the column is unchanged).
+- **Checked:**
+  - the monogram on Khmer/ivory and palace at 640 and 360 px, in the letter ink;
+  - velvet with the toggle on: the text only, no mark;
+  - no errors;
+  - tsc and `next build` are clean.
+
+## Monogram moved up
+
+- `.msg-join:has(.msg-monogram-mark) { padding-top: 0; margin-top: -0.4rem }`: the 1.2rem top padding (which lines ជាគូនឹង up with the names) no longer pushes the monogram down. It now sits centred on the two name blocks: centre 462 vs 465 px at 640 wide, 362 vs 364 at 360 wide. ជាគូនឹង keeps its old position. Build is clean.
+
+## The couple's two-day agenda, with its own icons
+
+Request: put the couple's printed agenda (programs.jpg) into the invitation, using each item's icon.
+- **Icons:** nine icons cut from the agenda image as alpha masks (`public/program-icons/*.png`, 160×160). Each is cut against its local paper brightness, upscaled ×4, and cleaned of specks and the timeline flourish: guests, procession, offering bowl, dining, haircut, khan sla, bok leak, couple feast and toast.
+  - `lib/programIcons.ts` lists them, and an event's `icon` names one as `pi:<key>`; emoji still work.
+  - `ProgramIcon` fills the mask with `currentColor`.
+- **`Program.tsx`:** the icon sits at the left of each card (3rem, 2.4rem on phones) in the heading colour. A group's emoji is shown only when it is set.
+- **Admin (`ProgramManager`):** a one-tap icon picker under the icon field when adding or editing. The list shows each event's icon. New events default to no group emoji.
+- **Migration `0047_program_agenda.sql`:** replaces the sample programme with the ten items, in two groups (ថ្ងៃទី១ ថ្ងៃសុក្រ ទី១៨ and ថ្ងៃទី២ ថ្ងៃសៅរ៍ ទី១៩ ខែធ្នូ ២០២៦), with times as "ម៉ោង …".
+  - It only applies to the invitation carrying the couple's 0042 date line (ថ្ងៃទី១៩ ខែធ្នូ ឆ្នាំ២០២៦ វេលាម៉ោង ៥ៈ៣០ ល្ងាច).
+  - ពិធីយកពាលាជ័យ has no icon, as in the agenda.
+- **Checked:** two groups, 10 items and 9 icons render at 412 and 1280 px, with no errors. tsc and `next build` are clean.
+
+## An icon for ពិធីយកពាលាជ័យ
+
+- **New icon `public/program-icons/peala-chey.png`:** an original silhouette drawn as SVG and rendered to the same 160×160 alpha mask as the agenda's icons, at a matching weight.
+  - It shows a three-tier folded banana-leaf cone (bai sei) with a spire and bead, standing on a footed offering bowl (ពាន) with an engraved band.
+  - Leaf folds only: no flower or lotus forms.
+- **Added to `PROGRAM_ICONS`** (យកពាលាជ័យ), so it appears in the admin picker.
+- **Migration `0048`:** sets it on ពិធីយកពាលាជ័យ wherever that item has no icon.
+- **Checked:** 10 of 10 items show icons at 412 and 1280 px. Build is clean.
+
+## Schedule icons in the letter's gold
+
+- `.program-icon-lg` is filled with `var(--msg-ink, var(--gold-1))`, the letter's own colour, instead of the heading colour (`text-heading` removed). Measured: icon = letter ink on ivory (132 105 62) and velvet (242 222 176). Build is clean.
+
+## Closing letters: សេចក្ដីថ្លែងអំណរគុណ and លិខិតសូមអភ័យទោស
+
+Request: replace the closing thanks/wish (and the admin card "ពរជ័យបញ្ចប់ និង SEO") with the couple's thank-you letter and apology letter (thanks_letter.jpg).
+- **New columns `thanks_letter` and `apology_letter`** (migration `0049`): their defaults are the couple's text, transcribed from the image, so existing invitations get it.
+- **`Blessing.tsx`:** two titled sections (SectionTitle with its flourish) in the letter's ink (`#blessing .msg-ink`), each hidden when empty, then the signature.
+- **Admin:** the card is now "សេចក្ដីថ្លែងអំណរគុណ និងលិខិតសូមអភ័យទោស" with two text boxes.
+  - The thanks, wish and meta-description fields are removed from the form.
+  - The saved meta description still drives link previews, falling back to the date and venue.
+- **Checked:** both titles and paragraphs render on ivory and velvet at 412 px, in the letter ink, with no errors. Build is clean.
+
+## Closing signature removed
+
+- The line ដោយក្តីគោរព និងក្តីស្រឡាញ់ពី and the couple's names under the closing letters are removed from `Blessing.tsx`. Build is clean.
+
+## No glow on button lettering in the picture themes
+
+- **Cause:** the reading halo that `sceneReadingCss` (Themes 2–8) puts round body text also matched the buttons' own `<a>` and `<span>` (`.btn-gold`: បើក Google Maps, ទូរស័ព្ទទៅកូនប្រុស/កូនស្រី, and others), so their light lettering glowed.
+- **Fix:** both halo rules now skip buttons and anything inside one (`:is(a,button)[class*=btn]` and `button`). Measured: text-shadow is none on the venue and contact buttons, while the body text keeps its halo. Build is clean.
+
+## Contact cards side by side; gallery title; venue ornament removed
+
+- **`Contact.tsx`:** the groom's and bride's cards now sit on one row (`grid-cols-2`), equal in height, with the button pinned to the foot. Phone and button text don't wrap. Measured: same top and height at 360, 412 and 1020 px; no overflow and no horizontal scroll.
+- **Gallery title:** អនុស្សាវរីយ៍របស់យើង → រូបភាពអនុស្សាវរីយ៍ (invitation and admin).
+- **`Venue.tsx`:** the small rosette above the venue name is removed.
+- Build is clean.

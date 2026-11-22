@@ -4783,7 +4783,21 @@ html[data-paper-dark] .dress-chip {
 /* with the name logo switched off: groom | bride, two equal columns */
 .msg-couple.no-logo { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
 .msg-monogram { width: clamp(7rem, 29vw, 12.5rem); }
-.msg-join { padding-top: 1.6rem; white-space: nowrap; }
+.msg-join { padding-top: 1.2rem; white-space: nowrap; display: flex; flex-direction: column; align-items: center; }
+/* the monogram sits centred on the two name blocks (label + name), not
+   pushed down to the names' line as the words ជាគូនឹង are */
+.msg-join:has(.msg-monogram-mark) { padding-top: 0; margin-top: -0.4rem; }
+/* the couple's monogram (public/brand), cut from its own carving and filled
+   with the letter's ink, so it takes each paper's colour like the words do */
+.msg-monogram-mark {
+  display: block;
+  width: clamp(4.6rem, 22vw, 6.5rem);
+  aspect-ratio: 678 / 588;
+  background: var(--msg-ink, var(--gold-1));
+  -webkit-mask: url("/brand/couple-monogram.webp") center / contain no-repeat;
+  mask: url("/brand/couple-monogram.webp") center / contain no-repeat;
+  filter: drop-shadow(0 1px 0 rgb(0 0 0 / 0.08));
+}
 
 /* The letter's text grows with the card: on a phone it fills the width as
    before; on a wide screen the formal wording runs to about two thirds of the
@@ -4991,7 +5005,7 @@ html[data-paper-dark] .name-logo-foil {
    in three different inks (heading, body, gold). They now share one: a light
    gold on the dark papers, and the paper's own printing gold on the light
    ones, where a light gold would not read against ivory. */
-.msg .msg-ink { color: var(--msg-ink, var(--gold-1)); }
+.msg .msg-ink, #blessing .msg-ink { color: var(--msg-ink, var(--gold-1)); }
 html[data-paper-dark] .card-stock { --msg-ink: var(--gold-2); }
 
 
@@ -5312,3 +5326,18 @@ html[data-paper-dark] .cv-guest { text-shadow: 0 1px 0 rgb(0 0 0 / 0.35), 0 0 22
 .scene-rosegate .scene-title { font-size: clamp(1rem, 5.6cqw, 2rem); white-space: nowrap; }
 .scene-rosegate .scene-names { width: min(62cqw, 30cqh); }
 .scene-rosegate .scene-guest { max-width: 74cqw; }
+
+/* ── The programme's ceremony icons (ProgramIcon): the agenda's own art,
+   filled with the section's heading colour so it suits every paper ── */
+.program-icon {
+  display: inline-block;
+  width: 1.6em; height: 1.6em;
+  flex: none;
+  background: currentColor;
+  -webkit-mask: var(--pi) center / contain no-repeat;
+  mask: var(--pi) center / contain no-repeat;
+}
+/* in the schedule: the same gold (or theme ink) as the letter's words */
+.program-icon-lg { width: 3rem; height: 3rem; background: var(--msg-ink, var(--gold-1)); }
+@media (max-width: 480px) { .program-icon-lg { width: 2.4rem; height: 2.4rem; } }
+.program-icon-pick { width: 1.75rem; height: 1.75rem; background: #475569; }

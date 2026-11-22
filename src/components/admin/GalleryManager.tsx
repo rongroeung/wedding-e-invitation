@@ -25,7 +25,7 @@ export function GalleryManager({ images }: { images: GalleryImage[] }) {
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold text-slate-800">វិចិត្រសាលរូបភាព</h1>
-          <p className="mt-1 text-sm text-slate-500">អនុស្សាវរីយ៍របស់យើង · {images.length} រូប</p>
+          <p className="mt-1 text-sm text-slate-500">រូបភាពអនុស្សាវរីយ៍ · {images.length} រូប</p>
         </div>
       </header>
 

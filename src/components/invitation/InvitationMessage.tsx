@@ -34,14 +34,21 @@ export function InvitationMessage({ wedding }: { wedding: Wedding }) {
         {`${wedding.invitationHonorific} ${wedding.invitationBody}`.replace(/\s+/g, " ").trim()}
       </p>
 
-      {/* The couple: groom | ជាគូនឹង | bride */}
+      {/* The couple: groom | monogram or ជាគូនឹង | bride */}
       <div className="msg-couple mt-10">
         <div className="min-w-0">
           <p className="text-xs title-face msg-ink khmer-wrap">កូនប្រុសនាម</p>
           <Fit className="mt-2 text-lg title-face msg-ink">{wedding.groomFullName}</Fit>
         </div>
-        {/* between the two names, the words that join them */}
-        <p className="msg-join self-center text-lg title-face msg-ink khmer-wrap">ជាគូនឹង</p>
+        {/* between the two names: the couple's monogram, printed in the
+            letter's own ink — or, when the couple choose, the words ជាគូនឹង */}
+        <div className="msg-join self-center">
+          {wedding.letterJoinText ? (
+            <p className="text-lg title-face msg-ink khmer-wrap">ជាគូនឹង</p>
+          ) : (
+            <span className="msg-monogram-mark" role="img" aria-label="ស្លាកសញ្ញាគូស្វាមីភរិយា" />
+          )}
+        </div>
         <div className="min-w-0">
           <p className="text-xs title-face msg-ink khmer-wrap">កូនស្រីនាម</p>
           <Fit className="mt-2 text-lg title-face msg-ink">{wedding.brideFullName}</Fit>

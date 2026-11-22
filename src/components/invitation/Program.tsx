@@ -1,6 +1,8 @@
 import type { WeddingEvent } from "@/lib/db/schema";
 import { FlourishDivider } from "@/components/ui/Ornaments";
 import { SectionTitle } from "@/components/ui/SectionTitle";
+import { ProgramIcon } from "@/components/ui/ProgramIcon";
+import { programIconSrc } from "@/lib/programIcons";
 
 /** កម្មវិធីសិរីមង្គលអាពាហ៍ពិពាហ៍ — grouped by the labels set in the dashboard. */
 export function Program({ events }: { events: WeddingEvent[] }) {
@@ -25,7 +27,7 @@ export function Program({ events }: { events: WeddingEvent[] }) {
           {Object.entries(groups).map(([groupName, group]) => (
             <div key={groupName} className="reveal">
               <div className="mb-6 flex items-center justify-center gap-3">
-                <span className="text-lg" aria-hidden="true">{group.icon}</span>
+                {group.icon && <span className="text-lg" aria-hidden="true">{group.icon}</span>}
                 <h3 className="text-lg text-heading khmer-wrap">{groupName}</h3>
               </div>
               <FlourishDivider role="medallion" width={84} className="mb-8" />
@@ -37,7 +39,10 @@ export function Program({ events }: { events: WeddingEvent[] }) {
                       className="absolute -left-[calc(1.5rem+5px)] top-5 h-2.5 w-2.5 rounded-full bg-gold-dark shadow-gold sm:-left-[calc(2rem+5px)]"
                       aria-hidden="true"
                     />
-                    <div className="card-panel gold-border rounded-2xl px-5 py-4 transition-transform duration-500 hover:-translate-y-0.5 sm:px-6 sm:py-5">
+                    <div className="card-panel gold-border flex items-center gap-4 rounded-2xl px-5 py-4 transition-transform duration-500 hover:-translate-y-0.5 sm:px-6 sm:py-5">
+                      {/* the ceremony's icon, from the couple's own agenda */}
+                      {programIconSrc(event.icon) && <ProgramIcon icon={event.icon} className="program-icon-lg" />}
+                      <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
                         <p className="gold-solid text-base font-medium">{event.timeLabel}</p>
                         {event.location && (
@@ -45,7 +50,7 @@ export function Program({ events }: { events: WeddingEvent[] }) {
                         )}
                       </div>
                       <p className="mt-1 text-base leading-loose text-heading khmer-wrap">
-                        {event.icon && <span className="mr-2">{event.icon}</span>}
+                        {event.icon && !programIconSrc(event.icon) && <span className="mr-2">{event.icon}</span>}
                         {event.title}
                       </p>
                       {event.description && (
@@ -53,6 +58,7 @@ export function Program({ events }: { events: WeddingEvent[] }) {
                           {event.description}
                         </p>
                       )}
+                      </div>
                     </div>
                   </li>
                 ))}

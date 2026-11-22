@@ -1,12 +1,14 @@
 "use client";
 
+import { ProgramIcon } from "@/components/ui/ProgramIcon";
+import { PROGRAM_ICONS } from "@/lib/programIcons";
 import { useState } from "react";
 import type { StoryItem, WeddingEvent } from "@/lib/db/schema";
 import { Button, Card, Field, Input, StatusMessage, Textarea, useApi } from "./ui";
 
 const EMPTY_EVENT = {
   groupName: "ពេលព្រឹក",
-  groupIcon: "🌸",
+  groupIcon: "",
   timeLabel: "",
   title: "",
   description: "",
@@ -52,6 +54,7 @@ export function ProgramManager({
           </Field>
           <Field label="រូបតំណាង">
             <Input value={draft.icon} onChange={(e) => setDraft({ ...draft, icon: e.target.value })} />
+            <IconPicker value={draft.icon} onPick={(icon) => setDraft({ ...draft, icon })} />
           </Field>
           <Field label="ទីកន្លែង">
             <Input value={draft.location} onChange={(e) => setDraft({ ...draft, location: e.target.value })} />
@@ -181,7 +184,7 @@ function EventRow({
             {event.groupIcon} {event.groupName} · {event.timeLabel} · លំដាប់ {event.sortOrder}
           </p>
           <p className="text-sm font-medium text-slate-800">
-            {event.icon} {event.title}
+            <ProgramIcon icon={event.icon} className="program-icon-pick mr-1 align-middle" /> {event.title}
           </p>
           {event.description && <p className="text-xs text-slate-500">{event.description}</p>}
         </div>
@@ -208,7 +211,10 @@ function EventRow({
         <Field label="លំដាប់"><Input type="number" value={form.sortOrder} onChange={(e) => setForm({ ...form, sortOrder: Number(e.target.value) })} /></Field>
         <Field label="ឈ្មោះពិធី"><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></Field>
         <Field label="ទីកន្លែង"><Input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} /></Field>
-        <Field label="រូបតំណាង"><Input value={form.icon} onChange={(e) => setForm({ ...form, icon: e.target.value })} /></Field>
+        <Field label="រូបតំណាង">
+            <Input value={form.icon} onChange={(e) => setForm({ ...form, icon: e.target.value })} />
+            <IconPicker value={form.icon} onPick={(icon) => setForm({ ...form, icon })} />
+        </Field>
         <div className="sm:col-span-3">
           <Field label="ការពិពណ៌នា"><Textarea rows={2} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></Field>
         </div>
@@ -239,6 +245,29 @@ function EventRow({
           រក្សាទុក
         </Button>
       </div>
+    </div>
+  );
+}
+
+/** The agenda's own icons, one tap to choose (or type an emoji above). */
+function IconPicker({ value, onPick }: { value: string; onPick: (icon: string) => void }) {
+  return (
+    <div className="mt-2 flex flex-wrap gap-1.5">
+      {PROGRAM_ICONS.map((i) => {
+        const v = `pi:${i.key}`;
+        return (
+          <button
+            key={i.key}
+            type="button"
+            title={i.km}
+            aria-pressed={value === v}
+            onClick={() => onPick(value === v ? "" : v)}
+            className={`rounded-md border p-1 ${value === v ? "border-amber-500 bg-amber-50" : "border-slate-200 hover:border-amber-400"}`}
+          >
+            <ProgramIcon icon={v} className="program-icon-pick" />
+          </button>
+        );
+      })}
     </div>
   );
 }

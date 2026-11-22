@@ -7,7 +7,7 @@ import { mediaSrc } from "@/lib/media";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { CARD_SCROLL_ID } from "./CardShell";
 
-/** អនុស្សាវរីយ៍របស់យើង — magazine-style masonry gallery with a swipe lightbox. */
+/** រូបភាពអនុស្សាវរីយ៍ — magazine-style masonry gallery with a swipe lightbox. */
 export function Gallery({ images }: { images: GalleryImage[] }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [mounted, setMounted] = useState(false);
@@ -138,7 +138,7 @@ export function Gallery({ images }: { images: GalleryImage[] }) {
       {/* a reading measure, not the card's width: on a wide sheet two columns
           made every photograph half a screen tall */}
       <div className="mx-auto max-w-3xl">
-        <SectionTitle title="អនុស្សាវរីយ៍របស់យើង" />
+        <SectionTitle title="រូបភាពអនុស្សាវរីយ៍" />
 
         <div className="reveal columns-1 gap-3 sm:columns-3 sm:gap-4">
           {images.map((image, index) => (

@@ -163,6 +163,12 @@ export function WeddingForm({ wedding }: { wedding: Wedding }) {
           >
             <Input value={form.invitationLead} onChange={(e) => set("invitationLead", e.target.value)} maxLength={160} />
           </Field>
+          <Toggle
+            label="បង្ហាញ «ជាគូនឹង» ជំនួសស្លាកសញ្ញា"
+            hint="រវាងឈ្មោះកូនប្រុស និងកូនស្រី ក្នុងលិខិត៖ បើក = ជាគូនឹង · បិទ = ស្លាកសញ្ញាខ្មែរ · Show ជាគូនឹង instead of the monogram"
+            checked={form.letterJoinText}
+            onChange={(v) => set("letterJoinText", v)}
+          />
           <Field
             label="ថ្ងៃខែ និងទីតាំង — ឃ្លាចាប់ផ្ដើម"
             hint="ឧ. ដែលនឹងប្រព្រឹត្តទៅនៅ — ទុកទទេ ដើម្បីប្រើ «ដែលនឹងប្រព្រឹត្តទៅ» និងម៉ោង"
@@ -228,13 +234,10 @@ export function WeddingForm({ wedding }: { wedding: Wedding }) {
         </div>
       </Card>
 
-      <Card title="ពរជ័យបញ្ចប់ និង SEO">
+      <Card title="សេចក្ដីថ្លែងអំណរគុណ និងលិខិតសូមអភ័យទោស" description="បង្ហាញនៅចុងបញ្ចប់នៃសំបុត្រ · ទុកទទេ ដើម្បីលាក់">
         <div className="space-y-4">
-          <Field label="អត្ថបទអរគុណ"><Textarea rows={2} value={form.blessingThanks} onChange={(e) => set("blessingThanks", e.target.value)} /></Field>
-          <Field label="អត្ថបទជូនពរ"><Textarea rows={3} value={form.blessingWish} onChange={(e) => set("blessingWish", e.target.value)} /></Field>
-          <Field label="Meta description" hint="បង្ហាញនៅពេលចែករំលែកលើ Telegram / Facebook">
-            <Textarea rows={2} value={form.metaDescription} onChange={(e) => set("metaDescription", e.target.value)} />
-          </Field>
+          <Field label="សេចក្ដីថ្លែងអំណរគុណ"><Textarea rows={5} value={form.thanksLetter} onChange={(e) => set("thanksLetter", e.target.value)} /></Field>
+          <Field label="លិខិតសូមអភ័យទោស"><Textarea rows={5} value={form.apologyLetter} onChange={(e) => set("apologyLetter", e.target.value)} /></Field>
         </div>
       </Card>
 
