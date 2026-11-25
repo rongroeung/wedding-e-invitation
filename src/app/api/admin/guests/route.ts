@@ -4,6 +4,8 @@ import { fail, ok, randomCode, readJson, slugify } from "@/lib/api";
 import { requireWorkspace } from "@/lib/workspace";
 import { getDb } from "@/lib/db";
 import { guests } from "@/lib/db/schema";
+import { getWedding } from "@/lib/queries";
+import { guestTitleList, parseGuestLines } from "@/lib/guestTitles";
 
 export const dynamic = "force-dynamic";
 
@@ -17,7 +19,7 @@ const guestSchema = z.object({
 });
 
 const bulkSchema = z.object({
-  /** One guest per line: `ឈ្មោះ, ចំនួនកៅអី` */
+  /** One guest per line: `[ងារ] ឈ្មោះ, ចំនួនកៅអី` (lib/guestTitles) */
   text: z.string().min(1).max(20000),
   title: z.string().max(40).default("លោក"),
 });
@@ -61,20 +63,13 @@ export async function POST(request: Request) {
   const bulk = bulkSchema.safeParse(body);
   if (bulk.success && "text" in (body as Record<string, unknown>)) {
     const db = await getDb();
+    const titles = guestTitleList((await getWedding(weddingId)).guestTitles);
     const created = [];
-    for (const line of bulk.data.text.split("\n")) {
-      const [name, seats] = line.split(/[,\t;]/).map((part) => part.trim());
-      if (!name) continue;
+    for (const line of parseGuestLines(bulk.data.text, titles, bulk.data.title)) {
       const code = await uniqueCode();
       const [row] = await db
         .insert(guests)
-        .values({
-          weddingId,
-          code,
-          title: bulk.data.title,
-          name,
-          allowedSeats: Math.min(20, Math.max(1, Number(seats) || 1)),
-        })
+        .values({ weddingId, code, title: line.title, name: line.name, allowedSeats: line.seats })
         .returning();
       created.push(row);
     }

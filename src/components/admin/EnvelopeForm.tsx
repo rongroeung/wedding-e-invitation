@@ -10,6 +10,7 @@ import {
 import { ArtworkField, Button, Card, Field, Input, MediaUpload, Select, StatusMessage, Toggle, useApi } from "./ui";
 import { videoSource } from "@/lib/video";
 
+import { useT } from "./AdminPrefs";
 /**
  * "3D Envelope" — the sealed card a guest opens before the invitation.
  *
@@ -18,6 +19,7 @@ import { videoSource } from "@/lib/video";
  * envelope loses nothing by saying so.
  */
 export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
+  const t = useT();
   const { busy, message, send } = useApi();
   const [form, setForm] = useState({
     envelopeEnabled: wedding.envelopeEnabled,
@@ -70,40 +72,39 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
       <header>
         <h1 className="text-xl font-semibold text-slate-800">3D Envelope &amp; Frame</h1>
         <p className="mt-1 text-sm text-slate-500">
-          សំបុត្រអញ្ជើញ ៣មិតិ និងស៊ុមក្បាច់ខ្មែរមាសរបស់លិខិតអញ្ជើញ
-        </p>
+          {t("សំបុត្រអញ្ជើញ ៣មិតិ")}</p>
       </header>
 
       <StatusMessage message={message} />
 
-      <Card title="បើក / បិទ">
+      <Card title={t("បើក / បិទ")}>
         <div className="space-y-3">
           <Toggle
-            label="បង្ហាញសំបុត្រ ៣មិតិ"
-            hint="បិទ = ភ្ញៀវឃើញលិខិតអញ្ជើញដោយផ្ទាល់ ដូចមុន"
+            label={t("បង្ហាញសំបុត្រ ៣មិតិ")}
+            hint={t("បិទ = ភ្ញៀវឃើញលិខិតអញ្ជើញដោយផ្ទាល់ ដូចមុន")}
             checked={form.envelopeEnabled}
             onChange={(v) => set("envelopeEnabled", v)}
           />
           <Toggle
-            label="បើកចលនា ៣មិតិ"
-            hint="បិទ = បើករួច ផ្លាស់ប្ដូរដោយរលោងភ្លាមៗ (ដូចរបៀបកាត់បន្ថយចលនា)"
+            label={t("បើកចលនា ៣មិតិ")}
+            hint={t("បិទ = បើករួច ផ្លាស់ប្ដូរដោយរលោងភ្លាមៗ (ដូចរបៀបកាត់បន្ថយចលនា)")}
             checked={form.envelopeAnimate}
             onChange={(v) => set("envelopeAnimate", v)}
           />
           <Toggle
-            label="បង្ហាញសំបុត្រគ្រប់ពេលចូលមើល"
-            hint="បិទ = បើករួចហើយ មិនបង្ហាញម្ដងទៀតក្នុងការចូលមើលដដែល"
+            label={t("បង្ហាញសំបុត្រគ្រប់ពេលចូលមើល")}
+            hint={t("បិទ = បើករួចហើយ មិនបង្ហាញម្ដងទៀតក្នុងការចូលមើលដដែល")}
             checked={form.envelopeEveryVisit}
             onChange={(v) => set("envelopeEveryVisit", v)}
           />
           <Toggle
-            label="បង្ហាញប៊ូតុងរំលង"
+            label={t("បង្ហាញប៊ូតុងរំលង")}
             checked={form.envelopeSkip}
             onChange={(v) => set("envelopeSkip", v)}
           />
           <Toggle
-            label="ចាក់ភ្លេងបន្ទាប់ពីបើកសំបុត្រ"
-            hint="ភ្លេងមិនចាក់មុនភ្ញៀវចុចឡើយ"
+            label={t("ចាក់ភ្លេងបន្ទាប់ពីបើកសំបុត្រ")}
+            hint={t("ភ្លេងមិនចាក់មុនភ្ញៀវចុចឡើយ")}
             checked={form.envelopeMusic}
             onChange={(v) => set("envelopeMusic", v)}
           />
@@ -118,21 +119,21 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
         * invitation that already uses them.
         */}
       <Card
-        title="វាំងនន"
-        description="វាំងននដែលបើកចេញ បង្ហាញសំបុត្រ បន្ទាប់ពីស្រោមសំបុត្រ។ អាចបិទ ឬបញ្ចូលក្រណាត់ផ្ទាល់ខ្លួន"
+        title={t("វាំងនន")}
+        description={t("វាំងននដែលបើកចេញ បង្ហាញសំបុត្រ បន្ទាប់ពីស្រោមសំបុត្រ។ អាចបិទ ឬបញ្ចូលក្រណាត់ផ្ទាល់ខ្លួន")}
       >
         <div className="space-y-4">
           <Toggle
-            label="បង្ហាញវាំងនន"
-            hint="បិទ ដើម្បីបង្ហាញសំបុត្រភ្លាមៗ គ្មានវាំងននបើក"
+            label={t("បង្ហាញវាំងនន")}
+            hint={t("បិទ ដើម្បីបង្ហាញសំបុត្រភ្លាមៗ គ្មានវាំងននបើក")}
             checked={form.curtainEnabled}
             onChange={(v) => set("curtainEnabled", v)}
           />
         </div>
         {form.curtainEnabled && (
         <div className="mt-6 space-y-4 border-t border-slate-100 pt-6">
-          <p className="text-sm font-medium text-slate-700">រូបភាព ឬវីដេអូលើវាំងនន</p>
-          <Field label="ប្រភេទ">
+          <p className="text-sm font-medium text-slate-700">{t("រូបភាព ឬវីដេអូលើវាំងនន")}</p>
+          <Field label={t("ប្រភេទ")}>
             <Select
               value={form.curtainMediaKind}
               onChange={(e) => {
@@ -143,18 +144,18 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
                 set("curtainMediaId", null);
               }}
             >
-              <option value="image">រូបភាព</option>
-              <option value="video">វីដេអូ (ចាក់វិលជុំ គ្មានសំឡេង)</option>
+              <option value="image">{t("រូបភាព")}</option>
+              <option value="video">{t("វីដេអូ (ចាក់វិលជុំ គ្មានសំឡេង)")}</option>
             </Select>
           </Field>
 
           <ArtworkField
-            label={form.curtainMediaKind === "video" ? "វីដេអូវាំងនន" : "រូបភាពវាំងនន"}
+            label={form.curtainMediaKind === "video" ? t("វីដេអូវាំងនន") : t("រូបភាពវាំងនន")}
             kind={form.curtainMediaKind === "video" ? "video" : "image"}
             hint={
               form.curtainMediaKind === "video"
-                ? "វីដេអូចាក់វិលជុំ គ្មានសំឡេង។ លើទូរស័ព្ទដែលយឺត ប្រព័ន្ធនឹងបង្ហាញរូបគម្របជំនួស ដើម្បីកុំឱ្យទំព័រគាំង។"
-                : "រូបនឹងគ្របពេញឆាក ហើយវាំងននទាំងសងខាងនៅតែរួញបើកឆ្វេង-ស្ដាំដូចដើម។"
+                ? t("វីដេអូចាក់វិលជុំ គ្មានសំឡេង។ លើទូរស័ព្ទដែលយឺត ប្រព័ន្ធនឹងបង្ហាញរូបគម្របជំនួស ដើម្បីកុំឱ្យទំព័រគាំង។")
+                : t("រូបនឹងគ្របពេញឆាក ហើយវាំងននទាំងសងខាងនៅតែរួញបើកឆ្វេង-ស្ដាំដូចដើម។")
             }
             mediaId={form.curtainMediaId}
             onMedia={(id) => set("curtainMediaId", id)}
@@ -162,18 +163,18 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
             onFit={(fit) => set("curtainFit", fit)}
             strength={form.curtainShade}
             onStrength={(value) => set("curtainShade", value)}
-            strengthLabel={(value) => `កម្រិតស្រមោលផ្នត់ — ${value}%`}
-            strengthHint="ស្រមោលផ្នត់ត្រូវបានលាយជាពន្លឺ មិនមែនគូរពីលើទេ ដូច្នេះពណ៌រូបរបស់អ្នកនៅដដែល"
+            strengthLabel={(value) => `${t("កម្រិតស្រមោលផ្នត់")} — ${value}%`}
+            strengthHint={t("ស្រមោលផ្នត់ត្រូវបានលាយជាពន្លឺ មិនមែនគូរពីលើទេ ដូច្នេះពណ៌រូបរបស់អ្នកនៅដដែល")}
           >
             <Toggle
-              label="ដាក់ស្រមោលផ្នត់វាំងននលើរូប"
-              hint="បិទ បើចង់ឃើញរូប ឬវីដេអូសុទ្ធ"
+              label={t("ដាក់ស្រមោលផ្នត់វាំងននលើរូប")}
+              hint={t("បិទ បើចង់ឃើញរូប ឬវីដេអូសុទ្ធ")}
               checked={form.curtainFolds}
               onChange={(v) => set("curtainFolds", v)}
             />
             {form.curtainMediaKind === "video" && (
               <MediaUpload
-                label="រូបគម្របវីដេអូ (បង្ហាញពេលកំពុងផ្ទុក ឬលើទូរស័ព្ទយឺត)"
+                label={t("រូបគម្របវីដេអូ (បង្ហាញពេលកំពុងផ្ទុក ឬលើទូរស័ព្ទយឺត)")}
                 kind="image"
                 currentSrc={form.curtainPosterId ? `/api/media/${form.curtainPosterId}` : undefined}
                 onUploaded={(id) => set("curtainPosterId", id)}
@@ -186,18 +187,18 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
       </Card>
 
       <Card
-        title="ក្បាច់លើគម្របស្រោមសំបុត្រ"
-        description="អ្វីដែលបោះពុម្ពជាមាសលើគម្របស្រោមសំបុត្រ"
+        title={t("ក្បាច់លើគម្របស្រោមសំបុត្រ")}
+        description={t("អ្វីដែលបោះពុម្ពជាមាសលើគម្របស្រោមសំបុត្រ")}
       >
         <div className="grid gap-3 sm:grid-cols-2">
           {[
-            { value: "namelogo", title: "ឡូហ្គោឈ្មោះ", text: "ឈ្មោះកូនប្រុស និងកូនស្រី ដូចនៅលើកាត និងគម្របសំបុត្រ" },
+            { value: "namelogo", title: "ឡូហ្គោឈ្មោះ", text: t("ឈ្មោះកូនប្រុស និងកូនស្រី ដូចនៅលើកាត និងគម្របសំបុត្រ") },
             {
               value: "monogram",
               title: "អក្សរផ្ចិត (Monogram)",
               text: wedding.monogram?.trim()
-                ? `អក្សរ «${wedding.monogram}» ពីព័ត៌មានអាពាហ៍ពិពាហ៍`
-                : "មិនទាន់មានអក្សរផ្ចិតទេ — សូមបញ្ចូលនៅទំព័រព័ត៌មានអាពាហ៍ពិពាហ៍។ បើទទេ នឹងបង្ហាញឡូហ្គោឈ្មោះ",
+                ? `${t("អក្សរ")} «${wedding.monogram}» ${t("ពីព័ត៌មានអាពាហ៍ពិពាហ៍")}`
+                : t("មិនទាន់មានអក្សរផ្ចិតទេ — សូមបញ្ចូលនៅទំព័រព័ត៌មានអាពាហ៍ពិពាហ៍។ បើទទេ នឹងបង្ហាញឡូហ្គោឈ្មោះ"),
             },
           ].map((option) => (
             <button
@@ -211,23 +212,23 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
               }`}
               aria-pressed={form.envelopeFlapMark === option.value}
             >
-              <p className="text-sm font-medium text-slate-800">{option.title}</p>
+              <p className="text-sm font-medium text-slate-800">{t(option.title)}</p>
               <p className="mt-0.5 text-xs leading-relaxed text-slate-500">{option.text}</p>
             </button>
           ))}
         </div>
       </Card>
 
-      <Card title="ត្រាបិទសំបុត្រ">
+      <Card title={t("ត្រាបិទសំបុត្រ")}>
         <div className="space-y-4">
           <Toggle
-            label="បង្ហាញត្រា"
+            label={t("បង្ហាញត្រា")}
             checked={form.envelopeSeal}
             onChange={(v) => set("envelopeSeal", v)}
           />
           <Field
-            label="អក្សរលើត្រា"
-            hint={`ទទេ = អក្សរកាត់របស់គូស្វាមីភរិយា (${sealInitials(wedding.groomName, wedding.brideName)})`}
+            label={t("អក្សរលើត្រា")}
+            hint={`${t("ទទេ = អក្សរកាត់របស់គូស្វាមីភរិយា")} (${sealInitials(wedding.groomName, wedding.brideName)})`}
           >
             <Input
               value={form.envelopeSealText}
@@ -239,11 +240,11 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
         </div>
       </Card>
 
-      <Card title="ចលនា និងអក្សរ">
+      <Card title={t("ចលនា និងអក្សរ")}>
         <div className="space-y-5">
           <Field
-            label={`រយៈពេលចលនា — ${(form.envelopeDuration / 1000).toFixed(1)} វិនាទី`}
-            hint="ចន្លោះ ១,៦ ដល់ ១៤ វិនាទី · ណែនាំ ៦ វិនាទី សម្រាប់ការបើកស្រោមសំបុត្រពេញលេញ"
+            label={`${t("រយៈពេលចលនា")} — ${(form.envelopeDuration / 1000).toFixed(1)} ${t("វិនាទី")}`}
+            hint={t("ចន្លោះ ១,៦ ដល់ ១៤ វិនាទី · ណែនាំ ៦ វិនាទី សម្រាប់ការបើកស្រោមសំបុត្រពេញលេញ")}
           >
             <input
               type="range"
@@ -257,14 +258,14 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
           </Field>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="ចំណងជើងលើស្រោមសំបុត្រ" hint="ទទេ = មិនបង្ហាញ">
+            <Field label={t("ចំណងជើងលើស្រោមសំបុត្រ")} hint={t("ទទេ = មិនបង្ហាញ")}>
               <Input
                 value={form.envelopeTitle}
                 onChange={(e) => set("envelopeTitle", e.target.value)}
                 maxLength={80}
               />
             </Field>
-            <Field label="អក្សរតុបតែងខាងក្រោម" hint="ឧ. The Wedding Invitation · ទទេ = មិនបង្ហាញ">
+            <Field label={t("អក្សរតុបតែងខាងក្រោម")} hint={t("ឧ. The Wedding Invitation · ទទេ = មិនបង្ហាញ")}>
               <Input
                 value={form.envelopeSubtitle}
                 onChange={(e) => set("envelopeSubtitle", e.target.value)}
@@ -274,21 +275,21 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-3">
-            <Field label="អក្សរលើប៊ូតុងបើក">
+            <Field label={t("អក្សរលើប៊ូតុងបើក")}>
               <Input
                 value={form.envelopeOpenLabel}
                 onChange={(e) => set("envelopeOpenLabel", e.target.value)}
                 maxLength={60}
               />
             </Field>
-            <Field label="អក្សរណែនាំ">
+            <Field label={t("អក្សរណែនាំ")}>
               <Input
                 value={form.envelopeHint}
                 onChange={(e) => set("envelopeHint", e.target.value)}
                 maxLength={120}
               />
             </Field>
-            <Field label="អក្សរប៊ូតុងរំលង">
+            <Field label={t("អក្សរប៊ូតុងរំលង")}>
               <Input
                 value={form.envelopeSkipLabel}
                 onChange={(e) => set("envelopeSkipLabel", e.target.value)}
@@ -300,46 +301,12 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
       </Card>
 
       <Card
-        title="ស៊ុមក្បាច់ខ្មែរ"
-        description="ក្បាច់មាសបោះពុម្ពផុសលើក្រដាស — ស្ថិត មិនមានចលនា"
+        title={t("វីដេអូមុនអាពាហ៍ពិពាហ៍")}
+        description={t("ចាក់បន្ទាប់ពីបើកសំបុត្ររួច មុនពេលវាំងននបើក")}
       >
         <div className="space-y-4">
           <Toggle
-            label="ក្បាច់ផុស (emboss)"
-            hint="ស្រមោល និងគែមភ្លឺ ធ្វើឱ្យក្បាច់ផុសចេញពីក្រដាស"
-            checked={form.frameEmboss}
-            onChange={(v) => set("frameEmboss", v)}
-          />
-
-          <Field
-            label={`កម្រិតផុស — ${form.frameDepth}%`}
-            hint="ទាប = ស្ដើង, ខ្ពស់ = ផុសច្បាស់"
-          >
-            <input
-              type="range"
-              min={0}
-              max={100}
-              step={5}
-              value={form.frameDepth}
-              onChange={(e) => set("frameDepth", Number(e.target.value))}
-              className="w-full accent-amber-600"
-            />
-          </Field>
-
-          <p className="text-xs leading-relaxed text-slate-500">
-            ស៊ុមក្បាច់ខ្មែរគ្មានចលនាទេ។ ចលនាទាំងអស់ស្ថិតនៅលើសំបុត្រប៉ុណ្ណោះ។
-            ដើម្បីកែទំហំស៊ុម សូមទៅកាន់ <strong>រូបរាង</strong>។
-          </p>
-        </div>
-      </Card>
-
-      <Card
-        title="វីដេអូមុនអាពាហ៍ពិពាហ៍"
-        description="ចាក់បន្ទាប់ពីបើកសំបុត្ររួច មុនពេលវាំងននបើក"
-      >
-        <div className="space-y-4">
-          <Toggle
-            label="បង្ហាញវីដេអូ"
+            label={t("បង្ហាញវីដេអូ")}
             checked={form.videoEnabled}
             onChange={(v) => set("videoEnabled", v)}
           />
@@ -347,8 +314,8 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
           {form.videoEnabled && (
             <>
               <Field
-                label="តំណវីដេអូ (YouTube, Vimeo, Facebook ឬ .mp4)"
-                hint="ចម្លងតំណពេញ រួមទាំង https://"
+                label={t("តំណវីដេអូ (YouTube, Vimeo, Facebook ឬ .mp4)")}
+                hint={t("ចម្លងតំណពេញ រួមទាំង https://")}
               >
                 <Input
                   value={form.videoUrl}
@@ -358,7 +325,7 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
               </Field>
 
               <MediaUpload
-                label="ឬផ្ទុកឯកសារវីដេអូ (អតិបរមា 64MB)"
+                label={t("ឬផ្ទុកឯកសារវីដេអូ (អតិបរមា 64MB)")}
                 kind="video"
                 currentSrc={form.videoMediaId ? `/api/media/${form.videoMediaId}` : undefined}
                 onUploaded={(id) => set("videoMediaId", id)}
@@ -366,7 +333,7 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
               />
 
               <MediaUpload
-                label="រូបភាពគម្រប (បង្ហាញពេលកំពុងផ្ទុក)"
+                label={t("រូបភាពគម្រប (បង្ហាញពេលកំពុងផ្ទុក)")}
                 kind="image"
                 currentSrc={form.videoPosterId ? `/api/media/${form.videoPosterId}` : undefined}
                 onUploaded={(id) => set("videoPosterId", id)}
@@ -383,7 +350,7 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
                 * two names for it meant the guest saw whichever one the
                 * browser happened to produce.
                 */}
-              <Field label="អក្សរប៊ូតុងរំលង">
+              <Field label={t("អក្សរប៊ូតុងរំលង")}>
                 <Input
                   value={form.videoSkipLabel}
                   onChange={(e) => set("videoSkipLabel", e.target.value)}
@@ -406,19 +373,18 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
                 {(() => {
                   const source = videoSource({ ...wedding, ...form });
                   if (!source) {
-                    return "មិនទាន់មានវីដេអូ។ សូមបញ្ចូលតំណ ឬផ្ទុកឯកសារ។";
+                    return t("មិនទាន់មានវីដេអូ។ សូមបញ្ចូលតំណ ឬផ្ទុកឯកសារ។");
                   }
                   if (source.kind === "file") {
-                    return "ឯកសារវីដេអូ៖ ចាក់ដោយស្វ័យប្រវត្តិ (បិទសំឡេង) ហើយបន្តទៅវាំងននដោយខ្លួនឯងពេលចប់។ ភ្ញៀវអាចបើកសំឡេង ឬរំលងបាន។";
+                    return t("ឯកសារវីដេអូ៖ ចាក់ដោយស្វ័យប្រវត្តិ (បិទសំឡេង) ហើយបន្តទៅវាំងននដោយខ្លួនឯងពេលចប់។ ភ្ញៀវអាចបើកសំឡេង ឬរំលងបាន។");
                   }
-                  return "តំណ YouTube / Vimeo / Facebook៖ ចាក់ដោយស្វ័យប្រវត្តិ (បិទសំឡេង) ប៉ុន្តែវេទិកាខាងក្រៅមិនប្រាប់ថាចប់ទេ — ភ្ញៀវត្រូវចុចប៊ូតុងរំលង ដើម្បីទៅលិខិត។";
+                  return t("តំណ YouTube / Vimeo / Facebook៖ ចាក់ដោយស្វ័យប្រវត្តិ (បិទសំឡេង) ប៉ុន្តែវេទិកាខាងក្រៅមិនប្រាប់ថាចប់ទេ — ភ្ញៀវត្រូវចុចប៊ូតុងរំលង ដើម្បីទៅលិខិត។");
                 })()}
               </p>
 
               {form.videoMediaId && form.videoUrl.trim() && (
                 <p className="text-xs text-amber-700">
-                  មានទាំងតំណ និងឯកសារ — ប្រព័ន្ធនឹងប្រើ<strong>ឯកសារដែលបានផ្ទុក</strong>។
-                </p>
+                  {t("មានទាំងតំណ និងឯកសារ — ប្រព័ន្ធនឹងប្រើ")}<strong>{t("ឯកសារដែលបានផ្ទុក")}</strong>{t("។")}</p>
               )}
             </>
           )}
@@ -433,20 +399,18 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
             send("/api/admin/wedding", {
               method: "PUT",
               body: JSON.stringify(form),
-              successText: "រក្សាទុករួចរាល់",
+              successText: t("រក្សាទុករួចរាល់"),
             })
           }
         >
-          រក្សាទុក
-        </Button>
+          {t("រក្សាទុក")}</Button>
         <a
           href={workspacePath(wedding.slug)}
           target="_blank"
           rel="noreferrer"
           className="text-sm text-amber-700 underline-offset-4 hover:underline"
         >
-          មើលសំបុត្រអញ្ជើញ ↗
-        </a>
+          {t("មើលសំបុត្រអញ្ជើញ ↗")}</a>
       </div>
     </div>
   );

@@ -1,8 +1,11 @@
 "use client";
 
+import { dropLeadingZeros } from "@/lib/numberInput";
+
 import { useRouter } from "next/navigation";
 import { useState, type ReactNode } from "react";
 
+import { useT } from "./AdminPrefs";
 /* ── Primitives ─────────────────────────────────────────────────────────── */
 
 /**
@@ -62,6 +65,14 @@ export function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...props}
+      onChange={
+        props.type === "number" && props.onChange
+          ? (e) => {
+              dropLeadingZeros(e.currentTarget); // 02 → 2
+              props.onChange!(e);
+            }
+          : props.onChange
+      }
       className={`w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-200 ${props.className ?? ""}`}
     />
   );
@@ -161,6 +172,7 @@ export function Card({ title, description, children, actions }: {
 /* ── Save state helper ──────────────────────────────────────────────────── */
 
 export function useApi() {
+  const t = useT();
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<{ type: "ok" | "error"; text: string } | null>(null);
@@ -181,11 +193,11 @@ export function useApi() {
       if (!response.ok || payload.ok === false) {
         throw new Error(payload.error || `Request failed (${response.status})`);
       }
-      setMessage({ type: "ok", text: successText ?? "រក្សាទុករួចរាល់" });
+      setMessage({ type: "ok", text: successText ?? t("រក្សាទុករួចរាល់") });
       router.refresh();
       return payload.data ?? payload;
     } catch (error) {
-      setMessage({ type: "error", text: error instanceof Error ? error.message : "មានបញ្ហា" });
+      setMessage({ type: "error", text: error instanceof Error ? error.message : t("មានបញ្ហា") });
       return null;
     } finally {
       setBusy(false);
@@ -225,6 +237,7 @@ export function MediaUpload({
   onUploaded: (mediaId: string) => void;
   onClear?: () => void;
 }) {
+  const t = useT();
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(0);
   const [error, setError] = useState("");
@@ -251,7 +264,7 @@ export function MediaUpload({
 
       const response = await fetch("/api/admin/upload/chunk", { method: "POST", body });
       const payload = await read(response);
-      if (!payload?.ok) throw new Error(payload?.error || `ការផ្ទុកបានបរាជ័យ (${response.status})`);
+      if (!payload?.ok) throw new Error(payload?.error || `${t("ការផ្ទុកបានបរាជ័យ")} (${response.status})`);
       setSent(Math.round(((index + 1) / total) * 100));
     }
     return uploadId;
@@ -272,7 +285,7 @@ export function MediaUpload({
       const response = await fetch("/api/admin/upload", { method: "POST", body });
       const payload = await read(response);
       if (!payload) {
-        throw new Error(`ការផ្ទុកមិនបានសម្រេច (${response.status}). សូមព្យាយាមម្ដងទៀត។`);
+        throw new Error(`${t("ការផ្ទុកមិនបានសម្រេច")} (${response.status}). ${t("សូមព្យាយាមម្ដងទៀត។")}`);
       }
       if (!response.ok || !payload.ok || !payload.data) {
         throw new Error(payload.error || "Upload failed");
@@ -304,11 +317,11 @@ export function MediaUpload({
               says "loading" for that long looks like one that has died. */}
           {busy
             ? sent > 0
-              ? `កំពុងផ្ទុក... ${sent}%`
-              : "កំពុងផ្ទុក..."
+              ? `${t("កំពុងផ្ទុក...")} ${sent}%`
+              : t("កំពុងផ្ទុក...")
             : currentSrc
-              ? "ប្ដូរឯកសារ"
-              : "ជ្រើសរើសឯកសារ"}
+              ? t("ប្ដូរឯកសារ")
+              : t("ជ្រើសរើសឯកសារ")}
           <input
             type="file"
             className="hidden"
@@ -323,8 +336,7 @@ export function MediaUpload({
         </label>
         {currentSrc && onClear && (
           <Button variant="danger" type="button" onClick={onClear}>
-            លុប
-          </Button>
+            {t("លុប")}</Button>
         )}
       </div>
       {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
@@ -378,6 +390,7 @@ export function ArtworkField({
    */
   preset?: boolean;
 }) {
+  const t = useT();
   return (
     <div className="space-y-4">
       <MediaUpload
@@ -398,11 +411,11 @@ export function ArtworkField({
         <div className="space-y-4 rounded-lg border border-slate-200 bg-slate-50/60 p-4">
           <div className="grid gap-4 sm:grid-cols-2">
             {mediaId && (
-              <Field label="របៀបដាក់រូប">
+              <Field label={t("របៀបដាក់រូប")}>
                 <Select value={fit} onChange={(e) => onFit(e.target.value)}>
                   {fits.map((option) => (
                     <option key={option} value={option}>
-                      {FIT_LABELS[option]}
+                      {t(FIT_LABELS[option])}
                     </option>
                   ))}
                 </Select>

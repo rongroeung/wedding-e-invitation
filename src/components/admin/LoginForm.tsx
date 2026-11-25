@@ -4,7 +4,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { Button, Field, Input } from "./ui";
 
+import { useT } from "./AdminPrefs";
 function Form() {
+  const t = useT();
   const router = useRouter();
   const params = useSearchParams();
   const [email, setEmail] = useState("");
@@ -37,11 +39,11 @@ function Form() {
       onSubmit={submit}
       className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-8 shadow-sm"
     >
-      <h1 className="text-lg font-semibold text-slate-800">ចូលប្រព័ន្ធគ្រប់គ្រង</h1>
+      <h1 className="text-lg font-semibold text-slate-800">{t("ចូលប្រព័ន្ធគ្រប់គ្រង")}</h1>
       <p className="mt-1 text-xs text-slate-500">Wedding E-Invitation Admin</p>
 
       <div className="mt-6 space-y-4">
-        <Field label="អ៊ីមែល">
+        <Field label={t("អ៊ីមែល")}>
           <Input
             type="email"
             value={email}
@@ -50,7 +52,7 @@ function Form() {
             required
           />
         </Field>
-        <Field label="ពាក្យសម្ងាត់">
+        <Field label={t("ពាក្យសម្ងាត់")}>
           <Input
             type="password"
             value={password}
@@ -64,7 +66,7 @@ function Form() {
       {error && <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
 
       <Button type="submit" disabled={busy} className="mt-6 w-full">
-        {busy ? "កំពុងចូល..." : "ចូល"}
+        {busy ? t("កំពុងចូល...") : t("ចូល")}
       </Button>
     </form>
   );

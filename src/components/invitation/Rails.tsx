@@ -2,6 +2,7 @@
 
 import type { Guest, Wedding } from "@/lib/db/schema";
 import { formatLatinDate } from "@/lib/khmer";
+import { guestDisplayName } from "@/lib/guestTitles";
 
 /* ── Left rail: the two facts a guest looks up again and again ─────────── */
 
@@ -113,7 +114,7 @@ export function ControlsRail({
             ស្កេន QR នេះដើម្បីបើកនៅលើទូរស័ព្ទ
           </p>
           <p className="mt-4 rounded-lg bg-white/10 px-3 py-2 text-sm text-cream khmer-wrap">
-            {guest.nameLatin?.trim() || `${guest.title} ${guest.name}`}
+            {guest.nameLatin?.trim() || guestDisplayName(guest)}
           </p>
         </div>
       )}

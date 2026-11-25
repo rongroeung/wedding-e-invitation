@@ -5,6 +5,7 @@ import { FieldReport } from "@/components/invitation/FieldReport";
 import { InvitationPage } from "@/components/invitation/InvitationPage";
 import { weddingMetadata } from "@/lib/metadata";
 import { getGuestByCode, getGuestRsvp, getInvitationData, getWedding } from "@/lib/queries";
+import { guestDisplayName } from "@/lib/guestTitles";
 
 export const dynamic = "force-dynamic";
 
@@ -31,9 +32,9 @@ export async function generateMetadata({ params }: Pick<Params, "params">): Prom
   const wedding = await getWedding(guest?.weddingId ?? "main").catch(() => getWedding());
   const title = `${wedding.title} | ${wedding.groomName} & ${wedding.brideName}`;
   return weddingMetadata(wedding, {
-    title: guest ? `${title} — ${guest.title} ${guest.name}` : title,
+    title: guest ? `${title} — ${guestDisplayName(guest)}` : title,
     description: guest
-      ? `សូមគោរពអញ្ជើញ ${guest.title} ${guest.name} • ${wedding.weddingDateKhmer}`
+      ? `សូមគោរពអញ្ជើញ ${guestDisplayName(guest)} • ${wedding.weddingDateKhmer}`
       : wedding.metaDescription,
   });
 }

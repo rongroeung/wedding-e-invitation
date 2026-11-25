@@ -24,8 +24,15 @@ import {
  */
 const weddingId = () => text("wedding_id").notNull();
 
-/** One colour of the wedding palette. */
-export type DressColor = { hex: string; name: string };
+/**
+ * One colour of the wedding palette: its colour and name, optionally a photo
+ * of the fabric (an upload, `mediaId`, or one of the swatches shipped in
+ * public/dress, `image`), and the group it belongs to (an index into
+ * `dressGroups`).
+ */
+export type DressColor = { hex: string; name: string; group?: number; mediaId?: string; image?: string };
+/** A group of colours with its own heading, e.g. "Evening Attire" / "December-19, 2026". */
+export type DressGroup = { title: string; note: string };
 
 /** Raw binary column used for uploaded photos / audio / QR images. */
 export const bytea = customType<{ data: Buffer; default: false }>({
@@ -150,6 +157,8 @@ export const wedding = pgTable("wedding", {
   invitationHonorific: text("invitation_honorific")
     .notNull()
     .default("ឯកឧត្តម លោកអ្នកឧកញ៉ា អ្នកឧកញ៉ា ឧកញ៉ា លោកជំទាវ លោក លោកស្រី អ្នកនាង កញ្ញា"),
+  /** On the opening page and the cover when the link names no guest. */
+  defaultGuestName: text("default_guest_name").notNull().default("ភ្ញៀវកិត្តិយស"),
   invitationBody: text("invitation_body").notNull().default("អញ្ជើញចូលរួម ជាអធិបតី និងជាភ្ញៀវកិត្តិយស ដើម្បីប្រសិទ្ធិពរជ័យសិរីមង្គលអាពាហ៍ពិពាហ៍ កូនប្រុស កូនស្រី របស់យើងខ្ញុំ"),
 
   // Date & venue
@@ -188,6 +197,10 @@ export const wedding = pgTable("wedding", {
   dressCodeNote: text("dress_code_note").notNull().default(""),
   /** In order: [{ hex: "#a4b8c4", name: "ខៀវស្រាល" }, …] (lib/dressColors). */
   dressColors: jsonb("dress_colors").$type<DressColor[]>().notNull().default([]),
+  /** The couple's own honorifics for guests, after the built-in ones (lib/guestTitles). */
+  guestTitles: jsonb("guest_titles").$type<string[]>().notNull().default([]),
+  /** Optional headings that split the colours, e.g. by day (lib/dressColors). */
+  dressGroups: jsonb("dress_groups").$type<DressGroup[]>().notNull().default([]),
 
   // Music
   musicEnabled: boolean("music_enabled").notNull().default(false),

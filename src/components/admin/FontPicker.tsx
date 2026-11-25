@@ -2,6 +2,7 @@
 
 import fonts from "@/lib/khmer-fonts.json";
 
+import { useT } from "./AdminPrefs";
 type KhmerFont = { family: string; role: "heading" | "text"; note: string; license: string };
 
 const FONTS = fonts as KhmerFont[];
@@ -27,6 +28,7 @@ export function FontPicker({
   prefer: "heading" | "text";
   sample: string;
 }) {
+  const t = useT();
   const groups: { role: KhmerFont["role"]; title: string }[] =
     prefer === "heading"
       ? [
@@ -42,7 +44,7 @@ export function FontPicker({
     <div className="max-h-[26rem] space-y-4 overflow-y-auto rounded-xl border border-slate-200 p-3">
       {groups.map((g) => (
         <div key={g.role}>
-          <p className="mb-2 text-xs font-medium text-slate-500">{g.title}</p>
+          <p className="mb-2 text-xs font-medium text-slate-500">{t(g.title)}</p>
           <div className="grid gap-2 sm:grid-cols-2">
             {FONTS.filter((f) => f.role === g.role).map((f) => {
               const chosen = current === f.family;
@@ -60,7 +62,7 @@ export function FontPicker({
                     {sample}
                   </span>
                   <span className="block text-xs text-slate-700">{f.family}</span>
-                  <span className="block text-[0.7rem] leading-relaxed text-slate-400">{f.note}</span>
+                  <span className="block text-[0.7rem] leading-relaxed text-slate-400">{t(f.note)}</span>
                 </button>
               );
             })}

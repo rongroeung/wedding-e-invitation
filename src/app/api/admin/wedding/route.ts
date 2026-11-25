@@ -11,7 +11,8 @@ import { getDb } from "@/lib/db";
 import { wedding } from "@/lib/db/schema";
 import { getWedding } from "@/lib/queries";
 import { MONOGRAM_FONT_IDS } from "@/lib/monogram-fonts";
-import { MAX_DRESS_COLORS } from "@/lib/dressColors";
+import { MAX_CUSTOM_TITLES } from "@/lib/guestTitles";
+import { BUILTIN_DRESS_IMAGE, MAX_DRESS_COLORS, MAX_DRESS_GROUPS } from "@/lib/dressColors";
 
 export const dynamic = "force-dynamic";
 
@@ -55,6 +56,7 @@ const schema = z.object({
   invitationDateLine: z.string().max(200).optional(),
   invitationPlace: z.string().max(400).optional(),
   invitationHonorific: z.string().max(300).optional(),
+  defaultGuestName: z.string().max(120).optional(),
   invitationBody: z.string().max(900).optional(),
 
   weddingDate: z.string().optional(),
@@ -77,8 +79,21 @@ const schema = z.object({
   dressCodeTitle: z.string().max(120).optional(),
   dressCodeNote: z.string().max(400).optional(),
   dressColors: z
-    .array(z.object({ hex: z.string().regex(/^#[0-9a-fA-F]{6}$/), name: z.string().trim().max(40) }))
+    .array(
+      z.object({
+        hex: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+        name: z.string().trim().max(40),
+        group: z.number().int().min(0).max(MAX_DRESS_GROUPS - 1).optional(),
+        mediaId: z.string().max(80).optional(),
+        image: z.string().regex(BUILTIN_DRESS_IMAGE).optional(),
+      }),
+    )
     .max(MAX_DRESS_COLORS)
+    .optional(),
+  guestTitles: z.array(z.string().trim().min(1).max(40)).max(MAX_CUSTOM_TITLES).optional(),
+  dressGroups: z
+    .array(z.object({ title: z.string().trim().max(80), note: z.string().trim().max(80) }))
+    .max(MAX_DRESS_GROUPS)
     .optional(),
   giftIntro: z.string().max(400).optional(),
   giftNote: z.string().max(400).optional(),
@@ -237,6 +252,9 @@ export async function PUT(request: Request) {
     if (/(MediaId|PhotoId|PosterId)$/.test(key) && typeof value === "string" && value) {
       if (!(await ownsMedia(weddingId, value))) return fail("File not found", 404, { field: key });
     }
+  }
+  for (const c of rest.dressColors ?? []) {
+    if (c.mediaId && !(await ownsMedia(weddingId, c.mediaId))) return fail("File not found", 404, { field: "dressColors" });
   }
 
   const db = await getDb();

@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
+import { AdminPrefsToggles, useT } from "./AdminPrefs";
+import { Brand } from "./Brand";
 
 type NavItem = { href: string; label: string; icon: string };
 
@@ -32,6 +34,7 @@ export function AdminSidebar({
   switcher?: ReactNode;
   logout: ReactNode;
 }) {
+  const t = useT();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -56,14 +59,13 @@ export function AdminSidebar({
     <>
       <div className="flex items-start justify-between px-5 py-5">
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-slate-800">{title}</p>
-          <p className="mt-0.5 truncate text-xs text-slate-500">{subtitle}</p>
+          <Brand tagline={subtitle} />
         </div>
         <button
           type="button"
           onClick={() => setOpen(false)}
           className="-mr-2 -mt-1 rounded-lg p-2 text-slate-500 hover:bg-slate-100 lg:hidden"
-          aria-label="បិទម៉ឺនុយ"
+          aria-label={t("បិទម៉ឺនុយ")}
         >
           ✕
         </button>
@@ -83,11 +85,12 @@ export function AdminSidebar({
             }`}
           >
             <span aria-hidden="true">{item.icon}</span>
-            {item.label}
+            {t(item.label)}
           </Link>
         ))}
       </nav>
       <div className="border-t border-slate-100 px-5 py-4">
+        <AdminPrefsToggles className="mb-3" />
         <p className="truncate text-xs text-slate-500">{email}</p>
         <div className="mt-3 flex flex-col gap-2">
           <Link
@@ -95,8 +98,7 @@ export function AdminSidebar({
             target="_blank"
             className="rounded-lg border border-slate-300 px-3 py-1.5 text-center text-xs text-slate-600 hover:bg-slate-50"
           >
-            មើលសំបុត្រអញ្ជើញ ↗
-          </Link>
+            {t("មើលសំបុត្រអញ្ជើញ ↗")}</Link>
           {logout}
         </div>
       </div>
@@ -111,7 +113,7 @@ export function AdminSidebar({
           type="button"
           onClick={() => setOpen(true)}
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 text-lg text-slate-700 hover:bg-slate-50"
-          aria-label="បើកម៉ឺនុយ"
+          aria-label={t("បើកម៉ឺនុយ")}
           aria-expanded={open}
           aria-controls="admin-drawer"
         >
@@ -119,7 +121,7 @@ export function AdminSidebar({
         </button>
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold text-slate-800">
-            {current ? `${current.icon} ${current.label}` : title}
+            {current ? `${current.icon} ${t(current.label)}` : title}
           </p>
           <p className="truncate text-xs text-slate-500">{subtitle}</p>
         </div>
@@ -138,7 +140,7 @@ export function AdminSidebar({
         className={`fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] overflow-y-auto bg-white shadow-xl transition-transform duration-300 lg:hidden ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
-        aria-label="ម៉ឺនុយគ្រប់គ្រង"
+        aria-label={t("ម៉ឺនុយគ្រប់គ្រង")}
         aria-hidden={!open}
         inert={!open}
       >

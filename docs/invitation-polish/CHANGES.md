@@ -965,3 +965,144 @@ Request: replace the closing thanks/wish (and the admin card "ពរជ័យប
 - **Cause:** the events API limited `icon` to 8 characters, which fits an emoji. The agenda icons are stored as names (`pi:offering-bowl`, 16 characters), so saving any item with one, new or edited, was rejected with 422.
 - **Fix:** `icon` max 40, `groupIcon` max 16 and `groupName` max 160 (for the long day headings), in both `api/admin/events` and `api/admin/events/[id]`.
 - **Checked** against the production build with an admin session: PUT with `pi:offering-bowl` returned 200, and POST with `pi:couple-feast` and a day-2 group name returned 201. The test item was deleted and the edited icon restored.
+
+## Pre-wedding film and poster preloaded
+
+- **Poster** (`ImagePreload.tsx`): the film's poster is now in the high-priority `<link rel=preload as=image>` list, with the other images.
+- **Film file** (`useFilmPreload.ts`, new): after the page's `load` event, an uploaded film is downloaded once in the background into a Blob, and the player is given that local copy. The film then starts instantly with no buffering when the guest reaches it. The original URL is used until the copy is ready, if the download fails, and always for YouTube/Vimeo links (those cannot be preloaded).
+- **No restart** (`PreWeddingVideo.tsx`): the player keeps the source it started with, so a copy that finishes downloading mid-play does not restart the film.
+- Verified in a browser with a test upload: the poster appeared in the preload links, the film was fetched once (~0.4 s after load), and after opening it played from the `blob:` copy with no second download. The test data was removed afterwards.
+- Trade-off: every visitor downloads the whole film, even if they never scroll to it. Keep uploads compressed (e.g. 720p, a few MB).
+
+## Themes 9, 10 and 11; ភ្ញៀវកិត្តិយស as the default guest name
+
+**Default guest name.** On the general link (no guest), the opening page and the cover used to show the letter's honorific line (ឯកឧត្តម លោកអ្នកឧកញ៉ា …). They now show a setting of their own.
+- New column `default_guest_name`, migration `0050_default_guest_name.sql`, default **ភ្ញៀវកិត្តិយស**.
+- Admin → ព័ត៌មានអាពាហ៍ពិពាហ៍ → **ឈ្មោះភ្ញៀវលំនាំដើម** (under ងារកិត្តិយស).
+- `coverName()` uses it, falling back to ភ្ញៀវកិត្តិយស when left empty. The letter's honorific line is unchanged.
+
+**Three film themes from the couple's videos.** Each video is a camera move that settles on a scene, after which a template couple's names fade in. Only footage from before the lettering is used.
+- **Theme 9 · សួនចង្កៀងគ្រីស្តាល់ (`chandelier`):** crystal chandeliers and silk swags over a rose-garden pavilion. The film runs frames 0–162 (5.44 s) and holds on the misty frame 162; the lettering starts at frame 168. Deep-rose ink.
+- **Theme 10 · សួនទឹកធ្លាក់ (`cascade`):** a waterfall, a bridge and a fountain. The lettering arrives before the mist, so the film is cut at frame 132 (4.4 s), then cross-fades over 1 s into the settled scene (frame 400). In that scene the lettering ("Pernikahan / Dina & Naufal") was removed by masking (darker and redder than the local median), inpainting in two passes and softening the filled area into mist. Plum ink.
+- **Theme 11 · សួនក្ងោក (`peacock`):** a white pavilion, a fawn and two peacocks. The film runs frames 0–162 and holds on frame 162. Sage ink, gold names.
+- **Files:** `public/themes/<key>/` holds the intro (H.264, faststart, muted), the still, the tiny still and the thumbnail, all at the source size.
+- **Code:** each theme has a `SCENES` spec and a label in `invitationTheme.ts`, and `.scene-<key>` CSS for placement and colours. No migration is needed for the themes.
+
+**Checked** on the production build. Themes were switched through the admin API (PUT 200 for each).
+- **Each theme**, at 390×844 and 1440×900: the film plays and the words come in; the opening, cover, letter and programme were screenshotted and reviewed; no page errors.
+- **General link:** the opening and the cover show ភ្ញៀវកិត្តិយស.
+- **Admin:** the theme page lists Themes 9–11 with thumbnails.
+- **Films:** the last frames of each were reviewed for any leftover lettering.
+- **Note:** the local test database was rebuilt twice with `db:setup` after I changed it while the server was running. Only this sandbox's demo data was affected. The theme was set back to Theme 1 afterwards.
+
+## An icon for ចៅមហា; Theme 7 opens on its envelope; the couple's attire colours
+
+**Icon for ពិធីចៅមហានិយាយជើងការ រាប់ផ្លែឈើ.**
+- **The icon:** `public/program-icons/chao-moha.png`, an original drawing: a footed tray heaped with a pyramid of fruit (3 · 2 · 1) with a stem and leaf on top. It uses the same 160×160 alpha mask and weight as the other icons, with fruit and leaf only (no flowers). Source: `scripts/icons/chao-moha.svg`.
+- **Picker:** listed in `PROGRAM_ICONS` as "ចៅមហា · រាប់ផ្លែឈើ". The offering bowl it used to share is now labelled "ពានជំនូន".
+- **Migration `0051`:** sets the icon on that item when it is still empty or on the offering bowl.
+
+**Film themes open on the film's first frame.**
+- **Cause:** the opening's `<video>` poster, and the blurred backdrop on wide screens, were the film's *last* frame. Until the film began playing, guests saw where it ends: for Theme 7, the empty golden arch instead of the envelope.
+- **Fix:** each scene now has `first` (`<key>-first.webp`, frame 0 of its intro). The poster and the backdrop are the first frame until the film arrives, then the last frame. If the film can't play (reduced motion, autoplay refused, an error), the opening moves to the last frame as before.
+- **Preloading:** `ImagePreload` loads the first frame at high priority while the opening will be shown.
+- **Checked (Theme 7, 390×844):** at load the poster and backdrop were `royal-first.webp` and the envelope with its wax seal was on screen. After the film the poster was the arch and the words were in. With reduced motion it went straight to the arch. No page errors.
+
+**ពណ៌សម្លៀកបំពាក់ in groups, shown as fabric photos.**
+- **Data:**
+  - `DressColor` gains `group` (an index into the new `dress_groups` column, `[{title, note}]`, migration `0052`), `mediaId` (an uploaded fabric photo, checked to be this wedding's own) and `image` (a swatch shipped in `public/dress/`, path-validated).
+  - Up to 12 colours and 4 groups.
+- **Invitation:** each group has its heading (Cormorant, uppercase, in the letter ink) and its line. Each colour is a round swatch of its fabric photo, or the drawn cloth when there is no photo. Neighbouring colours with the same name share one label under them all, as with the three golds.
+- **Admin (ពណ៌សម្លៀកបំពាក់):**
+  - a new **ក្រុមពណ៌** card (title and line per group, add or remove; removing a group moves its colours to the one before);
+  - per colour, a group picker and a **រូបក្រណាត់** upload;
+  - the preview shows the groups.
+- **The couple's colours**, from their colour card, written by `0052` to their invitation (the one with their 0042 date line, only while it has no groups):
+  - **Evening Attire · December-19, 2026:** Cream, Baby yellow, Chocolate, Brown;
+  - **Morning Attire · December-18, 2026:** Gold ×3.
+  
+  The photos are their seven fabric pictures, cropped square to 360 px (the cream one cropped clear of its Pinterest caption).
+- **Checked** at 390 and 1280: two headings and lines, 7 fabric chips, five runs (four single colours and the three golds as one "Gold"), no sideways scroll, no errors.
+  - Admin: it loads 2 groups, 7 pickers and 7 thumbnails, and saving round-trips unchanged.
+  - API: an upload of this wedding's own was accepted and served (200). Another id was refused (404), and an outside image path was refused (422). The colours were restored afterwards.
+- tsc and `next build` are clean.
+
+## Guest list: used buttons turn green, your own ងារ, titles in the bulk import; រុងរឿងសំបុត្រ branding; attire in Khmer
+
+**Used link buttons turn green.**
+- **Which buttons:** in ភ្ញៀវ & តំណអញ្ជើញ, ចម្លងសារ, ចម្លងតំណ, ចែករំលែក, QR, កូដថ្មី and Telegram turn green with a ✓ once clicked for that guest, so it's clear whom the invitation has already gone to.
+- **Storage:** the marks are kept in this browser (`localStorage`), per guest and per invitation code. A new code starts that guest afresh, because the old link stops working.
+- **Reset:** **សម្អាតសញ្ញា** clears all the marks.
+
+**More ងារ.**
+- **Adding:** the ＋ beside the ងារ list opens **ងារបន្ថែម**: type a title (e.g. ឧកញ៉ា) and add it, and it is selected.
+- **Removing:** your own titles are shown as chips with ✕. Removing one doesn't change guests who already have it.
+- **Storage:** the built-in eight stay. Your titles are saved per wedding in the new `guest_titles` column (migration `0053`, up to 30), listed in `lib/guestTitles.ts`.
+
+**Bulk import with titles.**
+- **Line format:** `ងារ ឈ្មោះ, ចំនួនកៅអី`. A line that starts with a known title (built-in or your own; the longest match wins, so លោកស្រី isn't read as លោក) uses it.
+- **Default title:** lines without a title take **ងារលំនាំដើម**, a new picker in that card (it used to silently reuse the single-guest form's title).
+- **Preview:** the card shows each line as it will be imported (title, name, seats). The server uses the same parser (`parseGuestLines`).
+
+**Branding: រុងរឿងសំបុត្រ** (`components/admin/Brand.tsx`).
+- **The mark:** an original sealed envelope in gold on deep wine (no flowers), with the name in Moul.
+- **Where it shows:**
+  - large on the login page above the form, with "ប្រព័ន្ធសំបុត្រអញ្ជើញអាពាហ៍ពិពាហ៍អនឡាញ";
+  - in the admin sidebar and the phone drawer, replacing "Wedding Admin";
+  - every admin tab title ends with "· រុងរឿងសំបុត្រ".
+- Guests' invitation pages are unchanged.
+
+**ពណ៌សម្លៀកបំពាក់ in Khmer.** Migration `0053` rewrites the attire written by `0052`, only while it is still exactly as written:
+- **Headings:** សម្លៀកបំពាក់ពេលល្ងាច · ថ្ងៃទី១៩ ខែធ្នូ ឆ្នាំ២០២៦, and សម្លៀកបំពាក់ពេលព្រឹក · ថ្ងៃទី១៨ ខែធ្នូ ឆ្នាំ២០២៦.
+- **Colours:** ពណ៌ក្រែម, ពណ៌លឿងស្រាល, ពណ៌សូកូឡា, ពណ៌ត្នោត and ពណ៌មាស (×3, one label).
+
+**Checked** on the production build in Chromium.
+- **Custom title:** added ឧកញ៉ា, saw it selected and listed, added a guest with it, then removed it (8 titles left, the guest unchanged).
+- **Bulk import:** "លោកស្រី …, 2 / … (no title), 1 / ឧកញ៉ា …, 3" with default កញ្ញា previewed and imported as លោកស្រី / កញ្ញា / ឧកញ៉ា with 2 / 1 / 3 seats.
+- **Marks:** ចម្លងសារ went from white to green with ✓ (rgb 236 253 245), copied the guest's message, and was still marked after a reload. QR was marked too.
+- **Branding:** login and sidebar screenshots; the tab title is "ចូលប្រព័ន្ធគ្រប់គ្រង · រុងរឿងសំបុត្រ".
+- **Attire:** the Khmer headings and names at 390 and 1280 px.
+- **Clean-up:** the test guests were deleted afterwards.
+- tsc and `next build` are clean.
+
+## Admin in Khmer or English; light or dark; brand fixed; buttons fade back; no-title guests; ស៊ុមក្បាច់ខ្មែរ card removed
+
+**Brand name clipped.**
+- **Cause:** the name's `truncate` sets `overflow: hidden`, and with a normal line height that cut off Moul's tall vowels (ុ ឿ ំ).
+- **Fix:** the name no longer truncates and gets a 1.9 line height with a little top padding. Checked in a 2× close-up of the login brand: every mark is whole and nothing overflows its box (scroll height = client height).
+
+**ស៊ុមក្បាច់ខ្មែរ card removed** from សំបុត្រ & ស៊ុម ៣មិតិ (emboss on/off and depth). The saved values are untouched, so the invitation looks the same.
+
+**Link buttons fade back.** A clicked ចម្លងសារ / ចម្លងតំណ / ចែករំលែក / QR / កូដថ្មី / Telegram turns green with ✓ for 6 seconds, then returns to normal. A second click restarts the 6 seconds. Nothing is stored any more; the **សម្អាតសញ្ញា** button and the localStorage marks are gone.
+
+**Guests without a ងារ.**
+- **Pickers:** both title pickers (one guest, bulk import) have **— គ្មានងារ —**.
+- **One helper:** `guestDisplayName()` (lib/guestTitles) joins title and name without a stray space. It's used on the cover, the side rail, the RSVP form, the page title and description, and the admin list and QR. The link message already tidied empty tokens.
+
+**Light / dark admin.**
+- **The switch:** ☾ / ☀ beside the language switch, on the login page (top right) and in the sidebar (also in the phone drawer).
+- **How it's styled:** dark mode remaps the admin's light utility colours under `.admin-root[data-admin-theme="dark"]` (one block in globals.css, no per-file changes). Native controls follow (`color-scheme: dark`). Anything inside `.admin-keep` (the attire preview of the invitation) keeps its real colours.
+
+**ខ្មែរ / EN admin** (admin only; the guests' invitation is unchanged).
+- **How it works:**
+  - The Khmer text is the key: `t("ចម្លងសារ")` (lib/i18n/admin.ts) returns the English from `lib/i18n/admin-en.ts` (about 600 entries), or the Khmer as written when an entry is missing, so nothing ever goes blank.
+  - Client components use `useT()` (AdminPrefs); server pages use `getT()`.
+  - Lists from lib (theme names and hints, paper tones, effects, fonts, design kits, programme icons, backdrops, caption tokens) are translated where they are shown, using their own `en` field where they have one.
+- **Not translated:** your own data (names, programme items, letter text, dates, colour names) and stored values (guest titles, defaults that get saved). The dashboard's Khmer digits show only in Khmer.
+- **No flash:** both choices are cookies (`admin_lang`, `admin_theme`, one year) that the server reads, so the first paint is already right. Switching the language refreshes the server-rendered parts in place.
+- **How the strings were wrapped:** a TypeScript-AST script (`scripts/i18n-wrap-admin.cjs`) wrapped JSX text, display attributes and status messages. The rest (text with numbers in it, module-level lists, the layout) was done by hand, and every wrapped literal was reviewed so that no stored value is translated.
+
+**Checked** on the production build in Chromium.
+- **English + dark:** switched both on the login page; title "Admin sign-in · រុងរឿងសំបុត្រ". Then all 13 admin pages: the only Khmer left is your data (couple's names, programme items, guest names, dates, colour names, font samples). Screenshots reviewed.
+- **Khmer + light:** the default for a fresh browser.
+- **No title:** a guest added with no title shows as just the name.
+- **Buttons:** ✓ ចម្លងតំណ after the click, plain ចម្លងតំណ after 6.5 s.
+- **Errors and clean-up:** no page errors; the test guests were deleted.
+- tsc and `next build` are clean.
+
+## Number boxes drop leading zeros (02 → 2)
+
+- **Cause:** typing "02" into a controlled number box keeps showing "02", because React only rewrites the box when its number differs from the state, and 02 = 2.
+- **Fix:** `dropLeadingZeros()` (lib/numberInput) rewrites the box itself as you type: 02 → 2, 012 → 12. A lone 0 and decimals like 0.5 are left alone.
+- **Where it applies:** in the shared admin `Input` for every `type="number"` (seats, programme order, gallery order…), and in the guests' RSVP count box.
+- **Checked** by typing into the real boxes on the production build: seats 02 → 2, 01 → 1, 012 → 12, 10 → 10, 0 → 0. On the invitation, typing 0 before 2 in the RSVP count → 2. No page errors; tsc and build are clean.

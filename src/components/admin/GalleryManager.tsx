@@ -5,8 +5,10 @@ import type { GalleryImage } from "@/lib/db/schema";
 import { mediaSrc } from "@/lib/media";
 import { Button, Card, Field, Input, MediaUpload, StatusMessage, useApi } from "./ui";
 
+import { useT } from "./AdminPrefs";
 /** Upload, caption, reorder and delete gallery photographs. */
 export function GalleryManager({ images }: { images: GalleryImage[] }) {
+  const t = useT();
   const { busy, message, send } = useApi();
   const [url, setUrl] = useState("");
   const [caption, setCaption] = useState("");
@@ -15,7 +17,7 @@ export function GalleryManager({ images }: { images: GalleryImage[] }) {
     await send("/api/admin/gallery", {
       method: "POST",
       body: JSON.stringify({ mediaId, caption, sortOrder: images.length + 1 }),
-      successText: "បានបញ្ចូលរូបភាព",
+      successText: t("បានបញ្ចូលរូបភាព"),
     });
     setCaption("");
   }
@@ -24,24 +26,24 @@ export function GalleryManager({ images }: { images: GalleryImage[] }) {
     <div className="space-y-6">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold text-slate-800">វិចិត្រសាលរូបភាព</h1>
-          <p className="mt-1 text-sm text-slate-500">រូបភាពអនុស្សាវរីយ៍ · {images.length} រូប</p>
+          <h1 className="text-xl font-semibold text-slate-800">{t("វិចិត្រសាលរូបភាព")}</h1>
+          <p className="mt-1 text-sm text-slate-500">{t("រូបភាពអនុស្សាវរីយ៍ · ")}{images.length} {t(" រូប")}</p>
         </div>
       </header>
 
       <StatusMessage message={message} />
 
-      <Card title="បន្ថែមរូបភាព" description="ផ្ទុករូបភាព ឬបញ្ចូល URL (អតិបរមា 6MB ក្នុងមួយរូប)">
+      <Card title={t("បន្ថែមរូបភាព")} description={t("ផ្ទុករូបភាព ឬបញ្ចូល URL (អតិបរមា 6MB ក្នុងមួយរូប)")}>
         <div className="space-y-4">
-          <Field label="ចំណងជើងរូបភាព (ស្រេចចិត្ត)">
-            <Input value={caption} onChange={(e) => setCaption(e.target.value)} placeholder="ឧ. ពិធីភ្ជាប់ពាក្យ" />
+          <Field label={t("ចំណងជើងរូបភាព (ស្រេចចិត្ត)")}>
+            <Input value={caption} onChange={(e) => setCaption(e.target.value)} placeholder={t("ឧ. ពិធីភ្ជាប់ពាក្យ")} />
           </Field>
 
-          <MediaUpload label="ផ្ទុករូបភាព" onUploaded={addFromMedia} />
+          <MediaUpload label={t("ផ្ទុករូបភាព")} onUploaded={addFromMedia} />
 
           <div className="flex flex-wrap items-end gap-3 border-t border-slate-100 pt-4">
             <div className="min-w-[240px] flex-1">
-              <Field label="ឬបញ្ចូល URL រូបភាព">
+              <Field label={t("ឬបញ្ចូល URL រូបភាព")}>
                 <Input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://..." />
               </Field>
             </div>
@@ -52,20 +54,19 @@ export function GalleryManager({ images }: { images: GalleryImage[] }) {
                 const result = await send("/api/admin/gallery", {
                   method: "POST",
                   body: JSON.stringify({ url: url.trim(), caption, sortOrder: images.length + 1 }),
-                  successText: "បានបញ្ចូលរូបភាព",
+                  successText: t("បានបញ្ចូលរូបភាព"),
                 });
                 if (result) { setUrl(""); setCaption(""); }
               }}
             >
-              បន្ថែម URL
-            </Button>
+              {t("បន្ថែម URL")}</Button>
           </div>
         </div>
       </Card>
 
-      <Card title="រូបភាពទាំងអស់">
+      <Card title={t("រូបភាពទាំងអស់")}>
         {images.length === 0 ? (
-          <p className="py-8 text-center text-sm text-slate-400">មិនទាន់មានរូបភាពទេ</p>
+          <p className="py-8 text-center text-sm text-slate-400">{t("មិនទាន់មានរូបភាពទេ")}</p>
         ) : (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
             {images.map((image) => (
@@ -87,6 +88,7 @@ function ImageCard({
   send: ReturnType<typeof useApi>["send"];
   busy: boolean;
 }) {
+  const t = useT();
   const [caption, setCaption] = useState(image.caption);
   const [order, setOrder] = useState(image.sortOrder);
 
@@ -100,14 +102,14 @@ function ImageCard({
         loading="lazy"
       />
       <figcaption className="space-y-2 p-3">
-        <Input value={caption} onChange={(e) => setCaption(e.target.value)} placeholder="ចំណងជើង" />
+        <Input value={caption} onChange={(e) => setCaption(e.target.value)} placeholder={t("ចំណងជើង")} />
         <div className="flex gap-2">
           <Input
             type="number"
             value={order}
             onChange={(e) => setOrder(Number(e.target.value))}
             className="w-20"
-            aria-label="លំដាប់"
+            aria-label={t("លំដាប់")}
           />
           <Button
             variant="ghost"
@@ -118,22 +120,20 @@ function ImageCard({
               send(`/api/admin/gallery/${image.id}`, {
                 method: "PUT",
                 body: JSON.stringify({ caption, sortOrder: Number(order) }),
-                successText: "បានរក្សាទុក",
+                successText: t("បានរក្សាទុក"),
               })
             }
           >
-            រក្សាទុក
-          </Button>
+            {t("រក្សាទុក")}</Button>
         </div>
         <Button
           variant="danger"
           type="button"
           disabled={busy}
           className="w-full"
-          onClick={() => send(`/api/admin/gallery/${image.id}`, { method: "DELETE", successText: "បានលុប" })}
+          onClick={() => send(`/api/admin/gallery/${image.id}`, { method: "DELETE", successText: t("បានលុប") })}
         >
-          លុបរូបភាព
-        </Button>
+          {t("លុបរូបភាព")}</Button>
       </figcaption>
     </figure>
   );

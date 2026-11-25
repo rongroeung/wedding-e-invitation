@@ -26,6 +26,9 @@ export const INVITATION_THEMES = {
   velvet: { km: "ស្បែកទី ៦ · វាំងននក្រហម", hint: "វាំងននវល្លិ៍ក្រហមបើក ចង្កៀងគ្រីស្តាល់ · ពណ៌ក្រហមចាស់ និងមាស" },
   royal: { km: "ស្បែកទី ៧ · ទ្វារក្លោងមាស", hint: "ស្រោមសំបុត្រមាស ត្រាភ្លឺ រួចទ្វារក្លោងមាស · ពណ៌ក្រែម មាស និងក្រហមចាស់" },
   rosegate: { km: "ស្បែកទី ៨ · ទ្វាររបងផ្កាកុលាប", hint: "ទ្វាររបងដែកបើកចូលសួនច្បារ ផ្កាកុលាបព្យួរ · ពណ៌ស៊ីជម្ពូស្រាល បៃតងអូលីវ និងក្រែម" },
+  chandelier: { km: "ស្បែកទី ៩ · សួនចង្កៀងគ្រីស្តាល់", hint: "ចង្កៀងគ្រីស្តាល់ វាំងននសូត្រ និងព្រះពន្លាក្នុងសួនផ្កាកុលាប · ពណ៌ផ្កាឈើស្រាល ខៀវទឹកសមុទ្រ និងក្រែម" },
+  cascade: { km: "ស្បែកទី ១០ · សួនទឹកធ្លាក់", hint: "ទឹកធ្លាក់ ស្ពាន និងអាងទឹកក្នុងសួនផ្កា · ពណ៌ស៊ីជម្ពូ ស្វាយស្រាល និងបៃតង" },
+  peacock: { km: "ស្បែកទី ១១ · សួនក្ងោក", hint: "ព្រះពន្លាស ក្ដាន់ និងក្ងោក ក្នុងសួនច្បារ · ពណ៌បៃតងស្រាល ស៊ីជម្ពូ និងមាស" },
 } as const;
 
 export type InvitationThemeKey = keyof typeof INVITATION_THEMES;
@@ -42,6 +45,9 @@ export function themeKeyOf(value: string | null | undefined): InvitationThemeKey
  */
 export type SceneSpec = {
   intro: string;
+  /** The film's first frame: the poster until it plays, so the opening starts where the film does. */
+  first: string;
+  /** The film's last frame: where it holds, and the poster when it cannot play. */
   still: string;
   stillTiny: string;
   thumb: string;
@@ -59,8 +65,9 @@ export type SceneSpec = {
   pageBg: string;
 };
 
-const scene = (key: string, rest: Omit<SceneSpec, "intro" | "still" | "stillTiny" | "thumb">): SceneSpec => ({
+const scene = (key: string, rest: Omit<SceneSpec, "intro" | "first" | "still" | "stillTiny" | "thumb">): SceneSpec => ({
   intro: `/themes/${key}/${key}-intro.mp4`,
+  first: `/themes/${key}/${key}-first.webp`,
   still: `/themes/${key}/${key}-still.webp`,
   stillTiny: `/themes/${key}/${key}-still-tiny.webp`,
   thumb: `/themes/${key}/${key}-thumb.webp`,
@@ -112,6 +119,33 @@ export const SCENES: Partial<Record<InvitationThemeKey, SceneSpec>> = {
     colors: { primary: "#5C6A3C", secondary: "#C48A8E", accent: "#F4E2DE", background: "#FCF8F3", text: "#4E4A3A" },
     pattern: "floral",
     pageBg: "src:/themes/rosegate/rosegate-still.webp",
+  }),
+  // crystal chandeliers and silk swags over a rose-garden pavilion
+  chandelier: scene("chandelier", {
+    dark: false,
+    wash: 40,
+    ink: "#6f2f3c",
+    colors: { primary: "#7A3A48", secondary: "#C98F8A", accent: "#DCEBEA", background: "#FDF7F3", text: "#55403F" },
+    pattern: "floral",
+    pageBg: "src:/themes/chandelier/chandelier-still.webp",
+  }),
+  // a waterfall, a bridge and a fountain in a pink and green garden
+  cascade: scene("cascade", {
+    dark: false,
+    wash: 40,
+    ink: "#6a2c4c",
+    colors: { primary: "#7A2F55", secondary: "#C9879F", accent: "#E4EEDF", background: "#FDF7FA", text: "#4F3A47" },
+    pattern: "floral",
+    pageBg: "src:/themes/cascade/cascade-still.webp",
+  }),
+  // a white pavilion, a fawn and two peacocks in a sage garden
+  peacock: scene("peacock", {
+    dark: false,
+    wash: 40,
+    ink: "#3f4f2c",
+    colors: { primary: "#4E6138", secondary: "#B39548", accent: "#F3DDE3", background: "#FAFBF5", text: "#3F4636" },
+    pattern: "floral",
+    pageBg: "src:/themes/peacock/peacock-still.webp",
   }),
   // garnet velvet, candle gold
   velvet: scene("velvet", {

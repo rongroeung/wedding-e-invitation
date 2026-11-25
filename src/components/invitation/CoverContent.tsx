@@ -3,6 +3,7 @@ import { Fit, FitGroup } from "@/components/ui/FitLine";
 import { NameLogo } from "@/components/ui/NameLogo";
 import { Flourish } from "@/components/ui/Ornaments";
 import { KHMER_MONTHS, KHMER_WEEKDAYS, toKhmerNumber, zonedParts } from "@/lib/khmer";
+import { guestDisplayName } from "@/lib/guestTitles";
 
 /**
  * What the closed invitation says: the monogram, the occasion, and who it is
@@ -18,7 +19,7 @@ export function coverName(wedding: Wedding, guest: Guest | null) {
   const latin = guest?.nameLatin?.trim();
   return {
     latin: Boolean(latin),
-    text: latin || (guest ? `${guest.title} ${guest.name}` : wedding.invitationHonorific),
+    text: latin || (guest ? guestDisplayName(guest) : wedding.defaultGuestName.trim() || "ភ្ញៀវកិត្តិយស"),
   };
 }
 

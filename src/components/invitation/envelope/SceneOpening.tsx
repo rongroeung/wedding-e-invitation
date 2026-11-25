@@ -112,8 +112,9 @@ export function SceneOpening({
 
   /*
    * The garden film. Muted, so every browser lets it play by itself; when one
-   * will not (a phone in low-power mode) the poster is the film's last frame,
-   * so the guest simply arrives where the film would have taken them. The
+   * will not (a phone in low-power mode) the poster turns to the film's last frame,
+   * so the guest simply arrives where the film would have taken them (until
+   * then it is the first frame, where the film starts). The
    * words come in at the end of the walk, or at once if there is no walk.
    */
   useEffect(() => {
@@ -183,7 +184,12 @@ export function SceneOpening({
   const name = coverName(wedding, guest);
   const closed = step === "closed";
   const garden = Boolean(film);
-  const backdrop = film ? film.still : photo ?? "";
+  /*
+   * A film opens on its first frame (Theme 7's envelope, not the arch it ends
+   * on), so nothing jumps when it starts. If it never plays (autoplay refused,
+   * reduced motion, an error), the guest is taken to its last frame instead.
+   */
+  const backdrop = film ? (arrived ? film.still : film.first) : photo ?? "";
 
   return (
     <OpeningTransition gone={step === "gone"} duration={step === "gone" ? 1000 : 420}>
@@ -203,7 +209,7 @@ export function SceneOpening({
               ref={video}
               className="scene-media"
               src={film.intro}
-              poster={film.still}
+              poster={backdrop}
               muted
               playsInline
               preload="auto"

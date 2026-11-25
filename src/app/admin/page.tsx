@@ -4,9 +4,10 @@ import { toKhmerNumber } from "@/lib/khmer";
 import { pageWorkspace } from "@/lib/workspace";
 
 
+import { adminPrefs, getT } from "@/lib/i18n/server";
 export const dynamic = "force-dynamic";
 
-function Stat({ label, value, tone = "slate" }: { label: string; value: number; tone?: string }) {
+function Stat({ label, value, tone = "slate", khmer = true }: { label: string; value: number; tone?: string; khmer?: boolean }) {
   const tones: Record<string, string> = {
     slate: "border-slate-200 text-slate-800",
     green: "border-emerald-200 text-emerald-700",
@@ -18,7 +19,7 @@ function Stat({ label, value, tone = "slate" }: { label: string; value: number; 
     <div className={`rounded-xl border bg-white px-5 py-4 shadow-sm ${tones[tone]}`}>
       <p className="text-2xl font-semibold tabular-nums">
         {value.toLocaleString("en-US")}
-        <span className="ml-2 text-sm font-normal opacity-60">{toKhmerNumber(value)}</span>
+        {khmer && <span className="ml-2 text-sm font-normal opacity-60">{toKhmerNumber(value)}</span>}
       </p>
       <p className="mt-1 text-xs text-slate-500">{label}</p>
     </div>
@@ -26,6 +27,8 @@ function Stat({ label, value, tone = "slate" }: { label: string; value: number; 
 }
 
 export default async function AdminDashboard() {
+  const t = await getT();
+  const khmer = (await adminPrefs()).lang === "km";
   const weddingId = await pageWorkspace();
   if (!weddingId) return null;
   const [stats, wedding] = await Promise.all([getDashboardStats(weddingId), getWedding(weddingId)]);
@@ -33,33 +36,31 @@ export default async function AdminDashboard() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-xl font-semibold text-slate-800">ផ្ទាំងគ្រប់គ្រង</h1>
+        <h1 className="text-xl font-semibold text-slate-800">{t("ផ្ទាំងគ្រប់គ្រង")}</h1>
         <p className="mt-1 text-sm text-slate-500">
           {wedding.groomName} &amp; {wedding.brideName} · {wedding.weddingDateKhmer}
         </p>
       </header>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        <Stat label="ភ្ញៀវសរុប" value={stats.totalGuests} />
-        <Stat label="ចំនួនមើលសំបុត្រ" value={stats.totalViews} tone="blue" />
-        <Stat label="បានបញ្ជាក់ចូលរួម" value={stats.confirmed} tone="green" />
-        <Stat label="មិនទាន់ឆ្លើយតប" value={stats.pending} tone="amber" />
-        <Stat label="មិនអាចចូលរួម" value={stats.declined} tone="red" />
-        <Stat label="អ្នកចូលរួមរំពឹងទុក" value={stats.expectedAttendees} tone="green" />
+        <Stat khmer={khmer} label={t("ភ្ញៀវសរុប")} value={stats.totalGuests} />
+        <Stat khmer={khmer} label={t("ចំនួនមើលសំបុត្រ")} value={stats.totalViews} tone="blue" />
+        <Stat khmer={khmer} label={t("បានបញ្ជាក់ចូលរួម")} value={stats.confirmed} tone="green" />
+        <Stat khmer={khmer} label={t("មិនទាន់ឆ្លើយតប")} value={stats.pending} tone="amber" />
+        <Stat khmer={khmer} label={t("មិនអាចចូលរួម")} value={stats.declined} tone="red" />
+        <Stat khmer={khmer} label={t("អ្នកចូលរួមរំពឹងទុក")} value={stats.expectedAttendees} tone="green" />
       </div>
 
       <section className="rounded-xl border border-slate-200 bg-white shadow-sm">
         <header className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
-          <h2 className="text-base font-semibold text-slate-800">ការបញ្ជាក់វត្តមានថ្មីៗ</h2>
+          <h2 className="text-base font-semibold text-slate-800">{t("ការបញ្ជាក់វត្តមានថ្មីៗ")}</h2>
           <Link href="/admin/rsvp" className="text-xs text-amber-700 hover:underline">
-            មើលទាំងអស់ →
-          </Link>
+            {t("មើលទាំងអស់ →")}</Link>
         </header>
         <div className="divide-y divide-slate-100">
           {stats.recentRsvps.length === 0 && (
             <p className="px-5 py-8 text-center text-sm text-slate-400">
-              មិនទាន់មានការបញ្ជាក់វត្តមានទេ
-            </p>
+              {t("មិនទាន់មានការបញ្ជាក់វត្តមានទេ")}</p>
           )}
           {stats.recentRsvps.map((rsvp) => (
             <div key={rsvp.id} className="flex flex-wrap items-center gap-x-4 gap-y-1 px-5 py-3">
@@ -69,7 +70,7 @@ export default async function AdminDashboard() {
                   rsvp.attending ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-600"
                 }`}
               >
-                {rsvp.attending ? `ចូលរួម · ${toKhmerNumber(rsvp.guestCount)} នាក់` : "មិនអាចចូលរួម"}
+                {rsvp.attending ? `${t("ចូលរួម")} · ${khmer ? toKhmerNumber(rsvp.guestCount) : rsvp.guestCount} ${t("នាក់")}` : t("មិនអាចចូលរួម")}
               </span>
               {rsvp.message && (
                 <span className="w-full truncate text-xs text-slate-500">“{rsvp.message}”</span>
@@ -81,16 +82,16 @@ export default async function AdminDashboard() {
 
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {[
-          { href: "/admin/wedding", title: "កែព័ត៌មានអាពាហ៍ពិពាហ៍", text: "ឈ្មោះ ថ្ងៃខែ ទីតាំង អត្ថបទអញ្ជើញ" },
-          { href: "/admin/guests", title: "គ្រប់គ្រងភ្ញៀវ", text: "បង្កើតតំណ និង QR Code ផ្ទាល់ខ្លួន" },
-          { href: "/admin/gallery", title: "បញ្ចូលរូបភាព", text: "រូបភាពមុនអាពាហ៍ពិពាហ៍ និងក្រុមគ្រួសារ" },
+          { href: "/admin/wedding", title: "កែព័ត៌មានអាពាហ៍ពិពាហ៍", text: t("ឈ្មោះ ថ្ងៃខែ ទីតាំង អត្ថបទអញ្ជើញ") },
+          { href: "/admin/guests", title: "គ្រប់គ្រងភ្ញៀវ", text: t("បង្កើតតំណ និង QR Code ផ្ទាល់ខ្លួន") },
+          { href: "/admin/gallery", title: "បញ្ចូលរូបភាព", text: t("រូបភាពមុនអាពាហ៍ពិពាហ៍ និងក្រុមគ្រួសារ") },
         ].map((card) => (
           <Link
             key={card.href}
             href={card.href}
             className="rounded-xl border border-slate-200 bg-white px-5 py-4 shadow-sm transition hover:border-amber-300"
           >
-            <p className="text-sm font-medium text-slate-800">{card.title}</p>
+            <p className="text-sm font-medium text-slate-800">{t(card.title)}</p>
             <p className="mt-1 text-xs text-slate-500">{card.text}</p>
           </Link>
         ))}

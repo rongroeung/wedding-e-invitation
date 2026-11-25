@@ -2,7 +2,9 @@
 
 import { useRouter } from "next/navigation";
 
+import { useT } from "./AdminPrefs";
 export function LogoutButton() {
+  const t = useT();
   const router = useRouter();
   return (
     <button
@@ -14,7 +16,6 @@ export function LogoutButton() {
       }}
       className="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-xs text-slate-600 transition hover:bg-slate-50"
     >
-      ចាកចេញ
-    </button>
+      {t("ចាកចេញ")}</button>
   );
 }

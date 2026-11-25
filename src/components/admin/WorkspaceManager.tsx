@@ -4,6 +4,7 @@ import { useState } from "react";
 import { workspacePath } from "@/lib/workspacePath";
 import { Button, Card, Field, Input, StatusMessage, useApi } from "./ui";
 
+import { useT } from "./AdminPrefs";
 type Admin = { id: string; email: string; name: string; isOwner: boolean };
 type Row = { id: string; slug: string; name: string; label: string; createdAt: string; guests: number; admins: Admin[] };
 
@@ -14,6 +15,7 @@ type Row = { id: string; slug: string; name: string; label: string; createdAt: s
  * site's own address ("/") and can be neither moved nor deleted.
  */
 export function WorkspaceManager({ workspaces, current, siteUrl }: { workspaces: Row[]; current: string | null; siteUrl: string }) {
+  const t = useT();
   const { busy, message, send } = useApi();
 
   const [slug, setSlug] = useState("");
@@ -27,7 +29,7 @@ export function WorkspaceManager({ workspaces, current, siteUrl }: { workspaces:
     const result = await send("/api/admin/workspaces", {
       method: "POST",
       body: JSON.stringify({ slug, name, adminEmail, adminName, adminPassword }),
-      successText: "បានបង្កើតកន្លែងធ្វើការថ្មី",
+      successText: t("បានបង្កើតកន្លែងធ្វើការថ្មី"),
     });
     if (result) {
       setSlug("");
@@ -41,36 +43,34 @@ export function WorkspaceManager({ workspaces, current, siteUrl }: { workspaces:
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-xl font-semibold text-slate-800">កន្លែងធ្វើការទាំងអស់</h1>
+        <h1 className="text-xl font-semibold text-slate-800">{t("កន្លែងធ្វើការទាំងអស់")}</h1>
         <p className="mt-1 text-sm text-slate-500">
-          ពិធីមង្គលការនីមួយៗមានកន្លែងធ្វើការផ្ទាល់ខ្លួន៖ ព័ត៌មាន ភ្ញៀវ តំណអញ្ជើញ និងគណនីគ្រប់គ្រងដាច់ដោយឡែក។
-          <span className="block text-xs text-slate-400">One workspace per wedding — its own details, guests, links and admins.</span>
+          {t("ពិធីមង្គលការនីមួយៗមានកន្លែងធ្វើការផ្ទាល់ខ្លួន៖ ព័ត៌មាន ភ្ញៀវ តំណអញ្ជើញ និងគណនីគ្រប់គ្រងដាច់ដោយឡែក។")}<span className="block text-xs text-slate-400">One workspace per wedding — its own details, guests, links and admins.</span>
         </p>
       </header>
 
       <StatusMessage message={message} />
 
-      <Card title="បង្កើតកន្លែងធ្វើការថ្មី" description="New workspace — its invitation will be at /w/<address>">
+      <Card title={t("បង្កើតកន្លែងធ្វើការថ្មី")} description="New workspace — its invitation will be at /w/<address>">
         <form onSubmit={create} className="grid gap-4 sm:grid-cols-2">
-          <Field label="អាសយដ្ឋាន (address)" hint="a–z, 0–9, -">
+          <Field label={t("អាសយដ្ឋាន (address)")} hint="a–z, 0–9, -">
             <Input value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="e.g. dara-sophea" required />
           </Field>
-          <Field label="ឈ្មោះ (name in the dashboard)">
+          <Field label={t("ឈ្មោះ (name in the dashboard)")}>
             <Input value={name} onChange={(e) => setName(e.target.value)} />
           </Field>
-          <Field label="អ៊ីមែលអ្នកគ្រប់គ្រង (optional)" hint="existing account, or a new one">
+          <Field label={t("អ៊ីមែលអ្នកគ្រប់គ្រង (optional)")} hint="existing account, or a new one">
             <Input type="email" value={adminEmail} onChange={(e) => setAdminEmail(e.target.value)} autoComplete="off" />
           </Field>
-          <Field label="ឈ្មោះអ្នកគ្រប់គ្រង">
+          <Field label={t("ឈ្មោះអ្នកគ្រប់គ្រង")}>
             <Input value={adminName} onChange={(e) => setAdminName(e.target.value)} autoComplete="off" />
           </Field>
-          <Field label="ពាក្យសម្ងាត់ (new account only)">
+          <Field label={t("ពាក្យសម្ងាត់ (new account only)")}>
             <Input type="password" value={adminPassword} onChange={(e) => setAdminPassword(e.target.value)} autoComplete="new-password" />
           </Field>
           <div className="flex items-end">
             <Button type="submit" disabled={busy || !slug.trim()}>
-              បង្កើត
-            </Button>
+              {t("បង្កើត")}</Button>
           </div>
         </form>
       </Card>
@@ -95,6 +95,7 @@ function WorkspaceCard({
   send: ReturnType<typeof useApi>["send"];
   busy: boolean;
 }) {
+  const t = useT();
   const isDefault = w.id === "main";
   const [name, setName] = useState(w.name);
   const [slug, setSlug] = useState(w.slug);
@@ -116,7 +117,7 @@ function WorkspaceCard({
     const result = await send(`/api/admin/workspaces/${w.id}/members`, {
       method: "POST",
       body: JSON.stringify({ email, name: adminName, password }),
-      successText: "បានបន្ថែមអ្នកគ្រប់គ្រង",
+      successText: t("បានបន្ថែមអ្នកគ្រប់គ្រង"),
     });
     if (result) {
       setEmail("");
@@ -125,45 +126,42 @@ function WorkspaceCard({
     }
   }
   async function switchTo() {
-    await send("/api/admin/workspace/switch", { method: "POST", body: JSON.stringify({ id: w.id }), successText: "បានប្ដូរ" });
+    await send("/api/admin/workspace/switch", { method: "POST", body: JSON.stringify({ id: w.id }), successText: t("បានប្ដូរ") });
   }
 
   return (
     <Card
-      title={`${w.label}${isCurrent ? " · កំពុងគ្រប់គ្រង" : ""}`}
-      description={`${address} · ភ្ញៀវ ${w.guests}`}
+      title={`${w.label}${isCurrent ? ` · ${t("កំពុងគ្រប់គ្រង")}` : ""}`}
+      description={`${address} · ${t("ភ្ញៀវ")} ${w.guests}`}
       actions={
         <div className="flex gap-2">
           <a href={workspacePath(w.slug)} target="_blank" rel="noreferrer" className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50">
-            មើល ↗
-          </a>
+            {t("មើល ↗")}</a>
           {!isCurrent && (
             <Button type="button" variant="ghost" onClick={switchTo} disabled={busy}>
-              គ្រប់គ្រងកន្លែងនេះ
-            </Button>
+              {t("គ្រប់គ្រងកន្លែងនេះ")}</Button>
           )}
         </div>
       }
     >
       <div className="space-y-5">
         <form onSubmit={save} className="grid gap-3 sm:grid-cols-3">
-          <Field label="ឈ្មោះ">
+          <Field label={t("ឈ្មោះ")}>
             <Input value={name} onChange={(e) => setName(e.target.value)} />
           </Field>
-          <Field label="អាសយដ្ឋាន" hint={isDefault ? "the site's own address (/)" : "/w/<address>"}>
+          <Field label={t("អាសយដ្ឋាន")} hint={isDefault ? "the site's own address (/)" : "/w/<address>"}>
             <Input value={slug} onChange={(e) => setSlug(e.target.value)} disabled={isDefault} />
           </Field>
           <div className="flex items-end">
             <Button type="submit" variant="ghost" disabled={busy}>
-              រក្សាទុក
-            </Button>
+              {t("រក្សាទុក")}</Button>
           </div>
         </form>
 
         <div>
-          <p className="text-sm font-medium text-slate-700">អ្នកគ្រប់គ្រង · Admins</p>
+          <p className="text-sm font-medium text-slate-700">{t("អ្នកគ្រប់គ្រង · Admins")}</p>
           <ul className="mt-2 divide-y divide-slate-100 rounded-lg border border-slate-200">
-            {w.admins.length === 0 && <li className="px-3 py-2 text-sm text-slate-400">មិនទាន់មាន</li>}
+            {w.admins.length === 0 && <li className="px-3 py-2 text-sm text-slate-400">{t("មិនទាន់មាន")}</li>}
             {w.admins.map((a) => (
               <li key={a.id} className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
                 <span className="min-w-0 truncate">
@@ -176,13 +174,12 @@ function WorkspaceCard({
                   onClick={() =>
                     send(`/api/admin/workspaces/${w.id}/members?userId=${encodeURIComponent(a.id)}`, {
                       method: "DELETE",
-                      successText: "បានដកចេញ",
+                      successText: t("បានដកចេញ"),
                     })
                   }
                   className="shrink-0 text-xs text-red-600 hover:underline disabled:opacity-50"
                 >
-                  ដកចេញ
-                </button>
+                  {t("ដកចេញ")}</button>
               </li>
             ))}
           </ul>
@@ -191,16 +188,14 @@ function WorkspaceCard({
             <Input placeholder="name" value={adminName} onChange={(e) => setAdminName(e.target.value)} autoComplete="off" aria-label="Admin name" />
             <Input type="password" placeholder="password (new account)" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" aria-label="Password for a new account" />
             <Button type="submit" variant="ghost" disabled={busy}>
-              បន្ថែមអ្នកគ្រប់គ្រង
-            </Button>
+              {t("បន្ថែមអ្នកគ្រប់គ្រង")}</Button>
           </form>
         </div>
 
         {!isDefault && (
           <div className="rounded-lg border border-red-200 bg-red-50/50 p-3">
             <p className="text-sm text-red-800">
-              លុបកន្លែងធ្វើការនេះ និងទិន្នន័យទាំងអស់ (ភ្ញៀវ ការឆ្លើយតប រូបភាព)។ វាយ <code className="font-mono">{w.slug}</code> ដើម្បីបញ្ជាក់។
-            </p>
+              {t("លុបកន្លែងធ្វើការនេះ និងទិន្នន័យទាំងអស់ (ភ្ញៀវ ការឆ្លើយតប រូបភាព)។ វាយ ")}<code className="font-mono">{w.slug}</code> {t(" ដើម្បីបញ្ជាក់។")}</p>
             <div className="mt-2 flex gap-2">
               <Input value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder={w.slug} aria-label="Type the address to confirm" />
               <Button
@@ -208,11 +203,10 @@ function WorkspaceCard({
                 variant="danger"
                 disabled={busy || confirm !== w.slug}
                 onClick={() =>
-                  send(`/api/admin/workspaces/${w.id}`, { method: "DELETE", body: JSON.stringify({ confirm }), successText: "បានលុប" })
+                  send(`/api/admin/workspaces/${w.id}`, { method: "DELETE", body: JSON.stringify({ confirm }), successText: t("បានលុប") })
                 }
               >
-                លុប
-              </Button>
+                {t("លុប")}</Button>
             </div>
           </div>
         )}

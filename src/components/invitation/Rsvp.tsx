@@ -4,7 +4,9 @@ import { useState } from "react";
 import type { Guest, Rsvp as RsvpRecord } from "@/lib/db/schema";
 import { toKhmerNumber } from "@/lib/khmer";
 import { SectionTitle } from "@/components/ui/SectionTitle";
+import { guestDisplayName } from "@/lib/guestTitles";
 
+import { dropLeadingZeros } from "@/lib/numberInput";
 /** What the guest has already told us, if anything. */
 export type RsvpReply = Pick<RsvpRecord, "name" | "attending" | "guestCount" | "message">;
 
@@ -34,7 +36,7 @@ export function Rsvp({
   const [saved, setSaved] = useState<RsvpReply | null>(reply);
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(
-    reply?.name || (guest ? `${guest.title} ${guest.name}` : ""),
+    reply?.name || (guest ? guestDisplayName(guest) : ""),
   );
   const [attending, setAttending] = useState(reply ? reply.attending : true);
   const [guestCount, setGuestCount] = useState(
@@ -197,7 +199,10 @@ export function Rsvp({
                       min={1}
                       max={20}
                       value={guestCount}
-                      onChange={(e) => setGuestCount(Math.max(1, Math.min(20, Number(e.target.value))))}
+                      onChange={(e) => {
+                        dropLeadingZeros(e.currentTarget); // 02 → 2
+                        setGuestCount(Math.max(1, Math.min(20, Number(e.target.value))));
+                      }}
                     />
                     <button
                       type="button"

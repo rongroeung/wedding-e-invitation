@@ -19,6 +19,7 @@ export default async function AdminGuestsPage() {
   ]);
   return (
     <GuestManager
+      titles={Array.isArray(wedding.guestTitles) ? wedding.guestTitles : []}
       guests={guestRows}
       rsvps={rsvpRows}
       siteUrl={siteUrl()}

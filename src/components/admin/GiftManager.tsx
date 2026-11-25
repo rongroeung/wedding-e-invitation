@@ -5,6 +5,7 @@ import type { Wedding } from "@/lib/db/schema";
 import { mediaSrc } from "@/lib/media";
 import { Button, Card, Field, Input, MediaUpload, StatusMessage, Textarea, Toggle, useApi } from "./ui";
 
+import { useT } from "./AdminPrefs";
 /**
  * ចំណងដៃ — a single KHQR.
  *
@@ -13,6 +14,7 @@ import { Button, Card, Field, Input, MediaUpload, StatusMessage, Textarea, Toggl
  * choose between, and simpler to keep correct.
  */
 export function GiftManager({ wedding }: { wedding: Wedding }) {
+  const t = useT();
   const { busy, message, send } = useApi();
   const [form, setForm] = useState({
     giftEnabled: wedding.giftEnabled,
@@ -28,33 +30,31 @@ export function GiftManager({ wedding }: { wedding: Wedding }) {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-xl font-semibold text-slate-800">ចំណងដៃ</h1>
-        <p className="mt-1 text-sm text-slate-500">KHQR សម្រាប់ចំណងដៃ</p>
+        <h1 className="text-xl font-semibold text-slate-800">{t("ចំណងដៃ")}</h1>
+        <p className="mt-1 text-sm text-slate-500">{t("KHQR សម្រាប់ចំណងដៃ")}</p>
       </header>
 
       <StatusMessage message={message} />
 
-      <Card title="ការកំណត់">
+      <Card title={t("ការកំណត់")}>
         <div className="space-y-5">
           <Toggle
-            label="បង្ហាញផ្នែកចំណងដៃ"
-            hint="បើបិទ ផ្នែកនេះនឹងមិនបង្ហាញលើសំបុត្រអញ្ជើញទេ"
+            label={t("បង្ហាញផ្នែកចំណងដៃ")}
+            hint={t("បើបិទ ផ្នែកនេះនឹងមិនបង្ហាញលើសំបុត្រអញ្ជើញទេ")}
             checked={form.giftEnabled}
             onChange={(v) => setForm({ ...form, giftEnabled: v })}
           />
 
           <MediaUpload
-            label="រូបភាព KHQR"
+            label={t("រូបភាព KHQR")}
             currentSrc={qr}
             onUploaded={(id) => setForm({ ...form, giftQrMediaId: id, giftQrUrl: "" })}
             onClear={() => setForm({ ...form, giftQrMediaId: null, giftQrUrl: "" })}
           />
           <p className="rounded-lg bg-slate-50 px-4 py-3 text-xs leading-relaxed text-slate-600">
-            ទាញយករូប KHQR ពីកម្មវិធីធនាគាររបស់លោកអ្នក (ABA, ACLEDA, Wing …) រួចផ្ទុកនៅទីនេះ។
-            KHQR មួយអាចស្កេនបានពីគ្រប់កម្មវិធីធនាគារនៅកម្ពុជា។
-          </p>
+            {t("ទាញយករូប KHQR ពីកម្មវិធីធនាគាររបស់លោកអ្នក (ABA, ACLEDA, Wing …) រួចផ្ទុកនៅទីនេះ។ KHQR មួយអាចស្កេនបានពីគ្រប់កម្មវិធីធនាគារនៅកម្ពុជា។")}</p>
 
-          <Field label="ឬបញ្ចូល URL រូបភាព KHQR">
+          <Field label={t("ឬបញ្ចូល URL រូបភាព KHQR")}>
             <Input
               value={form.giftQrUrl}
               placeholder="https://..."
@@ -62,7 +62,7 @@ export function GiftManager({ wedding }: { wedding: Wedding }) {
             />
           </Field>
 
-          <Field label="ឈ្មោះគណនី" hint="បង្ហាញនៅក្រោម QR (ស្រេចចិត្ត)">
+          <Field label={t("ឈ្មោះគណនី")} hint={t("បង្ហាញនៅក្រោម QR (ស្រេចចិត្ត)")}>
             <Input
               value={form.giftAccountName}
               placeholder="SOK VISAL"
@@ -70,14 +70,14 @@ export function GiftManager({ wedding }: { wedding: Wedding }) {
             />
           </Field>
 
-          <Field label="អត្ថបទណែនាំ">
+          <Field label={t("អត្ថបទណែនាំ")}>
             <Textarea
               rows={2}
               value={form.giftIntro}
               onChange={(e) => setForm({ ...form, giftIntro: e.target.value })}
             />
           </Field>
-          <Field label="អត្ថបទបន្ថែម">
+          <Field label={t("អត្ថបទបន្ថែម")}>
             <Textarea
               rows={2}
               value={form.giftNote}
@@ -93,18 +93,17 @@ export function GiftManager({ wedding }: { wedding: Wedding }) {
                 send("/api/admin/wedding", {
                   method: "PUT",
                   body: JSON.stringify(form),
-                  successText: "បានរក្សាទុក",
+                  successText: t("បានរក្សាទុក"),
                 })
               }
             >
-              រក្សាទុក
-            </Button>
+              {t("រក្សាទុក")}</Button>
           </div>
         </div>
       </Card>
 
       {qr && (
-        <Card title="ការបង្ហាញជាមុន">
+        <Card title={t("ការបង្ហាញជាមុន")}>
           <div className="mx-auto max-w-[17rem] rounded-2xl border border-slate-200 px-5 py-6 text-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={qr} alt="KHQR" className="mx-auto w-full max-w-[13rem] rounded-xl" />

@@ -3,6 +3,7 @@
 import { MONOGRAM_FONTS, monogramFont } from "@/lib/monogram-fonts";
 import { Monogram } from "@/components/ui/Monogram";
 
+import { useT } from "./AdminPrefs";
 /**
  * The face the monogram is set in, picked by looking at it.
  *
@@ -32,6 +33,7 @@ export function MonogramFontPicker({
   bride: string;
   onChange: (id: string) => void;
 }) {
+  const t = useT();
   const current = monogramFont(value);
   /*
    * Each group previews in its own script.
@@ -50,7 +52,7 @@ export function MonogramFontPicker({
       {(["latin", "khmer"] as const).map((script) => (
         <section key={script}>
           <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
-            {script === "latin" ? "អក្សរឡាតាំង · English" : "អក្សរខ្មែរ · Khmer"}
+            {script === "latin" ? t("អក្សរឡាតាំង · English") : t("អក្សរខ្មែរ · Khmer")}
           </h3>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
             {MONOGRAM_FONTS.filter((f) => f.script === script).map((f) => {
@@ -61,7 +63,7 @@ export function MonogramFontPicker({
                   type="button"
                   onClick={() => onChange(f.id)}
                   aria-pressed={on}
-                  title={f.note}
+                  title={t(f.note)}
                   className={`flex flex-col items-center rounded-xl border p-2 text-center transition ${
                     on
                       ? "border-amber-500 bg-amber-50 ring-1 ring-amber-400"
@@ -79,7 +81,7 @@ export function MonogramFontPicker({
                     {f.label}
                   </span>
                   <span className="mt-0.5 block text-[10px] leading-tight text-slate-400">
-                    {f.note}
+                    {t(f.note)}
                   </span>
                 </button>
               );

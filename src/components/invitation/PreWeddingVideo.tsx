@@ -30,7 +30,7 @@ import type { VideoSource } from "@/lib/video";
  * the film appearing *as* the envelope leaves.
  */
 export function PreWeddingVideo({
-  source,
+  source: given,
   skipLabel,
   gone,
   onDone,
@@ -42,6 +42,8 @@ export function PreWeddingVideo({
   /** Called once, when the film has finished or the guest has said carry on. */
   onDone: () => void;
 }) {
+  /* the source it opened with: the preloaded copy arriving mid-film must not restart it */
+  const [source] = useState(given);
   const video = useRef<HTMLVideoElement>(null);
   const done = useRef(false);
   const [muted, setMuted] = useState(true);

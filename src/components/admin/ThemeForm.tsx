@@ -13,6 +13,7 @@ import { BACKDROP_PRESETS, BACKDROP_PRESET_KEYS } from "@/lib/backgrounds";
 import { FX_LEVELS, FX_LEVEL_KEYS, FX_MODES, FX_MODE_KEYS, PAPER_THEMES, PAPER_THEME_KEYS, PAPER_TONES } from "@/lib/appearance";
 import { ArtworkField, Button, Card, Field, Input, MediaUpload, Select, StatusMessage, Toggle, useApi } from "./ui";
 
+import { useAdminPrefs, useT } from "./AdminPrefs";
 const PRESETS = [
   { name: "ក្រដាស & មាសបុរាណ (លំនាំដើម)", colorPrimary: "#4A3527", colorSecondary: "#C29A5B", colorAccent: "#E3D3B8", colorBackground: "#F6F3EE", colorText: "#4A3A2C" },
   { name: "ត្នោតខ្លាំង & មាស", colorPrimary: "#3B2A1D", colorSecondary: "#B8935A", colorAccent: "#E7DAC2", colorBackground: "#F4F1EA", colorText: "#3F3125" },
@@ -31,6 +32,8 @@ const PRESETS = [
 
 /** Colour palette, fonts and decorative pattern. */
 export function ThemeForm({ wedding }: { wedding: Wedding }) {
+  const t = useT();
+  const { lang } = useAdminPrefs();
   const { busy, message, send } = useApi();
   const [form, setForm] = useState({
     colorPrimary: wedding.colorPrimary,
@@ -77,29 +80,29 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
   });
 
   const colors: [keyof typeof form, string][] = [
-    ["colorPrimary", "ពណ៌ចម្បង (ឈ្មោះ និងប៊ូតុង)"],
-    ["colorSecondary", "ពណ៌មាស"],
-    ["colorAccent", "ពណ៌រង (Champagne)"],
-    ["colorBackground", "ពណ៌ផ្ទៃខាងក្រោយ"],
-    ["colorText", "ពណ៌អក្សរ"],
+    ["colorPrimary", t("ពណ៌ចម្បង (ឈ្មោះ និងប៊ូតុង)")],
+    ["colorSecondary", t("ពណ៌មាស")],
+    ["colorAccent", t("ពណ៌រង (Champagne)")],
+    ["colorBackground", t("ពណ៌ផ្ទៃខាងក្រោយ")],
+    ["colorText", t("ពណ៌អក្សរ")],
   ];
 
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-xl font-semibold text-slate-800">រូបរាង</h1>
-        <p className="mt-1 text-sm text-slate-500">ពណ៌ ពុម្ពអក្សរ និងលំនាំតុបតែងនៃសំបុត្រអញ្ជើញ</p>
+        <h1 className="text-xl font-semibold text-slate-800">{t("រូបរាង")}</h1>
+        <p className="mt-1 text-sm text-slate-500">{t("ពណ៌ ពុម្ពអក្សរ និងលំនាំតុបតែងនៃសំបុត្រអញ្ជើញ")}</p>
       </header>
 
       <StatusMessage message={message} />
 
       <Card
-        title="ស្បែកសំបុត្រ (Theme)"
-        description="ជ្រើសរើសស្បែកមួយ សម្រាប់ភ្ញៀវទាំងអស់ · One theme for every guest"
+        title={t("ស្បែកសំបុត្រ (Theme)")}
+        description={t("ជ្រើសរើសស្បែកមួយ សម្រាប់ភ្ញៀវទាំងអស់ · One theme for every guest")}
       >
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {INVITATION_THEME_KEYS.map((key) => {
-            const t = INVITATION_THEMES[key];
+            const theme = INVITATION_THEMES[key];
             const on = form.invitationTheme === key;
             const thumb = SCENES[key]?.thumb;
             return (
@@ -118,8 +121,8 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
                     <img src={thumb} alt="" loading="lazy" className="h-20 w-11 shrink-0 rounded-md object-cover shadow-sm" />
                   )}
                   <span className="min-w-0">
-                    <span className="block text-sm font-semibold text-slate-800">{t.km}</span>
-                    <span className="mt-1 block text-xs leading-relaxed text-slate-500">{t.hint}</span>
+                    <span className="block text-sm font-semibold text-slate-800">{t(theme.km)}</span>
+                    <span className="mt-1 block text-xs leading-relaxed text-slate-500">{t(theme.hint)}</span>
                   </span>
                 </span>
               </button>
@@ -129,25 +132,22 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
         {form.invitationTheme === "photo" && (
           <div className="mt-5">
             <MediaUpload
-              label="រូបថតទំព័រដំបូង (បញ្ឈរ) · Opening photo, portrait"
+              label={t("រូបថតទំព័រដំបូង (បញ្ឈរ) · Opening photo, portrait")}
               currentSrc={mediaSrc(form.openingPhotoId, form.openingPhotoUrl)}
               onUploaded={(id) => setForm({ ...form, openingPhotoId: id })}
               onClear={() => setForm({ ...form, openingPhotoId: null, openingPhotoUrl: "" })}
             />
             <p className="mt-2 text-xs text-slate-500">
-              រហូតដល់មានរូបថត ទំព័រដំបូងនៅតែបង្ហាញស្រោមសំបុត្រ · Until a photo is uploaded, the envelope stays.
-            </p>
+              {t("រហូតដល់មានរូបថត ទំព័រដំបូងនៅតែបង្ហាញស្រោមសំបុត្រ · Until a photo is uploaded, the envelope stays.")}</p>
           </div>
         )}
         {SCENES[form.invitationTheme as InvitationThemeKey] && (
           <p className="mt-4 text-xs leading-relaxed text-slate-500">
-            ស្បែកនេះប្រើវីដេអូ ក្រដាស ពណ៌ លំនាំ និងរូបភាពផ្ទៃខាងក្រោយរបស់វាផ្ទាល់ (គ្មានវាំងនន)។ ការកំណត់ខាងក្រោមត្រូវបានរក្សាទុក ហើយនឹងប្រើវិញ ពេលអ្នកប្ដូរទៅស្បែកទី ១ ឬ ២។
-            · This theme uses its own film, paper, colours, pattern and background, with no curtains. Your settings below are kept for Themes 1 and 2.
-          </p>
+            {t("ស្បែកនេះប្រើវីដេអូ ក្រដាស ពណ៌ លំនាំ និងរូបភាពផ្ទៃខាងក្រោយរបស់វាផ្ទាល់ (គ្មានវាំងនន)។ ការកំណត់ខាងក្រោមត្រូវបានរក្សាទុក ហើយនឹងប្រើវិញ ពេលអ្នកប្ដូរទៅស្បែកទី ១ ឬ ២។ · This theme uses its own film, paper, colours, pattern and background, with no curtains. Your settings below are kept for Themes 1 and 2.")}</p>
         )}
       </Card>
 
-      <Card title="ឈុតពណ៌សម្រេច">
+      <Card title={t("ឈុតពណ៌សម្រេច")}>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {PRESETS.map((preset) => (
             <button
@@ -161,13 +161,13 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
                   <span key={c} className="h-6 w-6 rounded-full border border-slate-200" style={{ background: c }} />
                 ))}
               </div>
-              <p className="mt-2 text-xs text-slate-600">{preset.name}</p>
+              <p className="mt-2 text-xs text-slate-600">{t(preset.name)}</p>
             </button>
           ))}
         </div>
       </Card>
 
-      <Card title="ពណ៌">
+      <Card title={t("ពណ៌")}>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {colors.map(([key, label]) => (
             <Field key={key} label={label}>
@@ -187,8 +187,8 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
       </Card>
 
       <Card
-        title="ឈុតក្បាច់តុបតែង"
-        description="ក្បាច់ទាំងមូលនៃសំបុត្រ — ក្បាច់កំពូល ខ្សែខណ្ឌក្រោមចំណងជើង ក្បាច់តូចៗ ត្រាក្រមួន និងក្បាច់លើស្រោមសំបុត្រ។ ការជ្រើសរើសឈុតនឹងប្តូរស៊ុមទៅតាមឈុតផងដែរ។"
+        title={t("ឈុតក្បាច់តុបតែង")}
+        description={t("ក្បាច់ទាំងមូលនៃសំបុត្រ — ក្បាច់កំពូល ខ្សែខណ្ឌក្រោមចំណងជើង ក្បាច់តូចៗ ត្រាក្រមួន និងក្បាច់លើស្រោមសំបុត្រ។ ការជ្រើសរើសឈុតនឹងប្តូរស៊ុមទៅតាមឈុតផងដែរ។")}
       >
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {DESIGN_KIT_KEYS.map((key) => {
@@ -223,31 +223,31 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={art.rosette.src} alt="" className="h-7 w-auto max-w-[16%] object-contain" />
                 </div>
-                <p className="mt-3 text-sm font-medium text-slate-800">{kit.label}</p>
-                <p className="mt-0.5 text-xs leading-relaxed text-slate-500">{kit.note}</p>
+                <p className="mt-3 text-sm font-medium text-slate-800">{t(kit.label)}</p>
+                <p className="mt-0.5 text-xs leading-relaxed text-slate-500">{t(kit.note)}</p>
               </button>
             );
           })}
         </div>
-        <p className="mt-3 text-xs text-slate-500">ចុច «រក្សាទុក» នៅខាងក្រោមទំព័រ ដើម្បីអនុវត្ត។</p>
+        <p className="mt-3 text-xs text-slate-500">{t("ចុច «រក្សាទុក» នៅខាងក្រោមទំព័រ ដើម្បីអនុវត្ត។")}</p>
       </Card>
 
       <Card
-        title="ស៊ុមសំបុត្រ"
-        description="ប្រើក្បាច់សម្រេច ឬផ្ទុកក្បាច់ផ្ទាល់ខ្លួនរបស់លោកអ្នក"
+        title={t("ស៊ុមសំបុត្រ")}
+        description={t("ប្រើក្បាច់សម្រេច ឬផ្ទុកក្បាច់ផ្ទាល់ខ្លួនរបស់លោកអ្នក")}
       >
         <div className="mb-5">
           <Toggle
-            label="បង្ហាញស៊ុមសំបុត្រ"
-            hint="បិទ ដើម្បីដកស៊ុម (ក្បាច់ជ្រុង ក្បាច់ក្បាល-ជើង និងបន្ទាត់) ចេញពីសំបុត្រទាំងស្រុង · Turn off to remove the border"
+            label={t("បង្ហាញស៊ុមសំបុត្រ")}
+            hint={t("បិទ ដើម្បីដកស៊ុម (ក្បាច់ជ្រុង ក្បាច់ក្បាល-ជើង និងបន្ទាត់) ចេញពីសំបុត្រទាំងស្រុង · Turn off to remove the border")}
             checked={form.frameEnabled}
             onChange={(v) => setForm({ ...form, frameEnabled: v })}
           />
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
           {[
-            { value: "builtin", title: "ក្បាច់សម្រេច", text: "ជ្រើសរើសពីក្បាច់ដែលមានស្រាប់" },
-            { value: "custom", title: "ក្បាច់ផ្ទាល់ខ្លួន", text: "ផ្ទុករូបភាពក្បាច់របស់លោកអ្នក" },
+            { value: "builtin", title: "ក្បាច់សម្រេច", text: t("ជ្រើសរើសពីក្បាច់ដែលមានស្រាប់") },
+            { value: "custom", title: "ក្បាច់ផ្ទាល់ខ្លួន", text: t("ផ្ទុករូបភាពក្បាច់របស់លោកអ្នក") },
           ].map((option) => (
             <button
               key={option.value}
@@ -260,7 +260,7 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
               }`}
               aria-pressed={form.frameSource === option.value}
             >
-              <p className="text-sm font-medium text-slate-800">{option.title}</p>
+              <p className="text-sm font-medium text-slate-800">{t(option.title)}</p>
               <p className="mt-0.5 text-xs text-slate-500">{option.text}</p>
             </button>
           ))}
@@ -268,7 +268,7 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
 
         {form.frameSource === "builtin" ? (
           <div className="mt-5">
-            <Field label="ក្បាច់">
+            <Field label={t("ក្បាច់")}>
               <Select
                 value={(FRAME_MOTIFS as readonly string[]).includes(form.frameMotif) ? form.frameMotif : FRAME_MOTIFS[0]}
                 onChange={(e) => setForm({ ...form, frameMotif: e.target.value })}
@@ -283,31 +283,29 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
           </div>
         ) : (
           <div className="mt-5 space-y-5">
-            <Field label="ទម្រង់ដាក់ក្បាច់">
+            <Field label={t("ទម្រង់ដាក់ក្បាច់")}>
               <Select value={form.frameLayout} onChange={(e) => setForm({ ...form, frameLayout: e.target.value })}>
-                <option value="band">ខាងលើ និងខាងក្រោម (band)</option>
-                <option value="corner">៤ ជ្រុង (corner)</option>
+                <option value="band">{t("ខាងលើ និងខាងក្រោម (band)")}</option>
+                <option value="corner">{t("៤ ជ្រុង (corner)")}</option>
               </Select>
             </Field>
 
             <div className="rounded-lg bg-slate-50 px-4 py-3 text-xs leading-relaxed text-slate-600">
-              <p className="font-medium text-slate-700">អ្វីដែលត្រូវផ្ទុក</p>
+              <p className="font-medium text-slate-700">{t("អ្វីដែលត្រូវផ្ទុក")}</p>
               <p className="mt-1">
-                រូបភាព PNG ដែលមានផ្ទៃខាងក្រោយថ្លា (transparent) ឬ SVG។ ទទឹងណែនាំ ១២០០–២០០០px។
-                កម្ពស់អាចជាប៉ុន្មានក៏បាន — ប្រព័ន្ធនឹងតម្រូវតាមទទឹងសំបុត្រដោយស្វ័យប្រវត្តិ។
-                {form.frameLayout === "corner"
-                  ? "ផ្ទុកតែក្បាច់ជ្រុងខាងលើ–ឆ្វេង ១ ប៉ុណ្ណោះ — ប្រព័ន្ធនឹងបញ្ច្រាសវាសម្រាប់ជ្រុងទាំង ៣ ទៀត។"
-                  : "កុំដាក់ស៊ុមពេញ ៤ ជ្រុងក្នុងរូបតែមួយ — ផ្ទុកតែផ្នែកខាងលើប៉ុណ្ណោះ ហើយប្រព័ន្ធនឹងបញ្ច្រាសវាសម្រាប់ខាងក្រោម។"}
+                {t("រូបភាព PNG ដែលមានផ្ទៃខាងក្រោយថ្លា (transparent) ឬ SVG។ ទទឹងណែនាំ ១២០០–២០០០px។ កម្ពស់អាចជាប៉ុន្មានក៏បាន — ប្រព័ន្ធនឹងតម្រូវតាមទទឹងសំបុត្រដោយស្វ័យប្រវត្តិ។")}{form.frameLayout === "corner"
+                  ? t("ផ្ទុកតែក្បាច់ជ្រុងខាងលើ–ឆ្វេង ១ ប៉ុណ្ណោះ — ប្រព័ន្ធនឹងបញ្ច្រាសវាសម្រាប់ជ្រុងទាំង ៣ ទៀត។")
+                  : t("កុំដាក់ស៊ុមពេញ ៤ ជ្រុងក្នុងរូបតែមួយ — ផ្ទុកតែផ្នែកខាងលើប៉ុណ្ណោះ ហើយប្រព័ន្ធនឹងបញ្ច្រាសវាសម្រាប់ខាងក្រោម។")}
               </p>
             </div>
 
             <MediaUpload
-              label="ក្បាច់ខាងលើ"
+              label={t("ក្បាច់ខាងលើ")}
               currentSrc={mediaSrc(form.frameTopMediaId, form.frameTopUrl)}
               onUploaded={(id) => setForm({ ...form, frameTopMediaId: id, frameTopUrl: "" })}
               onClear={() => setForm({ ...form, frameTopMediaId: null, frameTopUrl: "" })}
             />
-            <Field label="ឬបញ្ចូល URL រូបភាពក្បាច់ខាងលើ">
+            <Field label={t("ឬបញ្ចូល URL រូបភាពក្បាច់ខាងលើ")}>
               <Input
                 value={form.frameTopUrl}
                 placeholder="https://..."
@@ -317,8 +315,8 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
 
             {form.frameLayout === "band" && (
             <Toggle
-              label="បញ្ច្រាសក្បាច់ខាងលើសម្រាប់ខាងក្រោម"
-              hint="បិទប្រសិនបើលោកអ្នកចង់ផ្ទុកក្បាច់ខាងក្រោមផ្សេង"
+              label={t("បញ្ច្រាសក្បាច់ខាងលើសម្រាប់ខាងក្រោម")}
+              hint={t("បិទប្រសិនបើលោកអ្នកចង់ផ្ទុកក្បាច់ខាងក្រោមផ្សេង")}
               checked={form.frameMirrorBottom}
               onChange={(v) => setForm({ ...form, frameMirrorBottom: v })}
             />
@@ -328,12 +326,12 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
             {form.frameLayout === "band" && !form.frameMirrorBottom && (
               <>
                 <MediaUpload
-                  label="ក្បាច់ខាងក្រោម"
+                  label={t("ក្បាច់ខាងក្រោម")}
                   currentSrc={mediaSrc(form.frameBottomMediaId, form.frameBottomUrl)}
                   onUploaded={(id) => setForm({ ...form, frameBottomMediaId: id, frameBottomUrl: "" })}
                   onClear={() => setForm({ ...form, frameBottomMediaId: null, frameBottomUrl: "" })}
                 />
-                <Field label="ឬបញ្ចូល URL រូបភាពក្បាច់ខាងក្រោម">
+                <Field label={t("ឬបញ្ចូល URL រូបភាពក្បាច់ខាងក្រោម")}>
                   <Input
                     value={form.frameBottomUrl}
                     placeholder="https://..."
@@ -347,8 +345,8 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
 
         <div className="mt-5 space-y-4">
           <Field
-            label={`ទំហំក្បាច់ · ${form.frameScale}%`}
-            hint="កាត់បន្ថយ ដើម្បីឱ្យក្បាច់តូច និងទុកកន្លែងច្រើនសម្រាប់អត្ថបទ"
+            label={`${t("ទំហំក្បាច់")} · ${form.frameScale}%`}
+            hint={t("កាត់បន្ថយ ដើម្បីឱ្យក្បាច់តូច និងទុកកន្លែងច្រើនសម្រាប់អត្ថបទ")}
           >
             <input
               type="range"
@@ -362,15 +360,15 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
           </Field>
 
           <Toggle
-            label="ក្បាច់ជាប់នឹងអេក្រង់ (sticky)"
-            hint="ក្បាច់នៅនឹងកន្លែង ហើយអត្ថបទរំកិលនៅខាងក្នុង។ បើបិទ ទាំងអស់រំកិលជាមួយគ្នា"
+            label={t("ក្បាច់ជាប់នឹងអេក្រង់ (sticky)")}
+            hint={t("ក្បាច់នៅនឹងកន្លែង ហើយអត្ថបទរំកិលនៅខាងក្នុង។ បើបិទ ទាំងអស់រំកិលជាមួយគ្នា")}
             checked={form.frameSticky as boolean}
             onChange={(v) => setForm({ ...form, frameSticky: v })}
           />
 
           <Toggle
-            label="ធ្វើឱ្យក្បាច់មានពណ៌ដូចចំណងជើង"
-            hint="ប្តូរពណ៌មាសរបស់ក្បាច់ទៅជាពណ៌ចំណងជើង ដោយរក្សាស្រមោល និងពន្លឺដដែល"
+            label={t("ធ្វើឱ្យក្បាច់មានពណ៌ដូចចំណងជើង")}
+            hint={t("ប្តូរពណ៌មាសរបស់ក្បាច់ទៅជាពណ៌ចំណងជើង ដោយរក្សាស្រមោល និងពន្លឺដដែល")}
             checked={form.frameTint}
             onChange={(v) => setForm({ ...form, frameTint: v })}
           />
@@ -380,16 +378,16 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
       </Card>
 
       <Card
-        title="ក្រដាស និងចលនា"
-        description="ក្រដាសដែលសំបុត្របោះពុម្ព រូបភាពផ្ទៃខាងក្រោយ និងចលនាស្រាលៗពីលើ (ក៏ដូចជាពីក្រោយស្រោមសំបុត្រ)។ នេះជាការកំណត់លំនាំដើម — ភ្ញៀវអាចប្តូរសម្រាប់ខ្លួនឯងពីប៊ូតុងតូចលើសំបុត្រ បើលោកអ្នកអនុញ្ញាត។"
+        title={t("ក្រដាស និងចលនា")}
+        description={t("ក្រដាសដែលសំបុត្របោះពុម្ព រូបភាពផ្ទៃខាងក្រោយ និងចលនាស្រាលៗពីលើ (ក៏ដូចជាពីក្រោយស្រោមសំបុត្រ)។ នេះជាការកំណត់លំនាំដើម — ភ្ញៀវអាចប្តូរសម្រាប់ខ្លួនឯងពីប៊ូតុងតូចលើសំបុត្រ បើលោកអ្នកអនុញ្ញាត។")}
       >
         <div className="space-y-5">
           <div>
-            <p className="mb-2 text-sm font-medium text-slate-700">ក្រដាស</p>
+            <p className="mb-2 text-sm font-medium text-slate-700">{t("ក្រដាស")}</p>
             {[...PAPER_GROUPS, { key: "own" as const, km: "ផ្ទាល់ខ្លួន", en: "Your own" }].map((g) => (
               <div key={g.key} className="mb-4">
                 <p className="mb-2 text-xs font-medium text-slate-500">
-                  {g.km} · {g.en}
+                  {lang === "en" ? g.en : `${g.km} · ${g.en}`}
                 </p>
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
                   {PAPER_THEME_KEYS.filter((key) => PAPER_THEMES[key].group === g.key).map((key) => {
@@ -414,9 +412,9 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
                           }}
                         />
                         <span className="block px-3 py-2 text-xs text-slate-700">
-                          {PAPER_THEMES[key].km}
+                          {lang === "en" ? PAPER_THEMES[key].en : PAPER_THEMES[key].km}
                           <span className="block text-slate-400">
-                            {key === "couple" ? "រូបភាព ឬលំនាំផ្ទាល់ខ្លួន (ខាងក្រោម)" : PAPER_THEMES[key].en}
+                            {key === "couple" ? t("រូបភាព ឬលំនាំផ្ទាល់ខ្លួន (ខាងក្រោម)") : PAPER_THEMES[key].en}
                           </span>
                         </span>
                       </button>
@@ -428,13 +426,12 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
           </div>
 
           <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-4">
-            <p className="text-sm font-medium text-slate-700">ក្រដាសរបស់គូស្វាមីភរិយា — រូបភាព ឬលំនាំផ្ទាល់ខ្លួន</p>
+            <p className="text-sm font-medium text-slate-700">{t("ក្រដាសរបស់គូស្វាមីភរិយា — រូបភាព ឬលំនាំផ្ទាល់ខ្លួន")}</p>
             <p className="mb-4 mt-1 text-xs text-slate-500">
-              ជ្រើសលំនាំ ឬផ្ទុករូបឡើង ដើម្បីប្រើជាក្រដាសលិខិត។ ការជ្រើសនេះនឹងប្តូរក្រដាសទៅ «ក្រដាសរបស់គូស្វាមីភរិយា» ដោយស្វ័យប្រវត្តិ។
-            </p>
+              {t("ជ្រើសលំនាំ ឬផ្ទុករូបឡើង ដើម្បីប្រើជាក្រដាសលិខិត។ ការជ្រើសនេះនឹងប្តូរក្រដាសទៅ «ក្រដាសរបស់គូស្វាមីភរិយា» ដោយស្វ័យប្រវត្តិ។")}</p>
             <div className="space-y-6">
               <PresetPicker
-                label="ផ្ទៃខាងក្រោយសំបុត្រ (ក្រដាសលិខិត) — លំនាំសម្រេច"
+                label={t("ផ្ទៃខាងក្រោយសំបុត្រ (ក្រដាសលិខិត) — លំនាំសម្រេច")}
                 value={form.cardBgMediaId ? "" : form.cardBgPreset}
                 onChange={(key) =>
                   setForm({
@@ -450,8 +447,8 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
                 }
               />
               <ArtworkField
-                label="ក្រដាសលិខិត"
-                hint="រូបនេះនៅពីក្រោយអក្សរលិខិតផ្ទាល់។ សូមបង្កើនកម្រិតពណ៌គ្រប ដើម្បីឱ្យអក្សរនៅតែអានបាន។"
+                label={t("ក្រដាសលិខិត")}
+                hint={t("រូបនេះនៅពីក្រោយអក្សរលិខិតផ្ទាល់។ សូមបង្កើនកម្រិតពណ៌គ្រប ដើម្បីឱ្យអក្សរនៅតែអានបាន។")}
                 mediaId={form.cardBgMediaId}
                 preset={!form.cardBgMediaId && Boolean(form.cardBgPreset)}
                 onMedia={(id) => setForm({ ...form, cardBgMediaId: id, ...(id ? { cardBgPreset: "", appearancePaper: "couple" } : {}) })}
@@ -459,26 +456,26 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
                 onFit={(fit) => setForm({ ...form, cardBgFit: fit })}
                 strength={form.cardBgScrim}
                 onStrength={(value) => setForm({ ...form, cardBgScrim: value })}
-                strengthLabel={(value) => `កម្រិតពណ៌ក្រដាសគ្របលើរូប — ${value}%`}
-                strengthHint="ណែនាំយ៉ាងតិច ៥០% បើរូបមានពណ៌ច្រើន"
+                strengthLabel={(value) => `${t("កម្រិតពណ៌ក្រដាសគ្របលើរូប")} — ${value}%`}
+                strengthHint={t("ណែនាំយ៉ាងតិច ៥០% បើរូបមានពណ៌ច្រើន")}
               />
             </div>
           </div>
 
           <div>
             <p className="mb-2 text-sm font-medium text-slate-700">
-              ពណ៌ក្រដាស <span className="text-slate-500">· Paper colour</span>
+              {t("ពណ៌ក្រដាស ")}<span className="text-slate-500">· Paper colour</span>
             </p>
-            <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="ពណ៌ក្រដាស">
-              {[{ key: "design", km: "តាមក្បាច់", en: "Design's own", base: "" }, ...PAPER_TONES].map((t) => {
-                const chosen = (form.appearanceTone || "design") === t.key;
+            <div className="flex flex-wrap gap-2" role="radiogroup" aria-label={t("ពណ៌ក្រដាស")}>
+              {[{ key: "design", km: "តាមក្បាច់", en: "Design's own", base: "" }, ...PAPER_TONES].map((tone) => {
+                const chosen = (form.appearanceTone || "design") === tone.key;
                 return (
                   <button
-                    key={t.key}
+                    key={tone.key}
                     type="button"
                     role="radio"
                     aria-checked={chosen}
-                    onClick={() => setForm({ ...form, appearanceTone: t.key })}
+                    onClick={() => setForm({ ...form, appearanceTone: tone.key })}
                     className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs ${
                       chosen ? "border-amber-500 ring-2 ring-amber-300" : "border-slate-200 hover:border-amber-300"
                     }`}
@@ -486,10 +483,10 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
                     <span
                       className="h-4 w-4 rounded-full border border-slate-300"
                       style={{
-                        background: t.base || "conic-gradient(#f8f2e7 0 25%, #efd9d6 0 50%, #e1e7ee 0 75%, #5a1f2b 0)",
+                        background: tone.base || "conic-gradient(#f8f2e7 0 25%, #efd9d6 0 50%, #e1e7ee 0 75%, #5a1f2b 0)",
                       }}
                     />
-                    {t.km} <span className="text-slate-500">· {t.en}</span>
+                    {lang === "en" ? tone.en : <>{tone.km} <span className="text-slate-500">· {tone.en}</span></>}
                   </button>
                 );
               })}
@@ -497,20 +494,20 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="ចលនា">
+            <Field label={t("ចលនា")}>
               <Select value={form.appearanceFx} onChange={(e) => setForm({ ...form, appearanceFx: e.target.value })}>
                 {FX_MODE_KEYS.map((key) => (
                   <option key={key} value={key}>
-                    {FX_MODES[key].km} — {FX_MODES[key].en}
+                    {lang === "en" ? FX_MODES[key].en : `${FX_MODES[key].km} — ${FX_MODES[key].en}`}
                   </option>
                 ))}
               </Select>
             </Field>
-            <Field label="កម្រិតចលនា">
+            <Field label={t("កម្រិតចលនា")}>
               <Select value={form.appearanceLevel} onChange={(e) => setForm({ ...form, appearanceLevel: e.target.value })}>
                 {FX_LEVEL_KEYS.map((key) => (
                   <option key={key} value={key}>
-                    {FX_LEVELS[key].km} — {FX_LEVELS[key].en}
+                    {lang === "en" ? FX_LEVELS[key].en : `${FX_LEVELS[key].km} — ${FX_LEVELS[key].en}`}
                   </option>
                 ))}
               </Select>
@@ -518,11 +515,11 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
           </div>
 
           <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-4">
-            <p className="text-sm font-medium text-slate-700">ផ្ទៃខាងក្រោយទំព័រ</p>
-            <p className="mb-4 mt-1 text-xs text-slate-500">រូបនៅជុំវិញសំបុត្រ លើអេក្រង់ធំ (ក្រៅពីក្រដាសលិខិត)។</p>
+            <p className="text-sm font-medium text-slate-700">{t("ផ្ទៃខាងក្រោយទំព័រ")}</p>
+            <p className="mb-4 mt-1 text-xs text-slate-500">{t("រូបនៅជុំវិញសំបុត្រ លើអេក្រង់ធំ (ក្រៅពីក្រដាសលិខិត)។")}</p>
             <div className="space-y-6">
               <PresetPicker
-                label="ផ្ទៃខាងក្រោយទំព័រ (ជុំវិញសំបុត្រ លើអេក្រង់ធំ) — លំនាំសម្រេច"
+                label={t("ផ្ទៃខាងក្រោយទំព័រ (ជុំវិញសំបុត្រ លើអេក្រង់ធំ) — លំនាំសម្រេច")}
                 value={form.pageBgMediaId ? "" : form.pageBgPreset}
                 onChange={(key) =>
                   // a design replaces an upload; choosing "none" leaves an upload alone
@@ -530,8 +527,8 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
                 }
               />
               <ArtworkField
-                label="ផ្ទៃខាងក្រោយទំព័រ"
-                hint="រូបនេះនៅនឹងកន្លែង ពេលរំកិលទំព័រចុះឡើង។ វាស្ថិតនៅក្រោយអ្វីៗទាំងអស់។"
+                label={t("ផ្ទៃខាងក្រោយទំព័រ")}
+                hint={t("រូបនេះនៅនឹងកន្លែង ពេលរំកិលទំព័រចុះឡើង។ វាស្ថិតនៅក្រោយអ្វីៗទាំងអស់។")}
                 mediaId={form.pageBgMediaId}
                 preset={!form.pageBgMediaId && Boolean(form.pageBgPreset)}
                 onMedia={(id) => setForm({ ...form, pageBgMediaId: id, ...(id ? { pageBgPreset: "" } : {}) })}
@@ -539,28 +536,28 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
                 onFit={(fit) => setForm({ ...form, pageBgFit: fit })}
                 strength={form.pageBgScrim}
                 onStrength={(value) => setForm({ ...form, pageBgScrim: value })}
-                strengthLabel={(value) => `កម្រិតពណ៌ផ្ទៃគ្របលើរូប — ${value}%`}
-                strengthHint="បង្កើន បើរូបមើលទៅខ្លាំងពេក"
+                strengthLabel={(value) => `${t("កម្រិតពណ៌ផ្ទៃគ្របលើរូប")} — ${value}%`}
+                strengthHint={t("បង្កើន បើរូបមើលទៅខ្លាំងពេក")}
               />
             </div>
           </div>
 
           <Toggle
-            label="អនុញ្ញាតឱ្យភ្ញៀវប្តូររូបរាង"
-            hint="បង្ហាញប៊ូតុងតូចនៅជ្រុងខាងក្រោម ដែលភ្ញៀវអាចជ្រើសក្រដាស និងចលនាសម្រាប់ខ្លួនឯង (រក្សាទុកតែលើឧបករណ៍របស់គេ)"
+            label={t("អនុញ្ញាតឱ្យភ្ញៀវប្តូររូបរាង")}
+            hint={t("បង្ហាញប៊ូតុងតូចនៅជ្រុងខាងក្រោម ដែលភ្ញៀវអាចជ្រើសក្រដាស និងចលនាសម្រាប់ខ្លួនឯង (រក្សាទុកតែលើឧបករណ៍របស់គេ)")}
             checked={form.appearanceGuestPanel as boolean}
             onChange={(v) => setForm({ ...form, appearanceGuestPanel: v })}
           />
-          <p className="text-xs text-slate-500">ចុច «រក្សាទុក» នៅខាងក្រោមទំព័រ ដើម្បីអនុវត្ត។</p>
+          <p className="text-xs text-slate-500">{t("ចុច «រក្សាទុក» នៅខាងក្រោមទំព័រ ដើម្បីអនុវត្ត។")}</p>
         </div>
       </Card>
 
-      <Card title="ពុម្ពអក្សរ និងលំនាំ">
+      <Card title={t("ពុម្ពអក្សរ និងលំនាំ")}>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="sm:col-span-2 lg:col-span-4">
             <Field
-              label={`ទំហំអក្សរទាំងមូល · ${form.fontScale}%`}
-              hint="កែទំហំអក្សរ និងគម្លាតទាំងអស់ក្នុងសំបុត្រតាមសមាមាត្រ"
+              label={`${t("ទំហំអក្សរទាំងមូល")} · ${form.fontScale}%`}
+              hint={t("កែទំហំអក្សរ និងគម្លាតទាំងអស់ក្នុងសំបុត្រតាមសមាមាត្រ")}
             >
               <input
                 type="range"
@@ -575,7 +572,7 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
           </div>
 
           <div className="sm:col-span-2">
-            <Field label="ពុម្ពអក្សរចំណងជើង" hint="Khmer OS Muol Light ភ្ជាប់មកជាមួយកម្មវិធី">
+            <Field label={t("ពុម្ពអក្សរចំណងជើង")} hint={t("Khmer OS Muol Light ភ្ជាប់មកជាមួយកម្មវិធី")}>
             <FontPicker
               value={form.fontHeading}
               onChange={(v) => setForm({ ...form, fontHeading: v })}
@@ -585,7 +582,7 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
           </Field>
           </div>
           <div className="sm:col-span-2">
-            <Field label="ពុម្ពអក្សរអត្ថបទ" hint="សូមកុំប្រើ Muol សម្រាប់អត្ថបទវែង">
+            <Field label={t("ពុម្ពអក្សរអត្ថបទ")} hint={t("សូមកុំប្រើ Muol សម្រាប់អត្ថបទវែង")}>
             <FontPicker
               value={form.fontBody}
               onChange={(v) => setForm({ ...form, fontBody: v })}
@@ -594,11 +591,11 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
             />
           </Field>
           </div>
-          <Field label="លំនាំផ្ទៃខាងក្រោយ">
+          <Field label={t("លំនាំផ្ទៃខាងក្រោយ")}>
             <Select value={form.pattern} onChange={(e) => setForm({ ...form, pattern: e.target.value })}>
-              <option value="none">គ្មាន (ណែនាំ)</option>
-              <option value="angkor">អង្គរ</option>
-              <option value="floral">ផ្កាភ្ជាប់</option>
+              <option value="none">{t("គ្មាន (ណែនាំ)")}</option>
+              <option value="angkor">{t("អង្គរ")}</option>
+              <option value="floral">{t("ផ្កាភ្ជាប់")}</option>
             </Select>
           </Field>
         </div>
@@ -608,8 +605,7 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
           style={{ background: form.colorBackground, borderColor: form.colorAccent }}
         >
           <p style={{ color: form.colorSecondary, fontFamily: form.fontHeading }} className="text-lg">
-            សិរីមង្គលអាពាហ៍ពិពាហ៍
-          </p>
+            {t("សិរីមង្គលអាពាហ៍ពិពាហ៍")}</p>
           <p style={{ color: form.colorPrimary, fontFamily: form.fontHeading }} className="mt-2 text-xl">
             {wedding.groomName} &amp; {wedding.brideName}
           </p>
@@ -622,10 +618,9 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
           <Button
             type="button"
             disabled={busy}
-            onClick={() => send("/api/admin/wedding", { method: "PUT", body: JSON.stringify({ ...form, appearanceSaved: true }), successText: "បានរក្សាទុករូបរាង" })}
+            onClick={() => send("/api/admin/wedding", { method: "PUT", body: JSON.stringify({ ...form, appearanceSaved: true }), successText: t("បានរក្សាទុករូបរាង") })}
           >
-            រក្សាទុក
-          </Button>
+            {t("រក្សាទុក")}</Button>
         </div>
       </Card>
     </div>
@@ -646,6 +641,7 @@ function PresetPicker({
   value: string;
   onChange: (key: string) => void;
 }) {
+  const t = useT();
   const options = [
     { key: "", label: "គ្មាន", thumb: "" },
     ...BACKDROP_PRESET_KEYS.map((key) => ({ key, label: BACKDROP_PRESETS[key].label, thumb: BACKDROP_PRESETS[key].thumb })),
@@ -670,7 +666,7 @@ function PresetPicker({
                 className="block aspect-[4/3] w-full bg-slate-100"
                 style={option.thumb ? { background: `url(${option.thumb}) center / cover` } : undefined}
               />
-              <span className="block px-3 py-2 text-xs text-slate-700">{option.label}</span>
+              <span className="block px-3 py-2 text-xs text-slate-700">{t(option.label)}</span>
             </button>
           );
         })}
@@ -693,6 +689,7 @@ function FramePreview({
   form: Record<string, unknown>;
   wedding: Wedding;
 }) {
+  const t = useT();
   const custom = form.frameSource === "custom";
   const builtinBand = custom ? undefined : BUILTIN_BAND_ART[form.frameMotif as string];
   const uploadedTop = mediaSrc(form.frameTopMediaId as string | null, form.frameTopUrl as string);
@@ -706,8 +703,7 @@ function FramePreview({
   if (custom && !uploadedTop) {
     return (
       <p className="mt-5 rounded-lg bg-amber-50 px-4 py-3 text-xs text-amber-800">
-        ផ្ទុកក្បាច់ ដើម្បីមើលការបង្ហាញជាមុន។ បើមិនទាន់ផ្ទុកទេ ប្រព័ន្ធនឹងប្រើក្បាច់សម្រេច។
-      </p>
+        {t("ផ្ទុកក្បាច់ ដើម្បីមើលការបង្ហាញជាមុន។ បើមិនទាន់ផ្ទុកទេ ប្រព័ន្ធនឹងប្រើក្បាច់សម្រេច។")}</p>
     );
   }
 
@@ -718,7 +714,7 @@ function FramePreview({
 
   return (
     <div className="mt-5">
-      <p className="mb-2 text-sm font-medium text-slate-700">ការបង្ហាញជាមុន</p>
+      <p className="mb-2 text-sm font-medium text-slate-700">{t("ការបង្ហាញជាមុន")}</p>
 
       {layout === "corner" ? (
         <div className="relative mx-auto aspect-[3/4] max-w-sm overflow-hidden rounded-lg border" style={surface}>

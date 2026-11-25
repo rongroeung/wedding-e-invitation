@@ -25,6 +25,7 @@ import { InvitationMessage } from "./InvitationMessage";
 import { LoveStory } from "./LoveStory";
 import { MusicPlayer } from "./MusicPlayer";
 import { PreWeddingVideo } from "./PreWeddingVideo";
+import { useFilmPreload } from "./useFilmPreload";
 import { Program } from "./Program";
 import { Rsvp, type RsvpReply } from "./Rsvp";
 import { ShareBar } from "./ShareBar";
@@ -123,6 +124,8 @@ export function InvitationPage({
    * the only kind worth adding to a sequence this tightly timed.
    */
   const film = videoSource(wedding);
+  /* fetched ahead while the guest is on the opening page (useFilmPreload) */
+  const filmSource = useFilmPreload(film);
   const [filmDone, setFilmDone] = useState(!film);
   /* Fade the film out on its own beat, then unmount it, exactly as the
      curtains are struck: something that has finished should be seen leaving. */
@@ -459,7 +462,7 @@ export function InvitationPage({
   return (
     <>
       {/* every picture asked for up front (written into <head> as preload links) */}
-      <ImagePreload data={data} opening={envelopeShown} />
+      <ImagePreload data={data} opening={envelopeShown} filmPoster={film?.poster ?? ""} />
       {/*
         * The stage is the page, not a backdrop behind a scene that ends.
         *
@@ -500,7 +503,7 @@ export function InvitationPage({
         */}
       {film && envelopeShown && envelopeDone && !filmGone && (
         <PreWeddingVideo
-          source={film}
+          source={filmSource ?? film}
           skipLabel={wedding.videoSkipLabel}
           gone={filmDone}
           onDone={() => setFilmDone(true)}

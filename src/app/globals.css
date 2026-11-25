@@ -4699,29 +4699,48 @@ html[data-paper-dark] .ps-recess {
  * Swatches of cloth: the colour, lit from the upper left, a soft fold of shade
  * across the lower right, a faint weave, and a fine gold rim. */
 .dress-palette {
+  --sw: clamp(4.4rem, 19vw, 5.4rem);      /* one colour's cell */
+  --cw: clamp(3.6rem, 15vw, 4.5rem);      /* the chip itself */
+  --gx: clamp(0.9rem, 4vw, 1.5rem);
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: clamp(1rem, 4vw, 1.6rem) clamp(0.9rem, 4vw, 1.5rem);
+  gap: clamp(1rem, 4vw, 1.6rem) var(--gx);
   /* no wider than one balanced row (DressColors sets --cols); a narrow
      screen wraps sooner on its own */
-  max-width: calc(var(--cols, 4) * (clamp(4.4rem, 19vw, 5.4rem) + clamp(0.9rem, 4vw, 1.5rem)));
+  max-width: calc(var(--cols, 4) * (var(--sw) + var(--gx)));
   margin: 0 auto;
   padding: 0;
   list-style: none;
 }
+/* a run of colours that share one name: the chips side by side, spaced as
+   their own cells would be, and the name once, centred under them all */
+.dress-run {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: var(--sw);
+  text-align: center;
+}
+.dress-run-chips {
+  display: flex;
+  gap: calc(var(--sw) - var(--cw) + var(--gx));
+}
+/* the older single-swatch markup (admin preview) */
 .dress-swatch {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.6rem;
-  width: clamp(4.4rem, 19vw, 5.4rem);
+  width: var(--sw);
   text-align: center;
 }
 .dress-chip {
   position: relative;
   display: block;
-  width: clamp(3.6rem, 15vw, 4.5rem);
+  flex: none;
+  width: var(--cw, clamp(3.6rem, 15vw, 4.5rem));
   aspect-ratio: 1;
   border-radius: 50%;
   background:
@@ -4754,6 +4773,29 @@ html[data-paper-dark] .dress-chip {
 .dress-name {
   font-size: 0.8rem;
   line-height: 1.7;
+}
+/* a photo of the fabric instead of the drawn cloth: it carries its own light */
+.dress-chip-photo {
+  background-size: cover;
+  background-position: center;
+}
+/* groups of colours, each with its heading and line (e.g. by day) */
+.dress-sections { display: grid; gap: clamp(2rem, 7vw, 2.8rem); }
+.dress-group-head { margin-bottom: clamp(1rem, 4vw, 1.4rem); text-align: center; }
+.dress-group-title {
+  font-family: "Cormorant Garamond", var(--font-title, "Noto Serif Khmer"), serif;
+  font-size: clamp(1.35rem, 6vw, 1.85rem);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--msg-ink, var(--gold-1));
+}
+.dress-group-note {
+  margin-top: 0.15rem;
+  font-family: "Cormorant Garamond", "Noto Serif Khmer", serif;
+  font-size: clamp(0.95rem, 4vw, 1.1rem);
+  color: rgb(var(--c-text-rgb, 60 40 30) / 0.8);
 }
 
 /* ══ The couple (Couple.tsx): groom and bride side by side, equal ═════════════ */
@@ -5327,6 +5369,27 @@ html[data-paper-dark] .cv-guest { text-shadow: 0 1px 0 rgb(0 0 0 / 0.35), 0 0 22
 .scene-rosegate .scene-names { width: min(62cqw, 30cqh); }
 .scene-rosegate .scene-guest { max-width: 74cqw; }
 
+/* Theme 9 · សួនចង្កៀងគ្រីស្តាល់: under the chandelier, in the mist over the
+   pavilion — deep rose ink */
+.scene-chandelier {
+  --sf-ink: #6f2f3c; --sf-glow: 253 247 244; --sf-names: #a8606c; --sf-line: 201 143 138;
+  --sf-top: 27cqh; --sf-light-y: 46%; --sf-light: 0.72;
+}
+/* Theme 10 · សួនទឹកធ្លាក់: in the mist over the waterfall — plum ink */
+.scene-cascade {
+  --sf-ink: #6a2c4c; --sf-glow: 253 248 251; --sf-names: #9c4a74; --sf-line: 201 135 159;
+  --sf-top: 21cqh; --sf-light-y: 40%; --sf-light: 0.66;
+}
+/* Theme 11 · សួនក្ងោក: in the misty sky above the pavilion — sage ink, gold names */
+.scene-peacock {
+  --sf-ink: #3f4f2c; --sf-glow: 250 251 245; --sf-names: #a3863a; --sf-line: 179 149 72;
+  --sf-top: 18cqh; --sf-light-y: 38%; --sf-light: 0.72;
+}
+:is(.scene-chandelier, .scene-cascade, .scene-peacock) .scene-words { padding-inline: 13cqw; }
+:is(.scene-chandelier, .scene-cascade, .scene-peacock) .scene-title { font-size: clamp(1rem, 5.6cqw, 2rem); white-space: nowrap; }
+:is(.scene-chandelier, .scene-cascade, .scene-peacock) .scene-names { width: min(62cqw, 30cqh); }
+:is(.scene-chandelier, .scene-cascade, .scene-peacock) .scene-guest { max-width: 74cqw; }
+
 /* ── The programme's ceremony icons (ProgramIcon): the agenda's own art,
    filled with the section's heading colour so it suits every paper ── */
 .program-icon {
@@ -5341,3 +5404,65 @@ html[data-paper-dark] .cv-guest { text-shadow: 0 1px 0 rgb(0 0 0 / 0.35), 0 0 22
 .program-icon-lg { width: 3rem; height: 3rem; background: var(--msg-ink, var(--gold-1)); }
 @media (max-width: 480px) { .program-icon-lg { width: 2.4rem; height: 2.4rem; } }
 .program-icon-pick { width: 1.75rem; height: 1.75rem; background: #475569; }
+
+/* ══ Admin dark mode (AdminPrefs): the admin's light utility colours, remapped
+ * while data-admin-theme="dark". Anything inside .admin-keep (a preview of the
+ * invitation itself) keeps its real colours. ══ */
+.admin-root[data-admin-theme="dark"] { color-scheme: dark; background-color: #0f131b; color: #e6e9ef; }
+.admin-root[data-admin-theme="dark"] .bg-white:not(.admin-keep, .admin-keep *) { background-color:#171c26; }
+.admin-root[data-admin-theme="dark"] .bg-white\/95:not(.admin-keep, .admin-keep *) { background-color:rgb(23 28 38/.95); }
+.admin-root[data-admin-theme="dark"] .bg-slate-50:not(.admin-keep, .admin-keep *) { background-color:#0f131b; }
+.admin-root[data-admin-theme="dark"] .bg-slate-50\/60:not(.admin-keep, .admin-keep *) { background-color:rgb(255 255 255/.03); }
+.admin-root[data-admin-theme="dark"] .bg-slate-100:not(.admin-keep, .admin-keep *) { background-color:#232a37; }
+.admin-root[data-admin-theme="dark"] .bg-slate-300:not(.admin-keep, .admin-keep *) { background-color:#3a4354; }
+.admin-root[data-admin-theme="dark"] .bg-amber-50:not(.admin-keep, .admin-keep *) { background-color:rgb(245 158 11/.10); }
+.admin-root[data-admin-theme="dark"] .bg-amber-50\/40:not(.admin-keep, .admin-keep *) { background-color:rgb(245 158 11/.07); }
+.admin-root[data-admin-theme="dark"] .bg-amber-50\/50:not(.admin-keep, .admin-keep *) { background-color:rgb(245 158 11/.08); }
+.admin-root[data-admin-theme="dark"] .bg-amber-50\/60:not(.admin-keep, .admin-keep *) { background-color:rgb(245 158 11/.09); }
+.admin-root[data-admin-theme="dark"] .bg-amber-50\/70:not(.admin-keep, .admin-keep *) { background-color:rgb(245 158 11/.10); }
+.admin-root[data-admin-theme="dark"] .bg-amber-100:not(.admin-keep, .admin-keep *) { background-color:rgb(245 158 11/.18); }
+.admin-root[data-admin-theme="dark"] .bg-emerald-50:not(.admin-keep, .admin-keep *) { background-color:rgb(16 185 129/.12); }
+.admin-root[data-admin-theme="dark"] .bg-emerald-100:not(.admin-keep, .admin-keep *) { background-color:rgb(16 185 129/.2); }
+.admin-root[data-admin-theme="dark"] .bg-red-50:not(.admin-keep, .admin-keep *) { background-color:rgb(239 68 68/.12); }
+.admin-root[data-admin-theme="dark"] .bg-red-50\/50:not(.admin-keep, .admin-keep *) { background-color:rgb(239 68 68/.08); }
+.admin-root[data-admin-theme="dark"] .text-slate-900:not(.admin-keep, .admin-keep *) { color:#eef1f6; }
+.admin-root[data-admin-theme="dark"] .text-slate-800:not(.admin-keep, .admin-keep *) { color:#e6e9ef; }
+.admin-root[data-admin-theme="dark"] .text-slate-700:not(.admin-keep, .admin-keep *) { color:#d0d6e0; }
+.admin-root[data-admin-theme="dark"] .text-slate-600:not(.admin-keep, .admin-keep *) { color:#b4bcc9; }
+.admin-root[data-admin-theme="dark"] .text-slate-500:not(.admin-keep, .admin-keep *) { color:#939dad; }
+.admin-root[data-admin-theme="dark"] .text-slate-400:not(.admin-keep, .admin-keep *) { color:#737e90; }
+.admin-root[data-admin-theme="dark"] .text-amber-900:not(.admin-keep, .admin-keep *) { color:#fde68a; }
+.admin-root[data-admin-theme="dark"] .text-amber-800:not(.admin-keep, .admin-keep *) { color:#fcd34d; }
+.admin-root[data-admin-theme="dark"] .text-amber-700:not(.admin-keep, .admin-keep *) { color:#fbbf24; }
+.admin-root[data-admin-theme="dark"] .text-amber-600\/80:not(.admin-keep, .admin-keep *) { color:rgb(251 191 36/.8); }
+.admin-root[data-admin-theme="dark"] .text-emerald-700:not(.admin-keep, .admin-keep *) { color:#6ee7b7; }
+.admin-root[data-admin-theme="dark"] .text-red-600:not(.admin-keep, .admin-keep *) { color:#f87171; }
+.admin-root[data-admin-theme="dark"] .text-red-700:not(.admin-keep, .admin-keep *) { color:#fca5a5; }
+.admin-root[data-admin-theme="dark"] .text-red-800:not(.admin-keep, .admin-keep *) { color:#fecaca; }
+.admin-root[data-admin-theme="dark"] .border-slate-100:not(.admin-keep, .admin-keep *) { border-color:#222937; }
+.admin-root[data-admin-theme="dark"] .border-slate-200:not(.admin-keep, .admin-keep *) { border-color:#2a3242; }
+.admin-root[data-admin-theme="dark"] .border-slate-300:not(.admin-keep, .admin-keep *) { border-color:#3a4456; }
+.admin-root[data-admin-theme="dark"] .border-amber-200:not(.admin-keep, .admin-keep *) { border-color:rgb(245 158 11/.35); }
+.admin-root[data-admin-theme="dark"] .border-emerald-200:not(.admin-keep, .admin-keep *) { border-color:rgb(16 185 129/.35); }
+.admin-root[data-admin-theme="dark"] .border-emerald-300:not(.admin-keep, .admin-keep *) { border-color:rgb(16 185 129/.5); }
+.admin-root[data-admin-theme="dark"] .border-red-200:not(.admin-keep, .admin-keep *) { border-color:rgb(239 68 68/.4); }
+.admin-root[data-admin-theme="dark"] .divide-slate-100:not(.admin-keep, .admin-keep *) > * + * { border-color:#222937; }
+.admin-root[data-admin-theme="dark"] .hover\:bg-slate-50:hover:not(.admin-keep, .admin-keep *) { background-color:#1f2633; }
+.admin-root[data-admin-theme="dark"] .hover\:bg-slate-100:hover:not(.admin-keep, .admin-keep *) { background-color:#263042; }
+.admin-root[data-admin-theme="dark"] .hover\:bg-amber-50:hover:not(.admin-keep, .admin-keep *) { background-color:rgb(245 158 11/.14); }
+.admin-root[data-admin-theme="dark"] .hover\:bg-amber-50\/40:hover:not(.admin-keep, .admin-keep *) { background-color:rgb(245 158 11/.1); }
+.admin-root[data-admin-theme="dark"] .hover\:bg-amber-100:hover:not(.admin-keep, .admin-keep *) { background-color:rgb(245 158 11/.22); }
+.admin-root[data-admin-theme="dark"] .hover\:bg-emerald-100:hover:not(.admin-keep, .admin-keep *) { background-color:rgb(16 185 129/.24); }
+.admin-root[data-admin-theme="dark"] .hover\:bg-red-50:hover:not(.admin-keep, .admin-keep *) { background-color:rgb(239 68 68/.16); }
+.admin-root[data-admin-theme="dark"] .hover\:text-amber-800:hover:not(.admin-keep, .admin-keep *) { color:#fcd34d; }
+.admin-root[data-admin-theme="dark"] .hover\:text-amber-700:hover:not(.admin-keep, .admin-keep *) { color:#fbbf24; }
+.admin-root[data-admin-theme="dark"] .hover\:text-red-600:hover:not(.admin-keep, .admin-keep *) { color:#f87171; }
+.admin-root[data-admin-theme="dark"] :is(input:not([type=range], [type=color], [type=checkbox], [type=radio], [type=file]), select, textarea):not(.admin-keep, .admin-keep *) { background-color:#11161f; color:#e6e9ef; border-color:#3a4456; }
+.admin-root[data-admin-theme="dark"] :is(input, textarea)::placeholder { color:#6b7586; }
+.admin-root[data-admin-theme="dark"] .shadow-sm, .admin-root[data-admin-theme="dark"] .shadow-xl { --tw-shadow-color: rgb(0 0 0 / .5); }
+.admin-root[data-admin-theme="dark"] .brand-name { color:#efc98a; }
+.admin-root[data-admin-theme="dark"] .bg-slate-900\/40, .admin-root[data-admin-theme="dark"] .bg-slate-900\/60 { background-color: rgb(0 0 0 / .6); }
+.admin-root[data-admin-theme="dark"] .\!bg-emerald-50 { background-color: rgb(16 185 129 / .16) !important; }
+.admin-root[data-admin-theme="dark"] .\!text-emerald-700 { color: #6ee7b7 !important; }
+.admin-root[data-admin-theme="dark"] .\!border-emerald-300 { border-color: rgb(16 185 129 / .55) !important; }
+.admin-root[data-admin-theme="dark"] .hover\:\!bg-emerald-100:hover { background-color: rgb(16 185 129 / .26) !important; }

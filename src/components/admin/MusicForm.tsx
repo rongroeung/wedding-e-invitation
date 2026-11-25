@@ -5,8 +5,10 @@ import type { Wedding } from "@/lib/db/schema";
 import { mediaSrc } from "@/lib/media";
 import { Button, Card, Field, Input, MediaUpload, StatusMessage, Toggle, useApi } from "./ui";
 
+import { useT } from "./AdminPrefs";
 /** Background-music settings. */
 export function MusicForm({ wedding }: { wedding: Wedding }) {
+  const t = useT();
   const { busy, message, send } = useApi();
   const [form, setForm] = useState({
     musicEnabled: wedding.musicEnabled,
@@ -18,32 +20,31 @@ export function MusicForm({ wedding }: { wedding: Wedding }) {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-xl font-semibold text-slate-800">ភ្លេងផ្ទៃខាងក្រោយ</h1>
+        <h1 className="text-xl font-semibold text-slate-800">{t("ភ្លេងផ្ទៃខាងក្រោយ")}</h1>
         <p className="mt-1 text-sm text-slate-500">
-          ភ្លេងនឹងចាប់ផ្ដើមតែពេលភ្ញៀវចុចបើកសំបុត្រប៉ុណ្ណោះ (តាមលក្ខខណ្ឌរបស់កម្មវិធីរុករក)
-        </p>
+          {t("ភ្លេងនឹងចាប់ផ្ដើមតែពេលភ្ញៀវចុចបើកសំបុត្រប៉ុណ្ណោះ (តាមលក្ខខណ្ឌរបស់កម្មវិធីរុករក)")}</p>
       </header>
 
       <StatusMessage message={message} />
 
-      <Card title="ការកំណត់">
+      <Card title={t("ការកំណត់")}>
         <div className="space-y-4">
           <Toggle
-            label="បើកភ្លេងផ្ទៃខាងក្រោយ"
+            label={t("បើកភ្លេងផ្ទៃខាងក្រោយ")}
             checked={form.musicEnabled}
             onChange={(v) => setForm({ ...form, musicEnabled: v })}
           />
-          <Field label="ឈ្មោះបទចម្រៀង">
+          <Field label={t("ឈ្មោះបទចម្រៀង")}>
             <Input value={form.musicTitle} onChange={(e) => setForm({ ...form, musicTitle: e.target.value })} />
           </Field>
           <MediaUpload
-            label="ផ្ទុកឯកសារភ្លេង (MP3 អតិបរមា 12MB)"
+            label={t("ផ្ទុកឯកសារភ្លេង (MP3 អតិបរមា 12MB)")}
             kind="audio"
             currentSrc={mediaSrc(form.musicMediaId, form.musicUrl)}
             onUploaded={(id) => setForm({ ...form, musicMediaId: id })}
             onClear={() => setForm({ ...form, musicMediaId: null, musicUrl: "" })}
           />
-          <Field label="ឬបញ្ចូល URL ភ្លេង">
+          <Field label={t("ឬបញ្ចូល URL ភ្លេង")}>
             <Input
               value={form.musicUrl}
               onChange={(e) => setForm({ ...form, musicUrl: e.target.value })}
@@ -58,12 +59,11 @@ export function MusicForm({ wedding }: { wedding: Wedding }) {
                 send("/api/admin/wedding", {
                   method: "PUT",
                   body: JSON.stringify(form),
-                  successText: "បានរក្សាទុក",
+                  successText: t("បានរក្សាទុក"),
                 })
               }
             >
-              រក្សាទុក
-            </Button>
+              {t("រក្សាទុក")}</Button>
           </div>
         </div>
       </Card>

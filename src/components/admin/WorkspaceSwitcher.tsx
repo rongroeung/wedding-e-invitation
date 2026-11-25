@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { useT } from "./AdminPrefs";
 type Option = { id: string; label: string; slug: string };
 
 /**
@@ -11,6 +12,7 @@ type Option = { id: string; label: string; slug: string };
  * admin may manage, so the list here is a convenience, not the rule.
  */
 export function WorkspaceSwitcher({ current, options }: { current: string; options: Option[] }) {
+  const t = useT();
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -29,7 +31,7 @@ export function WorkspaceSwitcher({ current, options }: { current: string; optio
       // the page they are on, now for the other wedding
       router.refresh();
     } catch {
-      setError("មិនអាចប្ដូរបានទេ");
+      setError(t("មិនអាចប្ដូរបានទេ"));
     } finally {
       setBusy(false);
     }
@@ -38,8 +40,7 @@ export function WorkspaceSwitcher({ current, options }: { current: string; optio
   return (
     <div className="px-5 pb-3">
       <label htmlFor="ws-switch" className="block text-[11px] font-medium uppercase tracking-wide text-slate-400">
-        កន្លែងធ្វើការ · Workspace
-      </label>
+        {t("កន្លែងធ្វើការ · Workspace")}</label>
       <select
         id="ws-switch"
         value={current}
