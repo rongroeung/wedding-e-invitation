@@ -102,8 +102,9 @@ export type Backdrop = { src: string; fit: Fit; scrim: number; tile?: string };
  * design is meant to be laid (a repeat at its own size, or one picture across
  * the surface); otherwise nothing.
  */
-function backdropOf(mediaId: string | null, preset: string, fit: string, scrim: number): Backdrop | null {
-  const src = mediaSrc(mediaId);
+function backdropOf(mediaId: string | null, preset: string, fit: string, scrim: number, width: number): Backdrop | null {
+  // an upload at the size the surface is shown (the media route resizes it)
+  const src = mediaId ? `/api/media/${mediaId}?w=${width}` : "";
   if (src) return { src, fit: (fit as Fit) ?? "cover", scrim: clamp01(scrim) };
   // a theme can lay a picture straight onto a surface (lib/invitationTheme)
   if (preset.startsWith("src:")) return { src: preset.slice(4), fit: (fit as Fit) ?? "cover", scrim: clamp01(scrim) };
@@ -113,11 +114,11 @@ function backdropOf(mediaId: string | null, preset: string, fit: string, scrim: 
 }
 
 export function pageBackdrop(wedding: Wedding): Backdrop | null {
-  return backdropOf(wedding.pageBgMediaId, wedding.pageBgPreset, wedding.pageBgFit, wedding.pageBgScrim);
+  return backdropOf(wedding.pageBgMediaId, wedding.pageBgPreset, wedding.pageBgFit, wedding.pageBgScrim, 1920);
 }
 
 export function cardBackdrop(wedding: Wedding): Backdrop | null {
-  return backdropOf(wedding.cardBgMediaId, wedding.cardBgPreset, wedding.cardBgFit, wedding.cardBgScrim);
+  return backdropOf(wedding.cardBgMediaId, wedding.cardBgPreset, wedding.cardBgFit, wedding.cardBgScrim, 1280);
 }
 
 /**
@@ -165,6 +166,8 @@ export function backdropVars(
     `--${name}-bg-size:${extra("auto")}auto, ${size};`,
     `--${name}-bg-repeat:${extra("no-repeat")}repeat, ${repeat};`,
     `--${name}-bg-position:${extra("center")}center, ${position};`,
+    // the wash alone, for a live layer laid over the picture (LivePaper)
+    `--${name}-wash:${veil}${wash};`,
   ].join("");
 }
 

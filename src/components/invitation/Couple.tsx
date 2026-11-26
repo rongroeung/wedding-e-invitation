@@ -1,5 +1,5 @@
 import type { Wedding } from "@/lib/db/schema";
-import { mediaSrc } from "@/lib/media";
+import { PHOTO_W, photoSrc } from "@/lib/media";
 import { Flourish, Heart } from "@/components/ui/Ornaments";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 
@@ -54,7 +54,7 @@ export function Couple({ wedding }: { wedding: Wedding }) {
             role="កូនប្រុស"
             title={wedding.groomTitle}
             name={wedding.groomFullName}
-            photo={mediaSrc(wedding.groomPhotoId, wedding.groomPhotoUrl)}
+            photo={photoSrc(wedding.groomPhotoId, wedding.groomPhotoUrl, PHOTO_W.portrait)}
           />
 
           {/* the heart from the couple's name mark, joining the two of them */}
@@ -66,7 +66,7 @@ export function Couple({ wedding }: { wedding: Wedding }) {
             role="កូនស្រី"
             title={wedding.brideTitle}
             name={wedding.brideFullName}
-            photo={mediaSrc(wedding.bridePhotoId, wedding.bridePhotoUrl)}
+            photo={photoSrc(wedding.bridePhotoId, wedding.bridePhotoUrl, PHOTO_W.portrait)}
           />
         </div>
       </div>

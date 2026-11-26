@@ -75,6 +75,7 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
     appearanceTone: wedding.appearanceTone,
     appearanceGuestPanel: wedding.appearanceGuestPanel,
     invitationTheme: themeKeyOf(wedding.invitationTheme) as string,
+    livePaperEnabled: wedding.livePaperEnabled,
     openingPhotoId: wedding.openingPhotoId,
     openingPhotoUrl: wedding.openingPhotoUrl,
   });
@@ -139,6 +140,16 @@ export function ThemeForm({ wedding }: { wedding: Wedding }) {
             />
             <p className="mt-2 text-xs text-slate-500">
               {t("រហូតដល់មានរូបថត ទំព័រដំបូងនៅតែបង្ហាញស្រោមសំបុត្រ · Until a photo is uploaded, the envelope stays.")}</p>
+          </div>
+        )}
+        {SCENES[form.invitationTheme as InvitationThemeKey] && (
+          <div className="mt-5 rounded-lg border border-slate-200 p-3">
+            <Toggle
+              label={t("ផ្ទៃខាងក្រោយមានចលនា")}
+              hint={t("ស្បែកទី ៣–១១៖ ផ្ទៃខាងក្រោយនៅទំព័រដំបូង និងនៅពីក្រោយលិខិត នៅតែមានចលនា · បិទ = រូបនៅស្ងៀម")}
+              checked={form.livePaperEnabled}
+              onChange={(v) => setForm({ ...form, livePaperEnabled: v })}
+            />
           </div>
         )}
         {SCENES[form.invitationTheme as InvitationThemeKey] && (

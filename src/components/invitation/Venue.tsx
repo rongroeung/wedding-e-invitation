@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Wedding } from "@/lib/db/schema";
-import { mediaSrc } from "@/lib/media";
+import { PHOTO_W, photoSrc } from "@/lib/media";
 import { MapViewer } from "./MapViewer";
 import { FlourishDivider } from "@/components/ui/Ornaments";
 import { SectionTitle } from "@/components/ui/SectionTitle";
@@ -56,7 +56,7 @@ export function Venue({ wedding }: { wedding: Wedding }) {
     io.observe(el);
     return () => io.disconnect();
   }, [mapLoaded, embedUrl]);
-  const mapPicture = mediaSrc(wedding.venueMapMediaId, "");
+  const mapPicture = photoSrc(wedding.venueMapMediaId, "", PHOTO_W.wide);
   const [mapOpen, setMapOpen] = useState(false);
   const closeMap = useCallback(() => setMapOpen(false), []);
 

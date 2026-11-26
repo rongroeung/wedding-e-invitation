@@ -197,6 +197,8 @@ export const wedding = pgTable("wedding", {
   dressCodeNote: text("dress_code_note").notNull().default(""),
   /** In order: [{ hex: "#a4b8c4", name: "ខៀវស្រាល" }, …] (lib/dressColors). */
   dressColors: jsonb("dress_colors").$type<DressColor[]>().notNull().default([]),
+  /** A film theme's background moves (live loop or breathing picture) — LivePaper, SceneOpening. */
+  livePaperEnabled: boolean("live_paper_enabled").notNull().default(true),
   /** The couple's own honorifics for guests, after the built-in ones (lib/guestTitles). */
   guestTitles: jsonb("guest_titles").$type<string[]>().notNull().default([]),
   /** Optional headings that split the colours, e.g. by day (lib/dressColors). */

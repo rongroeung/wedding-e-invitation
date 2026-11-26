@@ -17,9 +17,9 @@ export type FilmPreload = {
  * opening page, so it starts at once (and plays without stalling) when the
  * envelope hands over to it. The opening page waits for it (useOpeningReady).
  *
- * It waits for the page itself to finish loading, so it never competes with
- * the first screen, then downloads the file into memory — reporting how far
- * it has got — and returns a local `blob:` address for the player. Until that
+ * It starts at once and downloads the file in several pieces side by side
+ * (byte ranges, see `download`), reporting how far it has got, then returns
+ * a local `blob:` address for the player. Until that
  * is ready — or if the download fails, or the film is a YouTube/Vimeo embed,
  * which cannot be fetched — the original address is used, which streams as
  * before.
@@ -36,26 +36,7 @@ export function useFilmPreload(film: VideoSource | null): FilmPreload {
     const ctl = new AbortController();
     const go = async () => {
       try {
-        const r = await fetch(src, { signal: ctl.signal });
-        if (!r.ok) throw new Error(String(r.status));
-        const total = Number(r.headers.get("content-length")) || 0;
-        let blob: Blob;
-        if (r.body && total) {
-          // read it piece by piece, so the opening page can show how far it is
-          const reader = r.body.getReader();
-          const parts: BlobPart[] = [];
-          let got = 0;
-          for (;;) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            parts.push(value);
-            got += value.length;
-            setProgress(Math.min(0.99, got / total));
-          }
-          blob = new Blob(parts, { type: r.headers.get("content-type") || "video/mp4" });
-        } else {
-          blob = await r.blob();
-        }
+        const blob = await download(src, ctl.signal, setProgress);
         url = URL.createObjectURL(blob);
         setProgress(1);
         setLocal(url);
@@ -63,11 +44,10 @@ export function useFilmPreload(film: VideoSource | null): FilmPreload {
         if (!ctl.signal.aborted) setFailed(true); // stream it instead
       }
     };
-    if (document.readyState === "complete") go();
-    else window.addEventListener("load", go, { once: true });
+    // at once, alongside the first-screen pictures (not after the whole page)
+    go();
     return () => {
       ctl.abort();
-      window.removeEventListener("load", go);
       if (url) URL.revokeObjectURL(url);
     };
   }, [src]);
@@ -79,4 +59,60 @@ export function useFilmPreload(film: VideoSource | null): FilmPreload {
     progress: local || failed ? 1 : progress,
     settled: Boolean(local) || failed,
   };
+}
+
+const PIECE = 2 * 1024 * 1024;
+const SIDE_BY_SIDE = 4;
+
+/**
+ * The whole file, fetched as 2 MB byte ranges, four at a time.
+ *
+ * One request for the whole file is read out of the database a window at a
+ * time, one window after another; pieces asked for side by side are read in
+ * parallel, which is several times faster on a remote database. The first
+ * piece also tells us the size. A server that ignores ranges answers the first
+ * request with the whole file, which is simply read to the end.
+ */
+async function download(src: string, signal: AbortSignal, onProgress: (p: number) => void): Promise<Blob> {
+  const first = await fetch(src, { signal, headers: { Range: `bytes=0-${PIECE - 1}` } });
+  if (!first.ok) throw new Error(String(first.status));
+  const type = first.headers.get("content-type") || "video/mp4";
+  const total = Number(/\/(\d+)$/.exec(first.headers.get("content-range") ?? "")?.[1] ?? 0);
+
+  if (first.status !== 206 || !total) {
+    // no ranges here: the whole file in one answer, read to the end
+    const length = Number(first.headers.get("content-length")) || 0;
+    if (!first.body || !length) return first.blob();
+    const reader = first.body.getReader();
+    const parts: BlobPart[] = [];
+    let got = 0;
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      parts.push(value);
+      got += value.length;
+      onProgress(Math.min(0.99, got / length));
+    }
+    return new Blob(parts, { type });
+  }
+
+  const parts: ArrayBuffer[] = [await first.arrayBuffer()];
+  let got = parts[0].byteLength;
+  onProgress(Math.min(0.99, got / total));
+  const count = Math.ceil(total / PIECE);
+  let next = 1;
+  const worker = async () => {
+    while (next < count) {
+      const i = next++;
+      const start = i * PIECE;
+      const end = Math.min(total, start + PIECE) - 1;
+      const r = await fetch(src, { signal, headers: { Range: `bytes=${start}-${end}` } });
+      if (r.status !== 206) throw new Error(String(r.status));
+      parts[i] = await r.arrayBuffer();
+      got += parts[i].byteLength;
+      onProgress(Math.min(0.99, got / total));
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(SIDE_BY_SIDE, count - 1) }, worker));
+  return new Blob(parts, { type });
 }

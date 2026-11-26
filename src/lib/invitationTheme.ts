@@ -63,9 +63,25 @@ export type SceneSpec = {
   pattern: string;
   /** What stands behind the card on a wide screen (a backdrop preset or `src:` picture). */
   pageBg: string;
+  /**
+   * A live paper: a short seamless loop played behind the writing instead of
+   * the still (LivePaper), with its first frame as the picture until it plays.
+   * Without one the still itself slowly breathes.
+   */
+  paper?: { film: string; poster: string };
 };
 
+/*
+ * The themes with a live background (the couple's own loops, each with its
+ * template lettering taken out and its end cross-faded into its start).
+ * Theme 7 has none, so its picture breathes instead.
+ */
+const LIVE_PAPERS = new Set(["garden", "palace", "golden", "velvet", "rosegate", "chandelier", "cascade", "peacock"]);
+
 const scene = (key: string, rest: Omit<SceneSpec, "intro" | "first" | "still" | "stillTiny" | "thumb">): SceneSpec => ({
+  ...(LIVE_PAPERS.has(key)
+    ? { paper: { film: `/themes/${key}/${key}-paper.mp4`, poster: `/themes/${key}/${key}-paper.webp` } }
+    : {}),
   intro: `/themes/${key}/${key}-intro.mp4`,
   first: `/themes/${key}/${key}-first.webp`,
   still: `/themes/${key}/${key}-still.webp`,
@@ -200,9 +216,9 @@ export function applyInvitationTheme(w: Wedding): Wedding {
   if (!spec) return w;
   return {
     ...w,
-    // the opening's last frame, on the cover and the letter
+    // the opening's last frame (or the live paper's own picture), on the cover and the letter
     cardBgMediaId: null,
-    cardBgPreset: `src:${spec.still}`,
+    cardBgPreset: `src:${spec.paper?.poster ?? spec.still}`,
     cardBgFit: "cover",
     cardBgScrim: spec.wash,
     // the paper is the picture itself (the "couple" paper), not a printed design

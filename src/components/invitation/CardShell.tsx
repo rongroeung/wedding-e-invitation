@@ -27,6 +27,7 @@ export function CardShell({
   cover,
   curtains,
   atmosphere,
+  livePaper,
   left,
   right,
   frame,
@@ -49,6 +50,8 @@ export function CardShell({
   curtains?: ReactNode;
   /** The live layer of motion above the paper (`CardFx`). */
   atmosphere?: ReactNode;
+  /** A film theme's living paper, under everything else (LivePaper). */
+  livePaper?: ReactNode;
   left?: ReactNode;
   right?: ReactNode;
   frame: FrameConfig;
@@ -131,7 +134,9 @@ export function CardShell({
               oneScreen ? "h-full" : "min-h-[100dvh]"
             }`}
           >
-            {/* the paper the card is printed on, then the live layer above it */}
+            {/* a film theme's living paper, then the paper the card is printed on,
+                then the live layer above it */}
+            {livePaper}
             <PaperSurface />
             {/* a botanical suite's double rule, between its corners */}
             {frame.shown && !frame.custom && <span className="bt-border" aria-hidden="true" />}

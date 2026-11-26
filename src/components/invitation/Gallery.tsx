@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { GalleryImage } from "@/lib/db/schema";
-import { mediaSrc } from "@/lib/media";
+import { PHOTO_W, photoSrc } from "@/lib/media";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { CARD_SCROLL_ID } from "./CardShell";
 
@@ -119,7 +119,7 @@ export function Gallery({ images }: { images: GalleryImage[] }) {
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={mediaSrc(current.mediaId, current.url)}
+          src={photoSrc(current.mediaId, current.url, PHOTO_W.wide)}
           alt={current.caption || "អនុស្សាវរីយ៍"}
           className="max-h-[84vh] w-auto max-w-full animate-scaleIn rounded-xl object-contain shadow-2xl"
         />
@@ -153,7 +153,7 @@ export function Gallery({ images }: { images: GalleryImage[] }) {
                 <span className="block overflow-hidden rounded-[14px] bg-cream">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={mediaSrc(image.mediaId, image.url)}
+                    src={photoSrc(image.mediaId, image.url, PHOTO_W.tile)}
                     alt={image.caption || "អនុស្សាវរីយ៍"}
                     loading="lazy"
                     decoding="async"

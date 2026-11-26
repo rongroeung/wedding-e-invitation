@@ -3,6 +3,39 @@ import { getDb } from "@/lib/db";
 import { media } from "@/lib/db/schema";
 
 export const dynamic = "force-dynamic";
+
+/** The widths a photo can be asked for in (lib/media PHOTO_W). */
+const RESIZE_WIDTHS = new Set([480, 640, 960, 1280, 1920]);
+/** Raster photos only: SVG stays vector, GIF keeps its animation. */
+const RESIZABLE = /^image\/(jpeg|jpg|pjpeg|png|webp|avif|heic|heif|tiff)$/i;
+
+/* Recently made variants, kept in this server's memory up to ~48 MB. */
+const variants = new Map<string, Buffer>();
+let variantBytes = 0;
+const VARIANT_CAP = 48 * 1024 * 1024;
+
+async function resized(key: string, width: number, original: () => Promise<Buffer>): Promise<Buffer> {
+  const hit = variants.get(key);
+  if (hit) {
+    variants.delete(key); // most recently used goes to the back
+    variants.set(key, hit);
+    return hit;
+  }
+  const sharp = (await import("sharp")).default;
+  const out = await sharp(await original(), { failOn: "none" })
+    .rotate() // a phone photo stands the way it was held
+    .resize({ width, withoutEnlargement: true })
+    .webp({ quality: 80 })
+    .toBuffer();
+  variants.set(key, out);
+  variantBytes += out.byteLength;
+  for (const [k, v] of variants) {
+    if (variantBytes <= VARIANT_CAP) break;
+    variants.delete(k);
+    variantBytes -= v.byteLength;
+  }
+  return out;
+}
 /* A picture that cannot be served in a minute will not be served at all;
    failing then is better than holding the request until the 300-second wall. */
 export const maxDuration = 60;
@@ -86,6 +119,36 @@ async function serve(request: Request, { params }: { params: Promise<{ id: strin
   };
 
   const size = file.size;
+
+  /*
+   * A photo at the size it is shown, not the size the camera took it.
+   *
+   * `?w=1280` returns the picture resized to that width (never enlarged) as
+   * WebP — typically a tenth of a phone or camera original — so the opening
+   * photo, the backdrops and the gallery arrive in a fraction of the time.
+   * Only a few fixed widths are made, so the set of variants stays small; each
+   * is kept by the CDN after the first guest (the URL never changes meaning),
+   * and in memory here for the next request to this same server.
+   */
+  const width = Number(new URL(request.url).searchParams.get("w"));
+  if (RESIZE_WIDTHS.has(width) && RESIZABLE.test(file.mimeType)) {
+    const variant = await resized(`${id}:${width}`, width, () => slice(0, size)).catch((err) => {
+      console.error("[media] resize failed, serving the original:", err instanceof Error ? err.message : err);
+      return null;
+    });
+    if (variant && variant.byteLength < size) {
+      return new Response(new Uint8Array(variant), {
+        headers: {
+          "Content-Type": "image/webp",
+          "Content-Length": String(variant.byteLength),
+          "Cache-Control": "public, max-age=31536000, immutable",
+          "CDN-Cache-Control": "public, max-age=2592000, immutable",
+          "Content-Disposition": `inline; filename="${encodeURIComponent(file.filename.replace(/\.[^.]+$/, ""))}.webp"`,
+          "X-Content-Type-Options": "nosniff",
+        },
+      });
+    }
+  }
 
   const headers: Record<string, string> = {
     "Content-Type": file.mimeType,

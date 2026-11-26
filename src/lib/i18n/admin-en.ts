@@ -611,4 +611,6 @@ export const ADMIN_EN: Record<string, string> = {
   "ចាក់វិលជុំ រហូតដល់ភ្ញៀវបើក": "Loop until the guest opens",
   "បិទ = ចាក់តែម្ដង (សមស្របសម្រាប់សំឡេងខ្លី)": "Off = play once (suits a short sound)",
   "កម្មវិធីរុករកមិនអនុញ្ញាតឱ្យចាក់សំឡេងដោយខ្លួនឯង មុនភ្ញៀវប៉ះអេក្រង់ទេ។ សំឡេងនឹងព្យាយាមចាក់ភ្លាម ហើយបើត្រូវបានរារាំង វានឹងចាប់ផ្ដើមនៅពេលភ្ញៀវប៉ះអេក្រង់ជាលើកដំបូង។": "Browsers don't let a page play sound by itself before the guest touches the screen. The sound tries to play straight away, and if that is blocked it starts on the guest's first touch.",
+  "ផ្ទៃខាងក្រោយមានចលនា": "Live background",
+  "ស្បែកទី ៣–១១៖ ផ្ទៃខាងក្រោយនៅទំព័រដំបូង និងនៅពីក្រោយលិខិត នៅតែមានចលនា · បិទ = រូបនៅស្ងៀម": "Themes 3–11: the background keeps moving on the opening page and behind the letter · off = a still picture",
 };

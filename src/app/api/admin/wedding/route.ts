@@ -90,6 +90,7 @@ const schema = z.object({
     )
     .max(MAX_DRESS_COLORS)
     .optional(),
+  livePaperEnabled: z.boolean().optional(),
   guestTitles: z.array(z.string().trim().min(1).max(40)).max(MAX_CUSTOM_TITLES).optional(),
   dressGroups: z
     .array(z.object({ title: z.string().trim().max(80), note: z.string().trim().max(80) }))

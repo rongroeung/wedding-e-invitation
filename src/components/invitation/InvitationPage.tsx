@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Guest } from "@/lib/db/schema";
 import type { InvitationData } from "@/lib/queries";
-import { mediaSrc } from "@/lib/media";
+import { PHOTO_W, mediaSrc, photoSrc } from "@/lib/media";
 import { Blessing } from "./Blessing";
 import { envelopeConfig } from "@/lib/envelope";
 import { frameConfig } from "@/lib/frame";
@@ -17,6 +17,7 @@ import { DressColors } from "./DressColors";
 import { ImagePreload, invitationImages } from "./ImagePreload";
 import { OpeningReadyProvider, useOpeningReady } from "./openingReady";
 import { PreMusic } from "./PreMusic";
+import { LivePaper } from "./LivePaper";
 import { FitGroup } from "@/components/ui/FitLine";
 import { SceneOpening } from "./envelope/SceneOpening";
 import { sceneOf, themeKeyOf, type InvitationThemeKey } from "@/lib/invitationTheme";
@@ -138,11 +139,13 @@ export function InvitationPage({
   const frame = frameConfig(wedding);
   const envelope = envelopeConfig(wedding);
   const envelopeShown = envelope.enabled && !skipEnvelope;
-  /* the opening page lets the guest in only once every picture and the
-     pre-wedding film have arrived (openingReady) */
+  /* the opening page lets the guest in once what is seen right after it —
+     the first-screen pictures and the pre-wedding film — has arrived
+     (openingReady). The rest (portraits, gallery, map) keeps loading behind,
+     long before the guest scrolls down to it. */
   const images = invitationImages(data, envelopeShown, film?.poster ?? "");
   const openingReady = useOpeningReady(
-    [...images.first, ...images.later],
+    images.first,
     filmPreload,
     film?.kind === "file",
     envelopeShown,
@@ -155,7 +158,9 @@ export function InvitationPage({
    * the envelope stands in) or the garden (Theme 3).
    */
   const theme = themeKeyOf(wedding.invitationTheme);
-  const openingPhoto = mediaSrc(wedding.openingPhotoId, wedding.openingPhotoUrl);
+  /* a film theme's spec: its living paper (LivePaper) */
+  const sceneSpec = sceneOf(theme);
+  const openingPhoto = photoSrc(wedding.openingPhotoId, wedding.openingPhotoUrl, PHOTO_W.full);
   const scene: "photo" | InvitationThemeKey | null = sceneOf(theme)
     ? theme
     : theme === "photo" && openingPhoto
@@ -382,6 +387,11 @@ export function InvitationPage({
     <CardShell
       frame={frame}
       atmosphere={<CardFx defaults={appearance} rich={rich} />}
+      livePaper={
+        sceneSpec && wedding.livePaperEnabled ? (
+          <LivePaper still={sceneSpec.paper?.poster ?? sceneSpec.still} film={sceneSpec.paper?.film} />
+        ) : null
+      }
       scrollable={opened}
       cover={
         <Cover
@@ -544,6 +554,7 @@ export function InvitationPage({
           /* Themes 2 and 3: a photograph or the garden in place of the envelope */
           <SceneOpening
             variant={scene}
+            live={wedding.livePaperEnabled}
             photo={openingPhoto}
             wedding={wedding}
             guest={guest}

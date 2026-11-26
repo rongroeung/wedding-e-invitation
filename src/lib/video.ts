@@ -48,7 +48,7 @@ const FACEBOOK = /^(?:www\.|web\.|m\.)?(?:facebook\.com|fb\.watch)$/i;
 export function videoSource(wedding: VideoFields): VideoSource | null {
   if (!wedding.videoEnabled) return null;
 
-  const poster = wedding.videoPosterId ? `/api/media/${wedding.videoPosterId}` : "";
+  const poster = wedding.videoPosterId ? `/api/media/${wedding.videoPosterId}?w=1280` : "";
 
   if (wedding.videoMediaId) {
     return { kind: "file", src: `/api/media/${wedding.videoMediaId}`, poster };

@@ -1144,3 +1144,85 @@ Request: replace the closing thanks/wish (and the admin card "ពរជ័យប
 - **Clean-up:** no page errors; the test media were unlinked and deleted.
 - **Not tested:** real phones and Safari.
 - tsc and `next build` are clean.
+
+## Faster opening; a living paper for Themes 3–11
+
+**Why it was slow** (the live site sat at 26%):
+- **Order:** the pre-wedding film only started downloading after the browser's `load` event, and `load` waits for every preloaded picture, including the whole gallery. So pictures and film came one after the other.
+- **What was waited for:** the opening also waited for the whole gallery, far down the page.
+- **Picture size:** photos were served at their uploaded size (camera originals of several MB).
+- **Film transfer:** a whole-file request is read out of the database 1 MB at a time, one window after another.
+
+**Fixes:**
+- **Wait only for what is seen next:** the opening waits for the first-screen pictures and the film. Portraits, gallery and map keep loading behind at low priority.
+- **Film at once, in parallel:** `useFilmPreload` starts at once and downloads 2 MB byte ranges four at a time, then assembles the blob. A server without ranges is read whole as before.
+- **Photos at the size they are shown:** `/api/media/<id>?w=<480|640|960|1280|1920>` returns the photo resized (never enlarged) as WebP via sharp, kept by the CDN after the first guest and in a ~48 MB in-memory cache on the server.
+  - **Widths used** (`photoSrc` / `PHOTO_W` in lib/media): opening photo and card paper 1280; page backdrop, gallery lightbox and map 1920; gallery tiles 960; portraits 640; video poster 1280.
+  - **Left as they are:** the gift QR and the name logo.
+  - **Preload list:** ImagePreload asks for the exact same addresses, so nothing downloads twice.
+  - **Dependency:** `sharp` added to dependencies (already installed via Next; the lock file is in step).
+
+**Living paper** (`LivePaper.tsx`, under the writing, with the same wash as before via the new `--card-wash`):
+- **Theme 9 (សួនចង្កៀងគ្រីស្តាល់):** the couple's live background.
+  - **Cropped:** from the 1920×1080 screen recording to its 608×1080 panel.
+  - **Lettering removed:** the template lettering ("The Wedding of Wendra & Adinda") was taken out of every frame. It drifts, so it is masked frame by frame, filled and softened into mist.
+  - **Looped:** the last 1.2 s cross-fade into the start, giving 8.6 s with a seam no larger than one frame's change.
+  - **Files:** `chandelier-paper.mp4` (1.5 MB) plus its first frame `chandelier-paper.webp`, which is now Theme 9's still paper.
+  - **Playback:** it pauses while the page is hidden.
+- **Themes 3–8, 10, 11:** their picture slowly breathes (a 26 s push-in and drift).
+- **Reduced motion:** both stand still.
+- **Particles:** the chosen Appearance particles still play on top.
+
+**Checked** on the production build.
+- **Resizer:** a 6.2 MB 4000×3000 JPEG became a 59 KB 1280×960 WebP (7 ms when repeated); a width not in the set returns the original.
+- **Opening:** with the gallery held back 8 s, the opening unlocked after 3.0 s. A 14.7 MB film came in 8 parallel ranges, the assembled copy was byte-identical (SHA-256), and it played from the `blob:` after opening.
+- **Living paper:** Theme 9's paper video plays; Theme 3's breathes (`paperBreathe running`); two screenshots 2.5 s apart differ. With reduced motion, the video is paused and there is no animation. The wash is present and the letter reads clearly (screenshots reviewed).
+- **Errors and clean-up:** no page errors; the test media and theme were restored.
+- **Not tested:** speed on the real Vercel site and database, and real phones and Safari.
+- **Local note:** a 14.7 MB single-request upload crashed the local in-memory dev database (the admin uploads large files in 3 MB pieces, which worked); the data was intact after a restart.
+- tsc and `next build` are clean.
+
+## The opening page stays alive after its film
+
+- **Theme 9:** when the intro film ends, the theme's live loop (`chandelier-paper.mp4`, buffered from the start) fades in over the held frame in 1.6 s. It is shown only once it is actually playing, so no still poster flashes.
+- **The other film themes (3–8, 10, 11):** the held frame breathes (`sceneAlive`, 26 s). It uses the `scale` and `translate` properties, so it adds to the lean-in's `transform` when the guest opens instead of fighting it.
+- **Reduced motion:** both stay still. If autoplay is refused, the film's held frame simply stays.
+- **Checked** on the production build at 390×844:
+  - Theme 9: intro ended → loop playing at opacity 1.
+  - Theme 3: `sceneAlive` running.
+  - Reduced motion: loop hidden and paused, no animation.
+  - Words in; the open button still opens; no page errors.
+  - Screenshot reviewed (the loop's mist sits behind the names).
+  - tsc and `next build` are clean.
+
+## Live backgrounds for Themes 3–6 and 8–11, with an on/off switch
+
+**The couple's eight live backgrounds** (`scripts/live-paper.py`, one run per video):
+- **Crop:** each 1920×1080 screen recording is cropped to its 584 (Theme 9: 608) × 1080 panel.
+- **Template lettering removed** (the names, "The Wedding of", "Pernikahan", and "CHANIEKA 18TH BIRTHDAY" on Theme 6):
+  - the lettering's colour is estimated from the pixels that stand out most in its area;
+  - in every frame, each pixel's *alpha* towards that colour (how far it has moved from its local background towards the ink) finds solid strokes and hairline edges alike;
+  - a strict pass finds the letters, then a loose pass right around them catches their faint edges;
+  - masks also take in the neighbouring frames, are filled, and are softened into mist.
+- **Where it searches:** each video has its own area, horizontal as well as vertical, so scenery of a similar colour is left alone (olive foliage in Theme 3). Theme 6 has two areas, so the small line between the candles is taken out without touching the candles.
+- **Loop:** the last 1 s cross-fades into the start.
+- **Output:** `public/themes/<key>/<key>-paper.mp4` (0.66–1.29 MB) and `-paper.webp` (first frame) for garden, palace, golden, velvet, rosegate, chandelier (replaced with the new video), cascade and peacock.
+- **Checked:** each video's lettering area before and after, at three moments. Seams match ordinary frame-to-frame change.
+
+**Wiring:**
+- **Code:** `LIVE_PAPERS` in lib/invitationTheme gives every one of these themes `paper`. The opening page fades the loop in after its film, and the letter plays it behind the writing (LivePaper).
+- **Theme 7 (royal):** it has no video, so its picture keeps breathing.
+
+**Switch (admin → រូបរាង → ស្បែកសំបុត្រ, shown for Themes 3–11):**
+- **ផ្ទៃខាងក្រោយមានចលនា · Live background**, on by default. Column `live_paper_enabled`, migration `0055`.
+- **Off:** no loop and no breathing, either on the opening page or behind the letter; the still pictures remain.
+
+**Checked** on the production build at 390×844:
+- **Each of the nine film themes:**
+  - opening: its own `*-paper.mp4` playing and faded in after the film (Theme 5 after its 15 s film), or breathing for Theme 7;
+  - letter: the same loop playing behind the writing, or breathing for Theme 7.
+- **Switch off** (palace, royal): neither loop nor breathing anywhere.
+- **Admin:** the switch shows for a film theme, toggles, and saves (`livePaperEnabled` false → 200).
+- **Screenshots:** reviewed for all eight, opening and letter.
+- **Clean-up:** no page errors; settings restored.
+- tsc and `next build` are clean.

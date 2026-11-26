@@ -45,7 +45,10 @@ export function SceneOpening({
   onStart,
   onOpen,
   onFinished,
+  live = true,
 }: {
+  /** the background keeps moving after the film (the couple's setting) */
+  live?: boolean;
   /** "photo" (Theme 2), or a film theme (3–6, lib/invitationTheme SCENES). */
   variant: "photo" | InvitationThemeKey;
   /** Theme 2's photograph. */
@@ -67,6 +70,10 @@ export function SceneOpening({
   const opened = useRef(false);
   const cleared = useRef(false);
   const video = useRef<HTMLVideoElement>(null);
+  /* the opening stays alive once the film has played: the theme's live loop
+     fades in (Theme 9), or the held picture slowly breathes (the others) */
+  const loop = useRef<HTMLVideoElement>(null);
+  const [looping, setLooping] = useState(false);
 
   const onOpenRef = useRef(onOpen);
   onOpenRef.current = onOpen;
@@ -138,6 +145,17 @@ export function SceneOpening({
       clearTimeout(fallback);
     };
   }, [film]);
+
+  useEffect(() => {
+    const l = loop.current;
+    if (!arrived || !l || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // shown only once it is actually playing, so no still poster flashes in
+    l.play()
+      .then(() => setLooping(true))
+      .catch(() => {
+        /* autoplay refused: the film's held frame simply stays */
+      });
+  }, [arrived]);
 
   const remember = useCallback(() => {
     try {
@@ -214,16 +232,31 @@ export function SceneOpening({
 
         <div className="scene-frame">
           {film ? (
-            <video
-              ref={video}
-              className="scene-media"
-              src={film.intro}
-              poster={backdrop}
-              muted
-              playsInline
-              preload="auto"
-              aria-hidden="true"
-            />
+            <>
+              <video
+                ref={video}
+                className={`scene-media ${live && arrived && !film.paper ? "scene-media-breathe" : ""}`}
+                src={film.intro}
+                poster={backdrop}
+                muted
+                playsInline
+                preload="auto"
+                aria-hidden="true"
+              />
+              {live && film.paper && (
+                /* buffered from the start, faded in over the held frame */
+                <video
+                  ref={loop}
+                  className={`scene-media scene-loop ${looping ? "scene-loop-on" : ""}`}
+                  src={film.paper.film}
+                  muted
+                  loop
+                  playsInline
+                  preload="auto"
+                  aria-hidden="true"
+                />
+              )}
+            </>
           ) : (
             // eslint-disable-next-line @next/next/no-img-element
             <img className="scene-media" src={backdrop} alt="" aria-hidden="true" />

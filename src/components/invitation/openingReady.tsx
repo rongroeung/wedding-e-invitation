@@ -4,8 +4,9 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { FilmPreload } from "./useFilmPreload";
 
 /**
- * Whether the invitation is ready to be opened: every picture it will show
- * (ImagePreload's list) and the pre-wedding film have arrived. Until then the
+ * Whether the invitation is ready to be opened: the pictures seen right after
+ * the opening (ImagePreload's first-screen list) and the pre-wedding film
+ * have arrived. Until then the
  * opening page's open button shows how far it has got and does not open, so
  * nothing pops in half-loaded after the guest taps.
  *

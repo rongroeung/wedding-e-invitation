@@ -5,7 +5,7 @@ import type { InvitationData } from "@/lib/queries";
 import { cardBackdrop, pageBackdrop } from "@/lib/artwork";
 import { frameConfig } from "@/lib/frame";
 import { sceneOf, themeKeyOf } from "@/lib/invitationTheme";
-import { mediaSrc } from "@/lib/media";
+import { PHOTO_W, mediaSrc, photoSrc } from "@/lib/media";
 
 /**
  * Every picture the invitation will show, asked for as the page is first
@@ -52,7 +52,7 @@ export function invitationImages(data: InvitationData, opening: boolean, filmPos
   const frame = frameConfig(wedding);
 
   const first = [
-    theme === "photo" ? mediaSrc(wedding.openingPhotoId, wedding.openingPhotoUrl) : "",
+    theme === "photo" ? photoSrc(wedding.openingPhotoId, wedding.openingPhotoUrl, PHOTO_W.full) : "",
     // a film theme opens on the film's first frame and holds on its last
     opening ? sceneOf(theme)?.first ?? "" : "",
     sceneOf(theme)?.still ?? "",
@@ -69,11 +69,11 @@ export function invitationImages(data: InvitationData, opening: boolean, filmPos
     opening ? filmPoster : "",
   ];
   const later = [
-    mediaSrc(wedding.groomPhotoId, wedding.groomPhotoUrl),
-    mediaSrc(wedding.bridePhotoId, wedding.bridePhotoUrl),
-    ...gallery.map((g) => mediaSrc(g.mediaId, g.url)),
+    photoSrc(wedding.groomPhotoId, wedding.groomPhotoUrl, PHOTO_W.portrait),
+    photoSrc(wedding.bridePhotoId, wedding.bridePhotoUrl, PHOTO_W.portrait),
+    ...gallery.map((g) => photoSrc(g.mediaId, g.url, PHOTO_W.tile)),
     mediaSrc(wedding.giftQrMediaId, wedding.giftQrUrl),
-    mediaSrc(wedding.venueMapMediaId, ""),
+    photoSrc(wedding.venueMapMediaId, "", PHOTO_W.wide),
   ];
   const clean = (list: string[]) => list.filter((src) => src && !src.startsWith("data:"));
   return { first: clean(first), later: clean(later) };
