@@ -4784,9 +4784,10 @@ html[data-paper-dark] .dress-chip {
 .dress-group-head { margin-bottom: clamp(1rem, 4vw, 1.4rem); text-align: center; }
 .dress-group-title {
   font-family: "Cormorant Garamond", var(--font-title, "Noto Serif Khmer"), serif;
-  font-size: clamp(1.35rem, 6vw, 1.85rem);
+  /* below the section title (1.35rem Muol), never above it */
+  font-size: clamp(1rem, 4.4vw, 1.15rem);
   font-weight: 600;
-  line-height: 1.25;
+  line-height: 1.6;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--msg-ink, var(--gold-1));
@@ -4794,7 +4795,7 @@ html[data-paper-dark] .dress-chip {
 .dress-group-note {
   margin-top: 0.15rem;
   font-family: "Cormorant Garamond", "Noto Serif Khmer", serif;
-  font-size: clamp(0.95rem, 4vw, 1.1rem);
+  font-size: clamp(0.85rem, 3.6vw, 0.95rem);
   color: rgb(var(--c-text-rgb, 60 40 30) / 0.8);
 }
 
@@ -5466,3 +5467,15 @@ html[data-paper-dark] .cv-guest { text-shadow: 0 1px 0 rgb(0 0 0 / 0.35), 0 0 22
 .admin-root[data-admin-theme="dark"] .\!text-emerald-700 { color: #6ee7b7 !important; }
 .admin-root[data-admin-theme="dark"] .\!border-emerald-300 { border-color: rgb(16 185 129 / .55) !important; }
 .admin-root[data-admin-theme="dark"] .hover\:\!bg-emerald-100:hover { background-color: rgb(16 185 129 / .26) !important; }
+
+/* The open button while the invitation is still loading (openingReady): a
+   quiet, steady face with a thin bar filling in, instead of the pulse. */
+.btn-seal.env-open-loading { cursor: progress; filter: saturate(0.85); opacity: 0.92; }
+.env-open-bar {
+  display: block; width: 9rem; height: 3px; border-radius: 999px; overflow: hidden;
+  background: rgb(60 35 20 / 0.18);
+}
+.env-open-bar > span {
+  display: block; height: 100%; border-radius: inherit;
+  background: currentColor; transition: width 0.4s ease;
+}

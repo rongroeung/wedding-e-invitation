@@ -1,5 +1,7 @@
 "use client";
 
+import { useOpeningReadyState } from "../openingReady";
+
 /**
  * The one thing a guest has to do.
  *
@@ -18,6 +20,10 @@ export function OpenButton({
   onOpen: () => void;
   hidden: boolean;
 }) {
+  /* Until the pictures and the film are in, the button counts up instead of
+     opening (openingReady); the tap is ignored by the opening itself. */
+  const { ready, progress } = useOpeningReadyState();
+  const pct = Math.round(progress * 100);
   return (
     <div
       className={`flex flex-col items-center transition-all duration-500 ${
@@ -27,9 +33,23 @@ export function OpenButton({
       <button
         type="button"
         onClick={onOpen}
-        className="btn-seal env-open-pulse min-h-[52px] min-w-[220px] khmer-wrap"
+        data-open-control=""
+        aria-disabled={!ready}
+        aria-busy={!ready}
+        className={`btn-seal min-h-[52px] min-w-[220px] khmer-wrap ${ready ? "env-open-pulse" : "env-open-loading"}`}
       >
-        {label}
+        {ready ? (
+          label
+        ) : (
+          <span className="flex flex-col items-center gap-1.5">
+            <span>
+              កំពុងរៀបចំសំបុត្រ… <span className="tabular-nums">{pct}%</span>
+            </span>
+            <span className="env-open-bar" aria-hidden="true">
+              <span style={{ width: `${pct}%` }} />
+            </span>
+          </span>
+        )}
       </button>
       {hint && (
         /*

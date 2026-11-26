@@ -16,6 +16,7 @@ import { OpeningTransition } from "./OpeningTransition";
 import { SkipButton } from "./SkipButton";
 import { usePointerTilt, useRichDevice } from "./usePointerTilt";
 
+import { useOpeningReadyState } from "../openingReady";
 /**
  * `useLayoutEffect` on the client, `useEffect` on the server.
  *
@@ -287,9 +288,16 @@ export function InvitationOpening({
     }
   }, [guest?.code]);
 
+  /* Not until every picture and the film have arrived (openingReady): the
+     tap is ignored and the open button shows how far the loading has got. */
+  const { ready } = useOpeningReadyState();
+  const readyRef = useRef(ready);
+  readyRef.current = ready;
+
   /** Straight to the invitation: the skip button, or a guest who asked for
    *  reduced motion, or an admin who turned the animation off. */
   const jump = useCallback(() => {
+    if (!readyRef.current) return;
     started.current = true;
     onStartRef.current?.();
     timers.current.forEach(clearTimeout);
@@ -300,6 +308,7 @@ export function InvitationOpening({
   }, [clear, finish, remember]);
 
   const start = useCallback(() => {
+    if (!readyRef.current) return;
     if (started.current || step !== "closed") return;
     started.current = true;
     onStartRef.current?.();

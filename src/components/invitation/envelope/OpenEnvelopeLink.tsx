@@ -39,6 +39,7 @@ export function OpenEnvelopeLink({ label, onOpen }: { label: string; onOpen: () 
     <a
       href="?envelope=open"
       className="env-anywhere tappable"
+      data-open-control=""
       aria-label={label}
       onClick={(event) => {
         /* JavaScript is running, so play the thing rather than navigate. */

@@ -14,7 +14,9 @@ import { Couple } from "./Couple";
 import { Cover } from "./Cover";
 import { DateSection } from "./DateSection";
 import { DressColors } from "./DressColors";
-import { ImagePreload } from "./ImagePreload";
+import { ImagePreload, invitationImages } from "./ImagePreload";
+import { OpeningReadyProvider, useOpeningReady } from "./openingReady";
+import { PreMusic } from "./PreMusic";
 import { FitGroup } from "@/components/ui/FitLine";
 import { SceneOpening } from "./envelope/SceneOpening";
 import { sceneOf, themeKeyOf, type InvitationThemeKey } from "@/lib/invitationTheme";
@@ -125,7 +127,8 @@ export function InvitationPage({
    */
   const film = videoSource(wedding);
   /* fetched ahead while the guest is on the opening page (useFilmPreload) */
-  const filmSource = useFilmPreload(film);
+  const filmPreload = useFilmPreload(film);
+  const filmSource = filmPreload.source;
   const [filmDone, setFilmDone] = useState(!film);
   /* Fade the film out on its own beat, then unmount it, exactly as the
      curtains are struck: something that has finished should be seen leaving. */
@@ -135,6 +138,17 @@ export function InvitationPage({
   const frame = frameConfig(wedding);
   const envelope = envelopeConfig(wedding);
   const envelopeShown = envelope.enabled && !skipEnvelope;
+  /* the opening page lets the guest in only once every picture and the
+     pre-wedding film have arrived (openingReady) */
+  const images = invitationImages(data, envelopeShown, film?.poster ?? "");
+  const openingReady = useOpeningReady(
+    [...images.first, ...images.later],
+    filmPreload,
+    film?.kind === "file",
+    envelopeShown,
+  );
+  /* the opening sound, on the first page until the guest opens (PreMusic) */
+  const preMusicSrc = wedding.preMusicEnabled ? mediaSrc(wedding.preMusicMediaId, wedding.preMusicUrl) : "";
   /*
    * The opening page under the invitation's theme: the envelope (Theme 1), the
    * couple's photograph (Theme 2, and only once one is uploaded — until then
@@ -171,6 +185,13 @@ export function InvitationPage({
    * the original note asked for.
    */
   const [velvetHung, setVelvetHung] = useState(!envelopeShown);
+  /* the guest has opened (the opening sound stops here; velvetHung is no
+     signal for this, as the curtains are also hung in idle time) */
+  const [openStarted, setOpenStarted] = useState(false);
+  const opening = useCallback(() => {
+    setVelvetHung(true);
+    setOpenStarted(true);
+  }, []);
 
   const contentRef = useRef<HTMLDivElement>(null);
   const tracked = useRef(false);
@@ -512,6 +533,12 @@ export function InvitationPage({
 
       {/* `skipEnvelope` is the server honouring `?envelope=skip` — the one way
           past this overlay that needs no JavaScript at all. */}
+      {envelopeShown && preMusicSrc && (
+        <OpeningReadyProvider value={openingReady}>
+          <PreMusic src={preMusicSrc} loop={wedding.preMusicLoop} playing={!openStarted && !envelopeDone} />
+        </OpeningReadyProvider>
+      )}
+      <OpeningReadyProvider value={openingReady}>
       {envelopeShown &&
         (scene ? (
           /* Themes 2 and 3: a photograph or the garden in place of the envelope */
@@ -521,7 +548,7 @@ export function InvitationPage({
             wedding={wedding}
             guest={guest}
             envelope={envelope}
-            onStart={() => setVelvetHung(true)}
+            onStart={opening}
             onOpen={envelopeOver}
             onFinished={veilCleared}
           />
@@ -531,11 +558,12 @@ export function InvitationPage({
             guest={guest}
             envelope={envelope}
             frame={frame}
-            onStart={() => setVelvetHung(true)}
+            onStart={opening}
             onOpen={envelopeOver}
             onFinished={veilCleared}
           />
         ))}
+      </OpeningReadyProvider>
     </>
   );
 }

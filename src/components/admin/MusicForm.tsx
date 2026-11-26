@@ -15,7 +15,17 @@ export function MusicForm({ wedding }: { wedding: Wedding }) {
     musicTitle: wedding.musicTitle,
     musicUrl: wedding.musicUrl,
     musicMediaId: wedding.musicMediaId,
+    preMusicEnabled: wedding.preMusicEnabled,
+    preMusicUrl: wedding.preMusicUrl,
+    preMusicMediaId: wedding.preMusicMediaId,
+    preMusicLoop: wedding.preMusicLoop,
   });
+  const save = () =>
+    send("/api/admin/wedding", {
+      method: "PUT",
+      body: JSON.stringify(form),
+      successText: t("បានរក្សាទុក"),
+    });
 
   return (
     <div className="space-y-6">
@@ -52,17 +62,47 @@ export function MusicForm({ wedding }: { wedding: Wedding }) {
             />
           </Field>
           <div className="flex justify-end">
-            <Button
-              type="button"
-              disabled={busy}
-              onClick={() =>
-                send("/api/admin/wedding", {
-                  method: "PUT",
-                  body: JSON.stringify(form),
-                  successText: t("បានរក្សាទុក"),
-                })
-              }
-            >
+            <Button type="button" disabled={busy} onClick={save}>
+              {t("រក្សាទុក")}</Button>
+          </div>
+        </div>
+      </Card>
+
+      <Card
+        title={t("សំឡេងបើកសំបុត្រ")}
+        description={t("ចាក់នៅទំព័រដំបូង មុនភ្ញៀវចុច «បើកសំបុត្រអញ្ជើញ» ហើយបញ្ឈប់ពេលបើក រួចភ្លេងផ្ទៃខាងក្រោយបន្ត")}
+      >
+        <div className="space-y-4">
+          <Toggle
+            label={t("បើកសំឡេងបើកសំបុត្រ")}
+            checked={form.preMusicEnabled}
+            onChange={(v) => setForm({ ...form, preMusicEnabled: v })}
+          />
+          <MediaUpload
+            label={t("ផ្ទុកឯកសារសំឡេង (MP3 អតិបរមា 12MB)")}
+            kind="audio"
+            currentSrc={mediaSrc(form.preMusicMediaId, form.preMusicUrl)}
+            onUploaded={(id) => setForm({ ...form, preMusicMediaId: id })}
+            onClear={() => setForm({ ...form, preMusicMediaId: null, preMusicUrl: "" })}
+          />
+          <Field label={t("ឬបញ្ចូល URL សំឡេង")}>
+            <Input
+              value={form.preMusicUrl}
+              onChange={(e) => setForm({ ...form, preMusicUrl: e.target.value })}
+              placeholder="https://..."
+            />
+          </Field>
+          <Toggle
+            label={t("ចាក់វិលជុំ រហូតដល់ភ្ញៀវបើក")}
+            hint={t("បិទ = ចាក់តែម្ដង (សមស្របសម្រាប់សំឡេងខ្លី)")}
+            checked={form.preMusicLoop}
+            onChange={(v) => setForm({ ...form, preMusicLoop: v })}
+          />
+          <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-800">
+            {t("កម្មវិធីរុករកមិនអនុញ្ញាតឱ្យចាក់សំឡេងដោយខ្លួនឯង មុនភ្ញៀវប៉ះអេក្រង់ទេ។ សំឡេងនឹងព្យាយាមចាក់ភ្លាម ហើយបើត្រូវបានរារាំង វានឹងចាប់ផ្ដើមនៅពេលភ្ញៀវប៉ះអេក្រង់ជាលើកដំបូង។")}
+          </p>
+          <div className="flex justify-end">
+            <Button type="button" disabled={busy} onClick={save}>
               {t("រក្សាទុក")}</Button>
           </div>
         </div>

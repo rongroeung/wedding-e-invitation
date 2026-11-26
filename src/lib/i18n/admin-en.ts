@@ -603,4 +603,12 @@ export const ADMIN_EN: Record<string, string> = {
   "Khmer OS Freehand — សរសេរដៃសេរី": "Khmer OS Freehand — free handwriting",
   "Khmer OS Metal Chrieng — ទ្រេត ស្រស់": "Khmer OS Metal Chrieng — slanted, lively",
   "ឈ្មោះភ្ញៀវ": "Guest name",
+  "សំឡេងបើកសំបុត្រ": "Opening sound",
+  "ចាក់នៅទំព័រដំបូង មុនភ្ញៀវចុច «បើកសំបុត្រអញ្ជើញ» ហើយបញ្ឈប់ពេលបើក រួចភ្លេងផ្ទៃខាងក្រោយបន្ត": "Plays on the first page, before the guest taps \"Open invitation\", and stops when they open; then the background music carries on",
+  "បើកសំឡេងបើកសំបុត្រ": "Turn on the opening sound",
+  "ផ្ទុកឯកសារសំឡេង (MP3 អតិបរមា 12MB)": "Upload a sound file (MP3, max 12 MB)",
+  "ឬបញ្ចូល URL សំឡេង": "Or enter a sound URL",
+  "ចាក់វិលជុំ រហូតដល់ភ្ញៀវបើក": "Loop until the guest opens",
+  "បិទ = ចាក់តែម្ដង (សមស្របសម្រាប់សំឡេងខ្លី)": "Off = play once (suits a short sound)",
+  "កម្មវិធីរុករកមិនអនុញ្ញាតឱ្យចាក់សំឡេងដោយខ្លួនឯង មុនភ្ញៀវប៉ះអេក្រង់ទេ។ សំឡេងនឹងព្យាយាមចាក់ភ្លាម ហើយបើត្រូវបានរារាំង វានឹងចាប់ផ្ដើមនៅពេលភ្ញៀវប៉ះអេក្រង់ជាលើកដំបូង។": "Browsers don't let a page play sound by itself before the guest touches the screen. The sound tries to play straight away, and if that is blocked it starts on the guest's first touch.",
 };

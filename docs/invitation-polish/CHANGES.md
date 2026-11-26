@@ -1106,3 +1106,41 @@ Request: replace the closing thanks/wish (and the admin card "ពរជ័យប
 - **Fix:** `dropLeadingZeros()` (lib/numberInput) rewrites the box itself as you type: 02 → 2, 012 → 12. A lone 0 and decimals like 0.5 are left alone.
 - **Where it applies:** in the shared admin `Input` for every `type="number"` (seats, programme order, gallery order…), and in the guests' RSVP count box.
 - **Checked** by typing into the real boxes on the production build: seats 02 → 2, 01 → 1, 012 → 12, 10 → 10, 0 → 0. On the invitation, typing 0 before 2 in the RSVP count → 2. No page errors; tsc and build are clean.
+
+## Smaller attire headings; the open button waits for everything to load; an opening sound
+
+**Attire group headings smaller than the section title.**
+- **Change:** `.dress-group-title` goes from clamp(1.35rem, 6vw, 1.85rem) to clamp(1rem, 4.4vw, 1.15rem), and the date line from clamp(0.95rem, 4vw, 1.1rem) to clamp(0.85rem, 3.6vw, 0.95rem).
+- **Measured** (heading against title "ពណ៌សម្លៀកបំពាក់"): 17.2 px against 21.6 px at 390 wide, and 19.4 px against 22.8 px at 1280. The heading's text is narrower than the title's (142 against 161 px on a phone).
+
+**The invitation can be opened only once it has loaded.**
+- **What is waited for** (`openingReady.tsx`):
+  - every picture in ImagePreload's list (now `invitationImages()`, shared by both): opening picture, paper, frame, backdrops, portraits, gallery, gift QR, map;
+  - the pre-wedding film, when it is an uploaded file.
+- **How the film reports progress:** `useFilmPreload` now reads the download in pieces and reports how far it has got.
+- **While waiting:** the open button reads "កំពុងរៀបចំសំបុត្រ… NN%" with a thin bar filling in, and the skip link is dimmed.
+- **Where the gate sits:** in the opening's own `start` and `jump` (classic envelope and scene themes). So every way in (the button, the tap-anywhere envelope link, the skip link, the envelope's document tap handler) is held until ready.
+- **Safety valves:**
+  - a picture that fails counts as done;
+  - after 45 s (`READY_CAP_MS`) the guest may open regardless, so a broken connection never traps them;
+  - a YouTube/Vimeo film can't be fetched, so it isn't waited for;
+  - without JavaScript, the links still work as before.
+
+**Opening sound (សំឡេងបើកសំបុត្រ).**
+- **Admin:** ភ្លេង → a new card with on/off, an upload or URL, and loop (on by default; off = play once). Columns `pre_music_enabled`, `pre_music_url`, `pre_music_media_id` and `pre_music_loop` (migration `0054`). The upload must be this wedding's own.
+- **Invitation (`PreMusic.tsx`):**
+  - on the first page it tries to play at once; where the browser refuses (it will, until the guest touches the page), it starts on the first touch, click or key, including a tap on the still-loading open button;
+  - a tap that actually opens the invitation doesn't start it;
+  - on opening it fades out over 0.7 s and stops, and the background music follows as before;
+  - it pauses while the page is hidden.
+- **Fixes found while testing:**
+  - its "has the guest opened?" signal was first tied to `velvetHung`, which also turns true in idle time, so a new `openStarted` flag is used;
+  - an animation frame time before the fade's start made the volume exceed 1, so the fade is now clamped.
+
+**Checked** on the production build, with a real uploaded film, poster and sound. The film download was held back 5 s, and Chromium ran with `--autoplay-policy=user-gesture-required`, the phone rule.
+- **While loading:** the button read "កំពុងរៀបចំសំបុត្រ… 35%". A tap on it did not open (the step stayed "closed") but started the sound (playing at 0.65 s).
+- **Unlocking:** the button unlocked 50 ms after the film arrived and read បើកសំបុត្រអញ្ជើញ.
+- **Opening:** opening faded the sound to a stop, and the film then played from its preloaded `blob:` copy.
+- **Clean-up:** no page errors; the test media were unlinked and deleted.
+- **Not tested:** real phones and Safari.
+- tsc and `next build` are clean.

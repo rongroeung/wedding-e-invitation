@@ -14,6 +14,7 @@ import { OpenEnvelopeLink } from "./OpenEnvelopeLink";
 import { OpeningTransition } from "./OpeningTransition";
 import { SkipButton } from "./SkipButton";
 
+import { useOpeningReadyState } from "../openingReady";
 const useIsoLayout = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 /**
@@ -146,7 +147,14 @@ export function SceneOpening({
     }
   }, [guest?.code]);
 
+  /* Not until every picture and the film have arrived (openingReady): the
+     tap is ignored and the open button shows how far the loading has got. */
+  const { ready } = useOpeningReadyState();
+  const readyRef = useRef(ready);
+  readyRef.current = ready;
+
   const jump = useCallback(() => {
+    if (!readyRef.current) return;
     started.current = true;
     onStartRef.current?.();
     timers.current.forEach(clearTimeout);
@@ -157,6 +165,7 @@ export function SceneOpening({
   }, [clear, finish, remember]);
 
   const start = useCallback(() => {
+    if (!readyRef.current) return;
     if (started.current) return;
     started.current = true;
     onStartRef.current?.();

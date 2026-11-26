@@ -1,5 +1,7 @@
 "use client";
 
+import { useOpeningReadyState } from "../openingReady";
+
 /**
  * A quiet way past the animation. Present, findable, never competing.
  *
@@ -28,16 +30,19 @@ export function SkipButton({
   onSkip: () => void;
   hidden: boolean;
 }) {
+  const { ready } = useOpeningReadyState();
   return (
     <a
       href="?envelope=skip"
+      data-open-control=""
+      aria-disabled={!ready}
       onClick={(event) => {
         /* With JavaScript, no navigation: dissolve out where we stand. */
         event.preventDefault();
         onSkip();
       }}
       className={`env-skip tappable absolute bottom-[max(1rem,env(safe-area-inset-bottom))] right-4 rounded-full px-4 py-2 text-xs underline-offset-4 transition-opacity duration-500 hover:underline khmer-wrap sm:bottom-6 sm:right-6 ${
-        hidden ? "pointer-events-none opacity-0" : "opacity-100"
+        hidden ? "pointer-events-none opacity-0" : ready ? "opacity-100" : "opacity-40"
       }`}
     >
       {label}

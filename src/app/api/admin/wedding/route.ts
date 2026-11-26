@@ -105,6 +105,10 @@ const schema = z.object({
   musicTitle: z.string().max(160).optional(),
   musicUrl: z.string().max(600).optional(),
   musicMediaId: z.string().max(80).nullable().optional(),
+  preMusicEnabled: z.boolean().optional(),
+  preMusicUrl: z.string().max(600).optional(),
+  preMusicMediaId: z.string().max(80).nullable().optional(),
+  preMusicLoop: z.boolean().optional(),
 
   showCountdown: z.boolean().optional(),
   showProgram: z.boolean().optional(),

@@ -207,6 +207,11 @@ export const wedding = pgTable("wedding", {
   musicTitle: text("music_title").notNull().default(""),
   musicUrl: text("music_url").notNull().default(""),
   musicMediaId: text("music_media_id"),
+  /** The opening sound: plays on the first page until the guest opens the invitation. */
+  preMusicEnabled: boolean("pre_music_enabled").notNull().default(false),
+  preMusicUrl: text("pre_music_url").notNull().default(""),
+  preMusicMediaId: text("pre_music_media_id"),
+  preMusicLoop: boolean("pre_music_loop").notNull().default(true),
 
   // Section toggles
   showCountdown: boolean("show_countdown").notNull().default(true),

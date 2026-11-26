@@ -29,6 +29,24 @@ export function ImagePreload({
   /** the pre-wedding film's poster, shown the moment the film opens */
   filmPoster?: string;
 }) {
+  const { first, later } = invitationImages(data, opening, filmPoster);
+  const seen = new Set<string>();
+  const ask = (src: string, fetchPriority: "high" | "low") => {
+    if (seen.has(src)) return;
+    seen.add(src);
+    preload(src, { as: "image", fetchPriority });
+  };
+  first.forEach((src) => ask(src, "high"));
+  later.forEach((src) => ask(src, "low"));
+  return null;
+}
+
+/**
+ * The invitation's pictures: what is seen first, then the rest. Shared by the
+ * preloading above and by the opening page, which waits for all of them
+ * (useOpeningReady) before it lets the guest open the invitation.
+ */
+export function invitationImages(data: InvitationData, opening: boolean, filmPoster = "") {
   const { wedding, gallery } = data;
   const theme = themeKeyOf(wedding.invitationTheme);
   const frame = frameConfig(wedding);
@@ -57,14 +75,6 @@ export function ImagePreload({
     mediaSrc(wedding.giftQrMediaId, wedding.giftQrUrl),
     mediaSrc(wedding.venueMapMediaId, ""),
   ];
-
-  const seen = new Set<string>();
-  const ask = (src: string, fetchPriority: "high" | "low") => {
-    if (!src || seen.has(src) || src.startsWith("data:")) return;
-    seen.add(src);
-    preload(src, { as: "image", fetchPriority });
-  };
-  first.forEach((src) => ask(src, "high"));
-  later.forEach((src) => ask(src, "low"));
-  return null;
+  const clean = (list: string[]) => list.filter((src) => src && !src.startsWith("data:"));
+  return { first: clean(first), later: clean(later) };
 }
