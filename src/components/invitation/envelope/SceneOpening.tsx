@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Guest, Wedding } from "@/lib/db/schema";
 import type { EnvelopeConfig } from "@/lib/envelope";
 import { sceneOf, type InvitationThemeKey } from "@/lib/invitationTheme";
@@ -10,12 +10,9 @@ import { envelopeSeenKey } from "./InvitationOpening";
 import { Fit, FitGroup } from "@/components/ui/FitLine";
 import { KbachNameFrame } from "./KbachNameFrame";
 import { OpenButton } from "./OpenButton";
-import { OpenEnvelopeLink } from "./OpenEnvelopeLink";
 import { OpeningTransition } from "./OpeningTransition";
-import { SkipButton } from "./SkipButton";
 
 import { useOpeningReadyState } from "../openingReady";
-const useIsoLayout = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 /**
  * The opening page of Themes 2 and 3, in place of the envelope.
@@ -31,8 +28,8 @@ const useIsoLayout = typeof window === "undefined" ? useEffect : useLayoutEffect
  * portrait in the middle, over a soft, blurred copy of itself.
  *
  * It keeps the envelope's contract with the page (`onStart`, `onOpen`,
- * `onFinished`, the once-per-visit memory, the skip link and the `<a href>`
- * tap target that works without JavaScript), so everything after it — the
+ * `onFinished`, and an open button that is a link, so it works without
+ * JavaScript), so everything after it — the
  * music, the film, the curtains, the cover — runs exactly as it does after
  * the envelope.
  */
@@ -94,20 +91,6 @@ export function SceneOpening({
     onFinishedRef.current();
   }, []);
 
-  /* Opened already during this visit: straight through, as the envelope does. */
-  useIsoLayout(() => {
-    if (envelope.everyVisit) return;
-    let seen = false;
-    try {
-      seen = window.sessionStorage.getItem(envelopeSeenKey(guest?.code ?? "")) === "1";
-    } catch {
-      /* storage blocked: show it */
-    }
-    if (seen) {
-      finish();
-      clear();
-    }
-  }, []);
 
   useEffect(() => {
     document.querySelector("[data-opening]")?.setAttribute("data-hydrated", "yes");
@@ -263,7 +246,6 @@ export function SceneOpening({
           )}
           <span className="scene-shade" aria-hidden="true" />
 
-          {closed && <OpenEnvelopeLink label={wedding.envelopeOpenLabel} onOpen={start} />}
 
           <div className={`scene-words pointer-events-none ${arrived ? "scene-words-in" : ""}`}>
             <div className="scene-top">
@@ -309,7 +291,6 @@ export function SceneOpening({
         </div>
       </div>
 
-      {envelope.skip && <SkipButton label={wedding.envelopeSkipLabel} onSkip={jump} hidden={!closed} />}
     </OpeningTransition>
   );
 }

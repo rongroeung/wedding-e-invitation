@@ -1,9 +1,9 @@
 /**
- * The system's name, រុងរឿងសំបុត្រ, with its mark: a sealed envelope in gold
+ * The system's name, នាំសារ, with its mark: a sealed envelope in gold
  * on deep wine — an original drawing (no flowers). The name is HTML text in
  * Moul, so the Khmer shapes correctly.
  */
-export const BRAND_NAME = "រុងរឿងសំបុត្រ";
+export const BRAND_NAME = "នាំសារ";
 
 export function BrandMark({ className = "h-10 w-10" }: { className?: string }) {
   return (

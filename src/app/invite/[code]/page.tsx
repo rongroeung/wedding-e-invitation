@@ -47,7 +47,7 @@ export default async function GuestInvitation({ params, searchParams }: Params) 
   /*
    * `skip` is the guest asking to go straight in. `open` is the *envelope's own
    * tap target*, arriving as a plain link because the page's JavaScript was not
-   * there to intercept it — see `OpenEnvelopeLink`. Both land in the same place:
+   * there to intercept it — see `OpenButton`. Both land in the same place:
    * the invitation, with no overlay in front of it. A guest who taps an
    * envelope must never be left looking at one.
    */

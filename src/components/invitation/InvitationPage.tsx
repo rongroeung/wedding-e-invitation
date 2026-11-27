@@ -18,6 +18,7 @@ import { ImagePreload, invitationImages } from "./ImagePreload";
 import { OpeningReadyProvider, useOpeningReady } from "./openingReady";
 import { PreMusic } from "./PreMusic";
 import { LivePaper } from "./LivePaper";
+import { SiteCredit } from "./SiteCredit";
 import { FitGroup } from "@/components/ui/FitLine";
 import { SceneOpening } from "./envelope/SceneOpening";
 import { sceneOf, themeKeyOf, type InvitationThemeKey } from "@/lib/invitationTheme";
@@ -468,6 +469,7 @@ export function InvitationPage({
             {wedding.groomName} &amp; {wedding.brideName} · {wedding.title}
           </p>
         </footer>
+        <SiteCredit />
         </FitGroup>
       </main>
 

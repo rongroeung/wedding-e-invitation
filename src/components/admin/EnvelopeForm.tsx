@@ -92,17 +92,6 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
             onChange={(v) => set("envelopeAnimate", v)}
           />
           <Toggle
-            label={t("បង្ហាញសំបុត្រគ្រប់ពេលចូលមើល")}
-            hint={t("បិទ = បើករួចហើយ មិនបង្ហាញម្ដងទៀតក្នុងការចូលមើលដដែល")}
-            checked={form.envelopeEveryVisit}
-            onChange={(v) => set("envelopeEveryVisit", v)}
-          />
-          <Toggle
-            label={t("បង្ហាញប៊ូតុងរំលង")}
-            checked={form.envelopeSkip}
-            onChange={(v) => set("envelopeSkip", v)}
-          />
-          <Toggle
             label={t("ចាក់ភ្លេងបន្ទាប់ពីបើកសំបុត្រ")}
             hint={t("ភ្លេងមិនចាក់មុនភ្ញៀវចុចឡើយ")}
             checked={form.envelopeMusic}
@@ -274,7 +263,7 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
             </Field>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2">
             <Field label={t("អក្សរលើប៊ូតុងបើក")}>
               <Input
                 value={form.envelopeOpenLabel}
@@ -287,13 +276,6 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
                 value={form.envelopeHint}
                 onChange={(e) => set("envelopeHint", e.target.value)}
                 maxLength={120}
-              />
-            </Field>
-            <Field label={t("អក្សរប៊ូតុងរំលង")}>
-              <Input
-                value={form.envelopeSkipLabel}
-                onChange={(e) => set("envelopeSkipLabel", e.target.value)}
-                maxLength={40}
               />
             </Field>
           </div>

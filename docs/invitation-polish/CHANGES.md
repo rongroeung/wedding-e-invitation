@@ -1226,3 +1226,36 @@ Request: replace the closing thanks/wish (and the admin card "ពរជ័យប
 - **Screenshots:** reviewed for all eight, opening and letter.
 - **Clean-up:** no page errors; settings restored.
 - tsc and `next build` are clean.
+
+## The first page can't be skipped; the film in portrait; renamed នាំសារ, with its credit
+
+**Only the open button opens the invitation:**
+- **Removed:**
+  - the whole-page tap target (`OpenEnvelopeLink`) and the document-level tap listener of the classic envelope;
+  - the skip link (`SkipButton`) on every opening;
+  - the "already opened this visit" shortcut (sessionStorage), so a reload shows the first page again.
+- **Admin:** the now-meaningless settings are removed from the envelope page: show the skip button, show the envelope on every visit, and the skip label.
+- **The open button is now itself a link** (`?envelope=open`, `role="button"`, Space handled as well as Enter). It keeps the old whole-page link's reason for being, which was iPhones whose scripts were still busy not answering taps, but only on the button. With JavaScript running, the full opening plays.
+- **Checked** at 1919×945 and 390×844 on a film theme, and with touch and keyboard on the classic envelope:
+  - no skip link and no full-screen link;
+  - taps elsewhere leave it closed;
+  - the button opens it, and Enter on the focused button opens the envelope;
+  - a reload in the same visit shows the first page again;
+  - no errors.
+
+**Pre-wedding film in portrait, the size of the invitation:**
+- **Size:** `.film-frame` is the opening page's panel on every screen: full height × min(100%, 0.6 × height). That is 567×945 on a 1919×945 window, and the whole screen on a phone.
+- **Fill:** the footage fills it (`object-fit: cover`), so a landscape film is cropped to its middle; the CSS comment says how to go back to `contain`.
+- **Controls:** the sound and skip-film buttons sit over the foot of the film.
+- **Checked:** with a 640×360 test film, measured 567×945 / 390×844, `cover`, playing.
+
+**Renamed រុងរឿងសំបុត្រ → នាំសារ** (`BRAND_NAME`): login, admin sidebar, every admin tab title. Checked: the login title is "ចូលប្រព័ន្ធគ្រប់គ្រង · នាំសារ", and a close-up of the brand shows it whole.
+
+**The maker's credit at the end of every invitation** (`SiteCredit`, after the footer), modelled on the sample:
+- **Content:** the នាំសារ mark and name (Moul), "សំបុត្រអញ្ជើញឌីជីថល", and an invitation to get in touch. The colours follow the letter's ink.
+- **Icons:** generic camera and paper-plane glyphs, not the platforms' logos.
+- **Contact details:** they are the site owner's, set once per deployment: `NEXT_PUBLIC_CREDIT_PHONE`, `NEXT_PUBLIC_CREDIT_TELEGRAM`, `NEXT_PUBLIC_CREDIT_INSTAGRAM` (a username or full link; added to `.env.example`). Each is shown only when set, and being `NEXT_PUBLIC_`, they need a rebuild after setting.
+- **Checked:**
+  - built with obviously fake test values: the phone `tel:` link and both links rendered (screenshot reviewed);
+  - built without them: the name and message only, with no phone and no links.
+- tsc and `next build` are clean; the test film was removed.

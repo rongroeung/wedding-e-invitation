@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Guest, Wedding } from "@/lib/db/schema";
 import type { EnvelopeConfig } from "@/lib/envelope";
 import type { FrameConfig } from "@/lib/frame";
@@ -11,20 +11,9 @@ import { Envelope } from "./Envelope";
 import { EnvelopeAddress } from "./EnvelopeAddress";
 import { EnvelopeHeading } from "./EnvelopeHeading";
 import { OpenButton } from "./OpenButton";
-import { OpenEnvelopeLink } from "./OpenEnvelopeLink";
 import { OpeningTransition } from "./OpeningTransition";
-import { SkipButton } from "./SkipButton";
 import { usePointerTilt, useRichDevice } from "./usePointerTilt";
-
 import { useOpeningReadyState } from "../openingReady";
-/**
- * `useLayoutEffect` on the client, `useEffect` on the server.
- *
- * React warns about `useLayoutEffect` during server rendering, correctly: there
- * is no layout pass to run before. This is the standard way to ask for
- * "before paint, if there is a paint" without the warning.
- */
-const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 /** Steps of the opening, in order. Each one only ever moves forward. */
 type Step = "closed" | "press" | "lift" | "flap" | "card" | "lower" | "fill" | "done";
@@ -176,7 +165,6 @@ export function InvitationOpening({
      only as the picture of the shared invitation link. */
   const timers = useRef<number[]>([]);
   const opened = useRef(false);
-  const checked = useRef(false);
   /*
    * The opening has been asked for. Not the same question as `step !== "closed"`:
    * state is asynchronous, and the whole point of what follows is that several
@@ -218,28 +206,6 @@ export function InvitationOpening({
     onFinishedRef.current();
   }, []);
 
-  /*
-   * Was this envelope already opened during this visit? Asked once, before the
-   * first paint — `useLayoutEffect`, not `useEffect`, because the whole point
-   * is to take the overlay away before the browser has drawn it. On the server
-   * there is no layout pass and no `sessionStorage` either, so it degrades to
-   * `useEffect` there and the check simply happens on the client as before.
-   */
-  useIsomorphicLayoutEffect(() => {
-    if (checked.current) return;
-    checked.current = true;
-    if (envelope.everyVisit) return;
-    let seen = false;
-    try {
-      seen = window.sessionStorage.getItem(envelopeSeenKey(guest?.code ?? "")) === "1";
-    } catch {
-      // Private mode, or storage blocked by the in-app browser: show it.
-    }
-    if (seen) {
-      finish();
-      clear();
-    }
-  }, [envelope.everyVisit, guest?.code, finish]);
 
   /* A beat after the room is up, start the camera moving. */
   useEffect(() => {
@@ -371,106 +337,11 @@ export function InvitationOpening({
   }, []);
 
   /*
-   * A tap anywhere opens the envelope — and it is listened for on the document,
-   * not on the target.
-   *
-   * The report that produced this: *"it always works when I screen record, or
-   * when I swipe the notification panel down and back up."* Those two actions
-   * have nothing in common at the level of this component. They have exactly one
-   * thing in common at the level of the browser — both force WebKit to redo the
-   * page's layout and recomposite it, and with it the **touch-event region map**
-   * iOS keeps to decide which element a finger has landed on. A workaround that
-   * is "record your screen" is the signature of that map being stale: the taps
-   * were arriving all along and being resolved against the wrong element, or
-   * against nothing.
-   *
-   * Which is why this listens on `document`, in the capture phase, for the touch
-   * itself. Whatever the stale map decides the finger hit, it hit *something* in
-   * this document, and the event passes through here on its way down. The
-   * question "which element was under the finger" — the one question that was
-   * being answered wrongly — stops being asked at all. That is a stronger fix
-   * than any target can be, because it does not depend on hit-testing being
-   * right; it only depends on the touch being delivered.
-   *
-   * `.env-anywhere` stays, because it is what makes this a *control*: a real
-   * button with a label, reachable by keyboard and announced by a screen reader.
-   * This is the safety net under it, not a replacement for it.
-   *
-   * Both `touchend` and `click` are taken. A finger fires the first immediately;
-   * the second is synthesised a moment later, and a mouse or a keyboard fires
-   * only the second. `started` above makes answering the same gesture twice
-   * harmless. A touch that travelled or dwelt is not a tap and is ignored, so a
-   * guest brushing the screen does not open their invitation by accident.
+   * The guest opens the invitation with the open button and nothing else: no
+   * tap anywhere on the page, no skip link and no "already seen this visit"
+   * shortcut. The button is itself a link (OpenButton), which is what kept the
+   * whole-page tap working on iPhones whose scripts were still busy.
    */
-  useEffect(() => {
-    if (step !== "closed") return;
-
-    let x = 0;
-    let y = 0;
-    let t0 = 0;
-
-    /* The one control on this overlay that means something else. */
-    const isSkip = (target: EventTarget | null) =>
-      target instanceof Element && !!target.closest(".env-skip");
-
-    const down = (event: TouchEvent) => {
-      const touch = event.changedTouches[0];
-      if (!touch) return;
-      x = touch.clientX;
-      y = touch.clientY;
-      t0 = Date.now();
-    };
-
-    /*
-     * Hold the navigation, because this listener is the reason it would happen.
-     *
-     * The tap target is an `<a href="?envelope=open">` so that it still works
-     * when the page's JavaScript does not, and its own React `onClick` calls
-     * `preventDefault`. But *this* listener runs in the capture phase, at the
-     * document, which is before that handler — and starting the opening
-     * unmounts the link. So the element was gone before its own handler could
-     * run, nothing prevented anything, and the browser did what a browser does
-     * with a link: it navigated. The invitation was answered by a page reload
-     * to `?envelope=open` instead of by the animation, on every desktop, where
-     * hydration is fast enough that this listener always wins.
-     *
-     * Whoever cancels the default has to be whoever handles the event. The link
-     * still navigates for a guest with no JavaScript, which is the entire point
-     * of it, because then there is no listener here to hold it back.
-     */
-    const hold = (event: Event) => {
-      const target = event.target;
-      if (target instanceof Element && target.closest(".env-anywhere")) {
-        event.preventDefault();
-      }
-    };
-
-    const up = (event: TouchEvent) => {
-      const touch = event.changedTouches[0];
-      if (!touch) return;
-      if (Date.now() - t0 > 700) return;
-      if (Math.abs(touch.clientX - x) > 12 || Math.abs(touch.clientY - y) > 12) return;
-      if (isSkip(event.target)) return;
-      hold(event);
-      start();
-    };
-
-    const tap = (event: MouseEvent) => {
-      if (isSkip(event.target)) return;
-      hold(event);
-      start();
-    };
-
-    document.addEventListener("touchstart", down, true);
-    /* Not passive: this one cancels the click the browser would synthesise. */
-    document.addEventListener("touchend", up, { capture: true, passive: false });
-    document.addEventListener("click", tap, true);
-    return () => {
-      document.removeEventListener("touchstart", down, true);
-      document.removeEventListener("touchend", up, true);
-      document.removeEventListener("click", tap, true);
-    };
-  }, [step, start]);
 
   /* A couple of degrees of parallax while the envelope is still closed. */
   const tilt = usePointerTilt(step === "closed");
@@ -557,33 +428,6 @@ export function InvitationOpening({
       <div
         className="env-stage flex h-full w-full items-center justify-center px-4"
       >
-        {/*
-          * The whole screen opens the envelope, and the target does not move.
-          *
-          * The tap used to be on the envelope drawing itself — which spends the
-          * first 6.2 seconds after load running a `transform` transition, the
-          * slow camera push. Hit-testing an element mid-transform is where
-          * WebKit and the compositor disagree: the tap resolves against where
-          * the element *was*, not where it is drawn, so it lands on nothing.
-          * Wait for the push to finish and the same tap works, which is exactly
-          * the "stuck, often" it was reported as.
-          *
-          * It never showed on a desktop, and that is the tell rather than a
-          * coincidence: a mouse moving over the page gives `usePointerTilt` a
-          * value, which swaps the camera to the 380ms parallax transition and
-          * cancels the six-second one within moments of the page loading. A
-          * finger produces no such event, so on a phone the long transition
-          * runs its full course — through precisely the window in which anybody
-          * would tap.
-          *
-          * This target is a sibling of the drawing, `inset: 0` on the stage, and
-          * carries no transform of its own, so there is nothing to disagree
-          * about. It is also simply better: a guest should not have to hit the
-          * paper to open an envelope that fills the screen.
-          */}
-        {closed && (
-          <OpenEnvelopeLink label={wedding.envelopeOpenLabel} onOpen={start} />
-        )}
 
         {/* The column is a layout box and nothing else, so it lets taps
             through to the target behind it; only the controls inside it take
@@ -680,9 +524,6 @@ export function InvitationOpening({
         aria-hidden="true"
       />
 
-      {envelope.skip && (
-        <SkipButton label={wedding.envelopeSkipLabel} onSkip={jump} hidden={!closed} />
-      )}
     </OpeningTransition>
   );
 }

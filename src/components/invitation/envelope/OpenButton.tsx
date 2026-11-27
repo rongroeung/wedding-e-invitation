@@ -7,7 +7,14 @@ import { useOpeningReadyState } from "../openingReady";
  *
  * Deliberately large and deliberately alone: many of these guests are elderly
  * and will open the invitation on a phone, in Telegram, one-handed. No drag,
- * no gesture, no second step.
+ * no gesture, no second step — and it is the only way in: no tap elsewhere on
+ * the page, no skip link.
+ *
+ * It is a link (`?envelope=open`), not a `<button>`: a link is the one thing a
+ * phone follows without asking the page's JavaScript, which is what the old
+ * whole-page tap target was for (iPhones whose scripts were still busy did not
+ * answer taps). With JavaScript running the click is taken here and the full
+ * opening plays; without it, the server answers with the invitation itself.
  */
 export function OpenButton({
   label,
@@ -30,13 +37,24 @@ export function OpenButton({
         hidden ? "pointer-events-none translate-y-2 opacity-0" : "opacity-100"
       }`}
     >
-      <button
-        type="button"
-        onClick={onOpen}
+      <a
+        href="?envelope=open"
+        role="button"
+        onClick={(event) => {
+          event.preventDefault();
+          onOpen();
+        }}
+        onKeyDown={(event) => {
+          // a link answers Enter by itself; a button also answers Space
+          if (event.key === " ") {
+            event.preventDefault();
+            onOpen();
+          }
+        }}
         data-open-control=""
         aria-disabled={!ready}
         aria-busy={!ready}
-        className={`btn-seal min-h-[52px] min-w-[220px] khmer-wrap ${ready ? "env-open-pulse" : "env-open-loading"}`}
+        className={`btn-seal inline-flex min-h-[52px] min-w-[220px] items-center justify-center khmer-wrap ${ready ? "env-open-pulse" : "env-open-loading"}`}
       >
         {ready ? (
           label
@@ -50,7 +68,7 @@ export function OpenButton({
             </span>
           </span>
         )}
-      </button>
+      </a>
       {hint && (
         /*
          * Light on dark, not the page's ink. The hint used to inherit the
