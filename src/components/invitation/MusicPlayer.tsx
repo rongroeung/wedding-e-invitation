@@ -61,12 +61,59 @@ function element(src: string): HTMLAudioElement | null {
 
 function start() {
   const a = audio;
-  if (!a || userPaused) return;
+  if (!a || userPaused || holds.size > 0) return;
   a.muted = false;
   if (!a.paused) return;
+  fadeTo(a, 1, 600);
   a.play().catch(() => {
     /* refused (no gesture yet): the next tap on the page starts it */
   });
+}
+
+/*
+ * One sound at a time.
+ *
+ * Something else on the page with its own sound (the pre-wedding film with
+ * its sound on) *holds* the music: it fades out and pauses, and comes back
+ * on its own when the last hold is let go, unless the guest switched it off
+ * meanwhile. If the guest taps the music button during a hold, they have
+ * chosen the music: each holder is asked to give way (the film mutes itself,
+ * which lets its hold go).
+ */
+const holds = new Map<symbol, () => void>();
+let fadeRaf = 0;
+
+function fadeTo(a: HTMLAudioElement, to: number, ms: number, then?: () => void) {
+  cancelAnimationFrame(fadeRaf);
+  const from = to === 1 && a.paused ? 0 : a.volume;
+  const t0 = performance.now();
+  a.volume = from;
+  const step = (now: number) => {
+    const k = Math.min(1, Math.max(0, (now - t0) / ms));
+    a.volume = Math.min(1, Math.max(0, from + (to - from) * k));
+    if (k < 1) fadeRaf = requestAnimationFrame(step);
+    else then?.();
+  };
+  fadeRaf = requestAnimationFrame(step);
+}
+
+/** Quiets the background music until the returned function is called. */
+export function holdMusic(giveWay: () => void): () => void {
+  const key = Symbol("hold");
+  holds.set(key, giveWay);
+  const a = audio;
+  if (a && !a.paused) {
+    fadeTo(a, 0, 400, () => {
+      if (holds.size > 0) {
+        a.pause();
+        a.volume = 1;
+      } else fadeTo(a, 1, 400); // let go mid-fade: come straight back
+    });
+  }
+  return () => {
+    if (!holds.delete(key) || holds.size > 0) return;
+    if (wanted && !userPaused) start();
+  };
 }
 
 /** Inside a gesture: make the element playable later, or start it now if it is wanted. */
@@ -76,7 +123,10 @@ function onGesture(e: Event) {
   // a tap on a music button is that button's business (toggle), not a cue
   const t = e.target as Element | null;
   if (t && typeof t.closest === "function" && t.closest("[data-music-toggle]")) return;
-  if (wanted && !userPaused && a.paused) {
+  // a tap on the film (or its sound button) is about the film, never a cue
+  // for the music: the music waits until the film is over
+  if (t && typeof t.closest === "function" && t.closest("[data-music-quiet]")) return;
+  if (wanted && !userPaused && a.paused && holds.size === 0) {
     start();
     return;
   }
@@ -120,6 +170,10 @@ function toggle() {
   if (!a) return;
   if (a.paused) {
     userPaused = false;
+    // the guest chose the music: whatever was holding it gives way
+    [...holds.values()].forEach((giveWay) => giveWay());
+    cancelAnimationFrame(fadeRaf);
+    a.volume = 1;
     a.muted = false;
     a.play().catch(() => emit({ playing: false }));
   } else {

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { VideoSource } from "@/lib/video";
+import { holdMusic } from "./MusicPlayer";
 
 /**
  * The pre-wedding film, played once between the envelope and the curtains.
@@ -85,11 +86,33 @@ export function PreWeddingVideo({
    */
   const embed = source.kind === "embed";
 
+  /*
+   * One sound at a time: while the film is heard, the background music waits
+   * (it fades out, and back in when the film's sound is off or the film is
+   * over). An embed's sound cannot be seen from here, so it holds the music
+   * for as long as it is on screen. A tap on the music button meanwhile means
+   * the guest chose the music: the film mutes.
+   */
+  const heard = !gone && (embed || !muted);
+  /* finished: silent at once, not through its fade-out over the music */
+  useEffect(() => {
+    if (gone) video.current?.pause();
+  }, [gone]);
+  useEffect(() => {
+    if (!heard) return;
+    return holdMusic(() => {
+      const el = video.current;
+      if (el) el.muted = true;
+      setMuted(true);
+    });
+  }, [heard]);
+
   return (
     <div
       className={`film ${gone ? "film-gone" : ""}`}
       data-frame={frame === "original" ? "original" : "portrait"}
       aria-label="Pre-wedding film"
+      data-music-quiet=""
       role="dialog"
       aria-modal="true"
     >

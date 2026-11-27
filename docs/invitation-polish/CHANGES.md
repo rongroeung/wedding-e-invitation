@@ -1289,3 +1289,23 @@ Request: replace the closing thanks/wish (and the admin card "ពរជ័យប
   - screenshots reviewed;
   - the test values, workspace and film were removed;
   - tsc and `next build` are clean.
+
+## Film sound and background music: one at a time
+
+- **The problem:** the background music starts when the envelope finishes, which is when the film starts. Nothing linked the two, so with the film's sound on, both played together. And every tap on the page, including a tap on the film or its sound button, was taken as the cue to (re)start the music.
+- **The fix, in `MusicPlayer.tsx`:**
+  - New `holdMusic(giveWay)`. While something holds the music, it fades out (0.4 s) and pauses. When the last hold is let go, it fades back in (0.6 s), unless the guest switched it off.
+  - A tap on the music button during a hold asks the holder to give way.
+  - Taps inside `[data-music-quiet]` are never a cue for the music.
+- **The fix, in `PreWeddingVideo.tsx`:**
+  - The film holds the music while its sound is on. An embed (YouTube/Vimeo) holds it for as long as it's on screen, since its sound can't be seen from the page.
+  - The film is marked `data-music-quiet`.
+  - When it's done (ended or skipped), it pauses at once instead of playing through its fade-out over the returning music.
+- **Checked** in Chromium with the autoplay policy set to user-gesture-required, at 390 and 1440 px, with a 20 s test film with sound and a test music track:
+  - film muted: the music plays, and a tap on the film changes nothing;
+  - film sound on: the music pauses, and tapping the film keeps it paused;
+  - film sound off: the music returns; on again, it pauses again;
+  - skip: the film is silent at once and the music fades back in;
+  - played to the end with sound: same as skip;
+  - no console errors;
+  - tsc and `next build` are clean; test media and settings were removed.
