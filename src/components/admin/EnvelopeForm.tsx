@@ -46,6 +46,7 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
     videoMediaId: wedding.videoMediaId,
     videoPosterId: wedding.videoPosterId,
     videoSkipLabel: wedding.videoSkipLabel,
+    videoFrame: wedding.videoFrame,
 
     frameEmboss: wedding.frameEmboss,
     frameDepth: wedding.frameDepth,
@@ -313,6 +314,16 @@ export function EnvelopeForm({ wedding }: { wedding: Wedding }) {
                 onUploaded={(id) => set("videoMediaId", id)}
                 onClear={() => set("videoMediaId", null)}
               />
+
+              <Field
+                label={t("ទំហំវីដេអូ")}
+                hint={t("បញ្ឈរ = ពេញកម្ពស់ ទំហំដូចសំបុត្រ (វីដេអូផ្ដេកត្រូវកាត់ផ្នែកសងខាង) · ទំហំដើម = រូបរាងដើមរបស់វីដេអូ មិនកាត់ចេញ")}
+              >
+                <Select value={form.videoFrame} onChange={(e) => set("videoFrame", e.target.value)}>
+                  <option value="portrait">{t("បញ្ឈរ · ទំហំដូចសំបុត្រ")}</option>
+                  <option value="original">{t("ទំហំដើមរបស់វីដេអូ")}</option>
+                </Select>
+              </Field>
 
               <MediaUpload
                 label={t("រូបភាពគម្រប (បង្ហាញពេលកំពុងផ្ទុក)")}

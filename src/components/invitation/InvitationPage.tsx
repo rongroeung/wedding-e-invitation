@@ -18,7 +18,7 @@ import { ImagePreload, invitationImages } from "./ImagePreload";
 import { OpeningReadyProvider, useOpeningReady } from "./openingReady";
 import { PreMusic } from "./PreMusic";
 import { LivePaper } from "./LivePaper";
-import { SiteCredit } from "./SiteCredit";
+import { SystemOwner } from "./SystemOwner";
 import { FitGroup } from "@/components/ui/FitLine";
 import { SceneOpening } from "./envelope/SceneOpening";
 import { sceneOf, themeKeyOf, type InvitationThemeKey } from "@/lib/invitationTheme";
@@ -469,7 +469,7 @@ export function InvitationPage({
             {wedding.groomName} &amp; {wedding.brideName} · {wedding.title}
           </p>
         </footer>
-        <SiteCredit />
+        {data.owner && <SystemOwner owner={data.owner} />}
         </FitGroup>
       </main>
 
@@ -538,6 +538,7 @@ export function InvitationPage({
         <PreWeddingVideo
           source={filmSource ?? film}
           skipLabel={wedding.videoSkipLabel}
+          frame={wedding.videoFrame}
           gone={filmDone}
           onDone={() => setFilmDone(true)}
         />

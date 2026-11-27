@@ -8,9 +8,11 @@ import {
   pageViews,
   rsvps,
   storyItems,
+  systemOwner,
   wedding,
   weddingEvents,
   type GalleryImage,
+  type SystemOwner,
   type Guest,
   type StoryItem,
   type Wedding,
@@ -22,7 +24,18 @@ export type InvitationData = {
   events: WeddingEvent[];
   story: StoryItem[];
   gallery: GalleryImage[];
+  /** the system owner's credit, the same on every invitation (null: hidden) */
+  owner: SystemOwner | null;
 };
+
+/** The system owner's details (one row for the whole site). */
+export async function getSystemOwner(): Promise<SystemOwner> {
+  const db = await getDb();
+  const [row] = await db.select().from(systemOwner).where(eq(systemOwner.id, "site")).limit(1);
+  if (row) return row;
+  const [made] = await db.insert(systemOwner).values({ id: "site" }).onConflictDoNothing().returning();
+  return made ?? (await db.select().from(systemOwner).where(eq(systemOwner.id, "site")).limit(1))[0];
+}
 
 /**
  * A workspace's wedding row. The default workspace ("main", served at "/") is
@@ -52,14 +65,15 @@ export async function getWeddingBySlug(slug: string): Promise<Wedding | null> {
 
 export async function getInvitationData(weddingId = "main"): Promise<InvitationData> {
   const db = await getDb();
-  const [weddingRow, events, story, gallery] = await Promise.all([
+  const [weddingRow, events, story, gallery, owner] = await Promise.all([
     getWedding(weddingId),
     db.select().from(weddingEvents).where(eq(weddingEvents.weddingId, weddingId)).orderBy(asc(weddingEvents.sortOrder)),
     db.select().from(storyItems).where(eq(storyItems.weddingId, weddingId)).orderBy(asc(storyItems.sortOrder)),
     db.select().from(galleryImages).where(eq(galleryImages.weddingId, weddingId)).orderBy(asc(galleryImages.sortOrder)),
+    getSystemOwner().catch(() => null),
   ]);
   // the theme's own choices on top of the couple's saved settings
-  return { wedding: applyInvitationTheme(weddingRow), events, story, gallery };
+  return { wedding: applyInvitationTheme(weddingRow), events, story, gallery, owner: owner?.enabled ? owner : null };
 }
 
 /** A guest by their invitation code. Codes are unique across every workspace,

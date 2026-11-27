@@ -34,9 +34,12 @@ export function PreWeddingVideo({
   skipLabel,
   gone,
   onDone,
+  frame = "portrait",
 }: {
   source: VideoSource;
   skipLabel: string;
+  /** "portrait": the size of the invitation, filled · "original": the film's own shape */
+  frame?: string;
   /** Finished: fade out, and be unmounted a moment later. */
   gone: boolean;
   /** Called once, when the film has finished or the guest has said carry on. */
@@ -85,6 +88,7 @@ export function PreWeddingVideo({
   return (
     <div
       className={`film ${gone ? "film-gone" : ""}`}
+      data-frame={frame === "original" ? "original" : "portrait"}
       aria-label="Pre-wedding film"
       role="dialog"
       aria-modal="true"

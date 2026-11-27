@@ -46,7 +46,14 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       </AdminPrefsProvider>
     );
   const session = ctx.session;
-  const nav = ctx.isOwner ? [...NAV, { href: "/admin/workspaces", label: "កន្លែងធ្វើការទាំងអស់", icon: "🗂️" }] : NAV;
+  const nav = ctx.isOwner
+    ? [
+        ...NAV,
+        { href: "/admin/workspaces", label: "កន្លែងធ្វើការទាំងអស់", icon: "🗂️" },
+        // the system owner's details belong to the whole site: set from the main workspace
+        ...(ctx.weddingId === "main" ? [{ href: "/admin/owner", label: "ម្ចាស់ប្រព័ន្ធ", icon: "🏷️" }] : []),
+      ]
+    : NAV;
 
   return (
     <AdminPrefsProvider {...prefs} className="min-h-screen bg-slate-50 text-slate-900">

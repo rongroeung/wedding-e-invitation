@@ -184,6 +184,7 @@ const schema = z.object({
   videoMediaId: z.string().max(64).nullable().optional(),
   videoPosterId: z.string().max(64).nullable().optional(),
   videoSkipLabel: z.string().max(40).optional(),
+  videoFrame: z.enum(["portrait", "original"]).optional(),
 
   /*
    * The couple's own artwork.

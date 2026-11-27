@@ -307,6 +307,8 @@ export const wedding = pgTable("wedding", {
       between the envelope and the curtains undoes both of them. */
   videoPosterId: text("video_poster_id"),
   videoSkipLabel: text("video_skip_label").notNull().default("រំលងវីដេអូ"),
+  /** The film's frame: "portrait" (the size of the invitation) or "original" (its own shape). */
+  videoFrame: text("video_frame").notNull().default("portrait"),
 
   /*
    * The couple's own artwork, on the four surfaces the app otherwise draws
@@ -484,3 +486,30 @@ export type Guest = typeof guests.$inferSelect;
 export type Rsvp = typeof rsvps.$inferSelect;
 
 export const nowSql = sql`now()`;
+
+/* ── The system owner: one row for the whole site ───────────────────────── */
+/** A further link of the owner's, e.g. { label: "LINE", url: "https://…" }. */
+export type OwnerLink = { label: string; url: string };
+
+/**
+ * Who made the system, shown at the end of every invitation (SystemOwner):
+ * their message and how to reach them. Edited by the site owner from the main
+ * workspace (/admin/owner). A field left empty is not shown.
+ */
+export const systemOwner = pgTable("system_owner", {
+  id: text("id").primaryKey().default("site"),
+  enabled: boolean("enabled").notNull().default(true),
+  message: text("message")
+    .notNull()
+    .default("តើលោកអ្នកចាប់អារម្មណ៍នឹងប្រើប្រាស់សេវាកម្មសំបុត្រអញ្ជើញឌីជីថលរបស់ពួកយើង សម្រាប់កម្មវិធីរបស់លោកអ្នកដែរឬទេ? ទាក់ទងមកកាន់ពួកយើងតាមរយៈ"),
+  phone: text("phone").notNull().default(""),
+  telegram: text("telegram").notNull().default(""),
+  instagram: text("instagram").notNull().default(""),
+  facebook: text("facebook").notNull().default(""),
+  tiktok: text("tiktok").notNull().default(""),
+  youtube: text("youtube").notNull().default(""),
+  website: text("website").notNull().default(""),
+  links: jsonb("links").$type<OwnerLink[]>().notNull().default([]),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+export type SystemOwner = typeof systemOwner.$inferSelect;

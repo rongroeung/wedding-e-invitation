@@ -1259,3 +1259,33 @@ Request: replace the closing thanks/wish (and the admin card "ពរជ័យប
   - built with obviously fake test values: the phone `tel:` link and both links rendered (screenshot reviewed);
   - built without them: the name and message only, with no phone and no links.
 - tsc and `next build` are clean; the test film was removed.
+
+## Choice of film frame; "system owner" with its details in the admin
+
+**Pre-wedding film size, the couple's choice** (admin → សំបុត្រ & ស៊ុម ៣មិតិ → វីដេអូ → **ទំហំវីដេអូ**):
+- **បញ្ឈរ · the size of the invitation** (default, as last time): a full-height portrait panel, the footage filling it.
+- **ទំហំដើម · original size:** the film in its own shape, nothing cut off. A 16/9 gilt frame up to 1180 px wide, letterboxed (`contain`), with the buttons under it. On a phone held upright it takes the screen, still letterboxed.
+- **Storage:** column `video_frame` (migration `0056`), `data-frame` on `.film`.
+- **Checked** with a 640×360 film:
+  - original: 1180×664 `contain` with the controls below at 1919×945, and 390×844 `contain` on a phone;
+  - portrait: 567×945 / 390×844 `cover`;
+  - screenshots reviewed.
+
+**The credit is now the system owner, set in the admin:**
+- **Storage:** a new one-row table `system_owner` (migration `0056`), the same on every invitation. Fields: on/off, message, phone, Telegram, Instagram, Facebook, TikTok, YouTube, website, and up to 8 further links (name + https:// link, e.g. LINE, WhatsApp). The `NEXT_PUBLIC_CREDIT_*` environment variables from last time are gone.
+- **Admin → ម្ចាស់ប្រព័ន្ធ:**
+  - shown only to the site owner, and only in the main workspace (`/admin/owner`);
+  - a live preview of exactly what guests see;
+  - the API (`/api/admin/owner`) enforces both rules (403 elsewhere) and accepts only http(s) links.
+- **Invitation (`SystemOwner`, replaces `SiteCredit`):**
+  - a username becomes the platform's link (t.me/…, instagram.com/…, tiktok.com/@…, youtube.com/@…), and a full link stays as it is;
+  - plain generic icons;
+  - empty fields are not shown, and switching it off hides the block on every invitation.
+- **Checked:**
+  - saved test values from the main workspace (200), and a `javascript:` link was refused (422);
+  - from a second, temporary workspace: API 403, the page explains it is main-only, and there is no menu entry;
+  - the invitation's links were all correct (phone `tel:`, Telegram, Instagram, Facebook, TikTok @, YouTube, website https://, LINE);
+  - switched off, the block is gone;
+  - screenshots reviewed;
+  - the test values, workspace and film were removed;
+  - tsc and `next build` are clean.
